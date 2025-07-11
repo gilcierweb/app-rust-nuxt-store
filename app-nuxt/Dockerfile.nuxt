@@ -1,0 +1,58 @@
+###### Builder ######
+FROM node:24-alpine AS builder
+
+LABEL maintainer="gilcierweb@gmail.com"
+
+RUN apk --no-cache add openssh git bash build-base busybox ca-certificates curl
+
+WORKDIR /app
+
+COPY ./package.json /app
+# COPY ./package-lock.json /app/
+# COPY ./yarn.lock /app
+COPY ./pnpm-lock.yaml /app
+
+COPY . /app
+
+# With NPM
+# RUN npm install -g npm@latest
+# RUN npm cache clean --force
+# RUN npm install --legacy-peer-deps && npm cache clean --force
+# RUN npm run build
+
+# With Yarn
+# RUN yarn --version
+# RUN yarn cache clean
+# RUN yarn install
+# RUN yarn build --verbose
+
+# With corepack and PNPM
+RUN corepack enable
+RUN corepack prepare pnpm@latest --activate
+RUN pnpm --version
+RUN pnpm install --frozen-lockfile --prod=false
+
+RUN pnpm build --verbose --loglevel debug
+
+RUN ls -laH && pwd
+
+###### Release Production ######
+FROM node:24-alpine AS release
+RUN apk --no-cache add openssh git bash build-base busybox ca-certificates curl util-linux
+
+WORKDIR /app
+
+COPY --from=builder /app/.output /app/.output
+
+RUN chmod -R 755 /app/.output
+
+RUN ls -laH /app/.output/server
+
+ENV NODE_ENV production
+
+ENV HOST 0.0.0.0
+ENV PORT 3000
+EXPOSE 3000
+
+ENTRYPOINT ["node", ".output/server/index.mjs"]
+# CMD ["tail", "-f", "/dev/null"]
