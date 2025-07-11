@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import "flyonui/flyonui";
 import "flyonui/dist/accordion";
 import "flyonui/dist/dropdown";
+import "flyonui/dist/carousel";
 
 // import "flyonui/dist/modal";
 // import "flyonui/dist/tooltip";
@@ -19,6 +20,9 @@ export default defineNuxtPlugin(() => {
         }
         if (window.HSDropdown) {
             window.HSDropdown.autoInit();
+        } 
+        if (window.HSCarousel) {
+            window.HSCarousel.autoInit();      
         }
     }, 100);
    

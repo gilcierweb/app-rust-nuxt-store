@@ -1,5 +1,8 @@
 <template>
   <div>
+    
+    <AppBanner />
+    
     <h1>Welcome to the homepage</h1>
 
     <button class="btn">Default</button>
