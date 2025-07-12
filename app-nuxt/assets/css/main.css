@@ -5,6 +5,7 @@
 
 @plugin "@iconify/tailwind4";
 
+
 /* Import Third-party override css */
 /* @import "flyonui/src/vendor/flatpickr.css"; */
 /* @import "flyonui/src/vendor/notyf.css"; */
@@ -14,3 +15,27 @@
 /* @import "flyonui/src/vendor/raty.css"; */
 /* @import "flyonui/src/vendor/waves.css"; */
 /* @import "flyonui/src/vendor/apexcharts.css"; */        
+
+ /*Custom classes tailwindcss*/
+
+.h1 {
+    @apply text-base-content text-4xl;
+}
+.h2 {
+    @apply text-base-content text-3xl;
+}
+.h3 {
+    @apply text-base-content text-2xl;
+}
+.h4 {
+    @apply text-base-content text-xl;
+}
+.h5 {
+    @apply text-base-content text-lg;
+}
+.h6 {
+    @apply text-base-content text-base;
+}
+.form-label{
+    @apply text-gray-800 text-sm mb-2 block;
+}

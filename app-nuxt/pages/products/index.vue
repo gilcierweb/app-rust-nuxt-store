@@ -22,7 +22,7 @@
             <p class="mb-4">
               {{ $truncate(product.description, 70, '...') }}
             </p>
-            <p> {{ product.category }}</p>
+            <p> <span class="badge badge-secondary">{{ product.category }}</span></p>
             <div class="card-actions">
               <button class="btn btn-primary">Buy Now</button>
               <NuxtLink :to="`/products/${product.id}`">
@@ -32,10 +32,9 @@
           </div>
         </div>
 
-          <div v-if="products.length === 0">No products available.</div>
       </div>
 
-    
+      <div v-if="products.length === 0">No products available.</div>
 
     </div>
   </div>
