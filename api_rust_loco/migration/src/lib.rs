@@ -6,6 +6,7 @@ mod m20220101_000001_users;
 
 
 mod m20250713_001217_posts;
+mod m20250713_052254_profiles;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -16,6 +17,7 @@ impl MigratorTrait for Migrator {
          
         
             Box::new(m20250713_001217_posts::Migration),
+            Box::new(m20250713_052254_profiles::Migration),
             // inject-above (do not remove this comment)
         ]
     }

@@ -41,7 +41,6 @@
 const route = useRoute();
 // const config = useRuntimeConfig(); 
 
-
 const id = route.params.id;
 console.log(route.params.id);
 

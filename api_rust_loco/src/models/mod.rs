@@ -3,3 +3,4 @@ pub mod users;
 
 pub mod posts;
 pub mod post_status;
+pub mod profiles;

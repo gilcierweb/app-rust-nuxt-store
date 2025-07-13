@@ -13,6 +13,7 @@
                     <li><NuxtLink to="/stores">Stores</NuxtLink></li>
                     <li><NuxtLink to="/about">About</NuxtLink></li>
                     <li><NuxtLink to="/posts">Posts</NuxtLink></li>                                  
+                    <li><NuxtLink to="/profiles">Profiles</NuxtLink></li>                                  
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
@@ -30,6 +31,7 @@
                         <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>
                         <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>
                         <li><NuxtLink to="/posts" class="dropdown-item">Posts</NuxtLink></li>                 
+                        <li><NuxtLink to="/profiles" class="dropdown-item">Profiles</NuxtLink></li>                 
                     </ul>
                 </div>
                 <a class="btn max-md:btn-square btn-primary" href="#">
