@@ -1,6 +1,5 @@
 <template>
     <div class="my-6">
-        <h1 class="h1 my-4">Categories</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
                 <div class="card-body flex items-center gap-2">

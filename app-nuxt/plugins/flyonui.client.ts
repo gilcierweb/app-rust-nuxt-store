@@ -15,13 +15,16 @@ export default defineNuxtPlugin(() => {
   const router = useRouter();
   router.afterEach(async () => {
     setTimeout(() => {
+       if (window.HSStaticMethods) {
+         window.HSStaticMethods.autoInit();
+       }     
         if (window.HSAccordion) {
             window.HSAccordion.autoInit();
         }
         if (window.HSDropdown) {
             window.HSDropdown.autoInit();
         } 
-        if (window.HSCarousel) {
+        if (window.HSCarousel) {     
             window.HSCarousel.autoInit();      
         }
     }, 100);

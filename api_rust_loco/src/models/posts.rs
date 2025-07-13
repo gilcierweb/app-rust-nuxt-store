@@ -1,6 +1,7 @@
 use sea_orm::entity::prelude::*;
 pub use super::_entities::posts::{ActiveModel, Model, Entity};
 pub type Posts = Entity;
+use super::post_status::PostStatus;
 
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {
@@ -19,7 +20,15 @@ impl ActiveModelBehavior for ActiveModel {
 }
 
 // implement your read-oriented logic here
-impl Model {}
+impl Model {
+    pub fn status_enum(&self) -> Option<PostStatus> {
+        self.status.and_then(|v| PostStatus::try_from(v).ok())
+    }
+
+    pub fn set_status_enum(&mut self, status: Option<PostStatus>) {
+        self.status = status.map(|s| s.into());
+    }
+}
 
 // implement your write-oriented logic here
 impl ActiveModel {}

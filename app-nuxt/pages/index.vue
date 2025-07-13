@@ -3,6 +3,7 @@
 
     <AppBanner />
 
+    <h1 class="h1 my-4">Categories</h1>
     <CategoriesList />
 
     <h1 class="h1 my-4">Products</h1>
@@ -15,6 +16,4 @@
 </template>
 
 <script setup lang="ts">
-import ProductList from '~/components/ProductList.vue';
-
 </script>

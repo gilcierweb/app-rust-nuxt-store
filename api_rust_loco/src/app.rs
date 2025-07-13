@@ -10,6 +10,9 @@ use loco_rs::{
     task::Tasks,
     Result,
 };
+
+use crate::seeds::posts as posts_seeder;
+
 use migration::Migrator;
 use std::path::Path;
 
@@ -63,9 +66,13 @@ impl Hooks for App {
         truncate_table(&ctx.db, users::Entity).await?;
         Ok(())
     }
-    async fn seed(ctx: &AppContext, base: &Path) -> Result<()> {
+    async fn seed(ctx: &AppContext, base: &Path) -> Result<()> {  
         db::seed::<users::ActiveModel>(&ctx.db, &base.join("users.yaml").display().to_string())
             .await?;
+
+        // Dynamic seed by code (with fakeit)
+        posts_seeder::seed(&ctx.db).await?;
+
         Ok(())
     }
 }

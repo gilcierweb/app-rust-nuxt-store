@@ -1,23 +1,33 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use axum::debug_handler;
 
-use crate::models::_entities::posts::{ActiveModel, Entity, Model};
+use crate::models::{
+    _entities::posts::{ActiveModel, Entity, Model},
+    post_status::PostStatus,
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
     pub title: Option<String>,
     pub content: Option<String>,
-    }
+    pub status: Option<PostStatus>,
+    pub user_id: Option<i32>,
+}
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-      item.title = Set(self.title.clone());
-      item.content = Set(self.content.clone());
-      }
+        item.title = Set(self.title.clone());
+        item.content = Set(self.content.clone());
+        item.status = Set(self.status.map(|s| s.into()));
+
+        if let Some(user_id) = self.user_id {
+            item.user_id = Set(user_id);
+        }
+    }
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {

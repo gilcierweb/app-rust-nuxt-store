@@ -14,8 +14,10 @@ impl MigrationTrait for Migration {
             
             ("title", ColType::StringNull),
             ("content", ColType::TextNull),
+            ("status", ColType::IntegerNull),
             ],
             &[
+            ("user", ""),
             ]
         ).await
     }

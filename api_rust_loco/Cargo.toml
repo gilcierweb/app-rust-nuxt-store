@@ -35,6 +35,7 @@ chrono = { version = "0.4" }
 validator = { version = "0.20" }
 uuid = { version = "1.6.0", features = ["v4"] }
 include_dir = { version = "0.7" }
+fakeit = "1.3.0"
 
 [[bin]]
 name = "api_rust_loco-cli"
@@ -46,3 +47,4 @@ loco-rs = { workspace = true, features = ["testing"] }
 serial_test = { version = "3.1.1" }
 rstest = { version = "0.21.0" }
 insta = { version = "1.34.0", features = ["redactions", "yaml", "filters"] }
+
