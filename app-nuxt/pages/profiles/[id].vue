@@ -7,8 +7,8 @@
         <div v-else class="w-full">
             <img height="400px" :src="profile?.avatar" />
             <h2>{{ profile?.first_name }}</h2>
-            <h2>{{ profile?.first_name }}</h2>
             <h2>{{ profile?.last_name }}</h2>
+            <h2>{{ profile?.full_name }}</h2>
             <p>{{ profile?.username }}</p>
             <p>{{ profile?.nickname }}</p>
             <p>{{ profile?.birth_date }}</p>
