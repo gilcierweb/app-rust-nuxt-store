@@ -8,7 +8,7 @@ use crate::models::_entities::profiles::{ActiveModel as Profile, Entity as Profi
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let count = Profiles::find().count(db).await?;
     if count > 0 {
-        tracing::info!("Profiles já existem, ignorando.");
+        tracing::info!("Profiles already exist, ignoring.");
         return Ok(());
     }
 
@@ -49,6 +49,6 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
         profile.insert(db).await?;
     }
 
-    tracing::info!("10 perfis gerados com fakeit ✅");
+    tracing::info!("10 profiles generated with fakeit");
     Ok(())
 }
