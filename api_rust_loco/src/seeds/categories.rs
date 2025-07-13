@@ -1,5 +1,5 @@
-use chrono::{ Utc};
-use fakeit::{company, unique, words};
+use chrono::Utc;
+use fakeit::{bool_rand, company, unique, words};
 use loco_rs::Result;
 use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -13,14 +13,13 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
         return Ok(());
     }
 
-    let now = Utc::now();
-    let date_current = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap();
+    let now = Utc::now();  
 
     let mut root_ids = Vec::new();
     for i in 0..5 {
         let name_val = company::company();
         let slug_val = unique::uuid_v4();
-        let active = date_current.subsec_nanos() % 2 == 0;     
+        let active = bool_rand::bool();
         let paragraph = words::paragraph(5, 4, 11, "\n".to_string());
 
         let category = ActiveModel {
@@ -42,7 +41,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     for i in 0..15 {
         let name_val = company::company();
         let slug_val = unique::uuid_v4();
-                let active = date_current.subsec_nanos() % 2 == 0;     
+        let active = bool_rand::bool();
 
         let paragraph = words::paragraph(5, 4, 11, "\n".to_string());
         let index = {
