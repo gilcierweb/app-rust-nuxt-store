@@ -20,18 +20,13 @@
 </template>
 
 <script setup lang="ts">
+import type { Post } from '~/types';
+
 const route = useRoute()
 const config = useRuntimeConfig();
 // When accessing /posts/1, route.params.id will be 1
 console.log(route.params.id)
 const id = route.params.id;
-
-interface Post {
-    id: number;
-    title: string;
-    content: string;
-    status: boolean;
-}
 
 const { status, data: post } = await useLazyFetch<Post>(`${config.public.baseURL}/api/posts/${id}`);
 </script>

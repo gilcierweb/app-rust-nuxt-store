@@ -10,9 +10,8 @@
           <span class="loading loading-spinner text-info size-40"></span>
         </div>
       </div>
-
-      <div v-else v-for="product in products" :key="product.id">
-        <div class="card sm:max-w-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+     
+       <div v-else v-for="product in products" :key="product.id" class="card bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <figure>
             <img :src="product?.thumbnail" alt="image" />
           </figure>
@@ -25,15 +24,13 @@
             <p> <span class="badge badge-secondary">{{ product.category }}</span></p>
             <div class="card-actions">
               <button class="btn btn-primary">Buy Now</button>
-              <NuxtLink :to="`/products/${product.id}`">
-                <button class="btn btn-secondary btn-soft btn-block">Details</button>
+              <NuxtLink :to="`/products/${product.id}`" class="btn btn-secondary btn-soft">
+                Details
               </NuxtLink>
             </div>
           </div>
         </div>
-
-      </div>
-
+     
       <div v-if="products.length === 0">No products available.</div>
 
     </div>

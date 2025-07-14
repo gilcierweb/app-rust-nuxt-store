@@ -43,3 +43,29 @@ export interface Category {
   updated_at: string;
   children?: Category[];
 }
+
+
+export interface Post {
+    id: number;
+    title: string;
+    content: string;
+    status: boolean;
+}
+
+export interface Profile {
+    id: number;
+    first_name: string,
+    last_name: string,
+    full_name: string,
+    username: string,
+    nickname: string,
+    phone:number,
+    birth_date: Date,
+    avatar: string,
+    bio: string,
+    whatsapp: number,
+    user_id: number,
+    title: string;
+    content: string;
+    status: boolean;
+}

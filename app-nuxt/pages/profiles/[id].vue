@@ -21,29 +21,15 @@
 </template>
 
 <script setup lang="ts">
+import type { Profile } from '~/types';
+
 const route = useRoute();
 const config = useRuntimeConfig();
 // When accessing /posts/1, route.params.id will be 1
 console.log(route.params.id);
 const id = route.params.id;
 
-interface Profile {
-    id: number;
-    first_name: string,
-    last_name: string,
-    full_name: string,
-    username: string,
-    nickname: string,
-    phone:number,
-    birth_date: Date,
-    avatar: string,
-    bio: string,
-    whatsapp: number,
-    user_id: number,
-    title: string;
-    content: string;
-    status: boolean;
-}
+
 
 const { pending, data: profile } = await useLazyFetch<Profile>(`${config.public.baseURL}/api/profiles/${id}`);
 </script>
