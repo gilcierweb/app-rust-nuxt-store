@@ -30,3 +30,16 @@ export interface ProductFilters {
   maxPrice?: number;
   brand?: string;
 }
+
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  active?: boolean;
+  position?: number;
+  parent_id?: number;
+  created_at: string;
+  updated_at: string;
+  children?: Category[];
+}

@@ -5,8 +5,9 @@ use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use axum::debug_handler;
 
-use crate::models::_entities::categories::{ActiveModel, Entity, Model};
+use crate::models::_entities::categories::{ ActiveModel, Entity, Model};
 use serde_json::json;
+use std::collections::HashMap;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -44,6 +45,20 @@ impl Params {
               }
               Ok(())
           }
+}
+
+#[derive(Serialize, Clone)]
+pub struct CategoryResponse {
+    pub id: i32,
+    pub name: String,
+    pub slug: String,
+    pub description: Option<String>,
+    pub active: Option<bool>,
+    pub position: Option<i32>,
+    pub parent_id: Option<i32>,
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
+    pub children: Vec<CategoryResponse>,
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
@@ -106,8 +121,7 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
             .await?
             .ok_or_else(|| Error::NotFound)?;
         
-       format::json(item)
-    // format::json(load_item(&ctx, id).await?)
+    format::json(item)
 }
 
 #[debug_handler]
@@ -125,12 +139,80 @@ pub async fn get_one_with_relations(Path(id): Path<i32>, State(ctx): State<AppCo
     format::json(response)
 }
 
+fn sort_children_recursive(category: &mut CategoryResponse) {
+    category.children.sort_by(|a, b| {
+        match (a.position, b.position) {
+            (Some(pa), Some(pb)) => pa.cmp(&pb),
+            (Some(_), None) => std::cmp::Ordering::Less,
+            (None, Some(_)) => std::cmp::Ordering::Greater,
+            (None, None) => std::cmp::Ordering::Equal,
+        }
+    });
+
+    for child in &mut category.children {
+        sort_children_recursive(child);
+    }
+}
+
+fn build_hierarchy_from_flat(categories: Vec<Model>) -> Vec<CategoryResponse> {
+    let mut items: HashMap<i32, CategoryResponse> = HashMap::new();
+   
+    for category in categories {
+        let item = CategoryResponse {
+            id: category.id,
+            name: category.name.unwrap_or_default(),
+            slug: category.slug.unwrap_or_default(),
+            description: category.description,
+            active: category.active,
+            position: category.position,
+            parent_id: category.parent_id,
+            created_at: category.created_at,
+            updated_at: category.updated_at,
+            children: vec![],
+        };
+
+        items.insert(item.id, item);
+    }
+
+    for id in items.keys().cloned().collect::<Vec<_>>() {
+        if let Some(child) = items.get(&id).cloned() {
+            if let Some(parent_id) = child.parent_id {
+                if let Some(parent) = items.get_mut(&parent_id) {
+                    parent.children.push(child);
+                }
+            }
+        }
+    }
+
+    let mut tree: Vec<CategoryResponse> = items.into_values()
+        .filter(|item| item.parent_id.is_none())
+        .collect();
+
+    for node in &mut tree {
+        sort_children_recursive(node);
+    }
+
+    tree
+}
+
 #[debug_handler]
 pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
-    let categories = Entity::find().all(&ctx.db).await?;        
-      
-    format::json(categories)
+    let all_categories = Entity::find().all(&ctx.db).await?;
+    let tree = build_hierarchy_from_flat(all_categories);
+    format::json(tree)
 }
+
+// #[debug_handler]
+// pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
+//     let hierarchy = build_hierarchy(&ctx.db, None).await?;
+//     format::json(hierarchy)
+// }
+// #[debug_handler]
+// pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
+//     let categories = Entity::find().all(&ctx.db).await?;        
+      
+//     format::json(categories)
+// }
 
 pub fn routes() -> Routes {
     Routes::new()

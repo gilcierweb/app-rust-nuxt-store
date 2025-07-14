@@ -4,6 +4,9 @@
     <AppBanner />
 
     <h1 class="h1 my-4">Categories</h1>
+    
+<CategoriesMenu />  
+
     <CategoriesList />
 
     <h1 class="h1 my-4">Products</h1>
