@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Page Stores</h1>
+    <h1 class="h1">Page Stores</h1>
      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 mt-6">
       <div class="card sm:max-w-sm">
         <figure><img src="https://cdn.flyonui.com/fy-assets/components/card/image-7.png" alt="headphone" /></figure>

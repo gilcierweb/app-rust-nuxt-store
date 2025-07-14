@@ -12,7 +12,7 @@
       </div>
 
       <div v-else v-for="product in products" :key="product.id">
-        <div class="card sm:max-w-sm">
+        <div class="card sm:max-w-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <figure>
             <img :src="product?.thumbnail" alt="image" />
           </figure>

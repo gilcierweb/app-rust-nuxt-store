@@ -9,11 +9,13 @@
             <div class="navbar-center max-md:hidden">
                 <ul class="menu menu-horizontal p-0 font-medium">
                     <li><NuxtLink to="/">Home</NuxtLink></li>
+                    <li><NuxtLink to="/categories">Categories</NuxtLink></li>
                     <li><NuxtLink to="/products">Products</NuxtLink></li>
-                    <li><NuxtLink to="/stores">Stores</NuxtLink></li>
-                    <li><NuxtLink to="/about">About</NuxtLink></li>
+                    <li><NuxtLink to="/stores">Stores</NuxtLink></li>               
                     <li><NuxtLink to="/posts">Posts</NuxtLink></li>                                  
-                    <li><NuxtLink to="/profiles">Profiles</NuxtLink></li>                                  
+                    <li><NuxtLink to="/profiles">Profiles</NuxtLink></li>   
+                    <li><NuxtLink to="/contact">Contact</NuxtLink></li>   
+                    <li><NuxtLink to="/about">About</NuxtLink></li>                                    
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
@@ -27,11 +29,13 @@
                     <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu"
                         aria-orientation="vertical" aria-labelledby="dropdown-default">
                         <li><NuxtLink to="/" class="dropdown-item">Home</NuxtLink></li>
+                        <li><NuxtLink to="/categories" class="dropdown-item">Categories</NuxtLink></li>
                         <li><NuxtLink to="/products" class="dropdown-item">Products</NuxtLink></li>
-                        <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>
-                        <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>
+                        <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>                        
                         <li><NuxtLink to="/posts" class="dropdown-item">Posts</NuxtLink></li>                 
                         <li><NuxtLink to="/profiles" class="dropdown-item">Profiles</NuxtLink></li>                 
+                        <li><NuxtLink to="/contact" class="dropdown-item">Contact</NuxtLink></li>   
+                        <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>              
                     </ul>
                 </div>
                 <a class="btn max-md:btn-square btn-primary" href="#">
