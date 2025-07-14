@@ -4,7 +4,7 @@
             Loading ... <br>
             <span class="loading loading-spinner  size-32"></span>
         </div>
-
+        
         <!-- Topo Colorido da Categoria -->
         <section v-else class="relative bg-gradient-to-br from-primary via-secondary to-accent overflow-hidden">
             <div class="absolute inset-0 bg-black/20"></div>
