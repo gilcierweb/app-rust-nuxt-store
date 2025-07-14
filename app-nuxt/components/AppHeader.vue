@@ -38,10 +38,17 @@
                         <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>              
                     </ul>
                 </div>
-                <a class="btn max-md:btn-square btn-primary" href="#">
+
+                <NuxtLink to="/users/sessions" class="btn max-md:btn-square btn-text">
+                    <span class="max-md:hidden">Log in</span>
+                    <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
+                </NuxtLink>
+                
+                <NuxtLink to="/users/registrations" class="btn max-md:btn-square btn-primary">
                     <span class="max-md:hidden">Get started</span>
                     <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
-                </a>
+                </NuxtLink>
+                                
             </div>
         </nav>
     </div>
