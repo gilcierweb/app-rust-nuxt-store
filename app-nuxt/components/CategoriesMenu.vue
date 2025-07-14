@@ -1,28 +1,23 @@
 <template>
-    <div>
-<ul class="menu sm:menu-horizontal">
-  <li>
-    <span class="menu-title">Services</span>
-    <ul class="menu" v-for="category in categories" :key="category.id">
-      <li class="category">
-        <NuxtLink to="/" :title="category.name">
-      <strong>{{ category.name }}</strong> ( {{ category.slug }} )
-      </NuxtLink>
+  <div class="container mx-auto my-6">
        
-      </li>    
+    <ul class="menu sm:menu-horizontal bg-base-200 rounded-box">
+      <CategoryItemHierarchy    
+        v-for="category in categories"
+        :key="category.id"
+        :category="category"
+        :level="0"
+      />
     </ul>
-  </li>
-  </ul>
-    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import type { Category } from '~/types';
 const config = useRuntimeConfig();
-const { $truncate } = useNuxtApp();
 
-const { pending, data: categories } = await useLazyFetch(`${config.public.baseURL}/api/categories/hierarchy`)
+const { data: categories } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories/hierarchy`);
 </script>
 
 <style scoped>
-
 </style>

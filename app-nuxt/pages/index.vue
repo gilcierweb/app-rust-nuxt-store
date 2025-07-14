@@ -4,13 +4,13 @@
     <AppBanner />
 
     <h1 class="h1 my-4">Categories</h1>
-    
-<CategoriesMenu />  
+
+    <CategoriesMenu />
 
     <CategoriesList />
 
     <h1 class="h1 my-4">Products</h1>
-    <ProductList /> 
+    <ProductList />
 
     <AppAlert>
       This is an auto-imported component

@@ -79,12 +79,10 @@ const props = defineProps({
 
 const isExpanded = ref(props.depth === 0 || props.searchTerm);
 
-// Verificar se a categoria tem filhos
 const hasChildren = computed(() => {
   return props.category.children && props.category.children.length > 0;
 });
 
-// Filtrar filhos com base no termo de busca
 const filteredChildren = computed(() => {
   if (!props.category.children) return [];
   
@@ -95,7 +93,6 @@ const filteredChildren = computed(() => {
   );
 });
 
-// Verificar se o filho corresponde à pesquisa
 function childMatchesSearch(child, termLower) {
   return (
     (child.name && child.name.toLowerCase().includes(termLower)) ||
@@ -104,14 +101,12 @@ function childMatchesSearch(child, termLower) {
   );
 }
 
-// Alternar estado expandido/recolhido
 function toggleExpanded() {
   if (hasChildren.value) {
     isExpanded.value = !isExpanded.value;
   }
 }
 
-// Formatar data para exibição
 function formatDate(dateString) {
   if (!dateString) return '-';
   
@@ -129,7 +124,6 @@ function formatDate(dateString) {
   }
 }
 
-// Expandir automaticamente se o termo de busca for encontrado
 if (props.searchTerm) {
   const termLower = props.searchTerm.toLowerCase();
   const shouldExpand = 
@@ -145,11 +139,4 @@ if (props.searchTerm) {
 </script>
 
 <style scoped>
-.category-item {
-  transition: all 0.3s ease;
-}
-
-.meta-grid {
-  grid-template-columns: auto 1fr;
-}
 </style>

@@ -13,7 +13,7 @@
     </template>
     
     <template v-else>
-      <a>{{ category.name }}</a>
+      <NuxtLink :to="`/categories/${category.id}`">{{ category.name }}</NuxtLink>
     </template>
   </li>
 </template>
@@ -32,7 +32,6 @@ const props = defineProps({
   }
 });
 
-// Verificar se a categoria tem filhos
 const hasChildren = computed(() => {
   return props.category.children && props.category.children.length > 0;
 });

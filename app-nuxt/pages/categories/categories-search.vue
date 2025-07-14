@@ -39,25 +39,21 @@ const config = useRuntimeConfig();
 const searchTerm = ref('');
 const { data: categories, pending, error } = await useFetch(`${config.public.baseURL}/api/categories/hierarchy`);
 
-// Filtrar categorias raiz que correspondem à pesquisa
 const filteredRootCategories = computed(() => {
   if (!categories.value) return [];
   
   if (!searchTerm.value) {
     return categories.value.filter(cat => !cat.parent_id);
   }
-  
-  // Filtrar todas as categorias que correspondem ao termo de busca
+   
   return categories.value.filter(category => 
     categoryMatchesSearch(category, searchTerm.value)
   );
 });
 
-// Função recursiva para verificar se a categoria ou seus filhos correspondem à pesquisa
 function categoryMatchesSearch(category, term) {
   const termLower = term.toLowerCase();
-  
-  // Verificar se a categoria atual corresponde
+   
   if (
     (category.name && category.name.toLowerCase().includes(termLower)) ||
     (category.slug && category.slug.toLowerCase().includes(termLower)) ||
@@ -66,7 +62,6 @@ function categoryMatchesSearch(category, term) {
     return true;
   }
   
-  // Verificar se algum filho corresponde
   if (category.children) {
     for (const child of category.children) {
       if (categoryMatchesSearch(child, term)) {
