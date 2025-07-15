@@ -12,8 +12,8 @@
       </div>
      
        <div v-else v-for="product in products" :key="product.id" class="card bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <figure>
-            <img :src="product?.thumbnail" alt="image" />
+          <figure>           
+            <NuxtImg :src="product?.thumbnail" loading="lazy" :alt="product?.title" />
           </figure>
           <div class="card-body">
             <h5 class="card-title mb-2.5">{{ product.title }}</h5>

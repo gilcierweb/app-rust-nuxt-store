@@ -10,7 +10,7 @@
 
       <div v-else v-for="post in posts" :key="post"
         class="card sm:max-w-sm  shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-        <figure><img src="https://cdn.flyonui.com/fy-assets/components/card/image-7.png" alt="headphone" /></figure>
+        <figure><NuxtImg src="https://cdn.flyonui.com/fy-assets/components/card/image-7.png" loading="lazy" :alt="post?.title" /></figure>
         <div class="card-body space-y-3">
           <h5 class="card-title">{{ post?.title }}</h5>
           <p>{{ $truncate(post?.content, 70, '...') }}</p>

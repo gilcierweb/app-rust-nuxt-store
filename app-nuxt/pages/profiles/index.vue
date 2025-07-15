@@ -9,7 +9,7 @@
       </div>
       <div v-else v-for="profile in profiles" :key="profile">
         <div class="card sm:max-w-sm shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <figure><img height="400px" :src="profile?.avatar" /></figure>
+          <figure><NuxtImg :src="profile?.avatar" loading="lazy" :alt="profile?.nickname" /></figure>
           <div class="card-body space-y-3">
             <h5 class="card-title">{{ profile.nickname }}</h5>
             <p>{{ $truncate(profile.full_name, 70, '...') }}</p>

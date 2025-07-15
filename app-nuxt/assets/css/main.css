@@ -39,3 +39,42 @@
 .form-label{
     @apply text-gray-800 text-sm mb-2 block;
 }
+
+ /* transations custom nuxt */
+ .layout-enter-active,
+.layout-leave-active {
+  transition: all 0.2s;
+}
+.layout-enter-from,
+.layout-leave-to {
+  filter: grayscale(1);
+}
+
+ .page-enter-active,
+ .page-leave-active {
+   transition: all 0.2s;
+ }
+ .page-enter-from,
+ .page-leave-to {
+   opacity: 0;
+   filter: blur(1rem);
+ }
+
+.rotate-enter-active,
+.rotate-leave-active {
+  transition: all 0.2s;
+}
+.rotate-enter-from,
+.rotate-leave-to {
+  opacity: 0;
+  transform: rotate3d(1, 1, 1, 15deg);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.2s;
+}
+.fade-enter,
+.fade-leave-active {
+  opacity: 0; filter: blur(1rem);
+}

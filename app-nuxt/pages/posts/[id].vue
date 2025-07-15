@@ -5,7 +5,7 @@
             <span class="loading loading-spinner  size-32"></span>
         </div>
         <div v-else class="w-full">
-            <img height="400px" src="https://via.assets.so/game.png?id=1&q=95&w=400&h=400&fit=fill" cover></img>
+            <NuxtImg src="https://via.assets.so/game.png?id=1&q=95&w=400&h=400&fit=fill" loading="lazy":alt="post?.title" />
             <h2>{{ post?.title }}</h2>
             <p>{{ post?.content }}</p>
             <p>

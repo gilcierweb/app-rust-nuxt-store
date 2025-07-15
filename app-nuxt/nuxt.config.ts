@@ -7,13 +7,14 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/image'],
   css: ['~/assets/css/main.css'],
   vite: { plugins: [tailwindcss(),], },
+  
   app: {
     pageTransition: {
       name: 'fade',
       mode: 'out-in' // default
     },
     layoutTransition: {
-      name: 'slide',
+      name: 'layout',
       mode: 'out-in' // default
     }
   },
