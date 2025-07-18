@@ -77,5 +77,31 @@ docker network create rustnet
 
 ```
 
+### ToDo
+
+* [X] Users
+* [X] Profiles
+* [X] Posts
+* [X] Categories
+* [ ] Products
+* [ ] Products Images
+* [ ] Products Variants Images
+* [ ] Products Variants
+* [ ] Products Options
+* [ ] Products Variants Options
+* [ ] Cart
+* [ ] Cart Items
+* [ ] Orders
+* [ ] Orders Items
+* [ ] Payments Methods
+* [ ] Payments
+* [ ] Addresses
+* [ ] Shipping Methods
+* [ ] Shipments
+* [ ] Coupons
+* [ ] Coupons Usages
+* [ ] Review
+* [ ] Wishlist
+
 
 https://gilcierweb.com.br
