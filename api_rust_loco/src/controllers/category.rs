@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use axum::debug_handler;
 
 use crate::models::_entities::categories::{ ActiveModel, Entity, Model};
+use crate::models::_entities::products::Entity as ProductEntity;
 use serde_json::json;
 use std::collections::HashMap;
 
@@ -74,7 +75,7 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 #[debug_handler]
 pub async fn list_with_relations(State(ctx): State<AppContext>) -> Result<Response> {
     let categories = Entity::find()
-        .find_with_related(Entity)
+        .find_with_related(ProductEntity)
         .all(&ctx.db)
         .await?;
   

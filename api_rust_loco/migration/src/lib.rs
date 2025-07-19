@@ -10,6 +10,7 @@ mod m20250713_052254_profiles;
 
 mod m20250713_094714_categories;
 mod m20250713_094959_add_parent_to_categories;
+mod m20250719_064242_products;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -24,6 +25,7 @@ impl MigratorTrait for Migrator {
  
             Box::new(m20250713_094714_categories::Migration),
             Box::new(m20250713_094959_add_parent_to_categories::Migration),
+            Box::new(m20250719_064242_products::Migration),
             // inject-above (do not remove this comment)
         ]
     }

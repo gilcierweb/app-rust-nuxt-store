@@ -4,7 +4,7 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "categories")]
+#[sea_orm(table_name = "products")]
 pub struct Model {
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
@@ -12,29 +12,34 @@ pub struct Model {
     pub id: i32,
     pub name: Option<String>,
     pub slug: Option<String>,
+    pub sku: Option<String>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub short_description: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
+    pub price: Option<Decimal>,
+    pub cost_price: Option<Decimal>,
+    pub compare_price: Option<Decimal>,
+    pub featured: Option<bool>,
     pub active: Option<bool>,
-    pub position: Option<i32>,
-    pub parent_id: Option<i32>,
+    pub status: Option<i32>,
+    pub category_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "Entity",
-        from = "Column::ParentId",
-        to = "Column::Id",
+        belongs_to = "super::categories::Entity",
+        from = "Column::CategoryId",
+        to = "super::categories::Column::Id",
         on_update = "Cascade",
-        on_delete = "SetNull"
+        on_delete = "Cascade"
     )]
-    SelfRef,
-    #[sea_orm(has_many = "super::products::Entity")]
-    Products,
+    Categories,
 }
 
-impl Related<super::products::Entity> for Entity {
+impl Related<super::categories::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Products.def()
+        Relation::Categories.def()
     }
 }

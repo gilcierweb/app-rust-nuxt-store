@@ -14,6 +14,7 @@ use loco_rs::{
 use crate::seeds::posts as posts_seeder;
 use crate::seeds::profiles as profiles_seeder;
 use crate::seeds::categories as categories_seeder;
+use crate::seeds::products as products_seeder;
 
 use migration::Migrator;
 use std::path::Path;
@@ -52,6 +53,7 @@ impl Hooks for App {
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
         AppRoutes::with_default_routes() // controller routes below
+            .add_route(controllers::product::routes())
             .add_route(controllers::category::routes())
             .add_route(controllers::profile::routes())
             .add_route(controllers::post::routes())
@@ -78,6 +80,7 @@ impl Hooks for App {
         posts_seeder::seed(&ctx.db).await?;
         profiles_seeder::seed(&ctx.db).await?;
         categories_seeder::seed(&ctx.db).await?;
+        products_seeder::seed(&ctx.db).await?;
 
         Ok(())
     }

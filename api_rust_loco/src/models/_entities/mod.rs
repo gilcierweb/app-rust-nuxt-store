@@ -4,5 +4,6 @@ pub mod prelude;
 
 pub mod categories;
 pub mod posts;
+pub mod products;
 pub mod profiles;
 pub mod users;

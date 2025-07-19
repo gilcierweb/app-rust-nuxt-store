@@ -67,3 +67,19 @@ export interface Profile {
     user_id: number,    
     status: boolean;
 }
+
+export interface ProductApi {
+  id: number;
+  name: string;
+  slug: string;
+  sku: string;
+  shortDescription: string;
+  description: string;
+  price: string;
+  costPrice: string;
+  comparePrice: string;
+  featured: boolean;
+  active: boolean;
+  status: number;
+  categoryId?: number; // exemplo de propriedade opcional
+}
