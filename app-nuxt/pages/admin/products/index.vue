@@ -39,6 +39,10 @@
                         <td>
                             <NuxtLink :to="`/admin/products/${product.id}`" class="btn btn-circle btn-text btn-sm"
                                 aria-label="Action button">
+                                <i class="icon-[tabler--eye] size-5"></i>
+                            </NuxtLink>
+                             <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-circle btn-text btn-sm"
+                                aria-label="Action button">
                                 <i class="icon-[tabler--pencil] size-5"></i>
                             </NuxtLink>
                             <button class="btn btn-circle btn-text btn-sm" aria-label="Action button"><span
