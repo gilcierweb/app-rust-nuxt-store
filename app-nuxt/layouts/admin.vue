@@ -8,14 +8,14 @@
 
       <AdminSidebar />
 
-      <main class="flex-1 overflow-auto p-6 ml-0 sm:ml-64">
+      <main class="flex-1 overflow-auto px-6 py-8 ml-0 sm:ml-64">
        
-          <div class="container mx-auto px-4 py-8">
+          <div class="container mx-auto">
             <h1 class="h1">layout admin</h1>
-            <slot />
+            <slot />        
           </div>
 
-          <AppFooter />
+          <AppFooterGilcierweb />
     
       </main>
 
