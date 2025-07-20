@@ -4,11 +4,11 @@
             <h1 class="h1">Products</h1>
         </div>
 
-<div class="mb-6 justify-between flex items-center">
+        <div class="mb-6 justify-between flex items-center">
             <form action="">
-                   <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <input type="text" placeholder="Search products" class="input input-bordered w-full mb-4" />
-                <button class="btn btn-primary">Search</button>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <input type="text" placeholder="Search products" class="input input-bordered w-full mb-4" />
+                    <button class="btn btn-primary">Search</button>
                 </div>
             </form>
             <button type="button" class="btn btn-success">Add</button>
@@ -41,7 +41,7 @@
                                 aria-label="Action button">
                                 <i class="icon-[tabler--eye] size-5"></i>
                             </NuxtLink>
-                             <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-circle btn-text btn-sm"
+                            <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-circle btn-text btn-sm"
                                 aria-label="Action button">
                                 <i class="icon-[tabler--pencil] size-5"></i>
                             </NuxtLink>
@@ -61,7 +61,7 @@
 <script setup lang="ts">
 
 definePageMeta({
-  layout: 'admin'
+    layout: 'admin'
 });
 
 const config = useRuntimeConfig();
