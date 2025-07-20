@@ -7,9 +7,7 @@
       <span class="icon-[tabler--menu-2] size-5"></span>
     </button>
     <div class="flex flex-1 items-center">
-      <a class="link text-base-content link-neutral text-xl font-semibold no-underline" href="#">
-        FlyonUI
-      </a>
+      <NuxtLink to="/admin" class="link text-base-content link-neutral text-xl font-semibold no-underline">FlyonUI</NuxtLink>      
     </div>
     <div class="navbar-end flex items-center gap-4">
       <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
