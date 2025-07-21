@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use axum::debug_handler;
 
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
+use crate::models::_entities::{products, categories};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -36,6 +37,66 @@ impl Params {
       item.active = Set(self.active.clone());
       item.status = Set(self.status.clone());
       }
+}
+
+#[derive(Serialize)]
+struct CategoryJson {
+    id: i32,
+    name: Option<String>,
+    slug: Option<String>,
+}
+
+#[derive(Serialize)]
+struct ProductWithCategory {
+    id: i32,
+    name: Option<String>,
+    slug: Option<String>,
+    sku: Option<String>,
+     short_description: Option<String>,
+     description: Option<String>,
+     price: Option<Decimal>,
+     cost_price: Option<Decimal>,
+     compare_price: Option<Decimal>,
+     featured: Option<bool>,
+     active: Option<bool>,
+     status: Option<i32>,
+    category: Option<CategoryJson>,
+}
+
+pub async fn get_products_with_categories(
+    State(ctx): State<AppContext>,
+) -> Result<impl IntoResponse> {
+    let db = &ctx.db;
+
+    let product_entities = products::Entity::find()
+        .find_also_related(categories::Entity)
+        .all(db)
+        .await?;
+
+    let data: Vec<ProductWithCategory> = product_entities
+        .into_iter()
+        .map(|(prod, cat_opt)| ProductWithCategory {
+            id: prod.id,
+            name: prod.name,
+            slug: prod.slug,          
+            sku: prod.sku,
+            short_description: prod.short_description,
+            description: prod.description,
+            price: prod.price,
+            cost_price: prod.cost_price,
+            compare_price: prod.compare_price,
+            featured: prod.featured,
+            active: prod.active,
+            status: prod.status,
+            category: cat_opt.map(|cat| CategoryJson {
+                id: cat.id,
+                name: cat.name,
+                slug: cat.slug,
+            }),
+        })
+        .collect();
+
+    Ok(Json(data))
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
@@ -85,7 +146,8 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/products/")
-        .add("/", get(list))
+        // .add("/", get(list))
+        .add("/",get(get_products_with_categories))
         .add("/", post(add))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))
