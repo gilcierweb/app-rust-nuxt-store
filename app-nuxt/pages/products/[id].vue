@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductApi } from '~/types';
+import type { Product, ProductApi } from '~/types';
 const config = useRuntimeConfig();
 const route = useRoute();
 // const config = useRuntimeConfig(); 
