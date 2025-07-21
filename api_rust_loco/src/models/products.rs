@@ -2,6 +2,57 @@ use sea_orm::entity::prelude::*;
 pub use super::_entities::products::{ActiveModel, Model, Entity};
 pub type Products = Entity;
 
+use super::_entities::categories::Model as CategoryModel;
+use serde::Serialize;
+
+#[derive(Debug, Serialize)]
+pub struct ProductWithCategory {
+    pub id: i32,
+    pub name: Option<String>,
+    pub slug: Option<String>,
+    pub sku: Option<String>,
+    pub short_description: Option<String>,
+    pub description: Option<String>,
+    pub price: Option<Decimal>,
+    pub cost_price: Option<Decimal>,
+    pub compare_price: Option<Decimal>,
+    pub featured: Option<bool>,
+    pub active: Option<bool>,
+    pub status: Option<i32>,
+    pub category: Option<CategoryJson>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct CategoryJson {
+    pub id: i32,
+    pub name: Option<String>,
+    pub slug: Option<String>,
+}
+
+impl From<(Model, Option<CategoryModel>)> for ProductWithCategory {
+    fn from((product, category): (Model, Option<CategoryModel>)) -> Self {
+        Self {
+            id: product.id,
+            name: product.name,
+            slug: product.slug,          
+            sku: product.sku,
+            short_description: product.short_description,
+            description: product.description,
+            price: product.price,
+            cost_price: product.cost_price,
+            compare_price: product.compare_price,
+            featured: product.featured,
+            active: product.active,
+            status: product.status,
+            category: category.map(|c| CategoryJson {
+                id: c.id,
+                name: c.name,
+                slug: c.slug,
+            }),
+        }
+    }
+}
+
 #[async_trait::async_trait]
 impl ActiveModelBehavior for ActiveModel {
     async fn before_save<C>(self, _db: &C, insert: bool) -> std::result::Result<Self, DbErr>
@@ -26,3 +77,4 @@ impl ActiveModel {}
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}
+

@@ -1,12 +1,13 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use axum::debug_handler;
 
+use crate::models::_entities::categories::Entity as Categories;
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
-use crate::models::_entities::{products, categories};
+use crate::models::products::{ProductWithCategory, Products};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -21,82 +22,35 @@ pub struct Params {
     pub featured: Option<bool>,
     pub active: Option<bool>,
     pub status: Option<i32>,
-    }
+}
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-      item.name = Set(self.name.clone());
-      item.slug = Set(self.slug.clone());
-      item.sku = Set(self.sku.clone());
-      item.short_description = Set(self.short_description.clone());
-      item.description = Set(self.description.clone());
-      item.price = Set(self.price.clone());
-      item.cost_price = Set(self.cost_price.clone());
-      item.compare_price = Set(self.compare_price.clone());
-      item.featured = Set(self.featured.clone());
-      item.active = Set(self.active.clone());
-      item.status = Set(self.status.clone());
-      }
-}
-
-#[derive(Serialize)]
-struct CategoryJson {
-    id: i32,
-    name: Option<String>,
-    slug: Option<String>,
-}
-
-#[derive(Serialize)]
-struct ProductWithCategory {
-    id: i32,
-    name: Option<String>,
-    slug: Option<String>,
-    sku: Option<String>,
-     short_description: Option<String>,
-     description: Option<String>,
-     price: Option<Decimal>,
-     cost_price: Option<Decimal>,
-     compare_price: Option<Decimal>,
-     featured: Option<bool>,
-     active: Option<bool>,
-     status: Option<i32>,
-    category: Option<CategoryJson>,
+        item.name = Set(self.name.clone());
+        item.slug = Set(self.slug.clone());
+        item.sku = Set(self.sku.clone());
+        item.short_description = Set(self.short_description.clone());
+        item.description = Set(self.description.clone());
+        item.price = Set(self.price.clone());
+        item.cost_price = Set(self.cost_price.clone());
+        item.compare_price = Set(self.compare_price.clone());
+        item.featured = Set(self.featured.clone());
+        item.active = Set(self.active.clone());
+        item.status = Set(self.status.clone());
+    }
 }
 
 pub async fn get_products_with_categories(
     State(ctx): State<AppContext>,
 ) -> Result<impl IntoResponse> {
-    let db = &ctx.db;
-
-    let product_entities = products::Entity::find()
-        .find_also_related(categories::Entity)
-        .all(db)
+    let products = Products::find()
+        .find_also_related(Categories)
+        .all(&ctx.db)
         .await?;
 
-    let data: Vec<ProductWithCategory> = product_entities
-        .into_iter()
-        .map(|(prod, cat_opt)| ProductWithCategory {
-            id: prod.id,
-            name: prod.name,
-            slug: prod.slug,          
-            sku: prod.sku,
-            short_description: prod.short_description,
-            description: prod.description,
-            price: prod.price,
-            cost_price: prod.cost_price,
-            compare_price: prod.compare_price,
-            featured: prod.featured,
-            active: prod.active,
-            status: prod.status,
-            category: cat_opt.map(|cat| CategoryJson {
-                id: cat.id,
-                name: cat.name,
-                slug: cat.slug,
-            }),
-        })
-        .collect();
+    let data: Vec<ProductWithCategory> = products.into_iter().map(Into::into).collect();
 
-    Ok(Json(data))
+    format::json(data)
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
@@ -147,7 +101,7 @@ pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/products/")
         // .add("/", get(list))
-        .add("/",get(get_products_with_categories))
+        .add("/", get(get_products_with_categories))
         .add("/", post(add))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))
