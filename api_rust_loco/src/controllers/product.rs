@@ -94,7 +94,17 @@ pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resul
 
 #[debug_handler]
 pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(load_item(&ctx, id).await?)
+    let result = Products::find_by_id(id)
+        .find_also_related(Categories)
+        .one(&ctx.db)
+        .await?;
+
+    match result {
+        Some((product, category)) => format::json(ProductWithCategory::from((product, category))),
+        None => Err(Error::NotFound),
+    }
+
+    // format::json(load_item(&ctx, id).await?)
 }
 
 pub fn routes() -> Routes {

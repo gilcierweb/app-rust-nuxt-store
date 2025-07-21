@@ -20,7 +20,7 @@
             <p class="mb-4">
               {{ $truncate(product.description, 70, '...') }}
             </p>
-            <p> <span class="badge badge-secondary">{{ product.category }}</span></p>
+            <p> <span class="badge badge-secondary">{{ product.category.name }}</span></p>
             <div class="card-actions">
               <button class="btn btn-primary">Buy Now</button>
               <NuxtLink :to="`/products/${product.id}`" class="btn btn-secondary btn-soft">

@@ -25,7 +25,7 @@
             <div>
                 <h1 class="text-base-content text-4xl">{{ productApi?.name }}</h1>
                 <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(productApi?.price) }}</p>
-                <p class="my-3"><span class="badge badge-secondary">{{ productApi?.category_id }}</span></p>
+                <p class="my-3"><span class="badge badge-secondary">{{ productApi?.category.name }}</span></p>
                 <button class="btn btn-primary btn-xl">Buy Now</button>
             </div>
             <div class="grid grid-cols-1">
@@ -65,7 +65,8 @@
                 <p>{{ product?.description }}</p>
             </div>
 
-        </div>
+        </div>       
+        
     </div>
 </template>
 

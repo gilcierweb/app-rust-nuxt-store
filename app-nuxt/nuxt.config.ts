@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt'],
+  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', '@vite-pwa/nuxt'],
   css: ["~/assets/css/main.css"],
   vite: { plugins: [tailwindcss(),], },
   shadcn: {
@@ -34,5 +34,8 @@ export default defineNuxtConfig({
       ApiRustBaseUrl: '',
       baseURL: process.env.NUXT_BASE_URL || 'http://localhost:5150' // Exposed to the frontend as well.
     }
+  },
+  pwa: {
+     /* PWA options */
   },
 })
