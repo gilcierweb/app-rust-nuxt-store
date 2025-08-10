@@ -58,25 +58,16 @@
                         </div>
                     </div>
 
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-semibold">Slug</span>
-                        </label>
-                        <input v-model="form.slug" type="text" placeholder="slug-do-produto"
-                            class="input input-bordered w-full" :class="{ 'input-error': errors.slug }" />
-                        <label v-if="errors.slug" class="label">
-                            <span class="label-text-alt text-error">{{ errors.slug }}</span>
-                        </label>
-                    </div>
-
-                    <!-- Descriptions -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="form-control">
                             <label class="label">
-                                <span class="label-text font-semibold">Descrição Curta</span>
+                                <span class="label-text font-semibold">Slug</span>
                             </label>
-                            <textarea v-model="form.shortDescription" placeholder="Descrição breve do produto"
-                                class="textarea textarea-bordered w-full" rows="3"></textarea>
+                            <input v-model="form.slug" type="text" placeholder="slug-do-produto"
+                                class="input input-bordered w-full" :class="{ 'input-error': errors.slug }" />
+                            <label v-if="errors.slug" class="label">
+                                <span class="label-text-alt text-error">{{ errors.slug }}</span>
+                            </label>
                         </div>
 
                         <div class="form-control">
@@ -90,6 +81,16 @@
                                 </option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- Descriptions -->
+
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Descrição Curta</span>
+                        </label>
+                        <textarea v-model="form.shortDescription" placeholder="Descrição breve do produto"
+                            class="textarea textarea-bordered w-full" rows="3"></textarea>
                     </div>
 
                     <div class="form-control">
@@ -216,11 +217,9 @@ const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Fetch categories for dropdown
 const { data: categoriesData } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories`)
 const categories = computed(() => categoriesData.value || [])
 
-// Auto-generate slug from name
 watch(() => form.value.name, (newName) => {
     if (newName && !props.isEditing) {
         form.value.slug = newName
@@ -232,7 +231,6 @@ watch(() => form.value.name, (newName) => {
     }
 })
 
-// Validation function
 const validateForm = (): boolean => {
     errors.value = {}
     if (!form.value.name?.trim()) errors.value.name = 'Nome é obrigatório'
@@ -241,7 +239,7 @@ const validateForm = (): boolean => {
     return Object.keys(errors.value).length === 0
 }
 
-// Handle form submission
+
 const handleSubmit = async () => {
     if (!validateForm()) return
 
@@ -254,7 +252,7 @@ const handleSubmit = async () => {
             ? `${config.public.baseURL}/api/products/${props.product?.id}`
             : `${config.public.baseURL}/api/products`
         const method = props.isEditing ? 'PUT' : 'POST'
-       
+
         const payload: ProductApi = {
             ...form.value,
             price: form.value.price ? Number(form.value.price) : 0,
@@ -294,7 +292,6 @@ const handleSubmit = async () => {
     }
 }
 
-// Reset form to initial state
 const resetForm = () => {
     form.value = {
         name: '',
@@ -313,7 +310,6 @@ const resetForm = () => {
     errors.value = {}
 }
 
-// Initialize form with product data if editing
 onMounted(() => {
     if (props.product && props.isEditing) {
         form.value = { ...props.product }
