@@ -4,6 +4,7 @@
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
+use tracing::info;
 
 use crate::models::_entities::categories::Entity as Categories;
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
@@ -22,6 +23,7 @@ pub struct Params {
     pub featured: Option<bool>,
     pub active: Option<bool>,
     pub status: Option<i32>,
+    pub category_id: i32,
 }
 
 impl Params {
@@ -37,6 +39,8 @@ impl Params {
         item.featured = Set(self.featured.clone());
         item.active = Set(self.active.clone());
         item.status = Set(self.status.clone());
+        item.category_id = Set(self.category_id.clone());
+      
     }
 }
 
@@ -69,8 +73,15 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
         ..Default::default()
     };
     params.update(&mut item);
-    let item = item.insert(&ctx.db).await?;
-    format::json(item)
+    info!("Item created: {:?}", params);
+    match item.insert(&ctx.db).await {
+        Ok(saved) => format::json(saved),
+        Err(e) => {
+    tracing::error!("Error saving product: {:?}", e);
+    Err(Error::Message("Error saving product".to_string()))
+    }
+    }
+
 }
 
 #[debug_handler]

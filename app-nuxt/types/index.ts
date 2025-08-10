@@ -75,9 +75,9 @@ export interface ProductApi {
   sku: string;
   shortDescription: string;
   description: string;
-  price: string;
-  costPrice: string;
-  comparePrice: string;
+  price: number;
+  costPrice: number;
+  comparePrice: number;
   featured: boolean;
   active: boolean;
   status: number;

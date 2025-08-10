@@ -48,7 +48,7 @@
                 <div class="w-full md:w-1/2 px-4 mb-8">                  
                   <NuxtImg :src="product?.thumbnail" loading="lazy" class="w-full h-auto rounded-lg shadow-md mb-4" :alt="product?.title" />
                     <div class="flex gap-4 py-4 justify-center overflow-x-auto">
-                        <div v-for="(item, index) in product.images" :key="index">
+                        <div v-for="(item, index) in product?.images" :key="index">
                             <NuxtImg :src="item" loading="lazy" class="size-16 sm:size-20 object-cover rounded-md cursor-pointer opacity-60 hover:opacity-100 transition duration-300" :alt="product?.title" />
                         </div>
                     </div>
