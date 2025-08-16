@@ -68,6 +68,18 @@ export interface Profile {
     status: boolean;
 }
 
+export interface ProductImage {
+  id?: number;
+  image?: string;
+  alt_text?: string;
+  active?: boolean;
+  cover?: boolean;
+  position?: number;
+  product_id?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface ProductApi {
   id: number;
   name: string;
@@ -81,5 +93,11 @@ export interface ProductApi {
   featured: boolean;
   active: boolean;
   status: number;
-  categoryId?: number; // exemplo de propriedade opcional
+  categoryId?: number;
+  images?: ProductImage[];
+  // Backend field names for compatibility
+  short_description?: string;
+  cost_price?: number;
+  compare_price?: number;
+  category_id?: number;
 }

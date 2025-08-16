@@ -3,6 +3,7 @@ pub use super::_entities::products::{ActiveModel, Model, Entity};
 pub type Products = Entity;
 
 use super::_entities::categories::Model as CategoryModel;
+// use super::_entities::product_images::Model as ProductImageModel;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -20,6 +21,7 @@ pub struct ProductWithCategory {
     pub active: Option<bool>,
     pub status: Option<i32>,
     pub category: Option<CategoryJson>,
+    pub images: Option<Vec<ProductImageJson>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -27,6 +29,17 @@ pub struct CategoryJson {
     pub id: i32,
     pub name: Option<String>,
     pub slug: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ProductImageJson {
+    pub id: i32,
+    pub image: Option<String>,
+    pub alt_text: Option<String>,
+    pub active: Option<bool>,
+    pub cover: Option<bool>,
+    pub position: Option<i32>,
+    pub product_id: i32,
 }
 
 impl From<(Model, Option<CategoryModel>)> for ProductWithCategory {
@@ -49,6 +62,7 @@ impl From<(Model, Option<CategoryModel>)> for ProductWithCategory {
                 name: c.name,
                 slug: c.slug,
             }),
+            images: None, // Will be populated separately
         }
     }
 }

@@ -159,6 +159,141 @@
                         </div>
                     </div>
 
+                    <!-- Image Upload Section -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Imagens do Produto</span>
+                        </label>
+                        
+                        <!-- Image Upload Input -->
+                        <div class="flex items-center gap-4 mb-4">
+                            <input 
+                                type="file" 
+                                @change="handleImageUpload" 
+                                multiple 
+                                accept="image/*"
+                                class="file-input file-input-bordered w-full max-w-xs"
+                                :disabled="pending"
+                            />
+                            <button 
+                                type="button" 
+                                @click="addImageField()" 
+                                class="btn btn-outline btn-sm"
+                                :disabled="pending"
+                            >
+                                Adicionar Campo
+                            </button>
+                        </div>
+
+                        <!-- Image Fields -->
+                        <div v-if="imageFields.length > 0" class="space-y-4">
+                            <div 
+                                v-for="(field, index) in imageFields" 
+                                :key="index"
+                                class="border rounded-lg p-4 bg-gray-50"
+                            >
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <!-- Image Preview/Upload -->
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">Imagem {{ index + 1 }}</span>
+                                        </label>
+                                        <input 
+                                            type="file" 
+                                            @change="(e) => handleImageFieldChange(e, index)"
+                                            accept="image/*"
+                                            class="file-input file-input-bordered w-full"
+                                            :disabled="pending"
+                                        />
+                                        <div v-if="field.preview" class="mt-2">
+                                            <img :src="field.preview" alt="Preview" class="w-20 h-20 object-cover rounded" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Alt Text -->
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">Texto Alternativo</span>
+                                        </label>
+                                        <input 
+                                            v-model="field.alt_text" 
+                                            type="text" 
+                                            placeholder="Descrição da imagem"
+                                            class="input input-bordered w-full"
+                                            :disabled="pending"
+                                        />
+                                    </div>
+
+                                    <!-- Position -->
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text">Posição</span>
+                                        </label>
+                                        <input 
+                                            v-model="field.position" 
+                                            type="number" 
+                                            min="0"
+                                            class="input input-bordered w-full"
+                                            :disabled="pending"
+                                        />
+                                    </div>
+
+                                    <!-- Options -->
+                                    <div class="form-control space-y-2">
+                                        <label class="label cursor-pointer">
+                                            <span class="label-text">Ativa</span>
+                                            <input 
+                                                v-model="field.active" 
+                                                type="checkbox" 
+                                                class="checkbox checkbox-primary"
+                                                :disabled="pending"
+                                            />
+                                        </label>
+                                        <label class="label cursor-pointer">
+                                            <span class="label-text">Capa</span>
+                                            <input 
+                                                v-model="field.cover" 
+                                                type="checkbox" 
+                                                class="checkbox checkbox-primary"
+                                                :disabled="pending"
+                                                @change="handleCoverChange(index)"
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Remove Button -->
+                                <div class="flex justify-end mt-3">
+                                    <button 
+                                        type="button" 
+                                        @click="removeImageField(index)"
+                                        class="btn btn-error btn-sm"
+                                        :disabled="pending"
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Drag and Drop Zone -->
+                        <div 
+                            v-if="imageFields.length === 0"
+                            @drop.prevent="handleDrop"
+                            @dragover.prevent
+                            @dragenter.prevent
+                            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors"
+                        >
+                            <div class="text-gray-500">
+                                <svg class="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <p class="text-lg font-medium">Arraste e solte imagens aqui</p>
+                                <p class="text-sm">ou clique para selecionar arquivos</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Action Buttons -->
                     <div class="flex justify-end space-x-4 pt-6">
                         <button type="button" @click="$emit('cancel')" class="btn btn-outline" :disabled="pending">
@@ -178,6 +313,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import type { ProductApi, Category } from '~/types'
+
+const toast = useToast()
 
 interface Props {
     product?: Partial<ProductApi>
@@ -209,6 +346,7 @@ const form = ref<Partial<ProductApi>>({
     active: true,
     status: 1,
     categoryId: undefined,
+    images: [],
     ...props.product
 })
 
@@ -217,8 +355,138 @@ const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
+// Image management
+const imageFields = ref<Array<{
+    file?: File;
+    preview: string;
+    alt_text: string;
+    position: number;
+    active: boolean;
+    cover: boolean;
+}>>([])
+
 const { data: categoriesData } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories`)
 const categories = computed(() => categoriesData.value || [])
+
+// Image handling methods
+const addImageField = () => {
+    const newField = {
+        file: undefined,
+        preview: '',
+        alt_text: '',
+        position: imageFields.value.length,
+        active: true,
+        cover: imageFields.value.length === 0 // First image is cover by default
+    }
+    
+    if (newField.cover) {
+        // Uncheck other cover images
+        imageFields.value.forEach(field => field.cover = false)
+    }
+    
+    imageFields.value.push(newField)
+}
+
+const handleImageUpload = (event: Event) => {
+    const files = (event.target as HTMLInputElement).files
+    if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i]
+            if (file) {
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    const previewUrl = e.target?.result as string
+                    const newField = {
+                        file: file,
+                        preview: previewUrl,
+                        alt_text: file.name,
+                        position: imageFields.value.length,
+                        active: true,
+                        cover: imageFields.value.length === 0 // First uploaded is cover
+                    }
+                    if (newField.cover) {
+                        imageFields.value.forEach(field => field.cover = false)
+                    }
+                    imageFields.value.push(newField)
+                }
+                reader.readAsDataURL(file)
+            }
+        }
+    }
+}
+
+const handleImageFieldChange = (event: Event, index: number) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            const previewUrl = e.target?.result as string
+            imageFields.value[index].file = file
+            imageFields.value[index].preview = previewUrl
+            imageFields.value[index].alt_text = file.name
+        }
+        reader.readAsDataURL(file)
+    }
+}
+
+const handleCoverChange = (index: number) => {
+    if (imageFields.value[index].cover) {
+        // Uncheck other cover images
+        imageFields.value.forEach((field, i) => {
+            if (i !== index) field.cover = false
+        })
+    }
+}
+
+const removeImageField = (index: number) => {
+    const field = imageFields.value[index]
+    if (field.preview && field.preview.startsWith('data:')) {
+        URL.revokeObjectURL(field.preview)
+    }
+    imageFields.value.splice(index, 1)
+    
+    // Update positions
+    imageFields.value.forEach((field, i) => {
+        field.position = i
+    })
+    
+    // If no images left, reset cover
+    if (imageFields.value.length === 0) {
+        // No action needed
+    } else if (imageFields.value.every(field => !field.cover)) {
+        // If no cover image, set first as cover
+        imageFields.value[0].cover = true
+    }
+}
+
+const handleDrop = (event: DragEvent) => {
+    event.preventDefault()
+    const files = event.dataTransfer?.files
+    if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i]
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    const previewUrl = e.target?.result as string
+                    const newField = {
+                        file: file,
+                        preview: previewUrl,
+                        alt_text: file.name,
+                        position: imageFields.value.length,
+                        active: true,
+                        cover: imageFields.value.length === 0 // First dropped is cover
+                    }
+                    if (newField.cover) {
+                        imageFields.value.forEach(field => field.cover = false)
+                    }
+                    imageFields.value.push(newField)
+                }
+                reader.readAsDataURL(file)
+            }
+        }
+    }
+}
 
 watch(() => form.value.name, (newName) => {
     if (newName && !props.isEditing) {
@@ -235,7 +503,7 @@ const validateForm = (): boolean => {
     errors.value = {}
     if (!form.value.name?.trim()) errors.value.name = 'Nome é obrigatório'
     if (!form.value.sku?.trim()) errors.value.sku = 'SKU é obrigatório'
-    if (!form.value.price || parseFloat(form.value.price as string) <= 0) errors.value.price = 'Preço deve ser maior que zero'
+    if (!form.value.price || Number(form.value.price) <= 0) errors.value.price = 'Preço deve ser maior que zero'
     return Object.keys(errors.value).length === 0
 }
 
@@ -253,35 +521,71 @@ const handleSubmit = async () => {
             : `${config.public.baseURL}/api/products`
         const method = props.isEditing ? 'PUT' : 'POST'
 
-        const payload: ProductApi = {
-            ...form.value,
-            price: form.value.price ? Number(form.value.price) : 0,
-            cost_price: form.value.costPrice ? Number(form.value.costPrice) : 0,
-            compare_price: form.value.comparePrice ? Number(form.value.comparePrice) : 0,
-            status: Number(form.value.status),
-            category_id: form.value.categoryId ? Number(form.value.categoryId) : undefined,
-            featured: !!form.value.featured,
-            active: !!form.value.active,
-            name: form.value.name || '',
-            slug: form.value.slug || '',
-            sku: form.value.sku || '',
-            short_description: form.value.shortDescription || '',
-            description: form.value.description || '',
-            id: props.product?.id || 0
+        if (method === 'POST' && imageFields.value.some(field => field.file)) {
+            // Use FormData for file upload
+            const formData = new FormData()
+            
+            // Add product data
+            formData.append('name', form.value.name || '')
+            formData.append('slug', form.value.slug || '')
+            formData.append('sku', form.value.sku || '')
+            formData.append('short_description', form.value.shortDescription || '')
+            formData.append('description', form.value.description || '')
+            formData.append('price', (form.value.price || 0).toString())
+            formData.append('cost_price', (form.value.costPrice || 0).toString())
+            formData.append('compare_price', (form.value.comparePrice || 0).toString())
+            formData.append('featured', (form.value.featured || false).toString())
+            formData.append('active', (form.value.active || true).toString())
+            formData.append('status', (form.value.status || 1).toString())
+            formData.append('category_id', (form.value.categoryId || 0).toString())
+            
+            // Add images
+            imageFields.value.forEach((field, index) => {
+                if (field.file) {
+                    formData.append(`image${index}`, field.file)
+                }
+            })
+            
+            const response = await $fetch(url, {
+                method,
+                body: formData,
+            })
+            toast.success({ position: 'topRight',title: 'Success!', message: 'Produto criado com sucesso!' })
+            successMessage.value = 'Produto criado com sucesso!'
+            emit('saved', response as ProductApi)
+            resetForm()
+        } else {
+            // Use JSON for non-file updates
+            const payload: ProductApi = {
+                ...form.value,
+                price: Number(form.value.price) || 0,
+                costPrice: Number(form.value.costPrice) || 0,
+                comparePrice: Number(form.value.comparePrice) || 0,
+                status: Number(form.value.status) || 1,
+                categoryId: Number(form.value.categoryId) || undefined,
+                featured: !!form.value.featured,
+                active: !!form.value.active,
+                name: form.value.name || '',
+                slug: form.value.slug || '',
+                sku: form.value.sku || '',
+                shortDescription: form.value.shortDescription || '',
+                description: form.value.description || '',
+                id: props.product?.id || 0
+            }
+
+            const response = await $fetch(url, {
+                method,
+                body: payload,
+            })
+
+            successMessage.value = props.isEditing
+                ? 'Produto atualizado com sucesso!'
+                : 'Produto criado com sucesso!'
+                toast.success({ position: 'topRight',title: 'Success!', message:  successMessage.value })
+            emit('saved', response as ProductApi)
+
+            if (!props.isEditing) resetForm()
         }
-
-        const response = await $fetch(url, {
-            method,
-            body: payload,
-        })
-
-        successMessage.value = props.isEditing
-            ? 'Produto atualizado com sucesso!'
-            : 'Produto criado com sucesso!'
-
-        emit('saved', response as ProductApi)
-
-        if (!props.isEditing) resetForm()
 
         setTimeout(() => { successMessage.value = '' }, 3000)
     } catch (err: any) {
@@ -299,20 +603,43 @@ const resetForm = () => {
         sku: '',
         shortDescription: '',
         description: '',
-        price: '',
-        costPrice: '',
-        comparePrice: '',
+        price: 0,
+        costPrice: 0,
+        comparePrice: 0,
         featured: false,
         active: true,
         status: 1,
         categoryId: undefined,
+        images: [],
     }
     errors.value = {}
+    
+    // Clear image fields
+    imageFields.value.forEach(field => {
+        if (field.preview && field.preview.startsWith('data:')) {
+            URL.revokeObjectURL(field.preview)
+        }
+    })
+    imageFields.value = []
 }
 
 onMounted(() => {
     if (props.product && props.isEditing) {
         form.value = { ...props.product }
+        
+        // Load existing images if editing
+        if (props.product.images && props.product.images.length > 0) {
+            props.product.images.forEach((image, index) => {
+                imageFields.value.push({
+                    file: undefined,
+                    preview: image.image ? `${config.public.baseURL}/uploads/products/${image.image}` : '',
+                    alt_text: image.alt_text || '',
+                    position: image.position || index,
+                    active: image.active ?? true,
+                    cover: image.cover ?? false
+                })
+            })
+        }
     }
 })
 </script>

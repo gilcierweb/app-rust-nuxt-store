@@ -5,9 +5,15 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use tracing::info;
+use rust_decimal::Decimal;
+use sea_orm::QueryOrder;
+use std::path::PathBuf;
+use uuid::Uuid;
+use axum::body::Bytes;
 
 use crate::models::_entities::categories::Entity as Categories;
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
+use crate::models::_entities::product_images::{ActiveModel as ProductImageActiveModel, Entity as ProductImageEntity};
 use crate::models::products::{ProductWithCategory, Products};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -40,8 +46,44 @@ impl Params {
         item.active = Set(self.active.clone());
         item.status = Set(self.status.clone());
         item.category_id = Set(self.category_id.clone());
-      
     }
+}
+async fn save_image(
+    content: Bytes,
+    filename: String,
+    product_id: i32, 
+    position: i32,
+    _ctx: &AppContext
+) -> Result<ProductImageActiveModel> {
+    let path_buf = PathBuf::from(&filename);
+    let extension = path_buf.extension().and_then(|ext| ext.to_str()).unwrap_or("jpg");
+    let unique_name = format!("{}_{}.{}", Uuid::new_v4(), position, extension);
+    
+    // Save file directly to filesystem
+    let upload_dir = "uploads/products";
+    tokio::fs::create_dir_all(upload_dir).await.map_err(|e| {
+        tracing::error!(error = ?e, "could not create upload directory");
+        Error::BadRequest("could not create upload directory".into())
+    })?;
+    
+    let file_path = format!("{}/{}", upload_dir, unique_name);
+    tokio::fs::write(&file_path, &content).await.map_err(|e| {
+        tracing::error!(error = ?e, "could not write file");
+        Error::BadRequest("could not write file".into())
+    })?;
+    
+    let now = chrono::Utc::now();
+    Ok(ProductImageActiveModel {
+        id: sea_orm::ActiveValue::NotSet,
+        image: sea_orm::ActiveValue::Set(Some(unique_name)), // Caminho relativo salvo no banco
+        alt_text: sea_orm::ActiveValue::Set(Some(filename)),
+        active: sea_orm::ActiveValue::Set(Some(true)),
+        cover: sea_orm::ActiveValue::Set(Some(position == 0)),
+        position: sea_orm::ActiveValue::Set(Some(position)),
+        product_id: sea_orm::ActiveValue::Set(product_id),
+        created_at: sea_orm::ActiveValue::Set(now.into()),
+        updated_at: sea_orm::ActiveValue::Set(now.into()),
+    })
 }
 
 pub async fn get_products_with_categories(
@@ -52,7 +94,26 @@ pub async fn get_products_with_categories(
         .all(&ctx.db)
         .await?;
 
-    let data: Vec<ProductWithCategory> = products.into_iter().map(Into::into).collect();
+    let mut data: Vec<ProductWithCategory> = products.into_iter().map(Into::into).collect();
+    
+    // Load images for each product
+    for product_with_category in &mut data {
+        let images = ProductImageEntity::find()
+            .filter(crate::models::_entities::product_images::Column::ProductId.eq(product_with_category.id))
+            .order_by_asc(crate::models::_entities::product_images::Column::Position)
+            .all(&ctx.db)
+            .await?;
+            
+        product_with_category.images = Some(images.into_iter().map(|img| crate::models::products::ProductImageJson {
+            id: img.id,
+            image: img.image,
+            alt_text: img.alt_text,
+            active: img.active,
+            cover: img.cover,
+            position: img.position,
+            product_id: img.product_id,
+        }).collect());
+    }
 
     format::json(data)
 }
@@ -68,20 +129,60 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 }
 
 #[debug_handler]
-pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
-    let mut item = ActiveModel {
-        ..Default::default()
-    };
-    params.update(&mut item);
-    info!("Item created: {:?}", params);
-    match item.insert(&ctx.db).await {
-        Ok(saved) => format::json(saved),
-        Err(e) => {
-    tracing::error!("Error saving product: {:?}", e);
-    Err(Error::Message("Error saving product".to_string()))
+pub async fn add(State(ctx): State<AppContext>, mut multipart: axum::extract::Multipart) -> Result<Response> {
+    let mut product = ActiveModel { ..Default::default() };
+    let mut images = Vec::new();
+    let mut position = 0;
+    
+    while let Some(field) = multipart.next_field().await.map_err(|e| {
+        tracing::error!(error = ?e, "could not read multipart");
+        Error::BadRequest("could not read multipart".into())
+    })? {
+        let name = field.name().unwrap_or("").to_string();
+        
+        if name.starts_with("image") {
+            // Process image field immediately since Field cannot be stored
+            let filename = field.file_name().unwrap_or("image.jpg").to_string();
+            let content = field.bytes().await.map_err(|e| {
+                tracing::error!(error = ?e, "could not read file bytes");
+                Error::BadRequest("could not read file bytes".into())
+            })?;
+            
+            if !content.is_empty() {
+                images.push((content, filename, position));
+                position += 1;
+            }
+        } else {
+            if let Ok(text) = field.text().await {
+                match name.as_str() {
+                    "name" => product.name = Set(Some(text)),
+                    "slug" => product.slug = Set(Some(text)),
+                    "sku" => product.sku = Set(Some(text)),
+                    "short_description" => product.short_description = Set(Some(text)),
+                    "description" => product.description = Set(Some(text)),
+                    "price" => if let Ok(p) = text.parse::<Decimal>() { product.price = Set(Some(p)) },
+                    "cost_price" => if let Ok(c) = text.parse::<Decimal>() { product.cost_price = Set(Some(c)) },
+                    "compare_price" => if let Ok(cp) = text.parse::<Decimal>() { product.compare_price = Set(Some(cp)) },
+                    "featured" => product.featured = Set(Some(text == "true")),
+                    "active" => product.active = Set(Some(text == "true")),
+                    "status" => if let Ok(s) = text.parse::<i32>() { product.status = Set(Some(s)) },
+                    "category_id" => if let Ok(cid) = text.parse::<i32>() { product.category_id = Set(cid) },
+                    _ => {}
+                }
+            }
+        }
     }
+    
+    let saved_product = product.insert(&ctx.db).await.map_err(|e| Error::Message(format!("Erro ao salvar produto: {}", e)))?;
+    
+    let images_count = images.len();
+    for (content, filename, pos) in images {
+        let image_model = save_image(content, filename, saved_product.id, pos, &ctx).await?;
+        image_model.insert(&ctx.db).await.map_err(|e| Error::Message(format!("Erro ao salvar imagem: {}", e)))?;
     }
-
+    
+    info!("Produto criado com {} imagens: {:?}", images_count, saved_product);
+    format::json(saved_product)
 }
 
 #[debug_handler]
@@ -111,11 +212,30 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
         .await?;
 
     match result {
-        Some((product, category)) => format::json(ProductWithCategory::from((product, category))),
+        Some((product, category)) => {
+            let mut product_with_category = ProductWithCategory::from((product, category));
+            
+            // Load images for the product
+            let images = ProductImageEntity::find()
+                .filter(crate::models::_entities::product_images::Column::ProductId.eq(product_with_category.id))
+                .order_by_asc(crate::models::_entities::product_images::Column::Position)
+                .all(&ctx.db)
+                .await?;
+                
+            product_with_category.images = Some(images.into_iter().map(|img| crate::models::products::ProductImageJson {
+                id: img.id,
+                image: img.image,
+                alt_text: img.alt_text,
+                active: img.active,
+                cover: img.cover,
+                position: img.position,
+                product_id: img.product_id,
+            }).collect());
+            
+            format::json(product_with_category)
+        },
         None => Err(Error::NotFound),
     }
-
-    // format::json(load_item(&ctx, id).await?)
 }
 
 pub fn routes() -> Routes {

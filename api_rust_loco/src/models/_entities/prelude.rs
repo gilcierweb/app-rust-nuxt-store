@@ -2,6 +2,7 @@
 
 pub use super::categories::Entity as Categories;
 pub use super::posts::Entity as Posts;
+pub use super::product_images::Entity as ProductImages;
 pub use super::products::Entity as Products;
 pub use super::profiles::Entity as Profiles;
 pub use super::users::Entity as Users;

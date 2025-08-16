@@ -6,3 +6,4 @@ pub mod post_status;
 pub mod profiles;
 pub mod categories;
 pub mod products;
+pub mod product_images;
