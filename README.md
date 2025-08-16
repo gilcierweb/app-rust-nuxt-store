@@ -83,8 +83,8 @@ docker network create rustnet
 * [X] Profiles
 * [X] Posts
 * [X] Categories
-* [ ] Products
-* [ ] Products Images
+* [X] Products
+* [X] Products Images
 * [ ] Products Variants Images
 * [ ] Products Variants
 * [ ] Products Options
