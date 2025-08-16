@@ -33,8 +33,8 @@
                         <td>{{ product.name }}</td>
                         <td>{{ formatNumberBR(product?.price) }}</td>
                         <td>{{ $truncate(product.description, 70, '...') }}</td>
-                        <td><span class="badge badge-soft badge-success text-xs">{{ product.category }}</span></td>
-                        <td><span class="badge badge-soft badge-success text-xs">{{ product.category }}</span></td>
+                        <td><span class="badge badge-soft badge-success text-xs">{{ product.status }}</span></td>
+                        <td><span class="badge badge-soft badge-success text-xs">{{ product.category.name }}</span></td>
                         <td>March 1, 2024</td>
                         <td>
                             <NuxtLink :to="`/admin/products/${product.id}`" class="btn btn-circle btn-text btn-sm"
