@@ -1,339 +1,284 @@
 <template>
-    <div class="max-w-4xl mx-auto">
-        <div class="card bg-white shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-2xl font-bold mb-6">
-                    {{ isEditing ? 'Editar Produto' : 'Novo Produto' }}
-                </h2>
+  <div class="max-w-4xl mx-auto">
+    <div class="card bg-white shadow-lg">
+      <div class="card-body">
+        <h2 class="card-title text-2xl font-bold mb-6">
+          {{ propsIsEditing ? 'Editar Produto' : 'Novo Produto' }}
+        </h2>
 
-                <!-- Loading State -->
-                <div v-if="pending" class="flex items-center justify-center py-8">
-                    <span class="loading loading-spinner text-primary size-12"></span>
-                    <span class="ml-3">Salvando produto...</span>
-                </div>
-
-                <!-- Success Message -->
-                <div v-if="successMessage" class="alert alert-success mb-6 flex items-center gap-4" role="alert">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{{ successMessage }}</span>
-                </div>
-
-                <!-- Error Message -->
-                <div v-if="errorMessage" class="alert alert-error mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{{ errorMessage }}</span>
-                </div>
-
-                <form @submit.prevent="handleSubmit" class="space-y-6">
-                    <!-- Basic Information -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Nome do Produto *</span>
-                            </label>
-                            <input v-model="form.name" type="text" placeholder="Nome do produto"
-                                class="input input-bordered w-full" :class="{ 'input-error': errors.name }" required />
-                            <label v-if="errors.name" class="label">
-                                <span class="label-text-alt text-error">{{ errors.name }}</span>
-                            </label>
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">SKU *</span>
-                            </label>
-                            <input v-model="form.sku" type="text" placeholder="SKU único"
-                                class="input input-bordered w-full" :class="{ 'input-error': errors.sku }" required />
-                            <label v-if="errors.sku" class="label">
-                                <span class="label-text-alt text-error">{{ errors.sku }}</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Slug</span>
-                            </label>
-                            <input v-model="form.slug" type="text" placeholder="slug-do-produto"
-                                class="input input-bordered w-full" :class="{ 'input-error': errors.slug }" />
-                            <label v-if="errors.slug" class="label">
-                                <span class="label-text-alt text-error">{{ errors.slug }}</span>
-                            </label>
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Categoria</span>
-                            </label>
-                            <select v-model="form.categoryId" class="select select-bordered w-full">
-                                <option value="">Selecione uma categoria</option>
-                                <option v-for="category in categories" :key="category.id" :value="category.id">
-                                    {{ category.name }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Descriptions -->
-
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-semibold">Descrição Curta</span>
-                        </label>
-                        <textarea v-model="form.shortDescription" placeholder="Descrição breve do produto"
-                            class="textarea textarea-bordered w-full" rows="3"></textarea>
-                    </div>
-
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-semibold">Descrição Completa</span>
-                        </label>
-                        <textarea v-model="form.description" placeholder="Descrição detalhada do produto"
-                            class="textarea textarea-bordered w-full" rows="5"></textarea>
-                    </div>
-
-                    <!-- Pricing -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Preço de Venda *</span>
-                            </label>
-                            <input v-model="form.price" type="number" step="0.01" min="0" placeholder="0.00"
-                                class="input input-bordered w-full" :class="{ 'input-error': errors.price }" required />
-                            <label v-if="errors.price" class="label">
-                                <span class="label-text-alt text-error">{{ errors.price }}</span>
-                            </label>
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Preço de Custo</span>
-                            </label>
-                            <input v-model="form.costPrice" type="number" step="0.01" min="0" placeholder="0.00"
-                                class="input input-bordered w-full" />
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Preço Comparativo</span>
-                            </label>
-                            <input v-model="form.comparePrice" type="number" step="0.01" min="0" placeholder="0.00"
-                                class="input input-bordered w-full" />
-                        </div>
-                    </div>
-
-                    <!-- Status and Features -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="form-control">
-                            <label class="label">
-                                <span class="label-text font-semibold">Status</span>
-                            </label>
-                            <select v-model="form.status" class="select select-bordered w-full">
-                                <option :value="1">Ativo</option>
-                                <option :value="0">Inativo</option>
-                                <option :value="2">Rascunho</option>
-                            </select>
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label cursor-pointer">
-                                <span class="label-text font-semibold">Produto em Destaque</span>
-                                <input v-model="form.featured" type="checkbox" class="checkbox checkbox-primary" />
-                            </label>
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label cursor-pointer">
-                                <span class="label-text font-semibold">Produto Ativo</span>
-                                <input v-model="form.active" type="checkbox" class="checkbox checkbox-primary" />
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Image Upload Section -->
-                    <div class="form-control">
-                        <label class="label">
-                            <span class="label-text font-semibold">Imagens do Produto</span>
-                        </label>
-                        
-                        <!-- Image Upload Input -->
-                        <div class="flex items-center gap-4 mb-4">
-                            <input 
-                                type="file" 
-                                @change="handleImageUpload" 
-                                multiple 
-                                accept="image/*"
-                                class="file-input file-input-bordered w-full max-w-xs"
-                                :disabled="pending"
-                            />
-                            <button 
-                                type="button" 
-                                @click="addImageField()" 
-                                class="btn btn-outline btn-sm"
-                                :disabled="pending"
-                            >
-                                Adicionar Campo
-                            </button>
-                        </div>
-
-                        <!-- Image Fields -->
-                        <div v-if="imageFields.length > 0" class="space-y-4">
-                            <div 
-                                v-for="(field, index) in imageFields" 
-                                :key="index"
-                                class="border rounded-lg p-4 bg-gray-50"
-                            >
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <!-- Image Preview/Upload -->
-                                    <div class="form-control">
-                                        <label class="label">
-                                            <span class="label-text">Imagem {{ index + 1 }}</span>
-                                        </label>
-                                        <input 
-                                            type="file" 
-                                            @change="(e) => handleImageFieldChange(e, index)"
-                                            accept="image/*"
-                                            class="file-input file-input-bordered w-full"
-                                            :disabled="pending"
-                                        />
-                                        <div v-if="field.preview" class="mt-2">
-                                            <img :src="field.preview" alt="Preview" class="w-20 h-20 object-cover rounded" />
-                                        </div>
-                                    </div>
-
-                                    <!-- Alt Text -->
-                                    <div class="form-control">
-                                        <label class="label">
-                                            <span class="label-text">Texto Alternativo</span>
-                                        </label>
-                                        <input 
-                                            v-model="field.alt_text" 
-                                            type="text" 
-                                            placeholder="Descrição da imagem"
-                                            class="input input-bordered w-full"
-                                            :disabled="pending"
-                                        />
-                                    </div>
-
-                                    <!-- Position -->
-                                    <div class="form-control">
-                                        <label class="label">
-                                            <span class="label-text">Posição</span>
-                                        </label>
-                                        <input 
-                                            v-model="field.position" 
-                                            type="number" 
-                                            min="0"
-                                            class="input input-bordered w-full"
-                                            :disabled="pending"
-                                        />
-                                    </div>
-
-                                    <!-- Options -->
-                                    <div class="form-control space-y-2">
-                                        <label class="label cursor-pointer">
-                                            <span class="label-text">Ativa</span>
-                                            <input 
-                                                v-model="field.active" 
-                                                type="checkbox" 
-                                                class="checkbox checkbox-primary"
-                                                :disabled="pending"
-                                            />
-                                        </label>
-                                        <label class="label cursor-pointer">
-                                            <span class="label-text">Capa</span>
-                                            <input 
-                                                v-model="field.cover" 
-                                                type="checkbox" 
-                                                class="checkbox checkbox-primary"
-                                                :disabled="pending"
-                                                @change="handleCoverChange(index)"
-                                            />
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <!-- Remove Button -->
-                                <div class="flex justify-end mt-3">
-                                    <button 
-                                        type="button" 
-                                        @click="removeImageField(index)"
-                                        class="btn btn-error btn-sm"
-                                        :disabled="pending"
-                                    >
-                                        Remover
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Drag and Drop Zone -->
-                        <div 
-                            v-if="imageFields.length === 0"
-                            @drop.prevent="handleDrop"
-                            @dragover.prevent
-                            @dragenter.prevent
-                            class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors"
-                        >
-                            <div class="text-gray-500">
-                                <svg class="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <p class="text-lg font-medium">Arraste e solte imagens aqui</p>
-                                <p class="text-sm">ou clique para selecionar arquivos</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex justify-end space-x-4 pt-6">
-                        <button type="button" @click="$emit('cancel')" class="btn btn-outline" :disabled="pending">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-primary" :disabled="pending">
-                            <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-                            {{ isEditing ? 'Atualizar' : 'Salvar' }} Produto
-                        </button>
-                    </div>
-                </form>
-            </div>
+        <!-- Loading State -->
+        <div v-if="pending" class="flex items-center justify-center py-8">
+          <span class="loading loading-spinner text-primary size-12"></span>
+          <span class="ml-3">Salvando produto...</span>
         </div>
+
+        <!-- helper/demo Alert (from your other lib). Keep or remove as needed -->
+        <Alert v-if="false">
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            You can add components to your app using the cli.
+          </AlertDescription>
+        </Alert>
+
+        <!-- Debug plain div to confirm reactivity (remove in production) -->
+        <div v-if="successMessage" class="mb-6 p-3 bg-green-100 text-green-800">
+          DEBUG: {{ successMessage }}
+        </div>
+
+        <!-- Reusable AppAlert component -->
+        <AppAlert v-if="successMessage" type="success" :message="successMessage" :auto-close="3000" @close="successMessage = ''" />
+        <AppAlert v-if="errorMessage" type="error" :message="errorMessage" :auto-close="5000" @close="errorMessage = ''" :dismissible="true" />
+
+        <!-- Form (vee-validate) -->
+        <form @submit.prevent="onSubmit" class="space-y-6" novalidate>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Nome do Produto *</span>
+              </label>
+              <input
+                v-model="name"
+                @blur="nameBlur"
+                type="text"
+                placeholder="Nome do produto"
+                class="input input-bordered w-full"
+                :class="{ 'input-error': nameError }"
+                required
+              />
+              <label v-if="nameError" class="label">
+                <span class="label-text-alt text-error">{{ nameError }}</span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">SKU *</span>
+              </label>
+              <input
+                v-model="sku"
+                @blur="skuBlur"
+                type="text"
+                placeholder="SKU único"
+                class="input input-bordered w-full"
+                :class="{ 'input-error': skuError }"
+                required
+              />
+              <label v-if="skuError" class="label">
+                <span class="label-text-alt text-error">{{ skuError }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Slug</span>
+              </label>
+              <input v-model="values.slug" type="text" placeholder="slug-do-produto" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Categoria</span>
+              </label>
+              <select v-model="values.categoryId" class="select select-bordered w-full">
+                <option value="">Selecione uma categoria</option>
+                <option v-for="category in categories" :key="category.id" :value="category.id">
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Descriptions -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">Descrição Curta</span>
+            </label>
+            <textarea v-model="values.shortDescription" placeholder="Descrição breve do produto" class="textarea textarea-bordered w-full" rows="3"></textarea>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">Descrição Completa</span>
+            </label>
+            <textarea v-model="values.description" placeholder="Descrição detalhada do produto" class="textarea textarea-bordered w-full" rows="5"></textarea>
+          </div>
+
+          <!-- Pricing -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Preço de Venda *</span>
+              </label>
+              <input
+                v-model="price"
+                @blur="priceBlur"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                class="input input-bordered w-full"
+                :class="{ 'input-error': priceError }"
+                required
+              />
+              <label v-if="priceError" class="label">
+                <span class="label-text-alt text-error">{{ priceError }}</span>
+              </label>
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Preço de Custo</span>
+              </label>
+              <input v-model="values.costPrice" type="number" step="0.01" min="0" placeholder="0.00" class="input input-bordered w-full" />
+            </div>
+
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Preço Comparativo</span>
+              </label>
+              <input v-model="values.comparePrice" type="number" step="0.01" min="0" placeholder="0.00" class="input input-bordered w-full" />
+            </div>
+          </div>
+
+          <!-- Status and Features -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text font-semibold">Status</span>
+              </label>
+              <select v-model="values.status" class="select select-bordered w-full">
+                <option :value="1">Ativo</option>
+                <option :value="0">Inativo</option>
+                <option :value="2">Rascunho</option>
+              </select>
+            </div>
+
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <span class="label-text font-semibold">Produto em Destaque</span>
+                <input v-model="values.featured" type="checkbox" class="checkbox checkbox-primary" />
+              </label>
+            </div>
+
+            <div class="form-control">
+              <label class="label cursor-pointer">
+                <span class="label-text font-semibold">Produto Ativo</span>
+                <input v-model="values.active" type="checkbox" class="checkbox checkbox-primary" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Image Upload Section -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">Imagens do Produto</span>
+            </label>
+
+            <div class="flex items-center gap-4 mb-4">
+              <input type="file" @change="handleImageUpload" multiple accept="image/*" class="file-input file-input-bordered w-full max-w-xs" :disabled="pending" />
+              <button type="button" @click="addImageField()" class="btn btn-outline btn-sm" :disabled="pending">Adicionar Campo</button>
+            </div>
+
+            <div v-if="imageFields.length > 0" class="space-y-4">
+              <div v-for="(field, index) in imageFields" :key="index" class="border rounded-lg p-4 bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Imagem {{ index + 1 }}</span>
+                    </label>
+                    <input type="file" @change="(e) => handleImageFieldChange(e, index)" accept="image/*" class="file-input file-input-bordered w-full" :disabled="pending" />
+                    <div v-if="field.preview" class="mt-2">
+                      <img :src="field.preview" alt="Preview" class="w-20 h-20 object-cover rounded" />
+                    </div>
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Texto Alternativo</span>
+                    </label>
+                    <input v-model="field.alt_text" type="text" placeholder="Descrição da imagem" class="input input-bordered w-full" :disabled="pending" />
+                  </div>
+
+                  <div class="form-control">
+                    <label class="label">
+                      <span class="label-text">Posição</span>
+                    </label>
+                    <input v-model="field.position" type="number" min="0" class="input input-bordered w-full" :disabled="pending" />
+                  </div>
+
+                  <div class="form-control space-y-2">
+                    <label class="label cursor-pointer">
+                      <span class="label-text">Ativa</span>
+                      <input v-model="field.active" type="checkbox" class="checkbox checkbox-primary" :disabled="pending" />
+                    </label>
+                    <label class="label cursor-pointer">
+                      <span class="label-text">Capa</span>
+                      <input v-model="field.cover" type="checkbox" class="checkbox checkbox-primary" :disabled="pending" @change="() => handleCoverChange(index)" />
+                    </label>
+                  </div>
+                </div>
+
+                <div class="flex justify-end mt-3">
+                  <button type="button" @click="removeImageField(index)" class="btn btn-error btn-sm" :disabled="pending">Remover</button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="imageFields.length === 0" @drop.prevent="handleDrop" @dragover.prevent @dragenter.prevent class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors">
+              <div class="text-gray-500">
+                <svg class="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p class="text-lg font-medium">Arraste e solte imagens aqui</p>
+                <p class="text-sm">ou clique para selecionar arquivos</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end space-x-4 pt-6">
+            <button type="button" @click="$emit('cancel')" class="btn btn-outline" :disabled="pending">Cancelar</button>
+            <button type="submit" class="btn btn-primary" :disabled="pending">
+              <span v-if="pending" class="loading loading-spinner loading-sm"></span>
+              {{ propsIsEditing ? 'Atualizar' : 'Salvar' }} Produto
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
+import { useForm, useField } from 'vee-validate'
+import AppAlert from '~/components/AppAlert.vue'
+/* keep Alert imports if you use that other component */
+declare const Alert: any
+declare const AlertTitle: any
+declare const AlertDescription: any
+
 import type { ProductApi, Category } from '~/types'
 
-const toast = useToast()
-
+/* Props / Emits */
 interface Props {
-    product?: Partial<ProductApi>
-    isEditing?: boolean
+  product?: Partial<ProductApi>
+  isEditing?: boolean
 }
+const props = withDefaults(defineProps<Props>(), { isEditing: false })
+const emit = defineEmits<{
+  (e: 'saved', product: ProductApi): void
+  (e: 'cancel'): void
+}>()
 
-interface Emits {
-    (e: 'saved', product: ProductApi): void
-    (e: 'cancel'): void
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    isEditing: false
-})
-
-const emit = defineEmits<Emits>()
 const config = useRuntimeConfig()
+const propsIsEditing = computed(() => !!props.isEditing)
 
-const form = ref<Partial<ProductApi>>({
+/* vee-validate form setup */
+const { handleSubmit, values, validate, setFieldValue, errors } = useForm({
+  initialValues: {
     name: '',
     slug: '',
     sku: '',
@@ -345,302 +290,248 @@ const form = ref<Partial<ProductApi>>({
     featured: false,
     active: true,
     status: 1,
-    categoryId: undefined,
-    images: [],
-    ...props.product
+    categoryId: undefined
+  }
 })
 
-const errors = ref<Record<string, string>>({})
+/* useField for fields we want explicit errors / blur handling */
+const { value: name, errorMessage: nameError, handleBlur: nameBlur } = useField('name', 'required')
+const { value: sku, errorMessage: skuError, handleBlur: skuBlur } = useField('sku', 'required')
+const { value: categoryId, errorMessage: categoryIdError, } = useField('categoryId', 'required')
+const { value: price, errorMessage: priceError, handleBlur: priceBlur } = useField('price', 'required|numeric|min_value:0.01')
+const { value: shortDescription } = useField('shortDescription')
+
+
+/* state */
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Image management
+const visible = ref(true)
+
+const toast = useToast()
+
+/* image fields (unchanged logic) */
 const imageFields = ref<Array<{
-    file?: File;
-    preview: string;
-    alt_text: string;
-    position: number;
-    active: boolean;
-    cover: boolean;
+  file?: File | undefined
+  preview: string
+  alt_text: string
+  position: number
+  active: boolean
+  cover: boolean
 }>>([])
 
+/* categories */
 const { data: categoriesData } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories`)
 const categories = computed(() => categoriesData.value || [])
 
-// Image handling methods
+/* image handlers (unchanged) */
 const addImageField = () => {
-    const newField = {
-        file: undefined,
-        preview: '',
-        alt_text: '',
-        position: imageFields.value.length,
-        active: true,
-        cover: imageFields.value.length === 0 // First image is cover by default
-    }
-    
-    if (newField.cover) {
-        // Uncheck other cover images
-        imageFields.value.forEach(field => field.cover = false)
-    }
-    
-    imageFields.value.push(newField)
+  const newField = {
+    file: undefined,
+    preview: '',
+    alt_text: '',
+    position: imageFields.value.length,
+    active: true,
+    cover: imageFields.value.length === 0
+  }
+  if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
+  imageFields.value.push(newField)
 }
 
 const handleImageUpload = (event: Event) => {
-    const files = (event.target as HTMLInputElement).files
-    if (files && files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i]
-            if (file) {
-                const reader = new FileReader()
-                reader.onload = (e) => {
-                    const previewUrl = e.target?.result as string
-                    const newField = {
-                        file: file,
-                        preview: previewUrl,
-                        alt_text: file.name,
-                        position: imageFields.value.length,
-                        active: true,
-                        cover: imageFields.value.length === 0 // First uploaded is cover
-                    }
-                    if (newField.cover) {
-                        imageFields.value.forEach(field => field.cover = false)
-                    }
-                    imageFields.value.push(newField)
-                }
-                reader.readAsDataURL(file)
-            }
+  const files = (event.target as HTMLInputElement).files
+  if (files && files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const previewUrl = e.target?.result as string
+          const newField = {
+            file,
+            preview: previewUrl,
+            alt_text: file.name,
+            position: imageFields.value.length,
+            active: true,
+            cover: imageFields.value.length === 0
+          }
+          if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
+          imageFields.value.push(newField)
         }
+        reader.readAsDataURL(file)
+      }
     }
+  }
 }
 
 const handleImageFieldChange = (event: Event, index: number) => {
-    const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            const previewUrl = e.target?.result as string
-            imageFields.value[index].file = file
-            imageFields.value[index].preview = previewUrl
-            imageFields.value[index].alt_text = file.name
-        }
-        reader.readAsDataURL(file)
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const previewUrl = e.target?.result as string
+      imageFields.value[index].file = file
+      imageFields.value[index].preview = previewUrl
+      imageFields.value[index].alt_text = file.name
     }
+    reader.readAsDataURL(file)
+  }
 }
 
 const handleCoverChange = (index: number) => {
-    if (imageFields.value[index].cover) {
-        // Uncheck other cover images
-        imageFields.value.forEach((field, i) => {
-            if (i !== index) field.cover = false
-        })
-    }
+  if (imageFields.value[index].cover) {
+    imageFields.value.forEach((f, i) => { if (i !== index) f.cover = false })
+  }
 }
 
 const removeImageField = (index: number) => {
-    const field = imageFields.value[index]
-    if (field.preview && field.preview.startsWith('data:')) {
-        URL.revokeObjectURL(field.preview)
-    }
-    imageFields.value.splice(index, 1)
-    
-    // Update positions
-    imageFields.value.forEach((field, i) => {
-        field.position = i
-    })
-    
-    // If no images left, reset cover
-    if (imageFields.value.length === 0) {
-        // No action needed
-    } else if (imageFields.value.every(field => !field.cover)) {
-        // If no cover image, set first as cover
-        imageFields.value[0].cover = true
-    }
+  const field = imageFields.value[index]
+  if (field.preview && field.preview.startsWith('data:')) URL.revokeObjectURL(field.preview)
+  imageFields.value.splice(index, 1)
+  imageFields.value.forEach((f, i) => (f.position = i))
+  if (imageFields.value.length && imageFields.value.every(f => !f.cover)) imageFields.value[0].cover = true
 }
 
 const handleDrop = (event: DragEvent) => {
-    event.preventDefault()
-    const files = event.dataTransfer?.files
-    if (files && files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i]
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader()
-                reader.onload = (e) => {
-                    const previewUrl = e.target?.result as string
-                    const newField = {
-                        file: file,
-                        preview: previewUrl,
-                        alt_text: file.name,
-                        position: imageFields.value.length,
-                        active: true,
-                        cover: imageFields.value.length === 0 // First dropped is cover
-                    }
-                    if (newField.cover) {
-                        imageFields.value.forEach(field => field.cover = false)
-                    }
-                    imageFields.value.push(newField)
-                }
-                reader.readAsDataURL(file)
-            }
+  event.preventDefault()
+  const files = event.dataTransfer?.files
+  if (files && files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const previewUrl = e.target?.result as string
+          const newField = {
+            file,
+            preview: previewUrl,
+            alt_text: file.name,
+            position: imageFields.value.length,
+            active: true,
+            cover: imageFields.value.length === 0
+          }
+          if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
+          imageFields.value.push(newField)
         }
+        reader.readAsDataURL(file)
+      }
     }
+  }
 }
 
-watch(() => form.value.name, (newName) => {
-    if (newName && !props.isEditing) {
-        form.value.slug = newName
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .trim()
+/* submit using vee-validate handler */
+const onSubmit = handleSubmit(async (vals) => {
+  pending.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    const url = props.isEditing ? `${config.public.baseURL}/api/products/${props.product?.id}` : `${config.public.baseURL}/api/products`
+    const method = props.isEditing ? 'PUT' : 'POST'
+
+    if (method === 'POST' && imageFields.value.some(f => f.file)) {
+      const formData = new FormData()
+      formData.append('name', vals.name || '')
+      formData.append('slug', vals.slug || '')
+      formData.append('sku', vals.sku || '')
+      formData.append('short_description', vals.shortDescription || '')
+      formData.append('description', vals.description || '')
+      formData.append('price', (vals.price || 0).toString())
+      formData.append('cost_price', (vals.costPrice || 0).toString())
+      formData.append('compare_price', (vals.comparePrice || 0).toString())
+      formData.append('featured', (vals.featured || false).toString())
+      formData.append('active', (vals.active || true).toString())
+      formData.append('status', (vals.status || 1).toString())
+      formData.append('category_id', (vals.categoryId || 0).toString())
+
+      imageFields.value.forEach((field, index) => {
+        if (field.file) formData.append(`image${index}`, field.file)
+        // optionally append alt_text, position, cover flags as form fields
+        formData.append(`images[${index}][alt_text]`, field.alt_text || '')
+        formData.append(`images[${index}][position]`, String(field.position))
+        formData.append(`images[${index}][active]`, String(field.active))
+        formData.append(`images[${index}][cover]`, String(field.cover))
+      })
+
+      const response = await $fetch(url, { method, body: formData })
+      successMessage.value = 'Produto criado com sucesso!'
+      emit('saved', response as ProductApi)
+      resetForm()
+    } else {
+      // JSON path
+      const payload = {
+        ...vals,
+        price: Number(vals.price) || 0,
+        costPrice: Number(vals.costPrice) || 0,
+        comparePrice: Number(vals.comparePrice) || 0,
+        status: Number(vals.status) || 1,
+        categoryId: Number(vals.categoryId) || undefined,
+        featured: !!vals.featured,
+        active: !!vals.active
+      }
+      const response = await $fetch(url, { method, body: payload })
+      successMessage.value = props.isEditing ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!'
+      emit('saved', response as ProductApi)
+      if (!props.isEditing) resetForm()
     }
+
+    setTimeout(() => { successMessage.value = '' }, 3000)
+  } catch (err: any) {
+    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar produto. Tente novamente.'
+    setTimeout(() => { errorMessage.value = '' }, 5000)
+  } finally {
+    pending.value = false
+  }
 })
 
-const validateForm = (): boolean => {
-    errors.value = {}
-    if (!form.value.name?.trim()) errors.value.name = 'Nome é obrigatório'
-    if (!form.value.sku?.trim()) errors.value.sku = 'SKU é obrigatório'
-    if (!form.value.price || Number(form.value.price) <= 0) errors.value.price = 'Preço deve ser maior que zero'
-    return Object.keys(errors.value).length === 0
-}
-
-
-const handleSubmit = async () => {
-    if (!validateForm()) return
-
-    pending.value = true
-    errorMessage.value = ''
-    successMessage.value = ''
-
-    try {
-        const url = props.isEditing
-            ? `${config.public.baseURL}/api/products/${props.product?.id}`
-            : `${config.public.baseURL}/api/products`
-        const method = props.isEditing ? 'PUT' : 'POST'
-
-        if (method === 'POST' && imageFields.value.some(field => field.file)) {
-            // Use FormData for file upload
-            const formData = new FormData()
-            
-            // Add product data
-            formData.append('name', form.value.name || '')
-            formData.append('slug', form.value.slug || '')
-            formData.append('sku', form.value.sku || '')
-            formData.append('short_description', form.value.shortDescription || '')
-            formData.append('description', form.value.description || '')
-            formData.append('price', (form.value.price || 0).toString())
-            formData.append('cost_price', (form.value.costPrice || 0).toString())
-            formData.append('compare_price', (form.value.comparePrice || 0).toString())
-            formData.append('featured', (form.value.featured || false).toString())
-            formData.append('active', (form.value.active || true).toString())
-            formData.append('status', (form.value.status || 1).toString())
-            formData.append('category_id', (form.value.categoryId || 0).toString())
-            
-            // Add images
-            imageFields.value.forEach((field, index) => {
-                if (field.file) {
-                    formData.append(`image${index}`, field.file)
-                }
-            })
-            
-            const response = await $fetch(url, {
-                method,
-                body: formData,
-            })
-            toast.success({ position: 'topRight',title: 'Success!', message: 'Produto criado com sucesso!' })
-            successMessage.value = 'Produto criado com sucesso!'
-            emit('saved', response as ProductApi)
-            resetForm()
-        } else {
-            // Use JSON for non-file updates
-            const payload: ProductApi = {
-                ...form.value,
-                price: Number(form.value.price) || 0,
-                costPrice: Number(form.value.costPrice) || 0,
-                comparePrice: Number(form.value.comparePrice) || 0,
-                status: Number(form.value.status) || 1,
-                categoryId: Number(form.value.categoryId) || undefined,
-                featured: !!form.value.featured,
-                active: !!form.value.active,
-                name: form.value.name || '',
-                slug: form.value.slug || '',
-                sku: form.value.sku || '',
-                shortDescription: form.value.shortDescription || '',
-                description: form.value.description || '',
-                id: props.product?.id || 0
-            }
-
-            const response = await $fetch(url, {
-                method,
-                body: payload,
-            })
-
-            successMessage.value = props.isEditing
-                ? 'Produto atualizado com sucesso!'
-                : 'Produto criado com sucesso!'
-                toast.success({ position: 'topRight',title: 'Success!', message:  successMessage.value })
-            emit('saved', response as ProductApi)
-
-            if (!props.isEditing) resetForm()
-        }
-
-        setTimeout(() => { successMessage.value = '' }, 3000)
-    } catch (err: any) {
-        errorMessage.value = err.message || 'Erro ao salvar produto. Tente novamente.'
-        setTimeout(() => { errorMessage.value = '' }, 5000)
-    } finally {
-        pending.value = false
-    }
-}
-
 const resetForm = () => {
-    form.value = {
-        name: '',
-        slug: '',
-        sku: '',
-        shortDescription: '',
-        description: '',
-        price: 0,
-        costPrice: 0,
-        comparePrice: 0,
-        featured: false,
-        active: true,
-        status: 1,
-        categoryId: undefined,
-        images: [],
-    }
-    errors.value = {}
-    
-    // Clear image fields
-    imageFields.value.forEach(field => {
-        if (field.preview && field.preview.startsWith('data:')) {
-            URL.revokeObjectURL(field.preview)
-        }
-    })
-    imageFields.value = []
+  setFieldValue('name', '')
+  setFieldValue('slug', '')
+  setFieldValue('sku', '')
+  setFieldValue('shortDescription', '')
+  setFieldValue('description', '')
+  setFieldValue('price', 0)
+  setFieldValue('costPrice', 0)
+  setFieldValue('comparePrice', 0)
+  setFieldValue('featured', false)
+  setFieldValue('active', true)
+  setFieldValue('status', 1)
+  setFieldValue('categoryId', undefined)
+  imageFields.value.forEach(field => { if (field.preview && field.preview.startsWith('data:')) URL.revokeObjectURL(field.preview) })
+  imageFields.value = []
 }
 
+/* populate values when editing */
 onMounted(() => {
-    if (props.product && props.isEditing) {
-        form.value = { ...props.product }
-        
-        // Load existing images if editing
-        if (props.product.images && props.product.images.length > 0) {
-            props.product.images.forEach((image, index) => {
-                imageFields.value.push({
-                    file: undefined,
-                    preview: image.image ? `${config.public.baseURL}/uploads/products/${image.image}` : '',
-                    alt_text: image.alt_text || '',
-                    position: image.position || index,
-                    active: image.active ?? true,
-                    cover: image.cover ?? false
-                })
-            })
-        }
+  if (props.product && props.isEditing) {
+    const p = props.product
+    setFieldValue('name', p.name || '')
+    setFieldValue('slug', p.slug || '')
+    setFieldValue('sku', p.sku || '')
+    setFieldValue('shortDescription', p.shortDescription || '')
+    setFieldValue('description', p.description || '')
+    setFieldValue('price', p.price || 0)
+    setFieldValue('costPrice', p.costPrice || 0)
+    setFieldValue('comparePrice', p.comparePrice || 0)
+    setFieldValue('featured', !!p.featured)
+    setFieldValue('active', p.active ?? true)
+    setFieldValue('status', p.status ?? 1)
+    setFieldValue('categoryId', p.categoryId)
+
+    if (p.images && p.images.length) {
+      p.images.forEach((image, index) => {
+        imageFields.value.push({
+          file: undefined,
+          preview: image.image ? `${config.public.baseURL}/uploads/products/${image.image}` : '',
+          alt_text: image.alt_text || '',
+          position: image.position ?? index,
+          active: image.active ?? true,
+          cover: image.cover ?? false
+        })
+      })
     }
+  }
 })
 </script>
 
