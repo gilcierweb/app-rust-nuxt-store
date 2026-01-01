@@ -35,6 +35,12 @@
           </a>
         </li>
         <li>
+         <NuxtLink to="/admin/categories">
+            <i class="icon-[tabler--shopping-bag] size-5"></i>
+            Categories
+          </NuxtLink>
+        </li>
+        <li>
          <NuxtLink to="/admin/products">
             <i class="icon-[tabler--shopping-bag] size-5"></i>
             Product

@@ -2,8 +2,7 @@
     <div>
 
         <div class="mt-6">
-            <h1 class="h1">Add New Product</h1>
-            <Button>Click me</Button>
+            <h1 class="h1">Add New Product</h1>       
         </div>
 
         <AdminProductsForm />
