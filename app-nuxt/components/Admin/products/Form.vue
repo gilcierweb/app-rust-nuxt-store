@@ -12,18 +12,7 @@
           <span class="ml-3">Salvando produto...</span>
         </div>
 
-        <!-- helper/demo Alert (from your other lib). Keep or remove as needed -->
-        <Alert v-if="false">
-          <AlertTitle>Heads up!</AlertTitle>
-          <AlertDescription>
-            You can add components to your app using the cli.
-          </AlertDescription>
-        </Alert>
 
-        <!-- Debug plain div to confirm reactivity (remove in production) -->
-        <div v-if="successMessage" class="mb-6 p-3 bg-green-100 text-green-800">
-          DEBUG: {{ successMessage }}
-        </div>
 
         <!-- Reusable AppAlert component -->
         <AppAlert v-if="successMessage" type="success" :message="successMessage" :auto-close="3000" @close="successMessage = ''" />
@@ -239,7 +228,7 @@
 
           <!-- Action Buttons -->
           <div class="flex justify-end space-x-4 pt-6">
-            <button type="button" @click="$emit('cancel')" class="btn btn-outline" :disabled="pending">Cancelar</button>
+            <button type="button" @click="emit('cancel')" class="btn btn-outline" :disabled="pending">Cancelar</button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
               {{ propsIsEditing ? 'Atualizar' : 'Salvar' }} Produto
@@ -252,14 +241,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
 import { useForm, useField } from 'vee-validate'
-import AppAlert from '~/components/AppAlert.vue'
-/* keep Alert imports if you use that other component */
-declare const Alert: any
-declare const AlertTitle: any
-declare const AlertDescription: any
-
 import type { ProductApi, Category } from '~/types'
 
 /* Props / Emits */
@@ -297,19 +279,13 @@ const { handleSubmit, values, validate, setFieldValue, errors } = useForm({
 /* useField for fields we want explicit errors / blur handling */
 const { value: name, errorMessage: nameError, handleBlur: nameBlur } = useField('name', 'required')
 const { value: sku, errorMessage: skuError, handleBlur: skuBlur } = useField('sku', 'required')
-const { value: categoryId, errorMessage: categoryIdError, } = useField('categoryId', 'required')
 const { value: price, errorMessage: priceError, handleBlur: priceBlur } = useField('price', 'required|numeric|min_value:0.01')
-const { value: shortDescription } = useField('shortDescription')
 
 
 /* state */
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
-
-const visible = ref(true)
-
-const toast = useToast()
 
 /* image fields (unchanged logic) */
 const imageFields = ref<Array<{
@@ -322,7 +298,7 @@ const imageFields = ref<Array<{
 }>>([])
 
 /* categories */
-const { data: categoriesData } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories`)
+const { data: categoriesData } = useLazyFetch<Category[]>(`${config.public.baseURL}/api/categories`)
 const categories = computed(() => categoriesData.value || [])
 
 /* image handlers (unchanged) */
@@ -359,6 +335,9 @@ const handleImageUpload = (event: Event) => {
           if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
           imageFields.value.push(newField)
         }
+        reader.onerror = () => {
+          console.error('Erro ao ler arquivo:', file.name)
+        }
         reader.readAsDataURL(file)
       }
     }
@@ -375,6 +354,9 @@ const handleImageFieldChange = (event: Event, index: number) => {
       imageFields.value[index].preview = previewUrl
       imageFields.value[index].alt_text = file.name
     }
+    reader.onerror = () => {
+      console.error('Erro ao ler arquivo:', file.name)
+    }
     reader.readAsDataURL(file)
   }
 }
@@ -387,7 +369,10 @@ const handleCoverChange = (index: number) => {
 
 const removeImageField = (index: number) => {
   const field = imageFields.value[index]
-  if (field.preview && field.preview.startsWith('data:')) URL.revokeObjectURL(field.preview)
+  // revokeObjectURL só deve ser usado para blob: URLs, não para data: URLs
+  if (field.preview && field.preview.startsWith('blob:')) {
+    URL.revokeObjectURL(field.preview)
+  }
   imageFields.value.splice(index, 1)
   imageFields.value.forEach((f, i) => (f.position = i))
   if (imageFields.value.length && imageFields.value.every(f => !f.cover)) imageFields.value[0].cover = true
@@ -414,6 +399,9 @@ const handleDrop = (event: DragEvent) => {
           if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
           imageFields.value.push(newField)
         }
+        reader.onerror = () => {
+          console.error('Erro ao ler arquivo:', file.name)
+        }
         reader.readAsDataURL(file)
       }
     }
@@ -421,7 +409,22 @@ const handleDrop = (event: DragEvent) => {
 }
 
 /* submit using vee-validate handler */
-const onSubmit = handleSubmit(async (vals) => {
+interface FormValues {
+  name: string
+  slug: string
+  sku: string
+  shortDescription: string
+  description: string
+  price: number
+  costPrice: number
+  comparePrice: number
+  featured: boolean
+  active: boolean
+  status: number
+  categoryId?: number
+}
+
+const onSubmit = handleSubmit(async (vals: FormValues) => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
@@ -475,11 +478,9 @@ const onSubmit = handleSubmit(async (vals) => {
       emit('saved', response as ProductApi)
       if (!props.isEditing) resetForm()
     }
-
-    setTimeout(() => { successMessage.value = '' }, 3000)
+    // Auto-close é gerenciado pelo componente AppAlert
   } catch (err: any) {
     errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar produto. Tente novamente.'
-    setTimeout(() => { errorMessage.value = '' }, 5000)
   } finally {
     pending.value = false
   }
@@ -498,7 +499,12 @@ const resetForm = () => {
   setFieldValue('active', true)
   setFieldValue('status', 1)
   setFieldValue('categoryId', undefined)
-  imageFields.value.forEach(field => { if (field.preview && field.preview.startsWith('data:')) URL.revokeObjectURL(field.preview) })
+  // Limpar blob URLs se existirem
+  imageFields.value.forEach(field => {
+    if (field.preview && field.preview.startsWith('blob:')) {
+      URL.revokeObjectURL(field.preview)
+    }
+  })
   imageFields.value = []
 }
 
