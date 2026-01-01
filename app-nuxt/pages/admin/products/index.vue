@@ -11,7 +11,9 @@
                     <button class="btn btn-primary">Search</button>
                 </div>
             </form>
-            <button type="button" class="btn btn-success">Add</button>
+
+            <NuxtLink to="/admin/products/new" class="btn btn-success"> Add</NuxtLink>
+
         </div>
 
         <div class="w-full overflow-x-auto">
