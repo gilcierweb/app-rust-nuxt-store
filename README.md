@@ -207,17 +207,6 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 - **Addresses** — Address management
 - **Shipments** — Shipping and tracking management
 
-## 📖 Documentation
-
-| Document | Description |
-|---|---|
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, design patterns, data flow |
-| [PRD.md](docs/PRD.md) | Product Requirements Document |
-| [TASKS.md](docs/TASKS.md) | Development task tracking (131/140 completed) |
-| [BACKLOG.md](docs/BACKLOG.md) | Sprint-based product backlog |
-| [NOTES.md](docs/NOTES.md) | Development notes and CLI references |
-| [NOTES-NUXT.MD](docs/NOTES-NUXT.MD) | Nuxt 4 patterns and best practices |
-
 ---
 
 ## ✅ ToDo — Completed
