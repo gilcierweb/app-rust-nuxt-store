@@ -3,7 +3,7 @@
 
 ### [Loco.rs](https://loco.rs/) It’s Like [Ruby on Rails](https://rubyonrails.org/), but for [Rust Lang](https://www.rust-lang.org/). 
 
-![App Nuxt](app-nuxt/assets/images/app-rust-nuxt-store.webp) 
+![App Nuxt](app-nuxt/app/assets/images/app-rust-nuxt-store.webp) 
 
 ### Skill
 
