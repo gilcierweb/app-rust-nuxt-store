@@ -11,7 +11,7 @@
     </div>
 
     <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-2 space-y-6">
         <div class="rounded-box border p-6">
           <h3 class="mb-4 text-lg font-semibold">{{ t('cart.summary') }}</h3>
           <div class="space-y-4">
@@ -23,6 +23,31 @@
               </div>
               <p class="font-semibold">{{ formatNumberBR(item.price * item.quantity) }}</p>
             </div>
+          </div>
+        </div>
+
+        <div class="rounded-box border p-6">
+          <h3 class="mb-4 text-lg font-semibold">{{ t('payment.select') }}</h3>
+          <div v-if="paymentMethods.length === 0" class="text-sm text-base-content/60">
+            {{ t('common.loading') }}
+          </div>
+          <div v-else class="space-y-3">
+            <label
+              v-for="method in paymentMethods"
+              :key="method.id"
+              class="flex items-center gap-3 rounded-lg border p-4 cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+            >
+              <input
+                v-model="selectedPaymentMethod"
+                type="radio"
+                name="payment_method"
+                :value="method.id"
+                class="radio radio-primary"
+              />
+              <div>
+                <p class="font-medium">{{ method.name || method.code }}</p>
+              </div>
+            </label>
           </div>
         </div>
       </div>
@@ -40,7 +65,7 @@
               <span class="text-primary">{{ formatNumberBR(cartStore.totalPrice) }}</span>
             </div>
           </div>
-          <button class="btn btn-primary mt-6 w-full" :disabled="submitting" @click="placeOrder">
+          <button class="btn btn-primary mt-6 w-full" :disabled="submitting || !selectedPaymentMethod" @click="placeOrder">
             <span v-if="submitting" class="loading loading-spinner" />
             {{ t('pages.checkout.placeOrder') }}
           </button>
@@ -56,11 +81,26 @@ const { t } = useI18n()
 const cartStore = useCartStore()
 const router = useRouter()
 const config = useRuntimeConfig()
+import type { PaymentMethod } from '~/types'
+
 const submitting = ref(false)
 const error = ref('')
+const selectedPaymentMethod = ref<number | null>(null)
+const paymentMethods = ref<PaymentMethod[]>([])
+
+onMounted(async () => {
+  try {
+    paymentMethods.value = await $fetch(`${config.public.baseURL}/api/payments/methods`)
+    if (paymentMethods.value.length > 0) {
+      selectedPaymentMethod.value = paymentMethods.value[0].id
+    }
+  } catch {
+    paymentMethods.value = []
+  }
+})
 
 async function placeOrder() {
-  if (cartStore.isEmpty) return
+  if (cartStore.isEmpty || !selectedPaymentMethod.value) return
   submitting.value = true
   error.value = ''
 
@@ -80,6 +120,7 @@ async function placeOrder() {
         total_amount: cartStore.totalPrice,
         shipping_amount: 0,
         discount_amount: 0,
+        payment_method_id: selectedPaymentMethod.value,
       },
     })
 

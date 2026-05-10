@@ -30,6 +30,12 @@
           <span class="text-base-content/60">{{ t('pages.orders.status') }}</span>
           <span class="badge badge-soft badge-primary">{{ t('order.status.pending') }}</span>
         </div>
+        <div class="flex justify-between py-2">
+          <span class="text-base-content/60">{{ t('pages.orders.payment') }}</span>
+          <span :class="paymentBadgeClass(order.payment_status)">
+            {{ paymentLabel(order.payment_status) }}
+          </span>
+        </div>
         <div class="flex justify-between border-t pt-4 mt-2 text-lg font-bold">
           <span>{{ t('order.total') }}</span>
           <span class="text-primary">{{ formatNumberBR(order.total_amount) }}</span>
@@ -61,4 +67,21 @@ const { data: order, pending } = await useFetch<Order>(
   `${config.public.baseURL}/api/orders/${id}`,
   { key: `confirmation-${id}` }
 )
+
+const paymentMap: Record<number, { label: string; badge: string }> = {
+  1: { label: t('order.paymentStatus.unpaid'), badge: 'badge-soft badge-error' },
+  2: { label: t('order.paymentStatus.paid'), badge: 'badge-soft badge-success' },
+  3: { label: t('order.paymentStatus.refunded'), badge: 'badge-soft badge-info' },
+  4: { label: t('order.paymentStatus.partiallyRefunded'), badge: 'badge-soft badge-warning' },
+}
+
+function paymentLabel(status: unknown): string {
+  if (status == null) return '-'
+  return paymentMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+}
+
+function paymentBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return paymentMap[status as number]?.badge ?? 'badge-soft'
+}
 </script>

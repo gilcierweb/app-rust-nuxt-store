@@ -21,6 +21,7 @@
             <th>{{ t('pages.orders.number') }}</th>
             <th>{{ t('pages.orders.date') }}</th>
             <th>{{ t('pages.orders.status') }}</th>
+            <th>{{ t('pages.orders.payment') }}</th>
             <th class="text-right">{{ t('pages.orders.total') }}</th>
             <th />
           </tr>
@@ -32,6 +33,11 @@
             <td>
               <span :class="statusBadgeClass(order.status)">
                 {{ statusLabel(order.status) }}
+              </span>
+            </td>
+            <td>
+              <span :class="paymentBadgeClass(order.payment_status)">
+                {{ paymentLabel(order.payment_status) }}
               </span>
             </td>
             <td class="text-right font-semibold">{{ formatNumberBR(order.total_amount) }}</td>
@@ -75,5 +81,22 @@ function statusLabel(status: unknown): string {
 function statusBadgeClass(status: unknown): string {
   if (status == null) return 'badge-soft'
   return statusMap[status as number]?.badge ?? 'badge-soft'
+}
+
+const paymentMap: Record<number, { label: string; badge: string }> = {
+  1: { label: t('order.paymentStatus.unpaid'), badge: 'badge-soft badge-error' },
+  2: { label: t('order.paymentStatus.paid'), badge: 'badge-soft badge-success' },
+  3: { label: t('order.paymentStatus.refunded'), badge: 'badge-soft badge-info' },
+  4: { label: t('order.paymentStatus.partiallyRefunded'), badge: 'badge-soft badge-warning' },
+}
+
+function paymentLabel(status: unknown): string {
+  if (status == null) return '-'
+  return paymentMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+}
+
+function paymentBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return paymentMap[status as number]?.badge ?? 'badge-soft'
 }
 </script>

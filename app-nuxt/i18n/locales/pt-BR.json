@@ -232,7 +232,8 @@
       "total": "Total",
       "items": "Itens",
       "detail": "Detalhes do Pedido",
-      "backToOrders": "Voltar aos Pedidos"
+      "backToOrders": "Voltar aos Pedidos",
+      "payment": "Pagamento"
     },
     "checkout": {
       "title": "Finalizar Compra",
@@ -781,6 +782,17 @@
       "2": "Ação de seed 2",
       "3": "Ação de seed 3",
       "4": "Ação de seed 4"
+    }
+  },
+  "payment": {
+    "select": "Selecionar método de pagamento",
+    "creditCard": "Cartão de Crédito",
+    "boleto": "Boleto",
+    "pix": "PIX",
+    "status": {
+      "pending": "Pendente",
+      "completed": "Concluído",
+      "failed": "Falhou"
     }
   },
   "variant": {

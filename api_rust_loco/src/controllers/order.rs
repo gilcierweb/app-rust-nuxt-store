@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
+use crate::models::_entities::payments;
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::order_status::OrderStatus;
 
@@ -78,11 +79,43 @@ pub async fn checkout(
         })?;
     }
 
+    let mut payment_id = None;
+    let mut payment_status = None;
+
+    if let Some(pm_id) = params.payment_method_id {
+        let transaction_id = format!("TXN-{}", uuid::Uuid::new_v4());
+        let payment = payments::ActiveModel {
+            order_id: Set(saved.id),
+            payment_method_id: Set(pm_id),
+            amount: Set(Some(params.total_amount)),
+            currency: Set(Some("BRL".to_string())),
+            status: Set(Some(1)),
+            transaction_id: Set(Some(transaction_id)),
+            processed_at: Set(Some(chrono::Utc::now().naive_utc())),
+            created_at: Set(now),
+            updated_at: Set(now),
+            ..Default::default()
+        };
+        let saved_payment = payment.insert(&ctx.db).await.map_err(|e| {
+            tracing::error!(error = ?e, "failed to create payment");
+            Error::InternalServerError
+        })?;
+        payment_id = Some(saved_payment.id);
+        payment_status = Some(1);
+
+        let mut order_active: crate::models::_entities::orders::ActiveModel = saved.clone().into();
+        order_active.payment_status = Set(Some(2));
+        order_active.updated_at = Set(chrono::Utc::now().into());
+        order_active.update(&ctx.db).await?;
+    }
+
     format::json(serde_json::json!({
         "id": saved.id,
         "order_number": saved.order_number,
         "status": saved.status,
         "total_amount": saved.total_amount,
+        "payment_id": payment_id,
+        "payment_status": payment_status,
     }))
 }
 

@@ -232,7 +232,8 @@
       "total": "Total",
       "items": "Items",
       "detail": "Order Details",
-      "backToOrders": "Back to Orders"
+      "backToOrders": "Back to Orders",
+      "payment": "Payment"
     },
     "checkout": {
       "title": "Checkout",
@@ -781,6 +782,17 @@
       "2": "Seed action 2",
       "3": "Seed action 3",
       "4": "Seed action 4"
+    }
+  },
+  "payment": {
+    "select": "Select payment method",
+    "creditCard": "Credit Card",
+    "boleto": "Boleto",
+    "pix": "PIX",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed"
     }
   },
   "variant": {

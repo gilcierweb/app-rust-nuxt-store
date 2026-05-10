@@ -192,3 +192,21 @@ export interface CartItem {
   slug?: string
   variantId?: number
 }
+
+export interface PaymentMethod {
+  id: number
+  name?: string
+  code?: string
+  active?: boolean
+}
+
+export interface Payment {
+  id: number
+  order_id: number
+  payment_method_id: number
+  amount?: number
+  currency?: string
+  status?: number
+  transaction_id?: string
+  processed_at?: string
+}
