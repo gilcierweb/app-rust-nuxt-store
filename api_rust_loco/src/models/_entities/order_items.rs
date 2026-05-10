@@ -8,14 +8,14 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
-    #[sea_orm(primary_key)]
+    #[sea_orm(primary_key, auto_increment = true)]
     pub id: i32,
     pub quantity: Option<i32>,
     pub price: Option<Decimal>,
     pub total: Option<Decimal>,
     pub order_id: i32,
     pub product_id: i32,
-    pub product_variant_id: i32,
+    pub product_variant_id: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

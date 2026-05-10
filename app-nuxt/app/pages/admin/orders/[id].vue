@@ -5,7 +5,7 @@
     </div>
 
     <div v-else-if="!order" class="flex flex-col items-center justify-center py-20">
-      <p class="text-lg text-base-content/60">Order not found</p>
+      <p class="text-lg text-base-content/60">{{ t('admin.statusLabels.unknown') }}</p>
       <NuxtLink to="/admin/orders" class="btn btn-primary mt-4">
         {{ t('pages.orders.backToOrders') }}
       </NuxtLink>
@@ -17,7 +17,7 @@
           <NuxtLink to="/admin/orders" class="link link-hover text-sm text-base-content/60">
             &larr; {{ t('pages.orders.backToOrders') }}
           </NuxtLink>
-          <h1 class="h1 mt-1">{{ t('pages.orders.detail') }} - {{ order.order_number }}</h1>
+          <h1 class="h1 mt-1">{{ t('pages.orders.detail') }} - {{ order.order_number || '#' + order.id }}</h1>
         </div>
         <span :class="statusBadgeClass(order.status)" class="text-sm">
           {{ statusLabel(order.status) }}
@@ -38,7 +38,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in order.items" :key="item.id">
+                <tr v-for="item in order.items || []" :key="item.id">
                   <td>{{ item.product_name || `Product #${item.product_id}` }}</td>
                   <td>{{ item.quantity }}</td>
                   <td class="text-right">{{ formatNumberBR(item.price) }}</td>
@@ -80,7 +80,7 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-base-content/60">{{ t('pages.orders.date') }}</span>
-                <span>{{ new Date(order.created_at).toLocaleDateString() }}</span>
+                <span>{{ formatDate(order.created_at) }}</span>
               </div>
               <div class="flex justify-between border-t pt-2 mt-2 text-base font-bold">
                 <span>{{ t('pages.orders.total') }}</span>
@@ -103,7 +103,8 @@ import type { Order } from '~/types'
 
 const id = route.params.id
 const { data: order, pending } = await useFetch<Order>(
-  `${config.public.baseURL}/api/orders/${id}`
+  `${config.public.baseURL}/api/orders/${id}`,
+  { key: `admin-order-${id}` }
 )
 const selectedStatus = ref('')
 const updating = ref(false)
@@ -131,20 +132,24 @@ const availableStatuses = computed(() => {
   const transitions: Record<number, number[]> = {
     1: [2, 6], 2: [3, 6], 3: [4, 6], 4: [5], 5: [], 6: [],
   }
-  return (transitions[current] ?? []).map(v => ({ value: v, label: statusMap[v]?.label ?? '' }))
+  return (transitions[current] ?? []).map(v => ({ value: v, label: statusMap[v]?.label ?? '-' }))
 })
 
-function statusLabel(status: number): string {
-  return statusMap[status]?.label ?? t('admin.statusLabels.unknown')
+function statusLabel(status: unknown): string {
+  if (status == null) return '-'
+  return statusMap[status as number]?.label ?? t('admin.statusLabels.unknown')
 }
-function statusBadgeClass(status: number): string {
-  return statusMap[status]?.badge ?? 'badge-soft'
+function statusBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return statusMap[status as number]?.badge ?? 'badge-soft'
 }
-function paymentLabel(status: number): string {
-  return paymentMap[status]?.label ?? t('admin.statusLabels.unknown')
+function paymentLabel(status: unknown): string {
+  if (status == null) return '-'
+  return paymentMap[status as number]?.label ?? t('admin.statusLabels.unknown')
 }
-function paymentBadgeClass(status: number): string {
-  return paymentMap[status]?.badge ?? 'badge-soft'
+function paymentBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return paymentMap[status as number]?.badge ?? 'badge-soft'
 }
 
 async function updateStatus() {
@@ -158,11 +163,11 @@ async function updateStatus() {
       body: { status: Number(selectedStatus.value) },
     })
     order.value.status = Number(selectedStatus.value)
-    statusMsg.value = 'Status updated successfully'
+    statusMsg.value = t('admin.statusLabels.completed')
     statusMsgType.value = 'text-success'
     selectedStatus.value = ''
   } catch (err: any) {
-    statusMsg.value = err?.data?.message || err?.message || 'Error updating status'
+    statusMsg.value = err?.data?.message || err?.message || t('admin.statusLabels.unknown')
     statusMsgType.value = 'text-error'
   } finally {
     updating.value = false

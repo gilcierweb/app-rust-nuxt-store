@@ -28,6 +28,7 @@ mod m20260510_082918_coupons;
 mod m20260510_083114_coupon_usages;
 mod m20260510_083315_reviews;
 mod m20260510_083524_wishlists;
+mod m20260510_101510_alter_order_items_product_variant_nullable;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -60,6 +61,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260510_083114_coupon_usages::Migration),
             Box::new(m20260510_083315_reviews::Migration),
             Box::new(m20260510_083524_wishlists::Migration),
+            Box::new(m20260510_101510_alter_order_items_product_variant_nullable::Migration),
             // inject-above (do not remove this comment)
         ]
     }

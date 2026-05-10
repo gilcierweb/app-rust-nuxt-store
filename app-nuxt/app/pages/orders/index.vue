@@ -27,8 +27,8 @@
         </thead>
         <tbody>
           <tr v-for="order in orders" :key="order.id" class="row-hover">
-            <td class="font-mono text-sm">{{ order.order_number }}</td>
-            <td>{{ new Date(order.created_at).toLocaleDateString() }}</td>
+            <td class="font-mono text-sm">{{ order.order_number || '-' }}</td>
+            <td>{{ formatDate(order.created_at) }}</td>
             <td>
               <span :class="statusBadgeClass(order.status)">
                 {{ statusLabel(order.status) }}
@@ -53,7 +53,8 @@ const config = useRuntimeConfig()
 import type { Order } from '~/types'
 
 const { data: ordersData, pending } = await useFetch<Order[]>(
-  `${config.public.baseURL}/api/orders/my_orders`
+  `${config.public.baseURL}/api/orders/my_orders`,
+  { key: 'my-orders' }
 )
 const orders = computed(() => ordersData.value ?? [])
 
@@ -66,11 +67,13 @@ const statusMap: Record<number, { label: string; badge: string }> = {
   6: { label: t('order.status.cancelled'), badge: 'badge-soft badge-error' },
 }
 
-function statusLabel(status: number): string {
-  return statusMap[status]?.label ?? t('admin.statusLabels.unknown')
+function statusLabel(status: unknown): string {
+  if (status == null) return '-'
+  return statusMap[status as number]?.label ?? t('admin.statusLabels.unknown')
 }
 
-function statusBadgeClass(status: number): string {
-  return statusMap[status]?.badge ?? 'badge-soft'
+function statusBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return statusMap[status as number]?.badge ?? 'badge-soft'
 }
 </script>

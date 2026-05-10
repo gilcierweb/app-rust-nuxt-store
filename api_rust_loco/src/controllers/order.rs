@@ -6,7 +6,6 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use sea_orm::QueryOrder;
-use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::models::_entities::order_items;
@@ -38,7 +37,6 @@ pub async fn checkout(
     let now = chrono::Utc::now().into();
 
     let order = ActiveModel {
-        id: Set(Default::default()),
         order_number: Set(Some(order_number)),
         status: Set(Some(OrderStatus::Pending.to_i32())),
         total_amount: Set(Some(params.total_amount)),
@@ -53,6 +51,7 @@ pub async fn checkout(
         user_id: Set(1), // default user until auth middleware
         created_at: Set(now),
         updated_at: Set(now),
+        ..Default::default()
     };
 
     let saved = order.insert(&ctx.db).await.map_err(|e| {
@@ -63,15 +62,15 @@ pub async fn checkout(
     for item in &params.items {
         let item_total = item.price * Decimal::from(item.quantity);
         let order_item = order_items::ActiveModel {
-            id: Set(Default::default()),
             order_id: Set(saved.id),
             product_id: Set(item.product_id),
-            product_variant_id: Set(0),
+            product_variant_id: Set(None),
             quantity: Set(Some(item.quantity)),
             price: Set(Some(item.price)),
             total: Set(Some(item_total)),
             created_at: Set(now),
             updated_at: Set(now),
+            ..Default::default()
         };
         order_item.insert(&ctx.db).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to create order item");

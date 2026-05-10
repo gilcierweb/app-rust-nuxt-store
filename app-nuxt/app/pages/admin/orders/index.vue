@@ -23,8 +23,8 @@
         </thead>
         <tbody>
           <tr v-for="order in orders" :key="order.id" class="row-hover">
-            <td class="font-mono text-sm">{{ order.order_number }}</td>
-            <td>{{ new Date(order.created_at).toLocaleDateString() }}</td>
+            <td class="font-mono text-sm">{{ order.order_number || '-' }}</td>
+            <td>{{ formatDate(order.created_at) }}</td>
             <td>
               <span :class="statusBadgeClass(order.status)">
                 {{ statusLabel(order.status) }}
@@ -56,7 +56,8 @@ const config = useRuntimeConfig()
 import type { Order } from '~/types'
 
 const { data: ordersData, pending } = await useFetch<Order[]>(
-  `${config.public.baseURL}/api/orders/list`
+  `${config.public.baseURL}/api/orders/list`,
+  { key: 'admin-orders' }
 )
 const orders = computed(() => ordersData.value ?? [])
 
@@ -76,16 +77,20 @@ const paymentMap: Record<number, { label: string; badge: string }> = {
   4: { label: t('order.paymentStatus.partiallyRefunded'), badge: 'badge-soft badge-warning' },
 }
 
-function statusLabel(status: number): string {
-  return statusMap[status]?.label ?? t('admin.statusLabels.unknown')
+function statusLabel(status: unknown): string {
+  if (status == null) return '-'
+  return statusMap[status as number]?.label ?? t('admin.statusLabels.unknown')
 }
-function statusBadgeClass(status: number): string {
-  return statusMap[status]?.badge ?? 'badge-soft'
+function statusBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return statusMap[status as number]?.badge ?? 'badge-soft'
 }
-function paymentLabel(status: number): string {
-  return paymentMap[status]?.label ?? t('admin.statusLabels.unknown')
+function paymentLabel(status: unknown): string {
+  if (status == null) return '-'
+  return paymentMap[status as number]?.label ?? t('admin.statusLabels.unknown')
 }
-function paymentBadgeClass(status: number): string {
-  return paymentMap[status]?.badge ?? 'badge-soft'
+function paymentBadgeClass(status: unknown): string {
+  if (status == null) return 'badge-soft'
+  return paymentMap[status as number]?.badge ?? 'badge-soft'
 }
 </script>
