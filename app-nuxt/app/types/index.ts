@@ -227,3 +227,61 @@ export interface Payment {
   transaction_id?: string
   processed_at?: string
 }
+
+export interface Review {
+  id: number
+  rating?: number
+  title?: string
+  comment?: string
+  verified_purchase?: boolean
+  active?: boolean
+  user_id: number
+  product_id: number
+  created_at: string
+  updated_at: string
+}
+
+export interface Coupon {
+  id: number
+  code?: string
+  discount_type?: number
+  discount_value?: number
+  minimum_amount?: number
+  maximum_discount?: number
+  usage_limit?: number
+  used_count?: number
+  expires_at?: string
+  active?: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface Address {
+  id: number
+  type?: string
+  first_name?: string
+  last_name?: string
+  company?: string
+  address1?: string
+  address2?: string
+  city?: string
+  state?: string
+  zip_code?: string
+  country?: string
+  phone?: string
+  default?: boolean
+  user_id: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ShippingMethod {
+  id: number
+  name?: string
+  code?: string
+  base_price?: number
+  free_shipping_threshold?: number
+  active?: boolean
+  created_at: string
+  updated_at: string
+}

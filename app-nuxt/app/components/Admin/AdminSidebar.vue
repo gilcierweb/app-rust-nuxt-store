@@ -64,6 +64,30 @@
              Profiles
            </NuxtLink>
         </li>
+        <li>
+         <NuxtLink to="/admin/reviews">
+             <i class="icon-[tabler--star] size-5"></i>
+             Reviews
+           </NuxtLink>
+        </li>
+        <li>
+         <NuxtLink to="/admin/coupons">
+             <i class="icon-[tabler--ticket] size-5"></i>
+             Coupons
+           </NuxtLink>
+        </li>
+        <li>
+         <NuxtLink to="/admin/addresses">
+             <i class="icon-[tabler--map-pin] size-5"></i>
+             Addresses
+           </NuxtLink>
+        </li>
+        <li>
+         <NuxtLink to="/admin/shippings">
+             <i class="icon-[tabler--truck-delivery] size-5"></i>
+             Shipping Methods
+           </NuxtLink>
+        </li>
         <li v-if="!isAuthenticated">
           <NuxtLink to="/users/sessions">
             <span class="icon-[tabler--login] size-5"></span>
