@@ -223,6 +223,29 @@
       "itemsCount": "{count} itens",
       "item": "Item"
     },
+    "orders": {
+      "title": "Meus Pedidos",
+      "empty": "Nenhum pedido ainda",
+      "number": "Pedido #",
+      "date": "Data",
+      "status": "Status",
+      "total": "Total",
+      "items": "Itens",
+      "detail": "Detalhes do Pedido",
+      "backToOrders": "Voltar aos Pedidos"
+    },
+    "checkout": {
+      "title": "Finalizar Compra",
+      "placeOrder": "Confirmar Pedido",
+      "orderSummary": "Resumo do Pedido",
+      "confirming": "Confirmando seu pedido..."
+    },
+    "confirmation": {
+      "title": "Pedido Confirmado",
+      "success": "Seu pedido foi realizado com sucesso!",
+      "number": "Número do Pedido",
+      "emailSent": "Um e-mail de confirmação foi enviado."
+    },
     "products": {
       "title": "Produtos",
       "loading": "Carregando...",
@@ -644,6 +667,36 @@
     "clearCart": "Limpar Carrinho",
     "itemsCount": "{count} itens",
     "yourCart": "Seu Carrinho"
+  },
+  "order": {
+    "status": {
+      "pending": "Pendente",
+      "confirmed": "Confirmado",
+      "processing": "Processando",
+      "shipped": "Enviado",
+      "delivered": "Entregue",
+      "cancelled": "Cancelado"
+    },
+    "paymentStatus": {
+      "unpaid": "Não Pago",
+      "paid": "Pago",
+      "refunded": "Reembolsado",
+      "partiallyRefunded": "Parcialmente Reembolsado"
+    },
+    "fulfillmentStatus": {
+      "unfulfilled": "Não Atendido",
+      "fulfilled": "Atendido",
+      "partial": "Parcial"
+    },
+    "number": "Pedido {number}",
+    "date": "Data",
+    "total": "Total",
+    "items": "{count} itens",
+    "details": "Ver Detalhes",
+    "adminTitle": "Pedidos",
+    "adminSearch": "Buscar pedidos...",
+    "updateStatus": "Atualizar Status",
+    "selectStatus": "Selecionar novo status"
   },
   "product": {
     "badges": {

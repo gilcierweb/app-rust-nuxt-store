@@ -86,10 +86,9 @@
             <span class="text-primary">{{ formatNumberBR(cartStore.totalPrice) }}</span>
           </div>
         </div>
-        <button class="btn btn-primary w-full" disabled>
+        <NuxtLink to="/checkout" class="btn btn-primary w-full">
           {{ t('cart.checkout') }}
-        </button>
-        <p class="mt-2 text-center text-xs text-base-content/40">Checkout coming soon</p>
+        </NuxtLink>
       </div>
     </div>
   </div>

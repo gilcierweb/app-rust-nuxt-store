@@ -223,6 +223,29 @@
       "itemsCount": "{count} items",
       "item": "Item"
     },
+    "orders": {
+      "title": "My Orders",
+      "empty": "No orders yet",
+      "number": "Order #",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "items": "Items",
+      "detail": "Order Details",
+      "backToOrders": "Back to Orders"
+    },
+    "checkout": {
+      "title": "Checkout",
+      "placeOrder": "Place Order",
+      "orderSummary": "Order Summary",
+      "confirming": "Confirming your order..."
+    },
+    "confirmation": {
+      "title": "Order Confirmed",
+      "success": "Your order has been placed successfully!",
+      "number": "Order Number",
+      "emailSent": "A confirmation email has been sent."
+    },
     "products": {
       "title": "Products",
       "loading": "Loading...",
@@ -644,6 +667,36 @@
     "clearCart": "Clear Cart",
     "itemsCount": "{count} items",
     "yourCart": "Your Cart"
+  },
+  "order": {
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "paymentStatus": {
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "partiallyRefunded": "Partially Refunded"
+    },
+    "fulfillmentStatus": {
+      "unfulfilled": "Unfulfilled",
+      "fulfilled": "Fulfilled",
+      "partial": "Partial"
+    },
+    "number": "Order {number}",
+    "date": "Date",
+    "total": "Total",
+    "items": "{count} items",
+    "details": "View Details",
+    "adminTitle": "Orders",
+    "adminSearch": "Search orders...",
+    "updateStatus": "Update Status",
+    "selectStatus": "Select new status"
   },
   "product": {
     "badges": {

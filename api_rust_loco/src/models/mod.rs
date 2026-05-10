@@ -14,6 +14,7 @@ pub mod carts;
 pub mod orders;
 pub mod cart_items;
 pub mod order_items;
+pub mod order_status;
 pub mod payment_methods;
 pub mod payments;
 pub mod addresses;

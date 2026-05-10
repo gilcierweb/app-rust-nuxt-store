@@ -132,6 +132,34 @@ export interface ResetParams {
   password: string
 }
 
+export interface OrderItem {
+  id: number
+  product_id: number
+  quantity: number
+  price: number
+  total: number
+  product_name?: string
+}
+
+export interface Order {
+  id: number
+  order_number: string
+  status: number
+  total_amount: number
+  subtotal: number
+  tax_amount: number
+  shipping_amount: number
+  discount_amount: number
+  currency: string
+  payment_status: number
+  fulfillment_status: number
+  notes?: string
+  user_id: number
+  created_at: string
+  updated_at: string
+  items?: OrderItem[]
+}
+
 export interface CartItem {
   id: string
   productId: number
