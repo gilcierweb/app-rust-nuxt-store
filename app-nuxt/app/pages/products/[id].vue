@@ -3,7 +3,7 @@
 
         <div v-if="pendingApi">
             <div class="flex items-center justify-center h-96">
-                <span>Loading ...</span> <br>
+                <span>{{ t('pages.products.loading') }}</span> <br>
                 <span class="loading loading-spinner text-info size-40"></span>
             </div>
         </div>
@@ -26,7 +26,7 @@
                 <h1 class="text-base-content text-4xl">{{ productApi?.name }}</h1>
                 <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(productApi?.price) }}</p>
                 <p class="my-3"><span class="badge badge-secondary">{{ productApi?.category.name }}</span></p>
-                <button class="btn btn-primary btn-xl">Buy Now</button>
+                <button class="btn btn-primary btn-xl">{{ t('pages.products.buy') }}</button>
             </div>
             <div class="grid grid-cols-1">
                 <p>{{ productApi?.description }}</p>
@@ -36,7 +36,7 @@
 
         <div v-if="pending">
             <div class="flex items-center justify-center h-96">
-                <span>Loading ...</span> <br>
+                <span>{{ t('pages.products.loading') }}</span> <br>
                 <span class="loading loading-spinner text-info size-40"></span>
             </div>
         </div>
@@ -59,7 +59,7 @@
                 <h1 class="text-base-content text-4xl">{{ product?.title }}</h1>
                 <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(product?.price) }}</p>
                 <p class="my-3"><span class="badge badge-secondary">{{ product?.category }}</span></p>
-                <button class="btn btn-primary btn-xl">Buy Now</button>
+                <button class="btn btn-primary btn-xl">{{ t('pages.products.buy') }}</button>
             </div>
             <div class="grid grid-cols-1">
                 <p>{{ product?.description }}</p>
@@ -72,6 +72,7 @@
 
 <script setup lang="ts">
 import type { Product, ProductApi } from '~/types';
+const { t } = useI18n()
 const config = useRuntimeConfig();
 const route = useRoute();
 // const config = useRuntimeConfig(); 

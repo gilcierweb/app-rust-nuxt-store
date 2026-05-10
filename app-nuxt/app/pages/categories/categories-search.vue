@@ -1,22 +1,22 @@
 <template>
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6">Categorias</h1>
+    <h1 class="text-3xl font-bold mb-6">{{ t('pages.categories.title') }}</h1>
     
     <div class="mb-6">
       <input 
         v-model="searchTerm"
-        placeholder="Buscar categorias..."
+        :placeholder="t('pages.categories.search.placeholder')"
         class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
     </div>
     
     <div v-if="pending" class="text-center py-8">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-      <p class="mt-2 text-gray-600">Carregando categorias...</p>
+      <p class="mt-2 text-gray-600">{{ t('pages.categories.loading') }}</p>
     </div>
     
     <div v-else-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-      Erro ao carregar categorias: {{ error.message }}
+      {{ t('pages.categories.error', { message: error.message }) }}
     </div>
     
     <div v-else>
@@ -35,6 +35,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+const { t } = useI18n()
 const config = useRuntimeConfig();
 const searchTerm = ref('');
 const { data: categories, pending, error } = await useFetch(`${config.public.baseURL}/api/categories/hierarchy`);

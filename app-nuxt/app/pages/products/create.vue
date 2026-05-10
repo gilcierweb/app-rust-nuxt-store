@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 py-8">
       <div class="mb-6">
         <NuxtLink to="/products" class="btn btn-outline btn-sm">
-          ← Voltar para Produtos
+          ← {{ t('pages.products.back') }}
         </NuxtLink>
       </div>
       
@@ -33,8 +33,10 @@ const handleCancel = () => {
   navigateTo('/products');
 };
 
+const { t } = useI18n()
+
 // Set page title
 useHead({
-  title: 'Criar Novo Produto'
+  title: t('pages.products.create.title')
 });
 </script> 

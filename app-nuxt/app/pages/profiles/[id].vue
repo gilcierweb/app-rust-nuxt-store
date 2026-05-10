@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="pending">
-            Loading ... <br />
+            {{ t('pages.profiles.detail.loading') }} <br />
             <span class="loading loading-spinner size-32"></span>
         </div>
          
@@ -24,7 +24,7 @@
                 <div class="mb-8">
                     <div class="relative inline-block">
                         <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&h=200&q=80" 
-                             alt="Foto do Perfil" 
+                             :alt="t('pages.profiles.detail.photoAlt')" 
                              class="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-2xl">
                         <div class="absolute bottom-2 right-2 bg-green-500 w-6 h-6 rounded-full border-2 border-white">
  <button class="absolute bottom-0 right-0 bg-blue-500 hover:bg-blue-600 w-8 h-8 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-sm transition-colors">
@@ -36,20 +36,20 @@
                 </div>
                 
                 <h1 class="text-4xl font-bold text-white mb-2">{{ profile?.full_name }}</h1>
-                <p class="text-white text-lg opacity-90 mb-6">Cliente Premium desde 2020</p>
+                <p class="text-white text-lg opacity-90 mb-6">{{ t('pages.profiles.detail.premiumSince') }}</p>
                 
                 <div class="flex justify-center space-x-4">
                     <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg px-6 py-3">
                         <div class="text-2xl font-bold text-black">156</div>
-                        <div class="text-black text-sm opacity-80">Pedidos</div>
+                        <div class="text-black text-sm opacity-80">{{ t('pages.profiles.detail.stats.orders') }}</div>
                     </div>
                     <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg px-6 py-3">
                         <div class="text-2xl font-bold text-black">R$ 25.680</div>
-                        <div class="text-black text-sm opacity-80">Total Gasto</div>
+                        <div class="text-black text-sm opacity-80">{{ t('pages.profiles.detail.stats.totalSpent') }}</div>
                     </div>
                     <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg px-6 py-3">
                         <div class="text-2xl font-bold text-black">4.8</div>
-                        <div class="text-black text-sm opacity-80">Avaliação</div>
+                        <div class="text-black text-sm opacity-80">{{ t('pages.profiles.detail.stats.rating') }}</div>
                     </div>
                 </div>
             </div>
@@ -64,37 +64,37 @@
                 <!-- Informações Pessoais -->
                 <div class="profile-card rounded-xl p-6 shadow-lg hover-lift">
                     <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900">Informações Pessoais</h2>
+                        <h2 class="text-2xl font-bold text-gray-900">{{ t('pages.profiles.detail.personalInfo') }}</h2>
                         <button class="btn btn-primary btn-sm">
                             <i class="fas fa-edit mr-2"></i>
-                            Editar
+                            {{ t('pages.profiles.detail.edit') }}
                         </button>
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('pages.profiles.detail.fields.fullName') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 <input type="text" class="input input-bordered w-full" value="João Silva" readonly>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('pages.profiles.detail.fields.email') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 <input type="email" class="input input-bordered w-full" value="joao@exemplo.com" readonly>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Telefone</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('pages.profiles.detail.fields.phone') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                 <input type="tel" class="input input-bordered w-full" value="(11) 99999-9999" readonly>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Data de Nascimento</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('pages.profiles.detail.fields.birthDate') }}</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                                 <input type="date" class="input input-bordered w-full" value="1990-05-15" readonly>
@@ -105,7 +105,7 @@
 
                 <!-- Últimos Pedidos -->
                 <div class="profile-card rounded-xl p-6 shadow-lg hover-lift">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">Últimos Pedidos</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ t('pages.profiles.detail.lastOrders') }}</h2>
                     
                     <div class="space-y-4">
                         <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -158,7 +158,7 @@
                     </div>
                     
                     <div class="mt-6 text-center">
-                        <button class="btn btn-outline btn-primary">Ver Todos os Pedidos</button>
+                        <button class="btn btn-outline btn-primary">{{ t('pages.profiles.detail.viewAllOrders') }}</button>
                     </div>
                 </div>
             </div>
@@ -170,7 +170,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-2xl font-bold">156</div>
-                            <div class="text-sm opacity-90">Total de Pedidos</div>
+                            <div class="text-sm opacity-90">{{ t('pages.profiles.detail.totalOrders') }}</div>
                         </div>
                         <div class="text-3xl opacity-80">
                             <i class="fas fa-shopping-bag"></i>
@@ -182,7 +182,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-2xl font-bold">23</div>
-                            <div class="text-sm opacity-90">Itens Favoritos</div>
+                            <div class="text-sm opacity-90">{{ t('pages.profiles.detail.favorites') }}</div>
                         </div>
                         <div class="text-3xl opacity-80">
                             <i class="fas fa-heart"></i>
@@ -194,7 +194,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-2xl font-bold">Gold</div>
-                            <div class="text-sm opacity-90">Status Premium</div>
+                            <div class="text-sm opacity-90">{{ t('pages.profiles.detail.premiumStatus') }}</div>
                         </div>
                         <div class="text-3xl opacity-80">
                             <i class="fas fa-crown"></i>
@@ -204,13 +204,13 @@
 
                 <!-- Endereços -->
                 <div class="profile-card rounded-xl p-6 shadow-lg hover-lift">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Endereços Salvos</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">{{ t('pages.profiles.detail.savedAddresses') }}</h3>
                     
                     <div class="space-y-3">
                         <div class="p-3 bg-gray-50 rounded-lg">
                             <div class="flex items-center justify-between">
-                                <div class="font-semibold text-gray-900">Casa</div>
-                                <div class="badge badge-primary">Principal</div>
+                                <div class="font-semibold text-gray-900">{{ t('pages.profiles.detail.addresses.home') }}</div>
+                                <div class="badge badge-primary">{{ t('pages.profiles.detail.addresses.main') }}</div>
                             </div>
                             <div class="text-sm text-gray-600 mt-1">
                                 Rua das Flores, 123<br>
@@ -219,7 +219,7 @@
                         </div>
                         
                         <div class="p-3 bg-gray-50 rounded-lg">
-                            <div class="font-semibold text-gray-900">Trabalho</div>
+                            <div class="font-semibold text-gray-900">{{ t('pages.profiles.detail.addresses.work') }}</div>
                             <div class="text-sm text-gray-600 mt-1">
                                 Av. Paulista, 1000<br>
                                 São Paulo - SP, 01310-100
@@ -229,13 +229,13 @@
                     
                     <button class="btn btn-outline btn-primary w-full mt-4">
                         <i class="fas fa-plus mr-2"></i>
-                        Adicionar Endereço
+                        {{ t('pages.profiles.detail.addresses.add') }}
                     </button>
                 </div>
 
                 <!-- Cupons -->
                 <div class="profile-card rounded-xl p-6 shadow-lg hover-lift">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Cupons Disponíveis</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">{{ t('pages.profiles.detail.coupons') }}</h3>
                     
                     <div class="space-y-3">
                         <div class="p-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg text-white">
@@ -274,6 +274,7 @@
 
 <script setup lang="ts">
 import type { Profile } from '~/types';
+const { t } = useI18n()
 
 const route = useRoute();
 const config = useRuntimeConfig();

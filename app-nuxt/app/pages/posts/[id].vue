@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="status === 'pending'">
-            Loading ... <br />
+            {{ t('pages.posts.detail.loading') }} <br />
             <span class="loading loading-spinner size-32"></span>
         </div>
 
@@ -34,14 +34,14 @@
                     class="flex items-center space-x-2 text-sm text-white/80 mb-8"
                 >
                     <a href="#" class="hover:text-white transition-colors"
-                        >Home</a
+                        >{{ t('pages.posts.detail.breadcrumb.home') }}</a
                     >
                     <i class="fas fa-chevron-right text-xs"></i>
                     <a href="#" class="hover:text-white transition-colors"
-                        >Blog</a
+                        >{{ t('pages.posts.detail.breadcrumb.blog') }}</a
                     >
                     <i class="fas fa-chevron-right text-xs"></i>
-                    <span class="text-white/60">Guias de Compra</span>
+                    <span class="text-white/60">{{ t('pages.posts.detail.breadcrumb.guides') }}</span>
                 </nav>
 
                 <!-- Categoria -->
@@ -50,7 +50,7 @@
                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 text-white backdrop-blur-sm"
                     >
                         <i class="fas fa-tag mr-2"></i>
-                        Guias de Compra
+                        {{ t('pages.posts.detail.category') }}
                     </span>
                 </div>
 
@@ -79,10 +79,10 @@
                         />
                         <div>
                             <p class="text-sm font-medium text-white">
-                                Maria Silva
+                                {{ t('pages.posts.detail.author.name') }}
                             </p>
                             <p class="text-xs text-white/70">
-                                Especialista em E-commerce
+                                {{ t('pages.posts.detail.author.role') }}
                             </p>
                         </div>
                     </div>
@@ -94,11 +94,11 @@
                         </span>
                         <span class="flex items-center">
                             <i class="fas fa-clock mr-2"></i>
-                            8 min de leitura
+                            {{ t('pages.posts.detail.meta.readingTime', { n: 8 }) }}
                         </span>
                         <span class="flex items-center">
                             <i class="fas fa-eye mr-2"></i>
-                            2.5k visualizações
+                            {{ t('pages.posts.detail.meta.views', { n: '2.5k' }) }}
                         </span>
                         <span
                             :color="post?.status ? 'green' : 'red'"
@@ -165,12 +165,7 @@
                             <p
                                 class="text-gray-700 text-lg leading-relaxed m-0"
                             >
-                                <strong>Escolher o produto certo</strong> pode
-                                parecer simples, mas com tantas opções
-                                disponíveis no mercado online, é fácil se perder
-                                entre especificações técnicas, avaliações e
-                                preços. Este guia vai te ajudar a tomar decisões
-                                mais assertivas.
+                                {{ t('pages.posts.detail.sections.introduction') }}
                             </p>
                         </div>
 
@@ -181,7 +176,7 @@
                                 class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3"
                                 >1</span
                             >
-                            Defina Suas Necessidades
+                            {{ t('pages.posts.detail.sections.step1') }}
                         </h2>
 
                         <p class="text-gray-700 mb-6 leading-relaxed">
@@ -207,13 +202,11 @@
                                     <h3
                                         class="text-lg font-semibold text-green-800 ml-3"
                                     >
-                                        Dica Importante
+                                        {{ t('pages.posts.detail.sections.tipTitle') }}
                                     </h3>
                                 </div>
                                 <p class="text-green-700 m-0">
-                                    Sempre considere o custo-benefício a longo
-                                    prazo. Um produto mais caro hoje pode ser
-                                    mais econômico ao longo do tempo.
+                                    {{ t('pages.posts.detail.sections.tipText') }}
                                 </p>
                             </div>
 
@@ -229,13 +222,11 @@
                                     <h3
                                         class="text-lg font-semibold text-blue-800 ml-3"
                                     >
-                                        Avaliações
+                                        {{ t('pages.posts.detail.sections.reviewTitle') }}
                                     </h3>
                                 </div>
                                 <p class="text-blue-700 m-0">
-                                    Leia sempre as avaliações mais recentes e
-                                    procure por comentários detalhados sobre o
-                                    uso do produto.
+                                    {{ t('pages.posts.detail.sections.reviewText') }}
                                 </p>
                             </div>
                         </div>
@@ -247,7 +238,7 @@
                                 class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3"
                                 >2</span
                             >
-                            Pesquise e Compare
+                            {{ t('pages.posts.detail.sections.step2') }}
                         </h2>
 
                         <p class="text-gray-700 mb-6 leading-relaxed">
@@ -264,7 +255,7 @@
                                 <i
                                     class="fas fa-check-circle text-purple-500 mr-3"
                                 ></i>
-                                Checklist de Compra
+                                {{ t('pages.posts.detail.checklist.title') }}
                             </h3>
                             <div class="space-y-3">
                                 <div class="flex items-center">
@@ -273,8 +264,7 @@
                                         class="w-5 h-5 text-purple-600 rounded mr-3"
                                     />
                                     <span class="text-gray-700"
-                                        >Verifiquei as especificações
-                                        técnicas</span
+                                        >{{ t('pages.posts.detail.checklist.items.specs') }}</span
                                     >
                                 </div>
                                 <div class="flex items-center">
@@ -283,8 +273,7 @@
                                         class="w-5 h-5 text-purple-600 rounded mr-3"
                                     />
                                     <span class="text-gray-700"
-                                        >Li pelo menos 5 avaliações
-                                        recentes</span
+                                        >{{ t('pages.posts.detail.checklist.items.reviews') }}</span
                                     >
                                 </div>
                                 <div class="flex items-center">
@@ -293,8 +282,7 @@
                                         class="w-5 h-5 text-purple-600 rounded mr-3"
                                     />
                                     <span class="text-gray-700"
-                                        >Comparei preços em 3 lojas
-                                        diferentes</span
+                                        >{{ t('pages.posts.detail.checklist.items.prices') }}</span
                                     >
                                 </div>
                                 <div class="flex items-center">
@@ -303,8 +291,7 @@
                                         class="w-5 h-5 text-purple-600 rounded mr-3"
                                     />
                                     <span class="text-gray-700"
-                                        >Verifiquei as políticas de troca e
-                                        devolução</span
+                                        >{{ t('pages.posts.detail.checklist.items.returnPolicy') }}</span
                                     >
                                 </div>
                                 <div class="flex items-center">
@@ -313,7 +300,7 @@
                                         class="w-5 h-5 text-purple-600 rounded mr-3"
                                     />
                                     <span class="text-gray-700"
-                                        >Confirmei a garantia do produto</span
+                                        >{{ t('pages.posts.detail.checklist.items.warranty') }}</span
                                     >
                                 </div>
                             </div>
@@ -326,7 +313,7 @@
                                 class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm mr-3"
                                 >3</span
                             >
-                            Tome a Decisão Final
+                            {{ t('pages.posts.detail.sections.step3') }}
                         </h2>
 
                         <p class="text-gray-700 mb-6 leading-relaxed">
@@ -342,16 +329,15 @@
                             class="bg-gradient-to-r from-purple-600 to-pink-600 p-8 rounded-2xl text-center my-12"
                         >
                             <h3 class="text-2xl font-bold text-white mb-4">
-                                Pronto para Aplicar Essas Dicas?
+                                {{ t('pages.posts.detail.cta.title') }}
                             </h3>
                             <p class="text-white/90 mb-6">
-                                Explore nossa seleção de produtos recomendados
-                                pela comunidade.
+                                {{ t('pages.posts.detail.cta.description') }}
                             </p>
                             <button
                                 class="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
                             >
-                                Ver Produtos Recomendados
+                                {{ t('pages.posts.detail.cta.button') }}
                             </button>
                         </div>
                     </div>
@@ -360,19 +346,19 @@
                     <div class="flex flex-wrap gap-2 my-8">
                         <span
                             class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
-                            >#compras-online</span
+                            >{{ t('pages.posts.detail.tags.onlineShopping') }}</span
                         >
                         <span
                             class="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium"
-                            >#guias</span
+                            >{{ t('pages.posts.detail.tags.guides') }}</span
                         >
                         <span
                             class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
-                            >#ecommerce</span
+                            >{{ t('pages.posts.detail.tags.ecommerce') }}</span
                         >
                         <span
                             class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium"
-                            >#dicas</span
+                            >{{ t('pages.posts.detail.tags.tips') }}</span
                         >
                     </div>
 
@@ -383,10 +369,10 @@
                                 <h3
                                     class="text-lg font-semibold text-gray-900 mb-2"
                                 >
-                                    Gostou do conteúdo?
+                                    {{ t('pages.posts.detail.share.title') }}
                                 </h3>
                                 <p class="text-gray-600 text-sm">
-                                    Compartilhe com seus amigos!
+                                    {{ t('pages.posts.detail.share.description') }}
                                 </p>
                             </div>
                             <div class="flex space-x-3">
@@ -394,13 +380,13 @@
                                     class="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                     <i class="fab fa-facebook-f mr-2"></i>
-                                    Compartilhar
+                                    {{ t('pages.posts.detail.share.facebook') }}
                                 </button>
                                 <button
                                     class="flex items-center px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
                                 >
                                     <i class="fab fa-twitter mr-2"></i>
-                                    Tweet
+                                    {{ t('pages.posts.detail.share.twitter') }}
                                 </button>
                             </div>
                         </div>
@@ -412,7 +398,7 @@
                     <!-- Sobre o Autor -->
                     <div class="bg-white p-6 rounded-xl shadow-lg">
                         <h3 class="font-semibold text-gray-900 mb-4">
-                            Sobre a Autora
+                            {{ t('pages.posts.detail.sidebar.aboutAuthor') }}
                         </h3>
                         <div class="text-center">
                             <img
@@ -424,16 +410,15 @@
                                 Maria Silva
                             </h4>
                             <p class="text-sm text-purple-600 mb-3">
-                                Especialista em E-commerce
+                                {{ t('pages.posts.detail.author.role') }}
                             </p>
                             <p class="text-sm text-gray-600 mb-4">
-                                Mais de 8 anos ajudando pessoas a fazer compras
-                                inteligentes online.
+                                {{ t('pages.posts.detail.author.bio') }}
                             </p>
                             <button
                                 class="w-full bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
                             >
-                                Seguir Autora
+                                {{ t('pages.posts.detail.sidebar.followAuthor') }}
                             </button>
                         </div>
                     </div>
@@ -441,7 +426,7 @@
                     <!-- Posts Relacionados -->
                     <div class="bg-white p-6 rounded-xl shadow-lg">
                         <h3 class="font-semibold text-gray-900 mb-4">
-                            Posts Relacionados
+                            {{ t('pages.posts.detail.sidebar.relatedPosts') }}
                         </h3>
                         <div class="space-y-4">
                             <a href="#" class="group block">
@@ -455,10 +440,10 @@
                                         <h4
                                             class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-2"
                                         >
-                                            10 Erros Comuns ao Comprar Online
+                                            {{ t('pages.posts.detail.relatedPosts.post1') }}
                                         </h4>
                                         <p class="text-xs text-gray-500 mt-1">
-                                            5 min de leitura
+                                            {{ t('pages.posts.detail.relatedPosts.time1') }}
                                         </p>
                                     </div>
                                 </div>
@@ -475,11 +460,10 @@
                                         <h4
                                             class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-2"
                                         >
-                                            Como Economizar nas Compras de Black
-                                            Friday
+                                            {{ t('pages.posts.detail.relatedPosts.post2') }}
                                         </h4>
                                         <p class="text-xs text-gray-500 mt-1">
-                                            7 min de leitura
+                                            {{ t('pages.posts.detail.relatedPosts.time2') }}
                                         </p>
                                     </div>
                                 </div>
@@ -496,10 +480,10 @@
                                         <h4
                                             class="text-sm font-medium text-gray-900 group-hover:text-purple-600 transition-colors line-clamp-2"
                                         >
-                                            Produtos Mais Vendidos do Mês
+                                            {{ t('pages.posts.detail.relatedPosts.post3') }}
                                         </h4>
                                         <p class="text-xs text-gray-500 mt-1">
-                                            3 min de leitura
+                                            {{ t('pages.posts.detail.relatedPosts.time3') }}
                                         </p>
                                     </div>
                                 </div>
@@ -511,20 +495,20 @@
                     <div
                         class="bg-gradient-to-br from-purple-600 to-pink-600 p-6 rounded-xl text-white"
                     >
-                        <h3 class="font-semibold mb-3">📧 Newsletter</h3>
+                        <h3 class="font-semibold mb-3">{{ t('pages.posts.detail.sidebar.newsletter') }}</h3>
                         <p class="text-sm text-white/90 mb-4">
-                            Receba dicas semanais sobre compras inteligentes!
+                            {{ t('pages.posts.detail.sidebar.newsletterText') }}
                         </p>
                         <div class="space-y-3">
                             <input
                                 type="email"
-                                placeholder="Seu e-mail"
+                                :placeholder="t('pages.posts.detail.sidebar.newsletterPlaceholder')"
                                 class="w-full px-3 py-2 rounded-lg text-gray-900 placeholder-gray-500 text-sm"
                             />
                             <button
                                 class="w-full bg-white text-purple-600 py-2 rounded-lg text-sm font-medium hover:shadow-lg transition-all"
                             >
-                                Assinar Grátis
+                                {{ t('pages.posts.detail.sidebar.newsletterButton') }}
                             </button>
                         </div>
                     </div>
@@ -544,6 +528,7 @@
 
 <script setup lang="ts">
 import type { Post } from "~/types";
+const { t } = useI18n()
 
 const route = useRoute();
 const config = useRuntimeConfig();

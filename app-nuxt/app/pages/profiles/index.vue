@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h1 class="h1">Page Profiles</h1>   
+    <h1 class="h1">{{ t('pages.profiles.title') }}</h1>   
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 mt-6">
 
       <div v-if="pending">
-        Loading ... <br>
+        {{ t('pages.profiles.loading') }} <br>
         <span class="loading loading-spinner  size-32"></span>
       </div>
       <div v-else v-for="profile in profiles" :key="profile">
@@ -15,7 +15,7 @@
             <h5 class="card-title">{{ profile?.nickname }}</h5>
             <p>{{ $truncate(profile?.full_name, 70, '...') }}</p>
             <div class="card-actions">
-              <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary w-full">Read More</NuxtLink>             
+              <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary w-full">{{ t('pages.profiles.readMore') }}</NuxtLink>             
             </div>
           </div>
         </div>
@@ -27,6 +27,7 @@
 
 <script setup lang="ts">
 import type { Profile } from '~/types';
+const { t } = useI18n()
 
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();

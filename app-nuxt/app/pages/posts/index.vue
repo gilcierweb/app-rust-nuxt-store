@@ -1,24 +1,24 @@
 <template>
   <div>
-    <h1 class="h1">Page Posts</h1>
+    <h1 class="h1">{{ t('pages.posts.title') }}</h1>
     
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-purple-600 to-blue-600 py-16">
         <div class="container mx-auto px-4 text-center">
             <h2 class="text-4xl md:text-5xl font-bold text-white mb-4 animate-fade-in">
-                Últimas Novidades
+                {{ t('pages.posts.hero.title') }}
             </h2>
             <p class="text-xl text-purple-100 mb-8 animate-fade-in">
-                Descubra as tendências mais quentes do e-commerce
+                {{ t('pages.posts.hero.description') }}
             </p>
             <button class="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
-                Explorar Posts
+                {{ t('pages.posts.hero.cta') }}
             </button>
         </div>
     </section>
 
     <div v-if="pending">
-        Loading ... <br>
+        {{ t('pages.posts.loading') }} <br>
         <span class="loading loading-spinner  size-32"></span>
       </div>
 
@@ -33,7 +33,7 @@
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">Tecnologia</span>
+                            <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm font-medium">{{ t('post.categories.technology') }}</span>
                             <span class="text-gray-500 text-sm">15 Jul 2025</span>
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">
@@ -45,9 +45,9 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
-                                <span class="text-sm text-gray-600">Por Maria Silva</span>
+                                <span class="text-sm text-gray-600">{{ t('post.authorBy', { name: 'Maria Silva' }) }}</span>
                             </div>
-                            <NuxtLink :to="`/posts/${post.id}`" class="btn btn-primary">Read More</NuxtLink>
+                            <NuxtLink :to="`/posts/${post.id}`" class="btn btn-primary">{{ t('pages.posts.readMoreBtn') }}</NuxtLink>
                         
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">Marketing</span>
+                            <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">{{ t('post.categories.marketing') }}</span>
                             <span class="text-gray-500 text-sm">14 Jul 2025</span>
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">
@@ -72,10 +72,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"></div>
-                                <span class="text-sm text-gray-600">Por João Santos</span>
+                                <span class="text-sm text-gray-600">{{ t('post.authorBy', { name: 'João Santos' }) }}</span>
                             </div>
                             <button class="text-purple-600 hover:text-purple-800 font-medium">
-                                Ler mais →
+                                {{ t('pages.posts.readMore') }}
                             </button>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">Sustentabilidade</span>
+                            <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-medium">{{ t('post.categories.sustainability') }}</span>
                             <span class="text-gray-500 text-sm">13 Jul 2025</span>
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">
@@ -100,10 +100,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-400 rounded-full"></div>
-                                <span class="text-sm text-gray-600">Por Ana Costa</span>
+                                <span class="text-sm text-gray-600">{{ t('post.authorBy', { name: 'Ana Costa' }) }}</span>
                             </div>
                             <button class="text-purple-600 hover:text-purple-800 font-medium">
-                                Ler mais →
+                                {{ t('pages.posts.readMore') }}
                             </button>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">Inovação</span>
+                            <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">{{ t('post.categories.innovation') }}</span>
                             <span class="text-gray-500 text-sm">12 Jul 2025</span>
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">
@@ -128,10 +128,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-orange-400 to-red-400 rounded-full"></div>
-                                <span class="text-sm text-gray-600">Por Pedro Lima</span>
+                                <span class="text-sm text-gray-600">{{ t('post.authorBy', { name: 'Pedro Lima' }) }}</span>
                             </div>
                             <button class="text-purple-600 hover:text-purple-800 font-medium">
-                                Ler mais →
+                                {{ t('pages.posts.readMore') }}
                             </button>
                         </div>
                     </div>
@@ -144,7 +144,7 @@
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium">Segurança</span>
+                            <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-sm font-medium">{{ t('post.categories.security') }}</span>
                             <span class="text-gray-500 text-sm">11 Jul 2025</span>
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">
@@ -156,10 +156,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full"></div>
-                                <span class="text-sm text-gray-600">Por Carlos Oliveira</span>
+                                <span class="text-sm text-gray-600">{{ t('post.authorBy', { name: 'Carlos Oliveira' }) }}</span>
                             </div>
                             <button class="text-purple-600 hover:text-purple-800 font-medium">
-                                Ler mais →
+                                {{ t('pages.posts.readMore') }}
                             </button>
                         </div>
                     </div>
@@ -172,7 +172,7 @@
                     </div>
                     <div class="p-6">
                         <div class="flex items-center space-x-2 mb-3">
-                            <span class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-medium">Social</span>
+                            <span class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-medium">{{ t('post.categories.social') }}</span>
                             <span class="text-gray-500 text-sm">10 Jul 2025</span>
                         </div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">
@@ -184,10 +184,10 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-pink-400 to-red-400 rounded-full"></div>
-                                <span class="text-sm text-gray-600">Por Luciana Ferreira</span>
+                                <span class="text-sm text-gray-600">{{ t('post.authorBy', { name: 'Luciana Ferreira' }) }}</span>
                             </div>
                             <button class="text-purple-600 hover:text-purple-800 font-medium">
-                                Ler mais →
+                                {{ t('pages.posts.readMore') }}
                             </button>
                         </div>
                     </div>
@@ -197,7 +197,7 @@
             <!-- Load More Button -->
             <div class="text-center mt-12">
                 <button class="btn-primary text-white px-8 py-3 rounded-full font-semibold">
-                    Carregar Mais Posts
+                    {{ t('pages.posts.loadMore') }}
                 </button>
             </div>
         </div>
@@ -208,6 +208,7 @@
 
 <script setup lang="ts">
 import type { Post } from '~/types';
+const { t } = useI18n()
 
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();

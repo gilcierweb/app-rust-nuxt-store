@@ -13,7 +13,59 @@
     "yes": "Sí",
     "no": "No",
     "or": "o",
-    "and": "y"
+    "and": "y",
+    "search": "Buscar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "noDescription": "Sin descripción",
+    "noRecords": "No se encontraron registros.",
+    "actions": {
+      "show": "Ver",
+      "edit": "Editar",
+      "new": "Nuevo",
+      "add": "Agregar",
+      "refresh": "Actualizar",
+      "saveChanges": "Guardar cambios",
+      "saving": "Guardando...",
+      "send": "Enviar",
+      "cancel": "Cancelar",
+      "back": "Volver",
+      "submit": "Enviar",
+      "delete": "Eliminar",
+      "tryAgain": "Intentar de nuevo",
+      "loadMore": "Cargar más"
+    },
+    "table": {
+      "actions": "Acciones",
+      "name": "Nombre",
+      "slug": "Slug",
+      "description": "Descripción",
+      "status": "Estado",
+      "position": "Posición",
+      "date": "Fecha",
+      "price": "Precio",
+      "category": "Categoría"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "pending": "Pendiente",
+      "archived": "Archivado",
+      "inProgress": "En curso",
+      "completed": "Completado",
+      "cancelled": "Cancelado",
+      "paid": "Pagado",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "draft": "Borrador",
+      "featured": "Destacado",
+      "unknown": "Desconocido"
+    },
+    "confirmDelete": "¿Está seguro de que desea eliminar \"{name}\"?",
+    "errorLoad": "Error al cargar {resource}",
+    "errorDelete": "Error al eliminar {resource}"
   },
   "auth": {
     "login": {
@@ -121,12 +173,212 @@
         "message": "El enlace de confirmación es inválido o ha expirado.",
         "backToLogin": "Volver a Iniciar sesión"
       }
+    },
+    "brandName": "App Rust Nuxt Store"
+  },
+  "pages": {
+    "home": {
+      "title": "Inicio",
+      "categories": "Categorías",
+      "products": "Productos",
+      "autoImport": "Este es un componente importado automáticamente"
+    },
+    "about": {
+      "title": "Sobre Nosotros",
+      "description": "Esta página se mostrará en la ruta /about."
+    },
+    "terms": {
+      "title": "Términos de Uso"
+    },
+    "privacy": {
+      "title": "Política de Privacidad"
+    },
+    "contact": {
+      "title": "Contacto"
+    },
+    "categories": {
+      "title": "Categorías",
+      "search": {
+        "placeholder": "Buscar categorías..."
+      },
+      "loading": "Cargando categorías...",
+      "error": "Error al cargar categorías: {message}",
+      "notFound": "No se encontraron categorías.",
+      "createFirst": "Crear primera categoría"
+    },
+    "products": {
+      "title": "Productos",
+      "loading": "Cargando...",
+      "buy": "Comprar Ahora",
+      "back": "Volver a Productos",
+      "backList": "← Volver a la Lista",
+      "create": {
+        "title": "Crear Nuevo Producto",
+        "cancel": "Cancelar",
+        "saved": "Producto creado con éxito"
+      },
+      "edit": {
+        "title": "Editar Producto",
+        "titleWithName": "Editar: {name}",
+        "loading": "Cargando producto...",
+        "error": "Error al cargar producto: {message}",
+        "updated": "Producto actualizado con éxito"
+      },
+      "detail": {
+        "price": "Precio",
+        "cost": "Precio de Costo",
+        "compare": "Precio Comparativo",
+        "shortDescription": "Descripción Corta",
+        "fullDescription": "Descripción Completa",
+        "images": "Galería de Imágenes",
+        "cover": "Portada",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "information": "Información"
+      },
+      "table": {
+        "name": "Nombre",
+        "price": "Precio",
+        "description": "Descripción",
+        "status": "Estado",
+        "category": "Categoría",
+        "date": "Fecha",
+        "actions": "Acciones"
+      },
+      "search": {
+        "placeholder": "Buscar productos..."
+      }
+    },
+    "posts": {
+      "title": "Posts",
+      "loading": "Cargando...",
+      "readMore": "Leer más →",
+      "readMoreBtn": "Read More",
+      "loadMore": "Cargar Más Posts",
+      "hero": {
+        "title": "Últimas Novedades",
+        "description": "Descubre las tendencias más populares del e-commerce",
+        "cta": "Explorar Posts"
+      },
+      "detail": {
+        "loading": "Cargando...",
+        "breadcrumb": {
+          "home": "Inicio",
+          "blog": "Blog",
+          "guides": "Guías de Compra"
+        },
+        "category": "Guías de Compra",
+        "author": {
+          "name": "María Silva",
+          "role": "Especialista en E-commerce",
+          "bio": "Más de 8 años ayudando a personas a hacer compras inteligentes en línea."
+        },
+        "meta": {
+          "readingTime": "{n} min de lectura",
+          "views": "{n} visitas"
+        },
+        "sections": {
+          "introduction": "Elegir el producto adecuado puede parecer simple, pero con tantas opciones disponibles en línea, es fácil perderse entre especificaciones técnicas, evaluaciones y precios. Esta guía te ayudará a tomar decisiones más asertivas.",
+          "step1": "Define tus Necesidades",
+          "step2": "Investiga y Compara",
+          "step3": "Toma la Decisión Final",
+          "tipTitle": "Consejo Importante",
+          "tipText": "Siempre considera la relación costo-beneficio a largo plazo. Un producto más caro hoy puede ser más económico con el tiempo.",
+          "reviewTitle": "Evaluaciones",
+          "reviewText": "Lee siempre las evaluaciones más recientes y busca comentarios detallados sobre el uso del producto."
+        },
+        "checklist": {
+          "title": "Lista de Verificación",
+          "items": {
+            "specs": "Verifiqué las especificaciones técnicas",
+            "reviews": "Leí al menos 5 evaluaciones recientes",
+            "prices": "Comparé precios en 3 tiendas diferentes",
+            "returnPolicy": "Verifiqué las políticas de cambio y devolución",
+            "warranty": "Confirmé la garantía del producto"
+          }
+        },
+        "cta": {
+          "title": "¿Listo para Aplicar Estos Consejos?",
+          "description": "Explora nuestra selección de productos recomendados por la comunidad.",
+          "button": "Ver Productos Recomendados"
+        },
+        "tags": {
+          "onlineShopping": "#compras-en-línea",
+          "guides": "#guías",
+          "ecommerce": "#ecommerce",
+          "tips": "#consejos"
+        },
+        "share": {
+          "title": "¿Te gustó el contenido?",
+          "description": "¡Compártelo con tus amigos!",
+          "facebook": "Compartir",
+          "twitter": "Tweet"
+        },
+        "sidebar": {
+          "aboutAuthor": "Sobre la Autora",
+          "followAuthor": "Seguir Autora",
+          "relatedPosts": "Posts Relacionados",
+          "newsletter": "📧 Newsletter",
+          "newsletterText": "¡Recibe consejos semanales de compras inteligentes!",
+          "newsletterPlaceholder": "Tu correo electrónico",
+          "newsletterButton": "Suscribirse Gratis"
+        },
+        "relatedPosts": {
+          "post1": "10 Errores Comunes al Comprar en Línea",
+          "post2": "Cómo Ahorrar en las Compras de Black Friday",
+          "post3": "Productos Más Vendidos del Mes",
+          "time1": "5 min de lectura",
+          "time2": "7 min de lectura",
+          "time3": "3 min de lectura"
+        }
+      }
+    },
+    "profiles": {
+      "title": "Perfiles",
+      "loading": "Cargando...",
+      "readMore": "Read More",
+      "detail": {
+        "loading": "Cargando...",
+        "photoAlt": "Foto de Perfil",
+        "premiumSince": "Cliente Premium desde 2020",
+        "stats": {
+          "orders": "Pedidos",
+          "totalSpent": "Total Gastado",
+          "rating": "Evaluación"
+        },
+        "personalInfo": "Información Personal",
+        "edit": "Editar",
+        "fields": {
+          "fullName": "Nombre Completo",
+          "email": "Correo electrónico",
+          "phone": "Teléfono",
+          "birthDate": "Fecha de Nacimiento"
+        },
+        "lastOrders": "Últimos Pedidos",
+        "viewAllOrders": "Ver Todos los Pedidos",
+        "totalOrders": "Total de Pedidos",
+        "favorites": "Artículos Favoritos",
+        "premiumStatus": "Estado Premium",
+        "savedAddresses": "Direcciones Guardadas",
+        "addresses": {
+          "home": "Casa",
+          "work": "Trabajo",
+          "main": "Principal",
+          "add": "Agregar Dirección"
+        },
+        "coupons": "Cupones Disponibles"
+      }
+    },
+    "stores": {
+      "title": "Tiendas",
+      "buy": "Buy Now",
+      "addToCart": "Add to cart"
     }
   },
   "admin": {
     "section": "Admin",
     "title": "Resumen operativo",
-    "description": "Monitorea los módulos críticos y acompaña el estado actual de la administración.",
+    "description": "Monitorea los módulos críticos y sigue el estado actual de la administración.",
     "statusLabels": {
       "active": "Activo",
       "inactive": "Inactivo",
@@ -140,20 +392,10 @@
       "rejected": "Rechazado",
       "unknown": "Desconocido"
     },
-    "quickActions": {
-      "title": "Acciones rápidas",
-      "reviewTickets": "Revisar tickets abiertos y definir prioridades.",
-      "publishAnnouncements": "Publicar anuncios pendientes para clientes.",
-      "updateProgress": "Actualizar snapshots de avance de los proyectos."
-    },
     "module": "Módulo",
     "modules": {
-      "dashboard": { "description": "KPIs consolidados y visibilidad operacional." },
-      "projects": { "description": "Acompaña entregas, hitos y estado de los proyectos." },
-      "announcements": { "description": "Gestiona comunicaciones enviadas a los clientes." },
-      "settings": {
-        "title": "Configuración",
-        "description": "Ajusta parámetros administrativos y políticas internas."
+      "dashboard": {
+        "description": "KPIs consolidados y visibilidad operacional."
       }
     },
     "navbar": {
@@ -170,12 +412,7 @@
         "defaultName": "Admin"
       },
       "activity": {
-        "title": "Actividad",
-        "items": {
-          "ticketCreated": "Nuevo ticket creado por Juan.",
-          "projectUpdated": "Proyecto \"Aurora\" actualizado.",
-          "announcementsPending": "2 anuncios pendientes de publicación."
-        }
+        "title": "Actividad"
       }
     },
     "account": {
@@ -218,6 +455,7 @@
       "openApiDocs": "Abrir Documentación de la API"
     },
     "dashboard": {
+      "title": "Admin Dashboard",
       "search": {
         "placeholder": "Escribe para buscar...",
         "ariaLabel": "Buscar"
@@ -234,14 +472,6 @@
       },
       "activity": {
         "title": "Actividad",
-        "mentionedYou": "te mencionó en el tema de tendencias",
-        "requestedFeedback": "solicitó comentarios sobre su diseño.",
-        "invitesYou": "te invita a revisar un archivo.",
-        "sharedUpdate": "ha compartido una actualización del proyecto.",
-        "wantsView": "quiere ver tu proyecto de diseño",
-        "inviteFromLink": "Invitación desde enlace",
-        "newTags": "nuevas etiquetas a Web Redesign",
-        "reply": "Responder",
         "time": {
           "minsAgo": "Hace {n} min",
           "hourAgo": "Hace 1 hora",
@@ -264,448 +494,193 @@
         "misc": "Varios",
         "error": "Error",
         "underMaintenance": "En mantenimiento",
-        "authentications": "Autenticaciones",
-        "loginBasic": "Inicio - Básico",
-        "loginCover": "Inicio - Portada",
-        "registerBasic": "Registro - Básico",
-        "registerCover": "Registro - Portada",
-        "forgotPasswordBasic": "Olvidé contraseña - Básico",
-        "forgotPasswordCover": "Olvidé contraseña - Portada",
-        "faq": "Preguntas frecuentes",
-        "pricing": "Precios",
-        "formsTables": "Formularios y tablas",
-        "formValidation": "Validación de formularios",
-        "dataTables": "Tablas de datos",
-        "basic": "Básico",
-        "advanced": "Avanzado",
-        "extensions": "Extensiones",
-        "applications": "Aplicaciones",
-        "user": "Usuario",
-        "list": "Lista",
-        "view": "Vista",
-        "rolesPermissions": "Roles y permisos",
-        "roles": "Roles",
-        "permission": "Permiso",
-        "order": "Pedido",
-        "orderList": "Lista de pedidos",
-        "orderDetails": "Detalles del pedido",
-        "orderTracking": "Seguimiento del pedido",
-        "vendor": "Proveedor",
-        "vendorList": "Lista de proveedores",
-        "vendorCreate": "Crear proveedor",
-        "vendorDetails": "Detalles del proveedor"
+        "authentications": "Autenticaciones"
       },
       "workspace": {
-        "title": "Espacio de trabajo",
+        "title": "Espacio de Trabajo",
         "flyonui": "FlyonUI"
+      },
+      "stats": {
+        "order": "Pedidos",
+        "orderProgress": "{current} de {total} pedidos",
+        "revenue": "Ingresos",
+        "revenueProgress": "${current} de ${total}",
+        "invoice": "Facturación",
+        "invoiceProgress": "${current} de ${total}",
+        "orderProgressbar": "Progreso de Pedidos",
+        "revenueProgressbar": "Progreso de Ingresos",
+        "invoiceProgressbar": "Progreso de Facturación",
+        "websiteTraffic": "Tráfico del Sitio",
+        "trafficChange": "{percent}% ↗ que la semana pasada",
+        "newSignups": "Nuevos Registros",
+        "signupsChange": "{percent}% de aumento este mes",
+        "customerRetention": "Retención de Clientes",
+        "retentionChange": "Estable en el último trimestre",
+        "totalPageViews": "Total de visitas",
+        "pageViewsChange": "{percent}% ↗ que el mes pasado",
+        "totalSales": "Total de Ventas",
+        "activeCustomers": "Clientes Activos",
+        "period": "De {start} a {end}",
+        "subscription": "Plan de Suscripción",
+        "subscriptionPlan": "Premium",
+        "upgradePlan": "Actualizar Plan",
+        "nextBilling": "Próxima Facturación",
+        "nextBillingDate": "15 de Oct, 2024",
+        "viewDetails": "Ver Detalles",
+        "changePayment": "Cambiar Método de Pago"
       }
     },
-    "projects": {
-      "status": {
-        "planning": "Planificación",
-        "inProgress": "En progreso",
-        "paused": "Pausado",
-        "completed": "Concluido"
+    "products": {
+      "title": "Productos",
+      "searchPlaceholder": "Buscar productos...",
+      "add": "Agregar",
+      "table": {
+        "name": "Nombre",
+        "price": "Precio",
+        "description": "Descripción",
+        "status": "Estado",
+        "category": "Categoría",
+        "date": "Fecha",
+        "actions": "Acciones"
       },
-      "messages": {
-        "loadError": "Error al cargar proyectos."
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "view": "Ver",
+      "confirmDelete": "¿Está seguro de que desea eliminar \"{name}\"?",
+      "errorDelete": "Error al eliminar producto",
+      "detail": {
+        "title": "Detalles del Producto",
+        "loading": "Cargando producto...",
+        "error": "Error al cargar producto: {message}",
+        "back": "Volver",
+        "backList": "← Volver a la Lista",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "draft": "Borrador",
+        "featured": "Destacado",
+        "unknown": "Desconocido",
+        "prices": "Precios",
+        "information": "Información"
       },
-      "index": {
-        "header": { "section": "Admin / Proyectos", "title": "Proyectos" },
-        "actions": { "new": "Nuevo", "refresh": "Actualizar" },
-        "metrics": {
-          "total": "Total",
-          "active": "Activos",
-          "source": "Origen",
-          "sourceDetail": "Lista integrada con el endpoint"
-        },
-        "table": {
-          "name": "Nombre",
-          "code": "Código",
-          "status": "Estado",
-          "actions": "Acciones",
-          "empty": "No hay proyectos cargados."
-        }
-      }
+      "new": {
+        "title": "Agregar Nuevo Producto"
+      },
+      "editTitle": "Editar Producto",
+      "loading": "Cargando producto...",
+      "error": "Error al cargar producto: {message}"
     },
-    "stages": {
-      "index": {
-        "header": { "title": "Etapas de obra" }
-      }
-    },
-    "announcements": {
-      "index": {
-        "header": { "title": "Anuncios" }
-      }
-    },
-    "tickets": {
-      "index": {
-        "header": { "title": "Tickets" }
-      }
-    },
-    "companies": {
-      "index": {
-        "table": {
-          "legalName": "Razón social",
-          "slug": "Slug",
-          "subdomain": "Subdominio"
-        }
+    "categories": {
+      "title": "Categorías",
+      "searchPlaceholder": "Buscar categorías",
+      "add": "Agregar",
+      "loading": "Cargando categorías...",
+      "error": "Error al cargar categorías: {message}",
+      "notFound": "No se encontraron categorías.",
+      "createFirst": "Crear primera categoría",
+      "table": {
+        "name": "Nombre",
+        "slug": "Slug",
+        "description": "Descripción",
+        "status": "Estado",
+        "position": "Posición",
+        "date": "Fecha",
+        "actions": "Acciones"
       },
-      "show": {
-        "fields": {
-          "legalName": "Razón social",
-          "slug": "Slug",
-          "subdomain": "Subdominio"
-        }
-      },
-      "form": {
-        "sections": {
-          "companyData": "Datos de la empresa",
-          "statusPolicies": "Estado y políticas",
-          "featureFlags": "Feature flags (checkboxes FlyonUI)",
-          "advancedWarning": "Usa Base64 o un arreglo JSON de bytes para los campos cifrados (ej: [1,2,3])."
-        },
-        "fields": {
-          "legalName": {
-            "label": "Razón social",
-            "placeholder": "Build Track Empreendimentos LTDA",
-            "helper": "Ingresa la razón social completa."
-          },
-          "tradeName": {
-            "label": "Nombre comercial",
-            "placeholder": "Build Track",
-            "helper": "Nombre de exhibición opcional."
-          },
-          "slug": {
-            "label": "Slug",
-            "placeholder": "build-track",
-            "prefix": "org/",
-            "helper": "Identificador interno único."
-          },
-          "subdomain": {
-            "label": "Subdominio",
-            "placeholder": "buildtrack",
-            "suffix": ".platform",
-            "helper": "Usa minúsculas, números y guion."
-          },
-          "visualTheme": {
-            "label": "Tema visual",
-            "options": {
-              "default": "Predeterminado",
-              "corporate": "Corporativo",
-              "light": "Claro",
-              "dark": "Oscuro"
-            }
-          },
-          "encryptionKeyVersion": {
-            "label": "Versión de clave de cifrado"
-          },
-          "status": {
-            "label": "Estado",
-            "options": {
-              "active": "Activa",
-              "suspended": "Suspendida",
-              "archived": "Archivada"
-            }
-          },
-          "logoFile": {
-            "label": "Selecciona un archivo",
-            "helper": "El nombre del archivo del logo se guardará en settings."
-          },
-          "advancedSwitch": "Campos criptográficos avanzados",
-          "flags": {
-            "portalEnabled": "Portal habilitado",
-            "notifications": "Notificaciones",
-            "ticketing": "Tickets",
-            "financePreview": "Vista previa financiera",
-            "publicGallery": "Galería pública",
-            "autoTimeline": "Timeline automática",
-            "requireLgpd": "Requerir LGPD",
-            "maintenanceMode": "Modo mantenimiento"
-          },
-          "internalNotes": {
-            "label": "Notas internas",
-            "placeholder": "Notas operativas internas"
-          },
-          "settingsJson": {
-            "label": "Settings JSON",
-            "placeholder": "\"theme\": \"default\""
-          },
-          "advanced": {
-            "cnpjEncrypted": "CNPJ cifrado",
-            "cnpjBlindIndex": "Blind index de CNPJ",
-            "contactEmailEncrypted": "Email de contacto cifrado",
-            "contactEmailBlindIndex": "Blind index de email de contacto",
-            "contactPhoneEncrypted": "Teléfono de contacto cifrado",
-            "contactPhoneBlindIndex": "Blind index de teléfono de contacto"
-          }
-        },
-        "actions": {
-          "saving": "Guardando..."
-        }
-      }
-    },
-    "memberships": {
-      "roles": { "admin": "Admin", "manager": "Manager", "editor": "Editor", "viewer": "Viewer" },
-      "status": { "active": "Activo", "invited": "Invitado", "suspended": "Suspendido" },
-      "messages": {
-        "loadError": "Error al cargar vínculos.",
-        "createSuccess": "Vínculo creado con éxito.",
-        "createError": "Error al crear vínculo.",
-        "updateSuccess": "Vínculo actualizado con éxito.",
-        "updateError": "Error al actualizar vínculo."
-      },
-      "index": {
-        "header": { "section": "Admin / Membresías", "title": "Vínculos Usuario-Empresa" },
-        "actions": { "new": "Nuevo vínculo", "refresh": "@:common.actions.refresh" },
-        "metrics": { "total": "Total", "active": "Activos", "primary": "Principales" },
-        "table": {
-          "user": "Usuario",
-          "company": "Empresa",
-          "role": "Rol",
-          "status": "Estado",
-          "primary": "Principal",
-          "actions": "@:common.table.actions",
-          "show": "@:common.actions.show",
-          "edit": "@:common.actions.edit",
-          "empty": "No hay vínculos cargados."
-        }
-      },
-      "new": { "header": { "section": "Admin / Membresías", "title": "Nuevo vínculo" }, "actions": { "submit": "Crear vínculo" } },
-      "edit": { "header": { "section": "Admin / Membresías", "title": "Editar vínculo" }, "actions": { "submit": "@:common.actions.saveChanges" } },
-      "show": {
-        "header": { "section": "Admin / Membresías", "title": "Detalles del vínculo" },
-        "actions": { "edit": "@:common.actions.edit" },
-        "fields": { "primary": "Principal" },
-        "empty": "Vínculo no encontrado."
-      },
-      "form": {
-        "sections": { "main": "Datos principales", "audit": "Auditoría" },
-        "fields": {
-          "userId": { "label": "Usuario" },
-          "companyId": { "label": "Empresa" },
-          "membershipRole": {
-            "label": "Rol del vínculo",
-            "options": { "admin": "Admin", "manager": "Manager", "editor": "Editor", "viewer": "Viewer" }
-          },
-          "status": { "label": "Estado", "options": { "active": "Activo", "invited": "Invitado", "suspended": "Suspendido" } },
-          "isPrimary": { "label": "Vínculo principal" },
-          "invitedBy": { "label": "Invitado por" },
-          "joinedAt": { "label": "Fecha de ingreso" },
-          "lastAccessedAt": { "label": "Último acceso en" }
-        },
-        "actions": { "saving": "@:common.actions.saving" }
+      "detail": {
+        "title": "Detalles de la Categoría",
+        "loading": "Cargando detalles de la categoría...",
+        "error": "Error al cargar categoría: {message}",
+        "tryAgain": "Intentar de nuevo",
+        "notFound": "Categoría no encontrada.",
+        "back": "Volver a la lista",
+        "mainInfo": "Información Principal",
+        "name": "Nombre",
+        "slug": "Slug",
+        "description": "Descripción",
+        "noDescription": "Sin descripción",
+        "settings": "Configuración",
+        "status": "Estado",
+        "active": "Activo",
+        "inactive": "Inactivo",
+        "position": "Posición",
+        "createdAt": "Creado en:",
+        "updatedAt": "Actualizado en:",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "confirmDelete": "¿Está seguro de que desea eliminar la categoría \"{name}\"?",
+        "errorDelete": "Error al eliminar categoría"
       }
     }
   },
-  "landing": {
-    "nav": {
+  "product": {
+    "badges": {
+      "inStock": "En stock",
+      "lastUnits": "Últimas unidades",
+      "offer": "Oferta",
+      "new": "Nuevo",
+      "trending": "Trending",
+      "bestseller": "Más vendido"
+    },
+    "addToCart": "Agregar al Carrito",
+    "loadMore": "Cargar más productos",
+    "found": "{count} productos encontrados",
+    "filters": {
+      "title": "Filtros:",
+      "allBrands": "Todas las marcas",
+      "price": "Precio",
+      "lowestPrice": "Menor precio",
+      "highestPrice": "Mayor precio",
+      "rating": "Evaluación",
+      "fiveStars": "5 estrellas",
+      "fourPlusStars": "4+ estrellas",
+      "threePlusStars": "3+ estrellas"
+    },
+    "breadcrumb": {
+      "home": "Inicio",
+      "categories": "Categorías"
+    },
+    "featuredCategories": "Categorías Destacadas",
+    "specialOffer": {
+      "title": "¡Oferta Especial del Día!",
+      "description": "Hasta 50% OFF en productos seleccionados + Envío Gratis",
+      "cta": "Ver Ofertas"
+    },
+    "flashDeal": {
+      "title": "Oferta Relámpago",
+      "description": "Hasta 70% OFF en productos seleccionados",
+      "cta": "Ver Ofertas"
+    },
+    "details": {
+      "rating": "{count} evaluaciones",
+      "avgRating": "{rating}/5 evaluación media",
+      "fastDelivery": "Entrega rápida",
+      "discount": "-{percent}%",
+      "reviews": "({count} evaluaciones)"
+    }
+  },
+  "post": {
+    "categories": {
       "technology": "Tecnología",
-      "cases": "Casos de éxito",
-      "impact": "Impacto",
-      "support": "Soporte",
-      "teamAccess": "Acceso Equipo",
-      "buyerPortal": "Portal Comprador"
+      "marketing": "Marketing",
+      "sustainability": "Sostenibilidad",
+      "innovation": "Innovación",
+      "security": "Seguridad",
+      "social": "Social"
     },
-    "hero": {
-      "badge": "Edición 2024 / Gestión Industrial",
-      "heading": "Comanda tu Obra con",
-      "highlight": "Precisión Absoluta.",
-      "description": "La nueva frontera de la ingeniería civil donde datos y ejecución convergen en una única visión panorámica de alto rendimiento.",
-      "cta": "Solicitar Demostración"
-    },
-    "features": {
-      "sectionTitle": "Diferenciales",
-      "transparency": {
-        "title": "Transparencia Total",
-        "description": "Visibilidad completa para clientes y equipo técnico en cada etapa crítica del proyecto."
-      },
-      "precision": {
-        "title": "Precisión de Datos",
-        "description": "Información exacta recopilada en tiempo real para una toma de decisiones basada en evidencia."
-      },
-      "technology": {
-        "title": "Tecnología de Punta",
-        "description": "Sistemas de gestión industrial integrados nativamente con herramientas de campo móviles."
-      }
-    },
-    "schedule": {
-      "title": "Cronograma Vivo",
-      "description": "El pulso de tu construcción transformado en visualizaciones métricas precisas.",
-      "globalAverage": "Promedio Global",
-      "task": {
-        "foundation": "Fundación y Estructura",
-        "masonry": "Albañilería y Paredes",
-        "electrical": "Instalaciones Eléctricas"
-      },
-      "status": {
-        "completed": "Completado {percent}%",
-        "inProgress": "{percent}% En Progreso",
-        "planned": "{percent}% Planificado"
-      }
-    },
-    "gallery": {
-      "title": "Archivo Visual",
-      "tabs": {
-        "all": "Todo",
-        "structure": "Estructura",
-        "finishing": "Acabado"
-      }
-    },
-    "investor": {
-      "badge": "Insight del Inversor",
-      "title": "Portal del Inversor",
-      "assetOnSite": "Patrimonio en Obra",
-      "description": "Sigue el ROI de tu construcción con gráficos de evolución física versus financiera. Transparencia que valoriza tu inversión.",
-      "reports": "Informes Semanales",
-      "audit": "Auditoría de Materiales",
-      "financialControl": "Control financiero en la palma de tu mano.",
-      "mobileDescription": "Nuestra interfaz fue diseñada para el tomador de decisiones casual que exige datos técnicos precisos sin la complejidad burocrática."
-    },
-    "field": {
-      "badge": "Operaciones de Campo",
-      "title": "El Motor del Área",
-      "description": "Desde el RDO (Registro Diario de Obra) hasta la gestión de insumos, el equipo de campo opera con máxima eficiencia a través de flujos de trabajo optimizados.",
-      "offlineFirst": {
-        "title": "Offline-First",
-        "description": "Funciona incluso sin conexión estable en el área."
-      },
-      "geoTracking": {
-        "title": "Geo-Tracking",
-        "description": "Validación espacial de todas las mediciones."
-      },
-      "rdos": {
-        "status": "Activo",
-        "workforce": "Fuerza laboral:",
-        "workers": "{n} Trabajadores",
-        "weather": "Clima:",
-        "weatherFormat": "{condition} ({temp})"
-      }
-    },
-    "infrastructure": {
-      "title": "Infraestructura Operacional",
-      "rdos": {
-        "title": "RDO Digital",
-        "description": "Firma biométrica y georreferenciación."
-      },
-      "measurements": {
-        "title": "Mediciones",
-        "description": "Conferencia vía láser y escaneo de proyectos."
-      },
-      "inventory": {
-        "title": "Inventario",
-        "description": "Control de insumos FIFO automatizado."
-      },
-      "bi": {
-        "title": "BI & Analytics",
-        "description": "Pronóstico de desviaciones basado en historial."
-      }
-    },
-    "cases": {
-      "badge": "Rendimiento Probado",
-      "title": "Casos de Éxito",
-      "description": "Navega por los proyectos que redefinieron el estándar de eficiencia con la plataforma BuildTrack.",
-      "project": {
-        "name": "Complejo Industrial Delta",
-        "result": "Reducción del 15% en Desperdicio",
-        "quote": "La implementación del sistema de seguimiento de insumos cambió nuestra margem de ganancia en solo 6 meses.",
-        "author": "Ricardo Almeida",
-        "role": "Ingeniero Jefe"
-      }
-    },
-    "esg": {
-      "title": "Sostenibilidad y Cumplimiento ESG",
-      "waste": {
-        "title": "Gestión de Residuos",
-        "description": "Seguimiento digital de eliminación y reutilización de escombros, garantindo vertederos certificados y cumplimiento legal."
-      },
-      "carbon": {
-        "title": "Huella de Carbono",
-        "description": "Monitoreo de logística y consumo energético para proyectos carbono-cero o de bajo impacto ambiental."
-      },
-      "wasteAvoided": "Residuos Evitados",
-      "certification": {
-        "title": "Certificación GreenFlow",
-        "description": "BuildTrack emite certificados de gestión de residuos en tiempo real para auditorías de sostenibilidad."
-      },
-      "impact": "IMPACTO",
-      "metric": "{value} Ton"
-    },
-    "security": {
-      "title": "Inmutabilidad de Datos",
-      "description": "Nuestra infraestructura utiliza protocolos de seguridad que hacen registros fotográficos y RDOs inmutables una vez validados, garantizando seguridad jurídica absoluta.",
-      "certifications": {
-        "iso": "ISO 27001",
-        "lgpd": "Cumplimiento LGPD",
-        "aws": "Asegurado por AWS"
-      }
-    },
-    "testimonials": {
-      "title": "Voces del Mercado",
-      "badge": "Historias de Clientes",
-      "quote1": {
-        "quote": "La transparencia de BuildTrack eliminó los ruidos de comunicación con nuestros inversores. El portal del comprador se convirtió en nuestra principal herramienta de cierre.",
-        "author": "Carlos Mendes",
-        "role": "Director Constructora Apex"
-      },
-      "quote2": {
-        "quote": "Identificar desviaciones en el cronograma antes de que se conviertan en costos es lo que diferencia una obra rentable de un dolor de cabeza.",
-        "author": "Mariana Silva",
-        "role": "Planificación Estratégica"
-      }
-    },
-    "faq": {
-      "title": "Especificaciones Técnicas",
-      "items": {
-        "erp": {
-          "question": "¿Integración con ERPs del mercado?",
-          "answer": "Sí. Nuestra API RESTful nativa se conecta con Sienge, TOTVS y SAP, garantizando sincronía bidireccional entre financiero y obra."
-        },
-        "offline": {
-          "question": "¿Funcionamiento sin conexión?",
-          "answer": "La aplicación móvil es offline-first. Almacena fotos y datos localmente y sincroniza automáticamente tan pronto como hay red disponible."
-        },
-        "storage": {
-          "question": "¿Límites de almacenamiento?",
-          "answer": "Nuestros planes Enterprise incluyen almacenamiento ilimitado para proyectos y registros fotográficos en la nube AWS."
-        }
-      }
-    },
-    "footer": {
-      "platform": {
-        "title": "Plataforma",
-        "teamPortal": "Portal de Equipo",
-        "buyerApp": "App del Comprador",
-        "apiIntegrations": "Integraciones API",
-        "esgSecurity": "Seguridad ESG"
-      },
-      "company": {
-        "title": "Empresa",
-        "aboutUs": "Sobre Nosotros",
-        "careers": "Carreras",
-        "privacy": "Privacidad",
-        "contact": "Contacto"
-      },
-      "copyright": "© 2024 BuildTrack Sistemas Técnicos S.A. TODOS LOS DERECHOS RESERVADOS.",
-      "cnpj": "CNPJ {number}",
-      "location": "{city}, {state}"
-    }
+    "authorBy": "Por {name}",
+    "readMore": "Leer más →"
   },
-  "about": {
-    "title": "Sobre Nosotros",
-    "hero": {
-      "title": "Sobre BuildTrack",
-      "subtitle": "Transformando la ingeniería civil con tecnología"
-    }
+  "profile": {
+    "authorAlt": "Autor"
   },
   "contact": {
-    "title": "Contáctanos",
+    "title": "Contacto",
     "form": {
       "name": "Nombre",
       "email": "Correo electrónico",
       "subject": "Asunto",
       "message": "Mensaje",
-      "submit": "Enviar mensaje"
+      "submit": "Enviar Mensaje"
     }
   },
   "terms": {
@@ -716,10 +691,10 @@
   },
   "seed": {
     "action": {
-      "1": "Accion de seed 1",
-      "2": "Accion de seed 2",
-      "3": "Accion de seed 3",
-      "4": "Accion de seed 4"
+      "1": "Acción de seed 1",
+      "2": "Acción de seed 2",
+      "3": "Acción de seed 3",
+      "4": "Acción de seed 4"
     }
   }
 }
