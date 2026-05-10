@@ -397,37 +397,3 @@ onMounted(() => {
   }
 });
 </script>
-
-<style scoped>
-.card {
-  @apply rounded-lg;
-}
-
-.form-control {
-  @apply w-full;
-}
-
-.label-text {
-  @apply text-gray-700;
-}
-
-.input, .textarea, .select {
-  @apply transition-all duration-200;
-}
-
-.input:focus, .textarea:focus, .select:focus {
-  @apply ring-2 ring-primary ring-opacity-50;
-}
-
-.checkbox {
-  @apply transition-all duration-200;
-}
-
-.btn {
-  @apply transition-all duration-200;
-}
-
-.btn:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-</style> 

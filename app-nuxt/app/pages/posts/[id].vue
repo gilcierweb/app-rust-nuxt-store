@@ -540,6 +540,24 @@ const { status, data: post } = await useLazyFetch<Post>(
     `${config.public.baseURL}/api/posts/${id}`,
 );
 
+// SEO optimization for blog post
+useSeoMeta({
+  title: post.value?.title || 'Blog Post',
+  ogTitle: post.value?.title || 'Blog Post',
+  description: post.value?.content?.substring(0, 160) || 'Read our latest blog post with valuable insights and tips.',
+  ogDescription: post.value?.content?.substring(0, 160) || 'Read our latest blog post with valuable insights and tips.',
+  ogImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=630&fit=crop',
+  ogUrl: `${config.public.baseURL}/posts/${id}`,
+  ogType: 'article',
+  articleAuthor: 'Maria Silva',
+  articlePublishedTime: '2024-07-15T00:00:00Z',
+  articleModifiedTime: '2024-07-15T00:00:00Z',
+  twitterCard: 'summary_large_image',
+  twitterTitle: post.value?.title || 'Blog Post',
+  twitterDescription: post.value?.content?.substring(0, 160) || 'Read our latest blog post with valuable insights and tips.',
+  twitterImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=630&fit=crop',
+})
+
 // function updateReadingProgress(): void {
 //   const article: HTMLElement | null = document.querySelector('article');
 //   if (!article) return;

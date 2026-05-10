@@ -870,8 +870,21 @@ const id = route.params.id;
 
 const { pending, data: category } = await useLazyFetch<Category>(`${config.public.baseURL}/api/categories/${id}`);
 
+// SEO optimization for category page
+useSeoMeta({
+  title: category.value?.name || 'Category',
+  ogTitle: category.value?.name || 'Category',
+  description: $truncate(category.value?.description, 160, '...') || 'Browse our collection of products in this category',
+  ogDescription: $truncate(category.value?.description, 160, '...') || 'Browse our collection of products in this category',
+  ogImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=630&fit=crop',
+  ogUrl: `${config.public.baseURL}/categories/${id}`,
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+  twitterTitle: category.value?.name || 'Category',
+  twitterDescription: $truncate(category.value?.description, 160, '...') || 'Browse our collection of products in this category',
+  twitterImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=630&fit=crop',
+})
 </script>
-
 <style scoped>
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 

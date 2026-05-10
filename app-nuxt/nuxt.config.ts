@@ -31,6 +31,8 @@ export default defineNuxtConfig({
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "App Rust Nuxt Store" },
         { name: "twitter:card", content: "summary_large_image" },
+        // CSP desabilitado para desenvolvimento - reabilitar em produção
+        // { "http-equiv": "Content-Security-Policy", content: "default-src 'self' 'unsafe-inline' 'unsafe-eval' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: *; worker-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com *; img-src 'self' data: * https://cdn.flyonui.com https://dummyjson.com https://cdn.dummyjson.com; font-src 'self' https://cdnjs.cloudflare.com *; connect-src 'self' http://localhost:5150 https://dummyjson.com https://cdn.dummyjson.com *;" },
       ],
       link: [
         { rel: "canonical", href: "https://app-rust-nuxt-store.com" },
@@ -115,8 +117,6 @@ export default defineNuxtConfig({
     ],
     defaultLocale: "pt-BR",
     strategy: "prefix_except_default",
-    lazy: true,
-    seo: true,
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "i18n_redirected",
@@ -146,6 +146,7 @@ export default defineNuxtConfig({
       xl: 1280,
       xxl: 1536,
     },
+    domains: [],
     presets: {
       product: {
         modifiers: {
@@ -166,12 +167,12 @@ export default defineNuxtConfig({
     },
   },
 
-  // Experimental features for better performance
-  experimental: {
-    payloadExtraction: true,
-    renderJsonPayloads: true,
-    clientFallback: true,
-  },
+  // Experimental features disabled - causing payload errors in dev
+  // experimental: {
+  //   payloadExtraction: true,
+  //   renderJsonPayloads: true,
+  //   clientFallback: true,
+  // },
 
   // Nitro build optimization
   nitro: {
@@ -180,10 +181,11 @@ export default defineNuxtConfig({
     routeRules: {
       '/api/**': { cors: true, headers: { 'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE' } },
       '/products/**': { isr: 60, prerender: false },
-      '/': { prerender: true },
-      '/products': { prerender: true },
-      '/about': { prerender: true },
-      '/contact': { prerender: true },
+      // Prerender disabled for dev - enable for production
+      // '/': { prerender: true },
+      // '/products': { prerender: true },
+      // '/about': { prerender: true },
+      // '/contact': { prerender: true },
     },
   },
 
@@ -196,21 +198,24 @@ export default defineNuxtConfig({
     build: {
       cssMinify: true,
       rollupOptions: {
-        output: {
-          manualChunks: {
-            // Code splitting for vendor libraries
-            'vendor-ui': ['@nuxt/image', 'reka-ui'],
-            'vendor-utils': ['pinia', '@pinia/nuxt'],
-          },
-        },
+
       },
     },
     optimizeDeps: {
       include: ['vue', 'vue-router', 'pinia'],
     },
+    // Desabilitar prefetch para evitar rate limiting
+    experimental: {
+      renderBuiltUrl: (filename) => `/_nuxt/${filename}`,
+    },
   },
 
-  // security: {
-  //     csrf: true,
-  //   },
+  security: {
+    // csrf: true,
+    headers: {
+      contentSecurityPolicy: {
+        'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com'],
+      }
+    }
+  },
 })

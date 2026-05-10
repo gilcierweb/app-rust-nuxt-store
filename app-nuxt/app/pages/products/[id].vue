@@ -144,18 +144,24 @@ useSeoMeta({
   ogTitle: computed(() => productApi.value?.name || product.value?.title || t('pages.products.title')),
   description: computed(() => productApi.value?.description || product.value?.description || ''),
   ogDescription: computed(() => productApi.value?.description || product.value?.description || ''),
-  ogImage: computed(() => productApi.value?.images?.[0]?.image || product.value?.thumbnail || ''),
+  ogImage: computed(() => (productApi.value?.images?.[0]?.image) || (product.value?.thumbnail) || ''),
 })
 const config = useRuntimeConfig()
 const route = useRoute()
 const cartStore = useCartStore()
 const { openCart } = useCartUI()
 
-const id = route.params.id
+const id = computed(() => {
+  const routeId = route.params.id
+  return routeId as string || ''
+})
 
 const selectedVariantId = ref<number | null>(null)
 const { data: variants } = await useFetch<ProductVariant[]>(
-  `${config.public.baseURL}/api/variants/list?product_id=${id}`
+  `${config.public.baseURL}/api/variants/list?product_id=${id.value}`,
+  {
+    key: id.value
+  }
 )
 
 const selectedVariant = computed(() => {
@@ -165,16 +171,21 @@ const selectedVariant = computed(() => {
 
 const selectedPrice = computed(() => {
   if (selectedVariant.value?.price) return selectedVariant.value.price
-  return productApi.value?.price
+  return (productApi.value?.price ?? product.value?.price ?? 0)
 })
 
 function addToCartApi(product: ProductApi) {
+  if (!product?.id) {
+    console.error('Product ID is undefined')
+    return
+  }
+  
   cartStore.addItem({
     productId: product.id,
-    name: product.name,
-    price: selectedPrice.value ?? product.price,
-    image: product.images?.[0]?.image,
-    slug: product.slug,
+    name: product.name ?? 'Unknown Product',
+    price: (selectedPrice.value ?? product.price ?? 0),
+    image: (product.images?.[0]?.image ?? ''),
+    slug: (product.slug ?? ''),
     variantId: selectedVariantId.value ?? undefined,
   })
   openCart()

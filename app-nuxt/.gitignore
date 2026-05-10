@@ -24,3 +24,9 @@ logs
 !.env.example
 
 sw.*
+output_test.txt
+test_output.txt
+
+# Playwright
+playwright-report/
+test-results/

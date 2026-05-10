@@ -12,13 +12,12 @@
 
       <div  v-for="product in productsApi" :key="product.id" class="card bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <figure>
-            <LazyImage
+            <OptimizedImage
               v-if="product.images?.[0]?.image"
               :src="product.images[0].image"
               :alt="product.name"
               :width="300"
               :height="300"
-              preset="thumbnail"
             />
           </figure>
           <div class="card-body">
@@ -52,7 +51,13 @@
      
        <div v-else v-for="product in products" :key="product.id" class="card bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
           <figure>           
-            <NuxtImg :src="product?.thumbnail" loading="lazy" :alt="product?.title" />
+            <NuxtImg
+              loading="lazy"
+              :src="product?.thumbnail"
+              :alt="product?.title"
+              :width="300"
+              :height="300"
+            />
           </figure>
           <div class="card-body">
             <h5 class="card-title mb-2.5">{{ product.title }}</h5>
@@ -83,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import OptimizedImage from './OptimizedImage.vue'
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();
 import type { ProductApi } from '~/types';
