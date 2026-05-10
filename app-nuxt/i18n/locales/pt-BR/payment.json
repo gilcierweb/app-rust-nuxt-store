@@ -1,11 +1,13 @@
 {
-  "select": "Selecionar método de pagamento",
-  "creditCard": "Cartão de Crédito",
-  "boleto": "Boleto",
-  "pix": "PIX",
-  "status": {
-    "pending": "Pendente",
-    "completed": "Concluído",
-    "failed": "Falhou"
+  "payment": {
+    "select": "Selecionar método de pagamento",
+    "creditCard": "Cartão de Crédito",
+    "boleto": "Boleto",
+    "pix": "PIX",
+    "status": {
+      "pending": "Pendente",
+      "completed": "Concluído",
+      "failed": "Falhou"
+    }
   }
 }

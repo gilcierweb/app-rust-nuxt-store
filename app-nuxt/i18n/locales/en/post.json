@@ -1,12 +1,14 @@
 {
-  "categories": {
-    "technology": "Technology",
-    "marketing": "Marketing",
-    "sustainability": "Sustainability",
-    "innovation": "Innovation",
-    "security": "Security",
-    "social": "Social"
-  },
-  "authorBy": "By {name}",
-  "readMore": "Read more →"
+  "post": {
+    "categories": {
+      "technology": "Technology",
+      "marketing": "Marketing",
+      "sustainability": "Sustainability",
+      "innovation": "Innovation",
+      "security": "Security",
+      "social": "Social"
+    },
+    "authorBy": "By {name}",
+    "readMore": "Read more →"
+  }
 }

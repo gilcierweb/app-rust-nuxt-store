@@ -1,3 +1,5 @@
 {
-  "authorAlt": "Autor"
+  "profile": {
+    "authorAlt": "Autor"
+  }
 }

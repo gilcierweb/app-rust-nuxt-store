@@ -1,16 +1,18 @@
 {
-  "title": "Carrinho de Compras",
-  "empty": "Seu carrinho está vazio",
-  "subtotal": "Subtotal",
-  "checkout": "Finalizar Compra",
-  "continueShopping": "Continuar Comprando",
-  "remove": "Remover",
-  "quantity": "Qtd",
-  "total": "Total",
-  "summary": "Resumo do Pedido",
-  "itemAdded": "Item adicionado ao carrinho",
-  "viewCart": "Ver Carrinho",
-  "clearCart": "Limpar Carrinho",
-  "itemsCount": "{count} itens",
-  "yourCart": "Seu Carrinho"
+  "cart": {
+    "title": "Carrinho de Compras",
+    "empty": "Seu carrinho está vazio",
+    "subtotal": "Subtotal",
+    "checkout": "Finalizar Compra",
+    "continueShopping": "Continuar Comprando",
+    "remove": "Remover",
+    "quantity": "Qtd",
+    "total": "Total",
+    "summary": "Resumo do Pedido",
+    "itemAdded": "Item adicionado ao carrinho",
+    "viewCart": "Ver Carrinho",
+    "clearCart": "Limpar Carrinho",
+    "itemsCount": "{count} itens",
+    "yourCart": "Seu Carrinho"
+  }
 }

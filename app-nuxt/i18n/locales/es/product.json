@@ -1,46 +1,48 @@
 {
-  "badges": {
-    "inStock": "En stock",
-    "lastUnits": "Últimas unidades",
-    "offer": "Oferta",
-    "new": "Nuevo",
-    "trending": "Trending",
-    "bestseller": "Más vendido"
-  },
-  "addToCart": "Agregar al Carrito",
-  "loadMore": "Cargar más productos",
-  "found": "{count} productos encontrados",
-  "filters": {
-    "title": "Filtros:",
-    "allBrands": "Todas las marcas",
-    "price": "Precio",
-    "lowestPrice": "Menor precio",
-    "highestPrice": "Mayor precio",
-    "rating": "Evaluación",
-    "fiveStars": "5 estrellas",
-    "fourPlusStars": "4+ estrellas",
-    "threePlusStars": "3+ estrellas"
-  },
-  "breadcrumb": {
-    "home": "Inicio",
-    "categories": "Categorías"
-  },
-  "featuredCategories": "Categorías Destacadas",
-  "specialOffer": {
-    "title": "¡Oferta Especial del Día!",
-    "description": "Hasta 50% OFF en productos seleccionados + Envío Gratis",
-    "cta": "Ver Ofertas"
-  },
-  "flashDeal": {
-    "title": "Oferta Relámpago",
-    "description": "Hasta 70% OFF en productos seleccionados",
-    "cta": "Ver Ofertas"
-  },
-  "details": {
-    "rating": "{count} evaluaciones",
-    "avgRating": "{rating}/5 evaluación media",
-    "fastDelivery": "Entrega rápida",
-    "discount": "-{percent}%",
-    "reviews": "({count} evaluaciones)"
+  "product": {
+    "badges": {
+      "inStock": "En stock",
+      "lastUnits": "Últimas unidades",
+      "offer": "Oferta",
+      "new": "Nuevo",
+      "trending": "Trending",
+      "bestseller": "Más vendido"
+    },
+    "addToCart": "Agregar al Carrito",
+    "loadMore": "Cargar más productos",
+    "found": "{count} productos encontrados",
+    "filters": {
+      "title": "Filtros:",
+      "allBrands": "Todas las marcas",
+      "price": "Precio",
+      "lowestPrice": "Menor precio",
+      "highestPrice": "Mayor precio",
+      "rating": "Evaluación",
+      "fiveStars": "5 estrellas",
+      "fourPlusStars": "4+ estrellas",
+      "threePlusStars": "3+ estrellas"
+    },
+    "breadcrumb": {
+      "home": "Inicio",
+      "categories": "Categorías"
+    },
+    "featuredCategories": "Categorías Destacadas",
+    "specialOffer": {
+      "title": "¡Oferta Especial del Día!",
+      "description": "Hasta 50% OFF en productos seleccionados + Envío Gratis",
+      "cta": "Ver Ofertas"
+    },
+    "flashDeal": {
+      "title": "Oferta Relámpago",
+      "description": "Hasta 70% OFF en productos seleccionados",
+      "cta": "Ver Ofertas"
+    },
+    "details": {
+      "rating": "{count} evaluaciones",
+      "avgRating": "{rating}/5 evaluación media",
+      "fastDelivery": "Entrega rápida",
+      "discount": "-{percent}%",
+      "reviews": "({count} evaluaciones)"
+    }
   }
 }

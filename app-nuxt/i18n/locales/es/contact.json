@@ -1,10 +1,12 @@
 {
-  "title": "Contacto",
-  "form": {
-    "name": "Nombre",
-    "email": "Correo electrónico",
-    "subject": "Asunto",
-    "message": "Mensaje",
-    "submit": "Enviar Mensaje"
+  "contact": {
+    "title": "Contacto",
+    "form": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "subject": "Asunto",
+      "message": "Mensaje",
+      "submit": "Enviar Mensaje"
+    }
   }
 }

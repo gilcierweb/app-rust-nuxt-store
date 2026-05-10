@@ -1,8 +1,10 @@
 {
-  "action": {
-    "1": "Ação de seed 1",
-    "2": "Ação de seed 2",
-    "3": "Ação de seed 3",
-    "4": "Ação de seed 4"
+  "seed": {
+    "action": {
+      "1": "Ação de seed 1",
+      "2": "Ação de seed 2",
+      "3": "Ação de seed 3",
+      "4": "Ação de seed 4"
+    }
   }
 }

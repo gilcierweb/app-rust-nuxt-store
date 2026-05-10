@@ -1,482 +1,484 @@
 {
-  "section": "Admin",
-  "title": "Visão geral operacional",
-  "description": "Monitore os módulos críticos e acompanhe o status atual da administração.",
-  "statusLabels": {
-    "active": "Ativo",
-    "inactive": "Inativo",
-    "pending": "Pendente",
-    "archived": "Arquivado",
-    "inProgress": "Em andamento",
-    "completed": "Concluído",
-    "cancelled": "Cancelado",
-    "paid": "Pago",
-    "approved": "Aprovado",
-    "rejected": "Rejeitado",
-    "unknown": "Desconhecido"
-  },
-  "module": "Módulo",
-  "modules": {
-    "dashboard": {
-      "description": "KPIs consolidados e visibilidade operacional."
-    }
-  },
-  "navbar": {
-    "search": {
-      "placeholder": "Pesquisar...",
-      "ariaLabel": "Pesquisar"
-    },
-    "profile": {
-      "ariaLabel": "Perfil",
-      "avatarAlt": "Avatar do usuário",
-      "myAccount": "Minha conta",
-      "settings": "Configurações",
-      "logout": "Sair",
-      "defaultName": "Admin"
-    },
-    "activity": {
-      "title": "Atividade"
-    }
-  },
-  "account": {
-    "section": "Conta",
-    "title": "Minha conta",
-    "description": "Dados básicos do usuário autenticado no painel administrativo.",
-    "profileTitle": "Perfil",
-    "permissionsTitle": "Permissões",
-    "fields": {
-      "id": "ID",
-      "email": "E-mail",
-      "profile": "Perfil"
-    },
-    "emptyRoles": "Nenhum papel atribuído.",
-    "goSettings": "Ir para configurações"
-  },
-  "sidebar": {
-    "closeSidebar": "Fechar menu lateral",
-    "close": "Fechar",
-    "avatarAlt": "Avatar do usuário",
-    "admin": "Admin",
-    "apiDocs": "Documentação da API",
-    "reports": "Relatórios",
-    "alerts": "Alertas",
-    "telemetry": "Telemetria",
-    "dashboard": "Painel",
-    "default": "Padrão",
-    "core": "Núcleo",
-    "coreResources": "Recursos Principais",
-    "operations": "Operações",
-    "fieldOperations": "Operações de Campo",
-    "monitoring": "Monitoramento",
-    "monitoringAndReports": "Monitoramento e Relatórios",
-    "quickLinks": "Links Rápidos",
-    "terms": "Termos",
-    "privacy": "Privacidade",
-    "workspace": "Espaço de Trabalho",
-    "alertsHub": "Central de Alertas",
-    "reportsHub": "Central de Relatórios",
-    "openApiDocs": "Abrir Documentação da API"
-  },
-  "dashboard": {
-    "title": "Admin Dashboard",
-    "search": {
-      "placeholder": "Digite para buscar...",
-      "ariaLabel": "Buscar"
-    },
-    "profile": {
-      "title": "Perfil",
-      "myAccount": "Minha conta",
-      "settings": "Configurações",
-      "billing": "Faturamento",
-      "manageTeam": "Gerenciar equipe",
-      "customisation": "Personalização",
-      "addTeamAccount": "Adicionar conta de equipe",
-      "logout": "Sair"
-    },
-    "activity": {
-      "title": "Atividade",
-      "time": {
-        "minsAgo": "Há {n} min",
-        "hourAgo": "Há 1 hora",
-        "hoursAgo": "Há {n} horas",
-        "daysAgo": "Há {n} dias"
-      }
-    },
-    "sidebar": {
-      "pages": "Páginas",
-      "dashboard": "Painel",
-      "default": "Padrão",
-      "analytics": "Análises",
-      "ecommerce": "Comércio",
-      "accountSetting": "Configuração de Conta",
-      "account": "Conta",
-      "security": "Segurança",
-      "billingPlans": "Faturamento e Planos",
-      "notifications": "Notificações",
-      "connections": "Conexões",
-      "misc": "Diversos",
-      "error": "Erro",
-      "underMaintenance": "Em Manutenção",
-      "authentications": "Autenticações"
-    },
-    "workspace": {
-      "title": "Espaço de Trabalho",
-      "flyonui": "FlyonUI"
-    },
-    "stats": {
-      "order": "Pedidos",
-      "orderProgress": "{current} de {total} pedidos",
-      "revenue": "Receita",
-      "revenueProgress": "${current} de ${total}",
-      "invoice": "Faturamento",
-      "invoiceProgress": "${current} de ${total}",
-      "orderProgressbar": "Progresso de Pedidos",
-      "revenueProgressbar": "Progresso de Receita",
-      "invoiceProgressbar": "Progresso de Faturamento",
-      "websiteTraffic": "Tráfego do Site",
-      "trafficChange": "{percent}% ↗ que na semana passada",
-      "newSignups": "Novos Cadastros",
-      "signupsChange": "{percent}% de aumento este mês",
-      "customerRetention": "Retenção de Clientes",
-      "retentionChange": "Estável no último trimestre",
-      "totalPageViews": "Total de visualizações",
-      "pageViewsChange": "{percent}% ↗ que no mês passado",
-      "totalSales": "Total de Vendas",
-      "activeCustomers": "Clientes Ativos",
-      "period": "De {start} a {end}",
-      "subscription": "Plano de Assinatura",
-      "subscriptionPlan": "Premium",
-      "upgradePlan": "Upgrade de Plano",
-      "nextBilling": "Próxima Cobrança",
-      "nextBillingDate": "15 de Out, 2024",
-      "viewDetails": "Ver Detalhes",
-      "changePayment": "Alterar Método de Pagamento"
-    }
-  },
-  "products": {
-    "title": "Produtos",
-    "searchPlaceholder": "Buscar produtos...",
-    "add": "Adicionar",
-    "table": {
-      "name": "Nome",
-      "price": "Preço",
-      "description": "Descrição",
-      "status": "Status",
-      "category": "Categoria",
-      "date": "Data",
-      "actions": "Ações"
-    },
-    "edit": "Editar",
-    "delete": "Excluir",
-    "view": "Visualizar",
-    "confirmDelete": "Tem certeza que deseja excluir \"{name}\"?",
-    "errorDelete": "Erro ao excluir produto",
-    "detail": {
-      "title": "Detalhes do Produto",
-      "loading": "Carregando produto...",
-      "error": "Erro ao carregar produto: {message}",
-      "back": "Voltar",
-      "backList": "← Voltar para Lista",
+  "admin": {
+    "section": "Admin",
+    "title": "Visão geral operacional",
+    "description": "Monitore os módulos críticos e acompanhe o status atual da administração.",
+    "statusLabels": {
       "active": "Ativo",
       "inactive": "Inativo",
-      "draft": "Rascunho",
-      "featured": "Destaque",
-      "unknown": "Desconhecido",
-      "prices": "Preços",
-      "information": "Informações",
-      "shortDescription": "Descrição Curta",
-      "fullDescription": "Descrição Completa",
-      "images": "Galeria de Imagens",
-      "cover": "Capa",
-      "manageVariants": "Gerenciar Variações"
-    },
-    "new": {
-      "title": "Adicionar Novo Produto"
-    },
-    "editTitle": "Editar Produto",
-    "loading": "Carregando produto...",
-    "error": "Erro ao carregar produto: {message}"
-  },
-  "categories": {
-    "title": "Categorias",
-    "searchPlaceholder": "Buscar categorias",
-    "add": "Adicionar",
-    "loading": "Carregando categorias...",
-    "error": "Erro ao carregar categorias: {message}",
-    "notFound": "Nenhuma categoria encontrada.",
-    "createFirst": "Criar primeira categoria",
-    "table": {
-      "name": "Nome",
-      "slug": "Slug",
-      "description": "Descrição",
-      "status": "Status",
-      "position": "Posição",
-      "date": "Data",
-      "actions": "Ações"
-    },
-    "detail": {
-      "title": "Detalhes da Categoria",
-      "loading": "Carregando detalhes da categoria...",
-      "error": "Erro ao carregar categoria: {message}",
-      "tryAgain": "Tentar novamente",
-      "notFound": "Categoria não encontrada.",
-      "back": "Voltar para lista",
-      "mainInfo": "Informações Principais",
-      "name": "Nome",
-      "slug": "Slug",
-      "description": "Descrição",
-      "noDescription": "Sem descrição",
-      "settings": "Configurações",
-      "status": "Status",
-      "active": "Ativo",
-      "inactive": "Inativo",
-      "position": "Posição",
-      "createdAt": "Criado em:",
-      "updatedAt": "Atualizado em:",
-      "edit": "Editar",
-      "delete": "Excluir",
-      "confirmDelete": "Tem certeza que deseja excluir a categoria \"{name}\"?",
-      "errorDelete": "Erro ao excluir categoria"
-    }
-  },
-  "coupons": {
-    "title": "Cupons",
-    "searchPlaceholder": "Buscar cupons",
-    "add": "Adicionar",
-    "loading": "Carregando cupons...",
-    "error": "Erro ao carregar cupons: {message}",
-    "notFound": "Nenhum cupom encontrado.",
-    "createFirst": "Criar primeiro cupom",
-    "table": {
-      "code": "Código",
-      "type": "Tipo",
-      "value": "Valor",
-      "usage": "Usado/Limite",
-      "expiration": "Expiração",
-      "status": "Status",
-      "actions": "Ações"
-    },
-    "types": {
-      "percentage": "Porcentagem",
-      "fixed": "Valor Fixo",
-      "freeShipping": "Frete Grátis",
-      "unknown": "Desconhecido"
-    },
-    "detail": {
-      "title": "Detalhes do Cupom",
-      "info": "Informações do Cupom",
-      "usage": "Uso do Cupom",
-      "active": "Ativo",
-      "inactive": "Inativo",
-      "expiresAt": "Expiração",
-      "neverExpires": "Não expira",
-      "minAmount": "Valor Mínimo",
-      "maxDiscount": "Desconto Máximo",
-      "back": "Voltar para lista",
-      "confirmDelete": "Tem certeza que deseja excluir o cupom \"{name}\"?",
-      "errorDelete": "Erro ao excluir cupom"
-    }
-  },
-  "orders": {
-    "title": "Pedidos",
-    "table": {
-      "number": "Número",
-      "date": "Data",
-      "status": "Status",
-      "payment": "Pagamento",
-      "total": "Total",
-      "items": "Itens"
-    },
-    "detail": {
-      "title": "Detalhes do Pedido",
-      "customer": "Cliente",
-      "shippingAddress": "Endereço de Entrega",
-      "paymentMethod": "Método de Pagamento",
-      "orderItems": "Itens do Pedido",
-      "subtotal": "Subtotal",
-      "shipping": "Frete",
-      "discount": "Desconto",
-      "total": "Total",
-      "back": "Voltar para lista"
-    }
-  },
-  "posts": {
-    "title": "Posts",
-    "searchPlaceholder": "Buscar posts",
-    "add": "Adicionar",
-    "loading": "Carregando posts...",
-    "error": "Erro ao carregar posts: {message}",
-    "notFound": "Nenhum post encontrado.",
-    "createFirst": "Criar primeiro post",
-    "noTitle": "(Sem título)",
-    "table": {
-      "title": "Título",
-      "status": "Status",
-      "author": "Autor ID",
-      "date": "Data",
-      "actions": "Ações"
-    },
-    "status": {
-      "draft": "Rascunho",
       "pending": "Pendente",
-      "scheduled": "Agendado",
-      "published": "Publicado",
-      "private": "Privado",
       "archived": "Arquivado",
-      "trashed": "Lixeira",
+      "inProgress": "Em andamento",
+      "completed": "Concluído",
+      "cancelled": "Cancelado",
+      "paid": "Pago",
+      "approved": "Aprovado",
       "rejected": "Rejeitado",
       "unknown": "Desconhecido"
     },
-    "detail": {
-      "title": "Detalhes do Post",
-      "content": "Conteúdo",
-      "noContent": "Sem conteúdo",
-      "back": "Voltar para lista",
-      "confirmDelete": "Tem certeza que deseja excluir o post \"{name}\"?",
-      "errorDelete": "Erro ao excluir post"
-    }
-  },
-  "profiles": {
-    "title": "Perfis",
-    "searchPlaceholder": "Buscar perfis",
-    "add": "Adicionar",
-    "loading": "Carregando perfis...",
-    "error": "Erro ao carregar perfis: {message}",
-    "notFound": "Nenhum perfil encontrado.",
-    "createFirst": "Criar primeiro perfil",
-    "table": {
-      "name": "Nome",
-      "username": "Username",
-      "phone": "Telefone",
-      "user": "Usuário ID",
-      "date": "Data",
-      "actions": "Ações"
+    "module": "Módulo",
+    "modules": {
+      "dashboard": {
+        "description": "KPIs consolidados e visibilidade operacional."
+      }
     },
-    "detail": {
-      "title": "Detalhes do Perfil",
-      "personalInfo": "Informações Pessoais",
-      "firstName": "Nome",
-      "lastName": "Sobrenome",
-      "fullName": "Nome Completo",
-      "username": "Username",
-      "phone": "Telefone",
-      "bio": "Bio",
-      "back": "Voltar para lista",
-      "confirmDelete": "Tem certeza que deseja excluir o perfil de \"{name}\"?",
-      "errorDelete": "Erro ao excluir perfil"
-    }
-  },
-  "reviews": {
-    "title": "Avaliações",
-    "searchPlaceholder": "Buscar avaliações",
-    "add": "Adicionar",
-    "loading": "Carregando avaliações...",
-    "error": "Erro ao carregar avaliações: {message}",
-    "notFound": "Nenhuma avaliação encontrada.",
-    "createFirst": "Criar primeira avaliação",
-    "table": {
-      "product": "Produto ID",
-      "user": "Usuário ID",
-      "rating": "Avaliação",
-      "title": "Título",
-      "verified": "Verificada",
-      "status": "Status",
-      "date": "Data",
-      "actions": "Ações"
+    "navbar": {
+      "search": {
+        "placeholder": "Pesquisar...",
+        "ariaLabel": "Pesquisar"
+      },
+      "profile": {
+        "ariaLabel": "Perfil",
+        "avatarAlt": "Avatar do usuário",
+        "myAccount": "Minha conta",
+        "settings": "Configurações",
+        "logout": "Sair",
+        "defaultName": "Admin"
+      },
+      "activity": {
+        "title": "Atividade"
+      }
     },
-    "status": {
-      "active": "Ativa",
-      "inactive": "Inativa",
-      "verified": "Sim",
-      "notVerified": "Não"
+    "account": {
+      "section": "Conta",
+      "title": "Minha conta",
+      "description": "Dados básicos do usuário autenticado no painel administrativo.",
+      "profileTitle": "Perfil",
+      "permissionsTitle": "Permissões",
+      "fields": {
+        "id": "ID",
+        "email": "E-mail",
+        "profile": "Perfil"
+      },
+      "emptyRoles": "Nenhum papel atribuído.",
+      "goSettings": "Ir para configurações"
     },
-    "detail": {
-      "title": "Detalhes da Avaliação",
-      "comment": "Comentário",
-      "back": "Voltar para lista",
-      "confirmDelete": "Tem certeza que deseja excluir a avaliação #{id}?",
-      "errorDelete": "Erro ao excluir avaliação"
-    }
-  },
-  "shipments": {
-    "title": "Remessas",
-    "searchPlaceholder": "Buscar remessas",
-    "add": "Criar Remessa",
-    "loading": "Carregando remessas...",
-    "error": "Erro ao carregar remessas: {message}",
-    "notFound": "Nenhuma remessa encontrada.",
-    "table": {
-      "order": "Pedido",
-      "tracking": "Rastreio",
-      "carrier": "Transportadora",
-      "status": "Status",
-      "date": "Data",
-      "actions": "Ações"
-    },
-    "detail": {
-      "title": "Detalhes da Remessa",
-      "back": "Voltar para lista",
-      "confirmDelete": "Tem certeza que deseja excluir a remessa #{id}?",
-      "errorDelete": "Erro ao excluir remessa"
-    }
-  },
-  "shippings": {
-    "title": "Métodos de Envio",
-    "searchPlaceholder": "Buscar métodos de envio",
-    "add": "Adicionar",
-    "loading": "Carregando métodos de envio...",
-    "error": "Erro ao carregar métodos de envio: {message}",
-    "notFound": "Nenhum método de envio encontrado.",
-    "createFirst": "Criar primeiro método",
-    "table": {
-      "name": "Nome",
-      "code": "Código",
-      "basePrice": "Preço Base",
-      "freeThreshold": "Frete Grátis",
-      "status": "Status",
-      "date": "Data",
-      "actions": "Ações"
-    },
-    "status": {
-      "above": "Acima de {threshold}",
-      "active": "Ativo",
-      "inactive": "Inativo"
-    },
-    "detail": {
-      "title": "Detalhes do Método de Envio",
-      "back": "Voltar para lista",
-      "confirmDelete": "Tem certeza que deseja excluir o método de envio \"{name}\"?",
-      "errorDelete": "Erro ao excluir método de envio"
-    }
-  },
-  "addresses": {
-    "title": "Endereços",
-    "searchPlaceholder": "Buscar endereços",
-    "add": "Adicionar",
-    "loading": "Carregando endereços...",
-    "error": "Erro ao carregar endereços: {message}",
-    "notFound": "Nenhum endereço encontrado.",
-    "createFirst": "Criar primeiro endereço",
-    "table": {
-      "name": "Nome",
-      "type": "Tipo",
-      "address": "Endereço",
-      "cityState": "Cidade/Estado",
+    "sidebar": {
+      "closeSidebar": "Fechar menu lateral",
+      "close": "Fechar",
+      "avatarAlt": "Avatar do usuário",
+      "admin": "Admin",
+      "apiDocs": "Documentação da API",
+      "reports": "Relatórios",
+      "alerts": "Alertas",
+      "telemetry": "Telemetria",
+      "dashboard": "Painel",
       "default": "Padrão",
-      "user": "Usuário ID",
-      "actions": "Ações"
+      "core": "Núcleo",
+      "coreResources": "Recursos Principais",
+      "operations": "Operações",
+      "fieldOperations": "Operações de Campo",
+      "monitoring": "Monitoramento",
+      "monitoringAndReports": "Monitoramento e Relatórios",
+      "quickLinks": "Links Rápidos",
+      "terms": "Termos",
+      "privacy": "Privacidade",
+      "workspace": "Espaço de Trabalho",
+      "alertsHub": "Central de Alertas",
+      "reportsHub": "Central de Relatórios",
+      "openApiDocs": "Abrir Documentação da API"
     },
-    "types": {
-      "home": "Casa",
-      "work": "Trabalho",
-      "other": "Outro"
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "search": {
+        "placeholder": "Digite para buscar...",
+        "ariaLabel": "Buscar"
+      },
+      "profile": {
+        "title": "Perfil",
+        "myAccount": "Minha conta",
+        "settings": "Configurações",
+        "billing": "Faturamento",
+        "manageTeam": "Gerenciar equipe",
+        "customisation": "Personalização",
+        "addTeamAccount": "Adicionar conta de equipe",
+        "logout": "Sair"
+      },
+      "activity": {
+        "title": "Atividade",
+        "time": {
+          "minsAgo": "Há {n} min",
+          "hourAgo": "Há 1 hora",
+          "hoursAgo": "Há {n} horas",
+          "daysAgo": "Há {n} dias"
+        }
+      },
+      "sidebar": {
+        "pages": "Páginas",
+        "dashboard": "Painel",
+        "default": "Padrão",
+        "analytics": "Análises",
+        "ecommerce": "Comércio",
+        "accountSetting": "Configuração de Conta",
+        "account": "Conta",
+        "security": "Segurança",
+        "billingPlans": "Faturamento e Planos",
+        "notifications": "Notificações",
+        "connections": "Conexões",
+        "misc": "Diversos",
+        "error": "Erro",
+        "underMaintenance": "Em Manutenção",
+        "authentications": "Autenticações"
+      },
+      "workspace": {
+        "title": "Espaço de Trabalho",
+        "flyonui": "FlyonUI"
+      },
+      "stats": {
+        "order": "Pedidos",
+        "orderProgress": "{current} de {total} pedidos",
+        "revenue": "Receita",
+        "revenueProgress": "${current} de ${total}",
+        "invoice": "Faturamento",
+        "invoiceProgress": "${current} de ${total}",
+        "orderProgressbar": "Progresso de Pedidos",
+        "revenueProgressbar": "Progresso de Receita",
+        "invoiceProgressbar": "Progresso de Faturamento",
+        "websiteTraffic": "Tráfego do Site",
+        "trafficChange": "{percent}% ↗ que na semana passada",
+        "newSignups": "Novos Cadastros",
+        "signupsChange": "{percent}% de aumento este mês",
+        "customerRetention": "Retenção de Clientes",
+        "retentionChange": "Estável no último trimestre",
+        "totalPageViews": "Total de visualizações",
+        "pageViewsChange": "{percent}% ↗ que no mês passado",
+        "totalSales": "Total de Vendas",
+        "activeCustomers": "Clientes Ativos",
+        "period": "De {start} a {end}",
+        "subscription": "Plano de Assinatura",
+        "subscriptionPlan": "Premium",
+        "upgradePlan": "Upgrade de Plano",
+        "nextBilling": "Próxima Cobrança",
+        "nextBillingDate": "15 de Out, 2024",
+        "viewDetails": "Ver Detalhes",
+        "changePayment": "Alterar Método de Pagamento"
+      }
     },
-    "status": {
-      "default": "Padrão"
+    "products": {
+      "title": "Produtos",
+      "searchPlaceholder": "Buscar produtos...",
+      "add": "Adicionar",
+      "table": {
+        "name": "Nome",
+        "price": "Preço",
+        "description": "Descrição",
+        "status": "Status",
+        "category": "Categoria",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "edit": "Editar",
+      "delete": "Excluir",
+      "view": "Visualizar",
+      "confirmDelete": "Tem certeza que deseja excluir \"{name}\"?",
+      "errorDelete": "Erro ao excluir produto",
+      "detail": {
+        "title": "Detalhes do Produto",
+        "loading": "Carregando produto...",
+        "error": "Erro ao carregar produto: {message}",
+        "back": "Voltar",
+        "backList": "← Voltar para Lista",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "draft": "Rascunho",
+        "featured": "Destaque",
+        "unknown": "Desconhecido",
+        "prices": "Preços",
+        "information": "Informações",
+        "shortDescription": "Descrição Curta",
+        "fullDescription": "Descrição Completa",
+        "images": "Galeria de Imagens",
+        "cover": "Capa",
+        "manageVariants": "Gerenciar Variações"
+      },
+      "new": {
+        "title": "Adicionar Novo Produto"
+      },
+      "editTitle": "Editar Produto",
+      "loading": "Carregando produto...",
+      "error": "Erro ao carregar produto: {message}"
     },
-    "detail": {
-      "confirmDelete": "Tem certeza que deseja excluir o endereço de \"{name}\"?",
-      "errorDelete": "Erro ao excluir endereço"
+    "categories": {
+      "title": "Categorias",
+      "searchPlaceholder": "Buscar categorias",
+      "add": "Adicionar",
+      "loading": "Carregando categorias...",
+      "error": "Erro ao carregar categorias: {message}",
+      "notFound": "Nenhuma categoria encontrada.",
+      "createFirst": "Criar primeira categoria",
+      "table": {
+        "name": "Nome",
+        "slug": "Slug",
+        "description": "Descrição",
+        "status": "Status",
+        "position": "Posição",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "detail": {
+        "title": "Detalhes da Categoria",
+        "loading": "Carregando detalhes da categoria...",
+        "error": "Erro ao carregar categoria: {message}",
+        "tryAgain": "Tentar novamente",
+        "notFound": "Categoria não encontrada.",
+        "back": "Voltar para lista",
+        "mainInfo": "Informações Principais",
+        "name": "Nome",
+        "slug": "Slug",
+        "description": "Descrição",
+        "noDescription": "Sem descrição",
+        "settings": "Configurações",
+        "status": "Status",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "position": "Posição",
+        "createdAt": "Criado em:",
+        "updatedAt": "Atualizado em:",
+        "edit": "Editar",
+        "delete": "Excluir",
+        "confirmDelete": "Tem certeza que deseja excluir a categoria \"{name}\"?",
+        "errorDelete": "Erro ao excluir categoria"
+      }
+    },
+    "coupons": {
+      "title": "Cupons",
+      "searchPlaceholder": "Buscar cupons",
+      "add": "Adicionar",
+      "loading": "Carregando cupons...",
+      "error": "Erro ao carregar cupons: {message}",
+      "notFound": "Nenhum cupom encontrado.",
+      "createFirst": "Criar primeiro cupom",
+      "table": {
+        "code": "Código",
+        "type": "Tipo",
+        "value": "Valor",
+        "usage": "Usado/Limite",
+        "expiration": "Expiração",
+        "status": "Status",
+        "actions": "Ações"
+      },
+      "types": {
+        "percentage": "Porcentagem",
+        "fixed": "Valor Fixo",
+        "freeShipping": "Frete Grátis",
+        "unknown": "Desconhecido"
+      },
+      "detail": {
+        "title": "Detalhes do Cupom",
+        "info": "Informações do Cupom",
+        "usage": "Uso do Cupom",
+        "active": "Ativo",
+        "inactive": "Inativo",
+        "expiresAt": "Expiração",
+        "neverExpires": "Não expira",
+        "minAmount": "Valor Mínimo",
+        "maxDiscount": "Desconto Máximo",
+        "back": "Voltar para lista",
+        "confirmDelete": "Tem certeza que deseja excluir o cupom \"{name}\"?",
+        "errorDelete": "Erro ao excluir cupom"
+      }
+    },
+    "orders": {
+      "title": "Pedidos",
+      "table": {
+        "number": "Número",
+        "date": "Data",
+        "status": "Status",
+        "payment": "Pagamento",
+        "total": "Total",
+        "items": "Itens"
+      },
+      "detail": {
+        "title": "Detalhes do Pedido",
+        "customer": "Cliente",
+        "shippingAddress": "Endereço de Entrega",
+        "paymentMethod": "Método de Pagamento",
+        "orderItems": "Itens do Pedido",
+        "subtotal": "Subtotal",
+        "shipping": "Frete",
+        "discount": "Desconto",
+        "total": "Total",
+        "back": "Voltar para lista"
+      }
+    },
+    "posts": {
+      "title": "Posts",
+      "searchPlaceholder": "Buscar posts",
+      "add": "Adicionar",
+      "loading": "Carregando posts...",
+      "error": "Erro ao carregar posts: {message}",
+      "notFound": "Nenhum post encontrado.",
+      "createFirst": "Criar primeiro post",
+      "noTitle": "(Sem título)",
+      "table": {
+        "title": "Título",
+        "status": "Status",
+        "author": "Autor ID",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "status": {
+        "draft": "Rascunho",
+        "pending": "Pendente",
+        "scheduled": "Agendado",
+        "published": "Publicado",
+        "private": "Privado",
+        "archived": "Arquivado",
+        "trashed": "Lixeira",
+        "rejected": "Rejeitado",
+        "unknown": "Desconhecido"
+      },
+      "detail": {
+        "title": "Detalhes do Post",
+        "content": "Conteúdo",
+        "noContent": "Sem conteúdo",
+        "back": "Voltar para lista",
+        "confirmDelete": "Tem certeza que deseja excluir o post \"{name}\"?",
+        "errorDelete": "Erro ao excluir post"
+      }
+    },
+    "profiles": {
+      "title": "Perfis",
+      "searchPlaceholder": "Buscar perfis",
+      "add": "Adicionar",
+      "loading": "Carregando perfis...",
+      "error": "Erro ao carregar perfis: {message}",
+      "notFound": "Nenhum perfil encontrado.",
+      "createFirst": "Criar primeiro perfil",
+      "table": {
+        "name": "Nome",
+        "username": "Username",
+        "phone": "Telefone",
+        "user": "Usuário ID",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "detail": {
+        "title": "Detalhes do Perfil",
+        "personalInfo": "Informações Pessoais",
+        "firstName": "Nome",
+        "lastName": "Sobrenome",
+        "fullName": "Nome Completo",
+        "username": "Username",
+        "phone": "Telefone",
+        "bio": "Bio",
+        "back": "Voltar para lista",
+        "confirmDelete": "Tem certeza que deseja excluir o perfil de \"{name}\"?",
+        "errorDelete": "Erro ao excluir perfil"
+      }
+    },
+    "reviews": {
+      "title": "Avaliações",
+      "searchPlaceholder": "Buscar avaliações",
+      "add": "Adicionar",
+      "loading": "Carregando avaliações...",
+      "error": "Erro ao carregar avaliações: {message}",
+      "notFound": "Nenhuma avaliação encontrada.",
+      "createFirst": "Criar primeira avaliação",
+      "table": {
+        "product": "Produto ID",
+        "user": "Usuário ID",
+        "rating": "Avaliação",
+        "title": "Título",
+        "verified": "Verificada",
+        "status": "Status",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "status": {
+        "active": "Ativa",
+        "inactive": "Inativa",
+        "verified": "Sim",
+        "notVerified": "Não"
+      },
+      "detail": {
+        "title": "Detalhes da Avaliação",
+        "comment": "Comentário",
+        "back": "Voltar para lista",
+        "confirmDelete": "Tem certeza que deseja excluir a avaliação #{id}?",
+        "errorDelete": "Erro ao excluir avaliação"
+      }
+    },
+    "shipments": {
+      "title": "Remessas",
+      "searchPlaceholder": "Buscar remessas",
+      "add": "Criar Remessa",
+      "loading": "Carregando remessas...",
+      "error": "Erro ao carregar remessas: {message}",
+      "notFound": "Nenhuma remessa encontrada.",
+      "table": {
+        "order": "Pedido",
+        "tracking": "Rastreio",
+        "carrier": "Transportadora",
+        "status": "Status",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "detail": {
+        "title": "Detalhes da Remessa",
+        "back": "Voltar para lista",
+        "confirmDelete": "Tem certeza que deseja excluir a remessa #{id}?",
+        "errorDelete": "Erro ao excluir remessa"
+      }
+    },
+    "shippings": {
+      "title": "Métodos de Envio",
+      "searchPlaceholder": "Buscar métodos de envio",
+      "add": "Adicionar",
+      "loading": "Carregando métodos de envio...",
+      "error": "Erro ao carregar métodos de envio: {message}",
+      "notFound": "Nenhum método de envio encontrado.",
+      "createFirst": "Criar primeiro método",
+      "table": {
+        "name": "Nome",
+        "code": "Código",
+        "basePrice": "Preço Base",
+        "freeThreshold": "Frete Grátis",
+        "status": "Status",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "status": {
+        "above": "Acima de {threshold}",
+        "active": "Ativo",
+        "inactive": "Inativo"
+      },
+      "detail": {
+        "title": "Detalhes do Método de Envio",
+        "back": "Voltar para lista",
+        "confirmDelete": "Tem certeza que deseja excluir o método de envio \"{name}\"?",
+        "errorDelete": "Erro ao excluir método de envio"
+      }
+    },
+    "addresses": {
+      "title": "Endereços",
+      "searchPlaceholder": "Buscar endereços",
+      "add": "Adicionar",
+      "loading": "Carregando endereços...",
+      "error": "Erro ao carregar endereços: {message}",
+      "notFound": "Nenhum endereço encontrado.",
+      "createFirst": "Criar primeiro endereço",
+      "table": {
+        "name": "Nome",
+        "type": "Tipo",
+        "address": "Endereço",
+        "cityState": "Cidade/Estado",
+        "default": "Padrão",
+        "user": "Usuário ID",
+        "actions": "Ações"
+      },
+      "types": {
+        "home": "Casa",
+        "work": "Trabalho",
+        "other": "Outro"
+      },
+      "status": {
+        "default": "Padrão"
+      },
+      "detail": {
+        "confirmDelete": "Tem certeza que deseja excluir o endereço de \"{name}\"?",
+        "errorDelete": "Erro ao excluir endereço"
+      }
     }
   }
 }

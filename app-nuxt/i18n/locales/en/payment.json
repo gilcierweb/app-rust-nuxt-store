@@ -1,11 +1,13 @@
 {
-  "select": "Select payment method",
-  "creditCard": "Credit Card",
-  "boleto": "Boleto",
-  "pix": "PIX",
-  "status": {
-    "pending": "Pending",
-    "completed": "Completed",
-    "failed": "Failed"
+  "payment": {
+    "select": "Select payment method",
+    "creditCard": "Credit Card",
+    "boleto": "Boleto",
+    "pix": "PIX",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
   }
 }
