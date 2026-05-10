@@ -12,6 +12,17 @@ pub struct CreateOrderParams {
     pub discount_amount: Option<Decimal>,
     pub notes: Option<String>,
     pub payment_method_id: Option<i32>,
+    pub shipping_method_id: Option<i32>,
+    pub address_first_name: Option<String>,
+    pub address_last_name: Option<String>,
+    pub address_company: Option<String>,
+    pub address1: Option<String>,
+    pub address2: Option<String>,
+    pub address_city: Option<String>,
+    pub address_state: Option<String>,
+    pub address_zip_code: Option<String>,
+    pub address_country: Option<String>,
+    pub address_phone: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -8,9 +8,11 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::QueryOrder;
 use uuid::Uuid;
 
+use crate::models::_entities::addresses;
 use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
 use crate::models::_entities::payments;
+use crate::models::_entities::shipments;
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::order_status::OrderStatus;
 
@@ -109,6 +111,51 @@ pub async fn checkout(
         order_active.update(&ctx.db).await?;
     }
 
+    let mut address_id = None;
+
+    if params.address1.is_some() {
+        let addr = addresses::ActiveModel {
+            first_name: Set(params.address_first_name.clone()),
+            last_name: Set(params.address_last_name.clone()),
+            company: Set(params.address_company.clone()),
+            address1: Set(params.address1.clone()),
+            address2: Set(params.address2.clone()),
+            city: Set(params.address_city.clone()),
+            state: Set(params.address_state.clone()),
+            zip_code: Set(params.address_zip_code.clone()),
+            country: Set(params.address_country.clone()),
+            phone: Set(params.address_phone.clone()),
+            user_id: Set(1),
+            r#type: Set(Some("shipping".to_string())),
+            created_at: Set(now),
+            updated_at: Set(now),
+            ..Default::default()
+        };
+        let saved_addr = addr.insert(&ctx.db).await.map_err(|e| {
+            tracing::error!(error = ?e, "failed to create address");
+            Error::InternalServerError
+        })?;
+        address_id = Some(saved_addr.id);
+    }
+
+    let mut shipment_id = None;
+
+    if let Some(sm_id) = params.shipping_method_id {
+        let ship = shipments::ActiveModel {
+            order_id: Set(saved.id),
+            shipping_method_id: Set(sm_id),
+            status: Set(Some(1)),
+            created_at: Set(now),
+            updated_at: Set(now),
+            ..Default::default()
+        };
+        let saved_ship = ship.insert(&ctx.db).await.map_err(|e| {
+            tracing::error!(error = ?e, "failed to create shipment");
+            Error::InternalServerError
+        })?;
+        shipment_id = Some(saved_ship.id);
+    }
+
     format::json(serde_json::json!({
         "id": saved.id,
         "order_number": saved.order_number,
@@ -116,6 +163,8 @@ pub async fn checkout(
         "total_amount": saved.total_amount,
         "payment_id": payment_id,
         "payment_status": payment_status,
+        "address_id": address_id,
+        "shipment_id": shipment_id,
     }))
 }
 

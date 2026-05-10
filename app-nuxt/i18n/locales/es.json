@@ -784,6 +784,35 @@
       "4": "Acción de seed 4"
     }
   },
+  "shipping": {
+    "title": "Envío",
+    "address": "Dirección de Envío",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "address1": "Dirección",
+    "address2": "Complemento",
+    "city": "Ciudad",
+    "state": "Estado",
+    "zipCode": "Código Postal",
+    "phone": "Teléfono",
+    "method": "Método de Envío",
+    "free": "Gratis",
+    "trackingNumber": "Número de Seguimiento",
+    "carrier": "Transportista",
+    "shipment": "Envío",
+    "createShipment": "Crear Envío",
+    "editShipment": "Editar Envío",
+    "shipmentDetails": "Detalles del Envío",
+    "noShipments": "No se encontraron envíos",
+    "list": "Envíos",
+    "order": "Pedido",
+    "status": {
+      "pending": "Pendiente",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
+      "cancelled": "Cancelado"
+    }
+  },
   "payment": {
     "select": "Seleccionar método de pago",
     "creditCard": "Tarjeta de Crédito",

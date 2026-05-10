@@ -1,6 +1,6 @@
 pub mod auth;
 
-
+pub mod shipment;
 pub mod post;
 pub mod profile;
 pub mod category;

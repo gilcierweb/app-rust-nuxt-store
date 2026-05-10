@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="col-span-4 md:col-span-4">
-      <h2 class="h2">{{ t('admin.dashboard.title') }}</h2>
+      <h2 class="h2">Dashboard</h2>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">

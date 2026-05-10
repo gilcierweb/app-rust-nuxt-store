@@ -84,9 +84,15 @@
         </li>
         <li>
          <NuxtLink to="/admin/shippings">
-             <i class="icon-[tabler--truck-delivery] size-5"></i>
-             Shipping Methods
-           </NuxtLink>
+              <i class="icon-[tabler--truck-delivery] size-5"></i>
+              Shipping Methods
+            </NuxtLink>
+        </li>
+        <li>
+         <NuxtLink to="/admin/shipments">
+              <i class="icon-[tabler--package-export] size-5"></i>
+              Shipments
+            </NuxtLink>
         </li>
         <li v-if="!isAuthenticated">
           <NuxtLink to="/users/sessions">

@@ -285,3 +285,16 @@ export interface ShippingMethod {
   created_at: string
   updated_at: string
 }
+
+export interface Shipment {
+  id: number
+  order_id: number
+  shipping_method_id: number
+  tracking_number?: string
+  carrier?: string
+  status?: number
+  shipped_at?: string
+  delivered_at?: string
+  created_at: string
+  updated_at: string
+}
