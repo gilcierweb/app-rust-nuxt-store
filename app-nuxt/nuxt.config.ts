@@ -40,6 +40,7 @@ export default defineNuxtConfig({
       mode: 'out-in' // default
     }
   },
+  
   runtimeConfig: {
     public: {
       ApiBaseUrl: '',
@@ -47,7 +48,51 @@ export default defineNuxtConfig({
       baseURL: process.env.NUXT_BASE_URL || 'http://localhost:5150' // Exposed to the frontend as well.
     }
   },
+  
   pwa: {
-    /* PWA options */
+    registerType: 'autoUpdate',
+    manifest: {
+      id: '/?source=pwa',
+      name: 'App Rust Nuxt Store',
+      short_name: 'App Rust Nuxt Store',
+      description: 'App Rust Nuxt Store',
+      start_url: '/?source=twa',
+      scope: '/',
+      display: 'standalone',
+      background_color: '#0A0A0F',
+      theme_color: '#00E5FF',
+      categories: ['saas', 'monitoring', 'industrial'],
+      icons: [
+        // regular icons
+        { src: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
+        { src: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' },
+        // maskable icon required for high-quality install UI
+        { src: '/pwa-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      ],
+      screenshots: [
+        { src: '/screenshot-1.webp', sizes: '1280x720', type: 'image/webp' },
+        { src: '/screenshot-2.webp', sizes: '1280x720', type: 'image/webp' },
+      ],
+    },
+    workbox: {
+      runtimeCaching: [
+        // Example: cache game assets
+        {
+          urlPattern: /\.(?:png|jpg|jpeg|webp|gif|svg|mp3|wav|ogg|mp4|webm|glb|gltf|bin|ttf|woff2)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'assets-cache',
+            expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 }, // 30 days
+          },
+        },
+      ],
+    },
+    devOptions: {
+      enabled: false,
+    },
   },
+
+  // security: {
+  //     csrf: true,
+  //   },
 })

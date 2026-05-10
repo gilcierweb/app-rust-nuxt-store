@@ -3,7 +3,7 @@
         <nav class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm">
             <div class="navbar-start max-md:w-1/4">
                 <a class="link text-base-content link-neutral text-xl font-bold no-underline" href="#">
-                    FlyonUI
+                    App Rust Nuxt Store
                 </a>
             </div>
             <div class="navbar-center max-md:hidden">
