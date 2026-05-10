@@ -76,7 +76,11 @@
       "workspace": "Espaço de Trabalho",
       "alertsHub": "Central de Alertas",
       "reportsHub": "Central de Relatórios",
-      "openApiDocs": "Abrir Documentação da API"
+      "openApiDocs": "Abrir Documentação da API",
+      "category_ecommerce": "E-commerce",
+      "category_logistics": "Logística",
+      "category_content": "Conteúdo",
+      "category_admin": "Administração"
     },
     "dashboard": {
       "title": "Admin Dashboard",

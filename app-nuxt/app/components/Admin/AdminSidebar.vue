@@ -12,7 +12,7 @@
         </li>
         
         <li class="menu-title mt-4">
-          <span>{{ $t('admin.sidebar.ecommerce') || 'E-commerce' }}</span>
+          <span>{{ $t('admin.sidebar.category_ecommerce') || 'E-commerce' }}</span>
         </li>
         <li>
          <NuxtLink to="/admin/orders">
@@ -46,7 +46,7 @@
         </li>
 
         <li class="menu-title mt-4">
-          <span>{{ $t('admin.sidebar.monitoring') || 'Logistics' }}</span>
+          <span>{{ $t('admin.sidebar.category_logistics') || 'Logistics' }}</span>
         </li>
         <li>
          <NuxtLink to="/admin/shipments">
@@ -62,7 +62,7 @@
         </li>
 
         <li class="menu-title mt-4">
-          <span>{{ $t('admin.sidebar.content') || 'Content' }}</span>
+          <span>{{ $t('admin.sidebar.category_content') || 'Content' }}</span>
         </li>
         <li>
          <NuxtLink to="/admin/posts">
@@ -72,7 +72,7 @@
         </li>
 
         <li class="menu-title mt-4">
-          <span>{{ $t('admin.sidebar.administration') || 'Administration' }}</span>
+          <span>{{ $t('admin.sidebar.category_admin') || 'Administration' }}</span>
         </li>
         <li>
          <NuxtLink to="/admin/customers">
