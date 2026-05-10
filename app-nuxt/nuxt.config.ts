@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
+  compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', '@vite-pwa/nuxt', 'nuxt-toast'],
   css: ["~/assets/css/main.css"],
@@ -19,6 +19,18 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
   app: {
+
+    head: {
+      title: "App Rust Nuxt Store",
+      meta: [
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { name: "description", content: "App Rust Nuxt Store" },
+        { name: "robots", content: "noindex, nofollow" }, // keep off search engines
+        { name: "theme-color", content: "#FF6F00" },
+      ],
+    },
+
     pageTransition: {
       name: 'fade',
       mode: 'out-in' // default
@@ -36,6 +48,6 @@ export default defineNuxtConfig({
     }
   },
   pwa: {
-     /* PWA options */
+    /* PWA options */
   },
 })
