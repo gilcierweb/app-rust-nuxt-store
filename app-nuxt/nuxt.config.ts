@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security', '@nuxtjs/sitemap'],
   css: ["~/assets/css/main.css"],
-  vite: { plugins: [tailwindcss(),], },
+
   shadcn: {
     /**
      * Prefix for all the imported component
@@ -132,6 +132,82 @@ export default defineNuxtConfig({
       { label: "Freq", width: "15%" },
       { label: "Priority", width: "15%" },
     ],
+  },
+
+  // Image optimization
+  image: {
+    quality: 80,
+    format: ['webp', 'avif', 'jpg'],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+    presets: {
+      product: {
+        modifiers: {
+          format: 'webp',
+          fit: 'cover',
+          quality: 80,
+        },
+      },
+      thumbnail: {
+        modifiers: {
+          format: 'webp',
+          fit: 'cover',
+          quality: 60,
+          width: 300,
+          height: 300,
+        },
+      },
+    },
+  },
+
+  // Experimental features for better performance
+  experimental: {
+    payloadExtraction: true,
+    renderJsonPayloads: true,
+    clientFallback: true,
+  },
+
+  // Nitro build optimization
+  nitro: {
+    compressPublicAssets: true,
+    minify: true,
+    routeRules: {
+      '/api/**': { cors: true, headers: { 'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE' } },
+      '/products/**': { isr: 60, prerender: false },
+      '/': { prerender: true },
+      '/products': { prerender: true },
+      '/about': { prerender: true },
+      '/contact': { prerender: true },
+    },
+  },
+
+  // Vite build optimization
+  vite: {
+    plugins: [tailwindcss()],
+    css: {
+      devSourcemap: true,
+    },
+    build: {
+      cssMinify: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Code splitting for vendor libraries
+            'vendor-ui': ['@nuxt/image', 'reka-ui'],
+            'vendor-utils': ['pinia', '@pinia/nuxt'],
+          },
+        },
+      },
+    },
+    optimizeDeps: {
+      include: ['vue', 'vue-router', 'pinia'],
+    },
   },
 
   // security: {

@@ -11,8 +11,15 @@
       </div>
 
       <div  v-for="product in productsApi" :key="product.id" class="card bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <figure>           
-            <!-- <NuxtImg :src="product?.thumbnail" loading="lazy" :alt="product?.title" /> -->
+          <figure>
+            <LazyImage
+              v-if="product.images?.[0]?.image"
+              :src="product.images[0].image"
+              :alt="product.name"
+              :width="300"
+              :height="300"
+              preset="thumbnail"
+            />
           </figure>
           <div class="card-body">
             <h5 class="card-title mb-2.5">{{ product.name }}</h5>
