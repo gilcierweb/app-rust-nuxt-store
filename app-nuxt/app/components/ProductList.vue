@@ -26,6 +26,9 @@
                 <span class="icon-[tabler--shopping-cart] size-4"></span>
                 {{ t('product.addToCart') }}
               </button>
+              <button class="btn btn-ghost btn-circle" @click="toggleWishlist(product.id)">
+                <span :class="[isInWishlist(product.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-5']"></span>
+              </button>
               <NuxtLink :to="`/products/${product.id}`" class="btn btn-secondary btn-soft">
                 Details
               </NuxtLink>
@@ -55,6 +58,9 @@
               <button class="btn btn-primary btn-soft" @click="addToCart(product)">
                 <span class="icon-[tabler--shopping-cart] size-4"></span>
                 {{ t('product.addToCart') }}
+              </button>
+              <button class="btn btn-ghost btn-circle" @click="toggleWishlist(product.id)">
+                <span :class="[isInWishlist(product.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-5']"></span>
               </button>
               <NuxtLink :to="`/products/${product.id}`" class="btn btn-secondary btn-soft">
                 Details
@@ -109,6 +115,10 @@ function addToCartApi(product: ProductApi) {
 }
 
 const { openCart } = useCartUI()
+const { fetchWishlist, toggleWishlist, isInWishlist } = useWishlist()
+
+onMounted(() => { fetchWishlist() })
+
 const { pending: pendingApi, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/products`);
 const productsApi = computed(() => productsData.value ?? []);
 const { pending, data } = await useFetch<Product[]>(`https://dummyjson.com/products`);

@@ -19,6 +19,9 @@
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
+                <NuxtLink to="/wishlist" class="btn btn-text btn-square relative">
+                    <span class="icon-[tabler--heart] size-5"></span>
+                </NuxtLink>
                 <button class="btn btn-text btn-square relative" @click="toggleCart">
                     <span class="icon-[tabler--shopping-cart] size-5"></span>
                     <span v-if="cartStore.totalItems > 0" class="badge badge-primary badge-xs absolute -top-1 -right-1">

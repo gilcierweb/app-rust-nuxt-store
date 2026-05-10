@@ -30,6 +30,9 @@
             <span class="icon-[tabler--shopping-cart] size-5"></span>
             {{ t('product.addToCart') }}
           </button>
+          <button class="btn btn-ghost btn-circle btn-xl" @click="toggleWishlist(productApi!.id)">
+            <span :class="[isInWishlist(productApi!.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-6']"></span>
+          </button>
         </div>
       </div>
       <div class="grid grid-cols-1">
@@ -62,6 +65,9 @@
           <button class="btn btn-primary btn-xl" @click="addToCart(product!)">
             <span class="icon-[tabler--shopping-cart] size-5"></span>
             {{ t('product.addToCart') }}
+          </button>
+          <button class="btn btn-ghost btn-circle btn-xl" @click="toggleWishlist(product!.id)">
+            <span :class="[isInWishlist(product!.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-6']"></span>
           </button>
         </div>
       </div>
@@ -174,6 +180,9 @@ function addToCart(product: Product) {
   })
   openCart()
 }
+
+const { fetchWishlist, toggleWishlist, isInWishlist } = useWishlist()
+onMounted(() => { fetchWishlist() })
 
 const { data: productApi, pending: pendingApi } = await useFetch<ProductApi>(`${config.public.baseURL}/api/products/${id}`)
 const { data: product, pending } = await useLazyFetch<Product>(`https://dummyjson.com/products/${id}`)

@@ -286,6 +286,14 @@ export interface ShippingMethod {
   updated_at: string
 }
 
+export interface WishlistItem {
+  id: number
+  user_id: number
+  product_id: number
+  created_at: string
+  updated_at: string
+}
+
 export interface Shipment {
   id: number
   order_id: number

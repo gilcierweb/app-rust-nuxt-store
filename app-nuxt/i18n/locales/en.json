@@ -10,6 +10,7 @@
     "next": "Next",
     "previous": "Previous",
     "close": "Close",
+    "apply": "Apply",
     "yes": "Yes",
     "no": "No",
     "or": "or",
@@ -239,7 +240,8 @@
       "title": "Checkout",
       "placeOrder": "Place Order",
       "orderSummary": "Order Summary",
-      "confirming": "Confirming your order..."
+      "confirming": "Confirming your order...",
+      "discount": "Discount"
     },
     "confirmation": {
       "title": "Order Confirmed",
@@ -250,6 +252,8 @@
     "products": {
       "title": "Products",
       "loading": "Loading...",
+      "reviews": "Reviews",
+      "writeReview": "Write a review",
       "buy": "Buy Now",
       "back": "Back to Products",
       "backList": "← Back to List",
@@ -373,6 +377,12 @@
           "time3": "3 min read"
         }
       }
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "empty": "Your wishlist is empty",
+      "continueShopping": "Continue Shopping",
+      "viewProduct": "View Product"
     },
     "profiles": {
       "title": "Profiles",

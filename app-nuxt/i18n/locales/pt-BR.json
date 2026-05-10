@@ -10,6 +10,7 @@
     "next": "Próximo",
     "previous": "Anterior",
     "close": "Fechar",
+    "apply": "Aplicar",
     "yes": "Sim",
     "no": "Não",
     "or": "ou",
@@ -239,7 +240,8 @@
       "title": "Finalizar Compra",
       "placeOrder": "Confirmar Pedido",
       "orderSummary": "Resumo do Pedido",
-      "confirming": "Confirmando seu pedido..."
+      "confirming": "Confirmando seu pedido...",
+      "discount": "Desconto"
     },
     "confirmation": {
       "title": "Pedido Confirmado",
@@ -250,6 +252,8 @@
     "products": {
       "title": "Produtos",
       "loading": "Carregando...",
+      "reviews": "Avaliações",
+      "writeReview": "Escrever uma avaliação",
       "buy": "Comprar Agora",
       "back": "Voltar para Produtos",
       "backList": "← Voltar para Lista",
@@ -373,6 +377,12 @@
           "time3": "3 min de leitura"
         }
       }
+    },
+    "wishlist": {
+      "title": "Lista de Desejos",
+      "empty": "Sua lista de desejos está vazia",
+      "continueShopping": "Continuar Comprando",
+      "viewProduct": "Ver Produto"
     },
     "profiles": {
       "title": "Perfis",
