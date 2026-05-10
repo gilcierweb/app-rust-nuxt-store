@@ -4,8 +4,14 @@
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
 use axum::debug_handler;
+use axum::extract::Query;
 
 use crate::models::_entities::reviews::{ActiveModel, Entity, Model};
+
+#[derive(Debug, Deserialize)]
+pub struct ListQuery {
+    pub product_id: Option<i32>,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -40,8 +46,15 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 #[debug_handler]
-pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(Entity::find().all(&ctx.db).await?)
+pub async fn list(
+    State(ctx): State<AppContext>,
+    Query(query): Query<ListQuery>,
+) -> Result<Response> {
+    let mut query_builder = Entity::find();
+    if let Some(product_id) = query.product_id {
+        query_builder = query_builder.filter(crate::models::_entities::reviews::Column::ProductId.eq(product_id));
+    }
+    format::json(query_builder.all(&ctx.db).await?)
 }
 
 #[debug_handler]

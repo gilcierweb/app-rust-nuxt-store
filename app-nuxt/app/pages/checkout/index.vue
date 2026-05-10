@@ -121,6 +121,40 @@
       <div>
         <div class="rounded-box border p-6">
           <h3 class="mb-4 text-lg font-semibold">{{ t('pages.checkout.orderSummary') }}</h3>
+
+          <!-- Coupon Input -->
+          <div class="mb-4 p-3 bg-base-200 rounded-lg">
+            <div class="flex gap-2">
+              <input
+                v-model="couponCode"
+                type="text"
+                placeholder="Cupom de desconto"
+                class="input input-bordered input-sm flex-1 uppercase"
+                :disabled="couponApplied || couponChecking"
+                @keyup.enter="applyCoupon"
+              />
+              <button
+                v-if="!couponApplied"
+                class="btn btn-primary btn-sm"
+                :disabled="!couponCode.trim() || couponChecking"
+                @click="applyCoupon"
+              >
+                <span v-if="couponChecking" class="loading loading-spinner loading-xs" />
+                {{ t('common.apply') }}
+              </button>
+              <button
+                v-else
+                class="btn btn-ghost btn-sm text-error"
+                @click="removeCoupon"
+              >
+                <i class="icon-[tabler--x] size-4"></i>
+              </button>
+            </div>
+            <p v-if="couponMessage" :class="['mt-1 text-xs', couponApplied ? 'text-success' : 'text-error']">
+              {{ couponMessage }}
+            </p>
+          </div>
+
           <div class="space-y-3">
             <div class="flex justify-between">
               <span>{{ t('cart.subtotal') }}</span>
@@ -130,9 +164,13 @@
               <span>{{ t('shipping.shipping') }}</span>
               <span>{{ formatNumberBR(selectedShippingCost) }}</span>
             </div>
+            <div v-if="couponDiscount" class="flex justify-between text-success">
+              <span>{{ t('pages.checkout.discount') }}</span>
+              <span>-{{ formatNumberBR(couponDiscount) }}</span>
+            </div>
             <div class="flex justify-between border-t pt-3 text-lg font-bold">
               <span>{{ t('cart.total') }}</span>
-              <span class="text-primary">{{ formatNumberBR(cartStore.totalPrice + (selectedShippingCost || 0)) }}</span>
+              <span class="text-primary">{{ formatNumberBR(totalAmount) }}</span>
             </div>
           </div>
           <button class="btn btn-primary mt-6 w-full" :disabled="submitting || !selectedPaymentMethod" @click="placeOrder">
@@ -151,7 +189,7 @@ const { t } = useI18n()
 const cartStore = useCartStore()
 const router = useRouter()
 const config = useRuntimeConfig()
-import type { PaymentMethod, ShippingMethod } from '~/types'
+import type { PaymentMethod, ShippingMethod, Coupon } from '~/types'
 
 const submitting = ref(false)
 const error = ref('')
@@ -159,6 +197,11 @@ const selectedPaymentMethod = ref<number | null>(null)
 const paymentMethods = ref<PaymentMethod[]>([])
 const selectedShippingMethod = ref<number | null>(null)
 const shippingMethods = ref<ShippingMethod[]>([])
+const couponCode = ref('')
+const couponDiscount = ref<number | null>(null)
+const couponMessage = ref('')
+const couponApplied = ref(false)
+const couponChecking = ref(false)
 const address = reactive({
   firstName: '',
   lastName: '',
@@ -175,6 +218,48 @@ const selectedShippingCost = computed(() => {
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
   return method?.base_price ?? null
 })
+
+const totalAmount = computed(() => {
+  const subtotal = cartStore.totalPrice
+  const shipping = selectedShippingCost.value || 0
+  const discount = couponDiscount.value || 0
+  return subtotal + shipping - discount
+})
+
+async function applyCoupon() {
+  if (!couponCode.value.trim() || couponApplied.value) return
+  couponChecking.value = true
+  couponMessage.value = ''
+  try {
+    const result = await $fetch(`${config.public.baseURL}/api/coupons/validate`, {
+      method: 'POST',
+      body: {
+        code: couponCode.value.trim().toUpperCase(),
+        total_amount: cartStore.totalPrice + (selectedShippingCost.value || 0)
+      }
+    })
+    if (result.valid) {
+      couponDiscount.value = result.discount
+      couponApplied.value = true
+      couponMessage.value = result.message
+    } else {
+      couponDiscount.value = null
+      couponApplied.value = false
+      couponMessage.value = result.message
+    }
+  } catch {
+    couponMessage.value = 'Erro ao validar cupom'
+  } finally {
+    couponChecking.value = false
+  }
+}
+
+function removeCoupon() {
+  couponCode.value = ''
+  couponDiscount.value = null
+  couponApplied.value = false
+  couponMessage.value = ''
+}
 
 onMounted(async () => {
   const [pm, sm] = await Promise.all([
@@ -203,6 +288,7 @@ async function placeOrder() {
   }))
 
   const shippingCost = selectedShippingCost || 0
+  const discount = couponDiscount.value || 0
 
   try {
     const data = await $fetch(`${config.public.baseURL}/api/orders/checkout`, {
@@ -211,9 +297,10 @@ async function placeOrder() {
       body: {
         items,
         subtotal: cartStore.totalPrice,
-        total_amount: cartStore.totalPrice + shippingCost,
+        total_amount: cartStore.totalPrice + shippingCost - discount,
         shipping_amount: shippingCost,
-        discount_amount: 0,
+        discount_amount: discount || null,
+        coupon_code: couponApplied.value ? couponCode.value.trim().toUpperCase() : null,
         payment_method_id: selectedPaymentMethod.value,
         shipping_method_id: selectedShippingMethod.value,
         address_first_name: address.firstName || null,
