@@ -97,6 +97,11 @@ export interface ProductApi {
   cost_price?: number;
   compare_price?: number;
   category_id?: number;
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
 }
 
 export interface LoginResponse {
@@ -125,4 +130,14 @@ export interface ForgotParams {
 export interface ResetParams {
   token: string
   password: string
+}
+
+export interface CartItem {
+  id: string
+  productId: number
+  name: string
+  price: number
+  quantity: number
+  image?: string
+  slug?: string
 }

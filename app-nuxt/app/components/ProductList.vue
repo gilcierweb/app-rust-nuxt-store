@@ -20,9 +20,12 @@
             <p class="mb-4">
               {{ $truncate(product.description, 70, '...') }}
             </p>
-            <p> <span class="badge badge-secondary">{{ product.category.name }}</span></p>
+            <p> <span v-if="product.category" class="badge badge-secondary">{{ product.category.name }}</span></p>
             <div class="card-actions">
-              <button class="btn btn-primary">Buy Now</button>
+              <button class="btn btn-primary btn-soft" @click="addToCartApi(product)">
+                <span class="icon-[tabler--shopping-cart] size-4"></span>
+                {{ t('product.addToCart') }}
+              </button>
               <NuxtLink :to="`/products/${product.id}`" class="btn btn-secondary btn-soft">
                 Details
               </NuxtLink>
@@ -49,7 +52,10 @@
             </p>
             <p> <span class="badge badge-secondary">{{ product.category }}</span></p>
             <div class="card-actions">
-              <button class="btn btn-primary">Buy Now</button>
+              <button class="btn btn-primary btn-soft" @click="addToCart(product)">
+                <span class="icon-[tabler--shopping-cart] size-4"></span>
+                {{ t('product.addToCart') }}
+              </button>
               <NuxtLink :to="`/products/${product.id}`" class="btn btn-secondary btn-soft">
                 Details
               </NuxtLink>
@@ -66,6 +72,10 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();
+import type { ProductApi } from '~/types';
+const { t } = useI18n()
+const cartStore = useCartStore()
+
 interface Product {
   id: number;
   title: string;
@@ -77,10 +87,30 @@ interface Product {
   thumbnail: string;
 }
 
-// const config = useRuntimeConfig();
+function addToCart(product: Product) {
+  cartStore.addItem({
+    productId: product.id,
+    name: product.title,
+    price: product.price,
+    image: product.thumbnail,
+  })
+  openCart()
+}
 
+function addToCartApi(product: ProductApi) {
+  cartStore.addItem({
+    productId: product.id,
+    name: product.name,
+    price: product.price,
+    image: product.images?.[0]?.image,
+    slug: product.slug,
+  })
+  openCart()
+}
 
-const { pending: pendingApi, data: productsApi } = await useFetch<ProductApi>(`${config.public.baseURL}/api/products`);
+const { openCart } = useCartUI()
+const { pending: pendingApi, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/products`);
+const productsApi = computed(() => productsData.value ?? []);
 const { pending, data } = await useFetch<Product[]>(`https://dummyjson.com/products`);
 const products = data.value?.products || [];
 </script>

@@ -26,7 +26,12 @@
                 <h1 class="text-base-content text-4xl">{{ productApi?.name }}</h1>
                 <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(productApi?.price) }}</p>
                 <p class="my-3"><span class="badge badge-secondary">{{ productApi?.category.name }}</span></p>
-                <button class="btn btn-primary btn-xl">{{ t('pages.products.buy') }}</button>
+                <div class="flex gap-2">
+                  <button class="btn btn-primary btn-xl" @click="addToCartApi(productApi!)">
+                    <span class="icon-[tabler--shopping-cart] size-5"></span>
+                    {{ t('product.addToCart') }}
+                  </button>
+                </div>
             </div>
             <div class="grid grid-cols-1">
                 <p>{{ productApi?.description }}</p>
@@ -59,7 +64,12 @@
                 <h1 class="text-base-content text-4xl">{{ product?.title }}</h1>
                 <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(product?.price) }}</p>
                 <p class="my-3"><span class="badge badge-secondary">{{ product?.category }}</span></p>
-                <button class="btn btn-primary btn-xl">{{ t('pages.products.buy') }}</button>
+                <div class="flex gap-2">
+                  <button class="btn btn-primary btn-xl" @click="addToCart(product!)">
+                    <span class="icon-[tabler--shopping-cart] size-5"></span>
+                    {{ t('product.addToCart') }}
+                  </button>
+                </div>
             </div>
             <div class="grid grid-cols-1">
                 <p>{{ product?.description }}</p>
@@ -75,17 +85,34 @@ import type { Product, ProductApi } from '~/types';
 const { t } = useI18n()
 const config = useRuntimeConfig();
 const route = useRoute();
-// const config = useRuntimeConfig(); 
+const cartStore = useCartStore()
+const { openCart } = useCartUI()
 
 const id = route.params.id;
-console.log(route.params.id);
+
+function addToCartApi(product: ProductApi) {
+  cartStore.addItem({
+    productId: product.id,
+    name: product.name,
+    price: product.price,
+    image: product.images?.[0]?.image,
+    slug: product.slug,
+  })
+  openCart()
+}
+
+function addToCart(product: Product) {
+  cartStore.addItem({
+    productId: product.id,
+    name: product.title,
+    price: product.price,
+    image: product.thumbnail,
+  })
+  openCart()
+}
 
 const { data: productApi, pending: pendingApi } = await useFetch<ProductApi>(`${config.public.baseURL}/api/products/${id}`);
 const { data: product, pending } = await useLazyFetch<Product>(`https://dummyjson.com/products/${id}`);
-console.log({
-    product,
-    id,
-});
 </script>
 
 <style scoped></style>

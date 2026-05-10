@@ -206,6 +206,23 @@
       "notFound": "Nenhuma categoria encontrada.",
       "createFirst": "Criar primeira categoria"
     },
+    "cart": {
+      "title": "Carrinho",
+      "empty": "Seu carrinho está vazio",
+      "subtotal": "Subtotal",
+      "checkout": "Finalizar Compra",
+      "continueShopping": "Continuar Comprando",
+      "remove": "Remover",
+      "quantity": "Qtd",
+      "total": "Total",
+      "summary": "Resumo do Pedido",
+      "itemAdded": "Item adicionado ao carrinho",
+      "viewCart": "Ver Carrinho",
+      "clearCart": "Limpar Carrinho",
+      "cartTotal": "Total do Carrinho",
+      "itemsCount": "{count} itens",
+      "item": "Item"
+    },
     "products": {
       "title": "Produtos",
       "loading": "Carregando...",
@@ -611,6 +628,22 @@
         "errorDelete": "Erro ao excluir categoria"
       }
     }
+  },
+  "cart": {
+    "title": "Carrinho de Compras",
+    "empty": "Seu carrinho está vazio",
+    "subtotal": "Subtotal",
+    "checkout": "Finalizar Compra",
+    "continueShopping": "Continuar Comprando",
+    "remove": "Remover",
+    "quantity": "Qtd",
+    "total": "Total",
+    "summary": "Resumo do Pedido",
+    "itemAdded": "Item adicionado ao carrinho",
+    "viewCart": "Ver Carrinho",
+    "clearCart": "Limpar Carrinho",
+    "itemsCount": "{count} itens",
+    "yourCart": "Seu Carrinho"
   },
   "product": {
     "badges": {

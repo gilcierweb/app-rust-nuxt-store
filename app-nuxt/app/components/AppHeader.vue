@@ -19,6 +19,12 @@
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
+                <button class="btn btn-text btn-square relative" @click="toggleCart">
+                    <span class="icon-[tabler--shopping-cart] size-5"></span>
+                    <span v-if="cartStore.totalItems > 0" class="badge badge-primary badge-xs absolute -top-1 -right-1">
+                        {{ cartStore.totalItems > 99 ? '99+' : cartStore.totalItems }}
+                    </span>
+                </button>
                 <div class="dropdown relative inline-flex md:hidden">
                     <button id="dropdown-default" type="button"
                         class="dropdown-toggle btn btn-text btn-secondary btn-square" aria-haspopup="menu"
@@ -31,6 +37,7 @@
                         <li><NuxtLink to="/" class="dropdown-item">Home</NuxtLink></li>
                         <li><NuxtLink to="/categories" class="dropdown-item">Categories</NuxtLink></li>
                         <li><NuxtLink to="/products" class="dropdown-item">Products</NuxtLink></li>
+                        <li><NuxtLink to="/cart" class="dropdown-item">Cart</NuxtLink></li>
                         <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>
                         <li><NuxtLink to="/posts" class="dropdown-item">Posts</NuxtLink></li>
                         <li><NuxtLink to="/profiles" class="dropdown-item">Profiles</NuxtLink></li>
@@ -76,6 +83,8 @@
 
 <script lang="ts" setup>
 const { isAuthenticated, user, logout } = useAuth()
+const { toggleCart } = useCartUI()
+const cartStore = useCartStore()
 
 function handleLogout() {
     logout()
