@@ -7,7 +7,7 @@
       <span class="icon-[tabler--menu-2] size-5"></span>
     </button>
     <div class="flex flex-1 items-center">
-      <NuxtLink to="/admin" class="link text-base-content link-neutral text-xl font-semibold no-underline">FlyonUI</NuxtLink>      
+      <NuxtLink to="/admin" class="link text-base-content link-neutral text-xl font-semibold no-underline">FlyonUI</NuxtLink>
     </div>
     <div class="navbar-end flex items-center gap-4">
       <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
@@ -116,15 +116,15 @@
               </div>
             </div>
             <div>
-              <h6 class="text-base-content text-base font-semibold">John Doe</h6>
+              <h6 class="text-base-content text-base font-semibold">{{ user?.name || 'User' }}</h6>
               <small class="text-base-content/50">Admin</small>
             </div>
           </li>
           <li>
-            <a class="dropdown-item" href="#">
+            <NuxtLink to="/profiles" class="dropdown-item">
               <span class="icon-[tabler--user]"></span>
               My Profile
-            </a>
+            </NuxtLink>
           </li>
           <li>
             <a class="dropdown-item" href="#">
@@ -145,10 +145,10 @@
             </a>
           </li>
           <li class="dropdown-footer gap-2">
-            <a class="btn btn-error btn-soft btn-block" href="#">
+            <button class="btn btn-error btn-soft btn-block" @click="handleLogout">
               <span class="icon-[tabler--logout]"></span>
               Sign out
-            </a>
+            </button>
           </li>
         </ul>
       </div>
@@ -158,9 +158,11 @@
 </template>
 
 <script lang="ts" setup>
+const { user, logout } = useAuth()
 
+function handleLogout() {
+    logout()
+}
 </script>
 
-<style>
-
-</style>
+<style></style>

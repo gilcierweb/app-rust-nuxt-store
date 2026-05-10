@@ -20,7 +20,6 @@ export interface ProductResponse {
   limit: number;
 }
 
-
 export interface CreateProductPayload extends Omit<Product, 'id'> {}
 export interface UpdateProductPayload extends Partial<Omit<Product, 'id'>> {}
 
@@ -44,7 +43,6 @@ export interface Category {
   children?: Category[];
 }
 
-
 export interface Post {
     id: number;
     title: string;
@@ -64,7 +62,7 @@ export interface Profile {
     avatar?: string,
     bio?: string,
     whatsapp?: number,
-    user_id: number,    
+    user_id: number,
     status: boolean;
 }
 
@@ -95,9 +93,36 @@ export interface ProductApi {
   status: number;
   categoryId?: number;
   images?: ProductImage[];
-  // Backend field names for compatibility
   short_description?: string;
   cost_price?: number;
   compare_price?: number;
   category_id?: number;
+}
+
+export interface LoginResponse {
+  token: string
+  pid: string
+  name: string
+  is_verified: boolean
+}
+
+export interface CurrentResponse {
+  pid: string
+  name: string
+  email: string
+}
+
+export interface RegisterParams {
+  name: string
+  email: string
+  password: string
+}
+
+export interface ForgotParams {
+  email: string
+}
+
+export interface ResetParams {
+  token: string
+  password: string
 }

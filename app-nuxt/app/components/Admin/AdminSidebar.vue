@@ -46,17 +46,17 @@
             Product
           </NuxtLink>
         </li>
-        <li>
-          <a href="#">
+        <li v-if="!isAuthenticated">
+          <NuxtLink to="/users/sessions">
             <span class="icon-[tabler--login] size-5"></span>
             Sign In
-          </a>
+          </NuxtLink>
         </li>
-        <li>
-          <a href="#">
+        <li v-if="isAuthenticated">
+          <button class="w-full text-left" @click="handleLogout">
             <span class="icon-[tabler--logout-2] size-5"></span>
             Sign Out
-          </a>
+          </button>
         </li>
       </ul>
     </div>
@@ -64,7 +64,11 @@
 </template>
 
 <script lang="ts" setup>
+const { isAuthenticated, logout } = useAuth()
 
+function handleLogout() {
+    logout()
+}
 </script>
 
 <style></style>

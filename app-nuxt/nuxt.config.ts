@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', '@vite-pwa/nuxt', 'nuxt-toast'],
+  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security'],
   css: ["~/assets/css/main.css"],
   vite: { plugins: [tailwindcss(),], },
   shadcn: {
@@ -89,6 +89,37 @@ export default defineNuxtConfig({
     },
     devOptions: {
       enabled: false,
+    },
+  },
+
+  i18n: {
+    locales: [
+      {
+        code: "en",
+        iso: "en-US",
+        file: "en.json",
+        name: "English",
+      },
+      {
+        code: "es",
+        iso: "es-ES",
+        file: "es.json",
+        name: "Español",
+      },
+      {
+        code: "pt-BR",
+        iso: "pt-BR",
+        file: "pt-BR.json",
+        name: "Português Brasil",
+      },
+    ],
+    defaultLocale: "pt-BR",
+    strategy: "prefix_except_default",
+    lazy: true,
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_redirected",
+      redirectOn: "root",
     },
   },
 

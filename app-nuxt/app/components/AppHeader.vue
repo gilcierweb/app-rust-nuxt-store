@@ -2,20 +2,20 @@
     <div>
         <nav class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm">
             <div class="navbar-start max-md:w-1/4">
-                <a class="link text-base-content link-neutral text-xl font-bold no-underline" href="#">
+                <NuxtLink to="/" class="link text-base-content link-neutral text-xl font-bold no-underline">
                     App Rust Nuxt Store
-                </a>
+                </NuxtLink>
             </div>
             <div class="navbar-center max-md:hidden">
                 <ul class="menu menu-horizontal p-0 font-medium">
                     <li><NuxtLink to="/">Home</NuxtLink></li>
                     <li><NuxtLink to="/categories">Categories</NuxtLink></li>
                     <li><NuxtLink to="/products">Products</NuxtLink></li>
-                    <li><NuxtLink to="/stores">Stores</NuxtLink></li>               
-                    <li><NuxtLink to="/posts">Posts</NuxtLink></li>                                  
-                    <li><NuxtLink to="/profiles">Profiles</NuxtLink></li>   
-                    <li><NuxtLink to="/contact">Contact</NuxtLink></li>   
-                    <li><NuxtLink to="/about">About</NuxtLink></li>                                    
+                    <li><NuxtLink to="/stores">Stores</NuxtLink></li>
+                    <li><NuxtLink to="/posts">Posts</NuxtLink></li>
+                    <li><NuxtLink to="/profiles">Profiles</NuxtLink></li>
+                    <li><NuxtLink to="/contact">Contact</NuxtLink></li>
+                    <li><NuxtLink to="/about">About</NuxtLink></li>
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
@@ -31,25 +31,53 @@
                         <li><NuxtLink to="/" class="dropdown-item">Home</NuxtLink></li>
                         <li><NuxtLink to="/categories" class="dropdown-item">Categories</NuxtLink></li>
                         <li><NuxtLink to="/products" class="dropdown-item">Products</NuxtLink></li>
-                        <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>                        
-                        <li><NuxtLink to="/posts" class="dropdown-item">Posts</NuxtLink></li>                 
-                        <li><NuxtLink to="/profiles" class="dropdown-item">Profiles</NuxtLink></li>                 
-                        <li><NuxtLink to="/contact" class="dropdown-item">Contact</NuxtLink></li>   
-                        <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>              
+                        <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>
+                        <li><NuxtLink to="/posts" class="dropdown-item">Posts</NuxtLink></li>
+                        <li><NuxtLink to="/profiles" class="dropdown-item">Profiles</NuxtLink></li>
+                        <li><NuxtLink to="/contact" class="dropdown-item">Contact</NuxtLink></li>
+                        <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>
+                        <li v-if="isAuthenticated"><hr class="my-1" /></li>
+                        <li v-if="isAuthenticated">
+                            <NuxtLink to="/admin" class="dropdown-item">Admin</NuxtLink>
+                        </li>
                     </ul>
                 </div>
 
-                <NuxtLink to="/users/sessions" class="btn max-md:btn-square btn-text">
-                    <span class="max-md:hidden">Log in</span>
-                    <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
-                </NuxtLink>
-                
-                <NuxtLink to="/users/registrations" class="btn max-md:btn-square btn-primary">
-                    <span class="max-md:hidden">Get started</span>
-                    <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
-                </NuxtLink>
-                                
+                <template v-if="isAuthenticated">
+                    <NuxtLink to="/admin" class="btn btn-text btn-sm max-md:hidden">
+                        <span class="icon-[tabler--layout-dashboard] size-4"></span>
+                        Admin
+                    </NuxtLink>
+                    <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
+                        <button type="button" class="dropdown-toggle btn btn-text flex items-center gap-2" aria-haspopup="menu" aria-expanded="false">
+                            <span class="icon-[tabler--user] size-4"></span>
+                            <span class="max-md:hidden">{{ user?.name || 'User' }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu">
+                            <li><NuxtLink to="/profiles" class="dropdown-item">Profile</NuxtLink></li>
+                            <li><button class="dropdown-item" @click="handleLogout">Sign out</button></li>
+                        </ul>
+                    </div>
+                </template>
+                <template v-else>
+                    <NuxtLink to="/users/sessions" class="btn max-md:btn-square btn-text">
+                        <span class="max-md:hidden">Log in</span>
+                        <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
+                    </NuxtLink>
+                    <NuxtLink to="/users/registrations" class="btn max-md:btn-square btn-primary">
+                        <span class="max-md:hidden">Get started</span>
+                        <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
+                    </NuxtLink>
+                </template>
             </div>
         </nav>
     </div>
 </template>
+
+<script lang="ts" setup>
+const { isAuthenticated, user, logout } = useAuth()
+
+function handleLogout() {
+    logout()
+}
+</script>
