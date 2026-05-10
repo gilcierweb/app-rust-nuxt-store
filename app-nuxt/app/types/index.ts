@@ -44,26 +44,43 @@ export interface Category {
 }
 
 export interface Post {
-    id: number;
-    title: string;
-    content: string;
-    status: boolean;
+  id: number;
+  title?: string;
+  content?: string;
+  status?: number;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
+export type PostStatus = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+export const PostStatusLabels: Record<number, string> = {
+  1: 'Rascunho',
+  2: 'Pendente de Revisão',
+  3: 'Agendado',
+  4: 'Publicado',
+  5: 'Privado',
+  6: 'Arquivado',
+  7: 'Lixeira',
+  8: 'Rejeitado'
+};
+
 export interface Profile {
-    id: number;
-    first_name: string,
-    last_name: string,
-    full_name: string,
-    username?: string,
-    nickname?: string,
-    phone?:number,
-    birth_date?: Date,
-    avatar?: string,
-    bio?: string,
-    whatsapp?: number,
-    user_id: number,
-    status: boolean;
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  username?: string;
+  nickname?: string;
+  phone?: number;
+  birth_date?: string;
+  avatar?: string;
+  bio?: string;
+  whatsapp?: number;
+  user_id: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ProductImage {

@@ -42,14 +42,26 @@
         </li>
         <li>
          <NuxtLink to="/admin/categories">
-            <i class="icon-[tabler--shopping-bag] size-5"></i>
+            <i class="icon-[tabler--category] size-5"></i>
             Categories
           </NuxtLink>
         </li>
         <li>
          <NuxtLink to="/admin/products">
-             <i class="icon-[tabler--shopping-bag] size-5"></i>
-             Product
+             <i class="icon-[tabler--package] size-5"></i>
+             Products
+           </NuxtLink>
+        </li>
+        <li>
+         <NuxtLink to="/admin/posts">
+             <i class="icon-[tabler--article] size-5"></i>
+             Posts
+           </NuxtLink>
+        </li>
+        <li>
+         <NuxtLink to="/admin/profiles">
+             <i class="icon-[tabler--user-circle] size-5"></i>
+             Profiles
            </NuxtLink>
         </li>
         <li v-if="!isAuthenticated">
