@@ -1,6 +1,10 @@
 <template>
   <div>
-    <AdminAddressesForm @saved="handleSaved" @cancel="navigateTo('/admin/addresses')" />
+    <AdminAddressesForm 
+      :initial-user-id="route.query.user_id ? Number(route.query.user_id) : undefined"
+      @saved="handleSaved" 
+      @cancel="handleCancel" 
+    />
   </div>
 </template>
 
@@ -11,8 +15,16 @@ definePageMeta({
   layout: 'admin'
 })
 
+const route = useRoute()
+
 const handleSaved = (address: Address) => {
-  navigateTo('/admin/addresses')
+  const returnTo = route.query.return_to as string
+  navigateTo(returnTo || '/admin/addresses')
+}
+
+const handleCancel = () => {
+  const returnTo = route.query.return_to as string
+  navigateTo(returnTo || '/admin/addresses')
 }
 </script>
 

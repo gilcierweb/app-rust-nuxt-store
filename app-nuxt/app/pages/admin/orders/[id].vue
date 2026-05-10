@@ -19,72 +19,169 @@
           </NuxtLink>
           <h1 class="h1 mt-1">{{ $t('admin.orders.detail.title') }} - {{ order.order_number || '#' + order.id }}</h1>
         </div>
-        <span :class="statusBadgeClass(order.status)" class="text-sm">
-          {{ statusLabel(order.status) }}
-        </span>
+        <div class="flex gap-2 items-center">
+          <span :class="statusBadgeClass(order.status)" class="text-sm">
+            {{ statusLabel(order.status) }}
+          </span>
+          <span :class="paymentBadgeClass(order.payment_status)" class="text-sm">
+            {{ paymentLabel(order.payment_status) }}
+          </span>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="lg:col-span-2 space-y-6">
-          <div class="rounded-box border p-6">
-            <h3 class="mb-4 font-semibold">{{ $t('admin.orders.table.items') }}</h3>
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th>{{ $t('admin.products.table.name') }}</th>
-                  <th>{{ $t('common.actions.quantity') }}</th>
-                  <th class="text-right">{{ $t('admin.products.table.price') }}</th>
-                  <th class="text-right">{{ $t('admin.orders.table.total') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in order.items || []" :key="item.id">
-                  <td>{{ item.product_name || `Product #${item.product_id}` }}</td>
-                  <td>{{ item.quantity }}</td>
-                  <td class="text-right">{{ formatNumberBR(item.price) }}</td>
-                  <td class="text-right font-semibold">{{ formatNumberBR(item.total) }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Items Table -->
+          <div class="card bg-base-100 shadow-sm border">
+            <div class="card-body p-0">
+              <div class="p-6 pb-0">
+                <h3 class="font-semibold text-lg">{{ $t('admin.orders.table.items') }}</h3>
+              </div>
+              <div class="overflow-x-auto mt-4">
+                <table class="table w-full">
+                  <thead>
+                    <tr>
+                      <th>{{ $t('admin.products.table.name') }}</th>
+                      <th>{{ $t('common.actions.quantity') || 'Qtd' }}</th>
+                      <th class="text-right">{{ $t('admin.products.table.price') }}</th>
+                      <th class="text-right">{{ $t('admin.orders.table.total') }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in order.items || []" :key="item.id">
+                      <td>{{ item.product_name || `Produto #${item.product_id}` }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td class="text-right">{{ formatNumberBR(item.price) }}</td>
+                      <td class="text-right font-semibold">{{ formatNumberBR(item.total) }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="3" class="text-right text-base-content/60">Subtotal</td>
+                      <td class="text-right">{{ formatNumberBR(order.subtotal) }}</td>
+                    </tr>
+                    <tr v-if="order.shipping_amount">
+                      <td colspan="3" class="text-right text-base-content/60">Frete</td>
+                      <td class="text-right">{{ formatNumberBR(order.shipping_amount) }}</td>
+                    </tr>
+                    <tr v-if="order.discount_amount">
+                      <td colspan="3" class="text-right text-base-content/60 text-error">Desconto</td>
+                      <td class="text-right text-error">-{{ formatNumberBR(order.discount_amount) }}</td>
+                    </tr>
+                    <tr class="text-lg font-bold">
+                      <td colspan="3" class="text-right">Total</td>
+                      <td class="text-right text-primary">{{ formatNumberBR(order.total_amount) }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer & Shipping Summary -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Customer Info -->
+            <div class="card bg-base-100 shadow-sm border">
+              <div class="card-body">
+                <h3 class="font-semibold mb-4 flex items-center gap-2">
+                  <i class="icon-[tabler--user] size-5"></i>
+                  Cliente
+                </h3>
+                <div v-if="pendingCustomer" class="flex justify-center py-4">
+                  <span class="loading loading-spinner loading-sm"></span>
+                </div>
+                <div v-else-if="customerProfile" class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div class="avatar avatar-placeholder">
+                       <div class="bg-neutral text-neutral-content rounded-full size-10">
+                         <span>{{ customerProfile.full_name?.[0] || 'U' }}</span>
+                       </div>
+                    </div>
+                    <div>
+                      <div class="font-medium">{{ customerProfile.full_name }}</div>
+                      <div class="text-xs text-gray-500">ID: {{ customerProfile.id }}</div>
+                    </div>
+                  </div>
+                  <div class="text-sm space-y-1">
+                    <div class="flex items-center gap-2">
+                      <i class="icon-[tabler--mail] size-4 text-gray-400"></i>
+                      <span>{{ customerProfile.username || 'N/A' }}</span>
+                    </div>
+                    <div v-if="customerProfile.phone" class="flex items-center gap-2">
+                      <i class="icon-[tabler--phone] size-4 text-gray-400"></i>
+                      <span>{{ customerProfile.phone }}</span>
+                    </div>
+                  </div>
+                  <NuxtLink :to="`/admin/customers/${customerProfile.id}`" class="btn btn-xs btn-outline btn-block mt-2">
+                    Ver Perfil Completo
+                  </NuxtLink>
+                </div>
+                <div v-else class="text-sm text-gray-500 italic">
+                  Informações do cliente não disponíveis (User ID: {{ order.user_id }})
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="card bg-base-100 shadow-sm border">
+              <div class="card-body">
+                <h3 class="font-semibold mb-4 flex items-center gap-2">
+                  <i class="icon-[tabler--map-pin] size-5"></i>
+                  Endereço de Entrega
+                </h3>
+                <div v-if="pendingAddresses" class="flex justify-center py-4">
+                  <span class="loading loading-spinner loading-sm"></span>
+                </div>
+                <div v-else-if="shippingAddress" class="text-sm space-y-1">
+                  <div class="font-medium">{{ shippingAddress.first_name }} {{ shippingAddress.last_name }}</div>
+                  <div>{{ shippingAddress.address1 }}</div>
+                  <div v-if="shippingAddress.address2">{{ shippingAddress.address2 }}</div>
+                  <div>{{ shippingAddress.city }}, {{ shippingAddress.state }}</div>
+                  <div>{{ shippingAddress.zip_code }} - {{ shippingAddress.country }}</div>
+                  <div v-if="shippingAddress.phone" class="pt-1 text-gray-500">Tel: {{ shippingAddress.phone }}</div>
+                </div>
+                <div v-else class="text-sm text-gray-500 italic">
+                  Endereço padrão não encontrado.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="space-y-6">
-          <div class="rounded-box border p-6">
-            <h3 class="mb-4 font-semibold">{{ $t('order.updateStatus') }}</h3>
-            <select v-model="selectedStatus" class="select w-full">
-              <option value="" disabled>{{ $t('order.selectStatus') }}</option>
-              <option v-for="s in availableStatuses" :key="s.value" :value="s.value">
-                {{ s.label }}
-              </option>
-            </select>
-            <button class="btn btn-primary mt-3 w-full" :disabled="!selectedStatus || updating" @click="updateStatus">
-              <span v-if="updating" class="loading loading-spinner" />
-              {{ $t('common.save') }}
-            </button>
-            <p v-if="statusMsg" class="mt-2 text-center text-sm" :class="statusMsgType">{{ statusMsg }}</p>
+          <div class="card bg-base-100 shadow-sm border">
+            <div class="card-body">
+              <h3 class="font-semibold mb-4">{{ $t('order.updateStatus') }}</h3>
+              <select v-model="selectedStatus" class="select select-bordered w-full">
+                <option value="" disabled>{{ $t('order.selectStatus') }}</option>
+                <option v-for="s in availableStatuses" :key="s.value" :value="s.value">
+                  {{ s.label }}
+                </option>
+              </select>
+              <button class="btn btn-primary mt-3 w-full" :disabled="!selectedStatus || updating" @click="updateStatus">
+                <span v-if="updating" class="loading loading-spinner" />
+                {{ $t('common.save') }}
+              </button>
+              <p v-if="statusMsg" class="mt-2 text-center text-sm" :class="statusMsgType">{{ statusMsg }}</p>
+            </div>
           </div>
 
-          <div class="rounded-box border p-6">
-            <h3 class="mb-4 font-semibold">{{ $t('admin.orders.table.status') }}</h3>
-            <div class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <span class="text-base-content/60">{{ $t('admin.orders.table.status') }}</span>
-                <span :class="statusBadgeClass(order.status)">{{ statusLabel(order.status) }}</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/60">{{ $t('admin.orders.table.payment') }}</span>
-                <span :class="paymentBadgeClass(order.payment_status)">
-                  {{ paymentLabel(order.payment_status) }}
-                </span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-base-content/60">{{ $t('admin.orders.table.date') }}</span>
-                <span>{{ formatDate(order.created_at) }}</span>
-              </div>
-              <div class="flex justify-between border-t pt-2 mt-2 text-base font-bold">
-                <span>{{ $t('admin.orders.table.total') }}</span>
-                <span class="text-primary">{{ formatNumberBR(order.total_amount) }}</span>
+          <div class="card bg-base-100 shadow-sm border">
+            <div class="card-body">
+              <h3 class="font-semibold mb-4">Resumo do Pedido</h3>
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-base-content/60">Data</span>
+                  <span>{{ formatDate(order.created_at) }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-base-content/60">Moeda</span>
+                  <span class="uppercase">{{ order.currency }}</span>
+                </div>
+                <div v-if="order.order_number" class="flex justify-between">
+                  <span class="text-base-content/60">Número</span>
+                  <span class="font-mono">{{ order.order_number }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -95,17 +192,46 @@
 </template>
 
 <script setup lang="ts">
+import type { Order, Profile, Address } from '~/types'
+
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const config = useRuntimeConfig()
 const route = useRoute()
-import type { Order } from '~/types'
 
 const id = route.params.id
+
+// Fetch Order
 const { data: order, pending } = await useFetch<Order>(
   `${config.public.baseURL}/api/orders/${id}`,
   { key: `admin-order-${id}` }
 )
+
+// Fetch Customer Profile (using user_id from order)
+const { data: customerProfile, pending: pendingCustomer } = await useAsyncData<Profile>(
+  `customer-${id}`,
+  async () => {
+    if (!order.value?.user_id) return null
+    // We need to find the profile that matches this user_id
+    const profiles = await $fetch<Profile[]>(`${config.public.baseURL}/api/profiles`)
+    return profiles.find(p => p.user_id === order.value?.user_id) || null
+  },
+  { watch: [order] }
+)
+
+// Fetch Addresses for this customer
+const { data: shippingAddress, pending: pendingAddresses } = await useAsyncData<Address>(
+  `address-${id}`,
+  async () => {
+    if (!order.value?.user_id) return null
+    const addresses = await $fetch<Address[]>(`${config.public.baseURL}/api/addresses`)
+    // Try to find the default shipping address for this user
+    return addresses.find(a => a.user_id === order.value?.user_id && a.default) || 
+           addresses.find(a => a.user_id === order.value?.user_id) || null
+  },
+  { watch: [order] }
+)
+
 const selectedStatus = ref('')
 const updating = ref(false)
 const statusMsg = ref('')
@@ -150,6 +276,16 @@ function paymentLabel(status: unknown): string {
 function paymentBadgeClass(status: unknown): string {
   if (status == null) return 'badge-soft'
   return paymentMap[status as number]?.badge ?? 'badge-soft'
+}
+
+function formatNumberBR(val: any) {
+  const n = Number(val) || 0
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
+}
+
+function formatDate(dateString: string) {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(dateString))
 }
 
 async function updateStatus() {

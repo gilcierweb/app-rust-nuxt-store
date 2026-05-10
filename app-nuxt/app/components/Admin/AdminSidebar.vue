@@ -60,12 +60,6 @@
               {{ $t('admin.shippings.title') }}
             </NuxtLink>
         </li>
-        <li>
-         <NuxtLink to="/admin/addresses">
-             <i class="icon-[tabler--address-book] size-5"></i>
-             {{ $t('admin.addresses.title') }}
-           </NuxtLink>
-        </li>
 
         <li class="menu-title mt-4">
           <span>{{ $t('admin.sidebar.content') || 'Content' }}</span>

@@ -13,7 +13,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span>Erro ao carregar endereço: {{ error.message }}</span>
-        <NuxtLink to="/admin/addresses" class="btn btn-sm">Voltar</NuxtLink>
+        <button class="btn btn-sm" @click="handleCancel">Voltar</button>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
       :address="address"
       :is-editing="true"
       @saved="handleSaved"
-      @cancel="navigateTo('/admin/addresses')"
+      @cancel="handleCancel"
     />
   </div>
 </template>
@@ -43,7 +43,13 @@ const { data: address, pending, error } = useLazyFetch<Address>(
 )
 
 const handleSaved = (savedAddress: Address) => {
-  navigateTo('/admin/addresses')
+  const returnTo = route.query.return_to as string
+  navigateTo(returnTo || '/admin/addresses')
+}
+
+const handleCancel = () => {
+  const returnTo = route.query.return_to as string
+  navigateTo(returnTo || '/admin/addresses')
 }
 </script>
 
