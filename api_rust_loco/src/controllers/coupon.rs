@@ -1,9 +1,9 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use axum::debug_handler;
 
 use crate::models::_entities::coupons::{ActiveModel, Entity, Model};
 
@@ -34,9 +34,113 @@ impl Params {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct ValidateParams {
+    pub code: String,
+    pub total_amount: Decimal,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ValidateResult {
+    pub valid: bool,
+    pub coupon: Option<Model>,
+    pub discount: Option<Decimal>,
+    pub message: String,
+}
+
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     let item = Entity::find_by_id(id).one(&ctx.db).await?;
     item.ok_or_else(|| Error::NotFound)
+}
+
+fn calculate_discount(coupon: &Model, total: Decimal) -> Option<Decimal> {
+    match coupon.discount_type.unwrap_or(1) {
+        1 => {
+            let pct = coupon.discount_value.unwrap_or(Decimal::ZERO) / Decimal::from(100);
+            let calculated = total * pct;
+            if let Some(max) = coupon.maximum_discount {
+                Some(calculated.min(max))
+            } else {
+                Some(calculated)
+            }
+        }
+        2 => Some(coupon.discount_value.unwrap_or(Decimal::ZERO)),
+        _ => None,
+    }
+}
+
+#[debug_handler]
+pub async fn validate(
+    State(ctx): State<AppContext>,
+    Json(params): Json<ValidateParams>,
+) -> Result<Response> {
+    let coupon = Entity::find()
+        .filter(crate::models::_entities::coupons::Column::Code.eq(Some(params.code.clone())))
+        .one(&ctx.db)
+        .await?;
+
+    let coupon = match coupon {
+        Some(c) => c,
+        None => {
+            return format::json(ValidateResult {
+                valid: false,
+                coupon: None,
+                discount: None,
+                message: "Coupon not found".to_string(),
+            })
+        }
+    };
+
+    if !coupon.active.unwrap_or(false) {
+        return format::json(ValidateResult {
+            valid: false,
+            coupon: None,
+            discount: None,
+            message: "Coupon is inactive".to_string(),
+        });
+    }
+
+    if let Some(expires_at) = coupon.expires_at {
+        if expires_at < chrono::Utc::now().naive_utc() {
+            return format::json(ValidateResult {
+                valid: false,
+                coupon: None,
+                discount: None,
+                message: "Coupon has expired".to_string(),
+            });
+        }
+    }
+
+    if let Some(limit) = coupon.usage_limit {
+        if limit > 0 && coupon.used_count.unwrap_or(0) >= limit {
+            return format::json(ValidateResult {
+                valid: false,
+                coupon: None,
+                discount: None,
+                message: "Coupon usage limit reached".to_string(),
+            });
+        }
+    }
+
+    if let Some(min) = coupon.minimum_amount {
+        if params.total_amount < min {
+            return format::json(ValidateResult {
+                valid: false,
+                coupon: None,
+                discount: None,
+                message: format!("Minimum order amount is {}", min),
+            });
+        }
+    }
+
+    let discount = calculate_discount(&coupon, params.total_amount);
+
+    format::json(ValidateResult {
+        valid: true,
+        coupon: Some(coupon),
+        discount,
+        message: "Coupon applied successfully".to_string(),
+    })
 }
 
 #[debug_handler]
@@ -83,6 +187,7 @@ pub fn routes() -> Routes {
         .prefix("api/coupons/")
         .add("/", get(list))
         .add("/", post(add))
+        .add("validate", post(validate))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))
         .add("{id}", put(update))

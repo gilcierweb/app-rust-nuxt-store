@@ -23,6 +23,7 @@ pub struct CreateOrderParams {
     pub address_zip_code: Option<String>,
     pub address_country: Option<String>,
     pub address_phone: Option<String>,
+    pub coupon_code: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

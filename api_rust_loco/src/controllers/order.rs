@@ -9,6 +9,8 @@ use sea_orm::QueryOrder;
 use uuid::Uuid;
 
 use crate::models::_entities::addresses;
+use crate::models::_entities::coupon_usages;
+use crate::models::_entities::coupons;
 use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
 use crate::models::_entities::payments;
@@ -34,6 +36,36 @@ pub async fn checkout(
 ) -> Result<Response> {
     if params.items.is_empty() {
         return Err(Error::BadRequest("Cart is empty".into()));
+    }
+
+    if let Some(ref code) = params.coupon_code {
+        let coupon = coupons::Entity::find()
+            .filter(coupons::Column::Code.eq(Some(code.clone())))
+            .one(&ctx.db)
+            .await?
+            .ok_or_else(|| Error::BadRequest("Coupon not found".into()))?;
+
+        if !coupon.active.unwrap_or(false) {
+            return Err(Error::BadRequest("Coupon is inactive".into()));
+        }
+
+        if let Some(expires_at) = coupon.expires_at {
+            if expires_at < chrono::Utc::now().naive_utc() {
+                return Err(Error::BadRequest("Coupon has expired".into()));
+            }
+        }
+
+        if let Some(limit) = coupon.usage_limit {
+            if limit > 0 && coupon.used_count.unwrap_or(0) >= limit {
+                return Err(Error::BadRequest("Coupon usage limit reached".into()));
+            }
+        }
+
+        if let Some(min) = coupon.minimum_amount {
+            if params.total_amount < min {
+                return Err(Error::BadRequest(format!("Minimum order amount is {}", min)));
+            }
+        }
     }
 
     let order_number = generate_order_number();
@@ -77,6 +109,37 @@ pub async fn checkout(
         };
         order_item.insert(&ctx.db).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to create order item");
+            Error::InternalServerError
+        })?;
+    }
+
+    if params.coupon_code.is_some() {
+        let coupon = coupons::Entity::find()
+            .filter(coupons::Column::Code.eq(params.coupon_code.clone()))
+            .one(&ctx.db)
+            .await?
+            .ok_or_else(|| Error::BadRequest("Coupon not found".into()))?;
+
+        let usage = coupon_usages::ActiveModel {
+            coupon_id: Set(coupon.id),
+            user_id: Set(1),
+            order_id: Set(saved.id),
+            used_at: Set(Some(chrono::Utc::now().naive_utc())),
+            created_at: Set(now),
+            updated_at: Set(now),
+            ..Default::default()
+        };
+        usage.insert(&ctx.db).await.map_err(|e| {
+            tracing::error!(error = ?e, "failed to record coupon usage");
+            Error::InternalServerError
+        })?;
+
+        let current_count = coupon.used_count.unwrap_or(0);
+        let mut coupon_active: coupons::ActiveModel = coupon.into();
+        coupon_active.used_count = Set(Some(current_count + 1));
+        coupon_active.updated_at = Set(now);
+        coupon_active.update(&ctx.db).await.map_err(|e| {
+            tracing::error!(error = ?e, "failed to update coupon count");
             Error::InternalServerError
         })?;
     }
