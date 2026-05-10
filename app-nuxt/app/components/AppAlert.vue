@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps<{
   type?: 'success' | 'error' | 'info' | 'warning'
@@ -100,6 +100,10 @@ watch(
     if (visible.value) startAutoClose()
   }
 )
+
+onMounted(() => {
+  if (visible.value) startAutoClose()
+})
 
 onBeforeUnmount(() => {
   if (timer) {
