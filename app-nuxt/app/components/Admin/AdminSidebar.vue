@@ -48,9 +48,9 @@
         </li>
         <li>
          <NuxtLink to="/admin/products">
-            <i class="icon-[tabler--shopping-bag] size-5"></i>
-            Product
-          </NuxtLink>
+             <i class="icon-[tabler--shopping-bag] size-5"></i>
+             Product
+           </NuxtLink>
         </li>
         <li v-if="!isAuthenticated">
           <NuxtLink to="/users/sessions">

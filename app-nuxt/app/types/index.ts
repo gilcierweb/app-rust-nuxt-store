@@ -160,6 +160,28 @@ export interface Order {
   items?: OrderItem[]
 }
 
+export interface ProductVariant {
+  id: number
+  name?: string
+  sku?: string
+  price?: number
+  cost_price?: number
+  compare_price?: number
+  inventory_quantity?: number
+  weight?: number
+  barcode?: string
+  position?: number
+  active?: boolean
+  product_id: number
+  options?: ProductVariantOption[]
+}
+
+export interface ProductVariantOption {
+  id: number
+  option_name?: string
+  value?: string
+}
+
 export interface CartItem {
   id: string
   productId: number
@@ -168,4 +190,5 @@ export interface CartItem {
   quantity: number
   image?: string
   slug?: string
+  variantId?: number
 }

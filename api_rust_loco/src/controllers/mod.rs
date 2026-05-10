@@ -13,3 +13,4 @@ pub mod address;
 pub mod coupon;
 pub mod payment;
 pub mod shipping;
+pub mod variant;

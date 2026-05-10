@@ -121,8 +121,16 @@
           </div>
         </div>
 
+        <!-- Variants Link -->
+        <div class="mt-6 pt-4 border-t">
+          <NuxtLink :to="`/admin/products/${product.id}/variants`" class="btn btn-outline btn-primary">
+            <span class="icon-[tabler--box] size-5"></span>
+            Gerenciar Variações
+          </NuxtLink>
+        </div>
+
         <!-- Back Button -->
-        <div class="mt-8 pt-4 border-t">
+        <div class="mt-4">
           <NuxtLink to="/admin/products" class="btn btn-outline">
             ← Voltar para Lista
           </NuxtLink>

@@ -782,5 +782,28 @@
       "3": "Seed action 3",
       "4": "Seed action 4"
     }
+  },
+  "variant": {
+    "title": "Variants",
+    "select": "Select variant",
+    "noVariants": "No variants available",
+    "sku": "SKU",
+    "price": "Price",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "name": "Name",
+    "inventory": "Inventory",
+    "weight": "Weight",
+    "barcode": "Barcode",
+    "position": "Position",
+    "active": "Active",
+    "add": "Add Variant",
+    "edit": "Edit Variant",
+    "list": "Product Variants",
+    "saveSuccess": "Variant saved successfully",
+    "deleteConfirm": "Are you sure you want to delete this variant?",
+    "deleted": "Variant deleted successfully",
+    "costPrice": "Cost Price",
+    "comparePrice": "Compare Price"
   }
 }
