@@ -180,6 +180,7 @@
   "pages": {
     "home": {
       "title": "Página Inicial",
+      "description": "App Rust Nuxt Store - Sua loja online completa com os melhores produtos",
       "categories": "Categorias",
       "products": "Produtos",
       "autoImport": "Este é um componente importado automaticamente"
@@ -189,16 +190,20 @@
       "description": "Esta página será exibida na rota /about."
     },
     "terms": {
-      "title": "Termos de Uso"
+      "title": "Termos de Uso",
+      "description": "Termos de uso da App Rust Nuxt Store"
     },
     "privacy": {
-      "title": "Política de Privacidade"
+      "title": "Política de Privacidade",
+      "description": "Política de privacidade da App Rust Nuxt Store"
     },
     "contact": {
-      "title": "Contato"
+      "title": "Contato",
+      "description": "Entre em contato com a App Rust Nuxt Store"
     },
     "categories": {
       "title": "Categorias",
+      "description": "Explore nossas categorias de produtos",
       "search": {
         "placeholder": "Buscar categorias..."
       },
@@ -251,6 +256,7 @@
     },
     "products": {
       "title": "Produtos",
+      "description": "Confira nossa lista completa de produtos",
       "loading": "Carregando...",
       "reviews": "Avaliações",
       "writeReview": "Escrever uma avaliação",
@@ -296,6 +302,7 @@
     },
     "posts": {
       "title": "Posts",
+      "description": "Leia nossos posts e artigos",
       "loading": "Carregando...",
       "readMore": "Ler mais →",
       "readMoreBtn": "Read More",
@@ -380,12 +387,14 @@
     },
     "wishlist": {
       "title": "Lista de Desejos",
+      "description": "Sua lista de desejos personalizada",
       "empty": "Sua lista de desejos está vazia",
       "continueShopping": "Continuar Comprando",
       "viewProduct": "Ver Produto"
     },
     "profiles": {
       "title": "Perfis",
+      "description": "Perfis de usuários da plataforma",
       "loading": "Carregando...",
       "readMore": "Read More",
       "detail": {
@@ -422,6 +431,7 @@
     },
     "stores": {
       "title": "Lojas",
+      "description": "Conheça nossas lojas parceiras",
       "buy": "Buy Now",
       "addToCart": "Add to cart"
     }

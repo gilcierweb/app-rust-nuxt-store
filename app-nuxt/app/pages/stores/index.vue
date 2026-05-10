@@ -98,6 +98,12 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.stores.title'),
+  ogTitle: t('pages.stores.title'),
+  description: t('pages.stores.description'),
+  ogDescription: t('pages.stores.description'),
+})
 </script>
 
 <style scoped></style>

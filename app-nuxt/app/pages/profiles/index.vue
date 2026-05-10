@@ -28,6 +28,12 @@
 <script setup lang="ts">
 import type { Profile } from '~/types';
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.profiles.title'),
+  ogTitle: t('pages.profiles.title'),
+  description: t('pages.profiles.description'),
+  ogDescription: t('pages.profiles.description'),
+})
 
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();

@@ -96,6 +96,10 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.cart.title'),
+  ogTitle: t('pages.cart.title'),
+})
 const cartStore = useCartStore()
 </script>
 

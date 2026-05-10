@@ -209,6 +209,12 @@
 <script setup lang="ts">
 import type { Post } from '~/types';
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.posts.title'),
+  ogTitle: t('pages.posts.title'),
+  description: t('pages.posts.description'),
+  ogDescription: t('pages.posts.description'),
+})
 
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();

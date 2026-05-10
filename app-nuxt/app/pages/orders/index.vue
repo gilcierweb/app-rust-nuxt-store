@@ -55,6 +55,10 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.orders.title'),
+  ogTitle: t('pages.orders.title'),
+})
 const config = useRuntimeConfig()
 import type { Order } from '~/types'
 

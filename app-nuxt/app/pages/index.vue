@@ -20,4 +20,10 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.home.title'),
+  ogTitle: t('pages.home.title'),
+  description: t('pages.home.description'),
+  ogDescription: t('pages.home.description'),
+})
 </script>

@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security'],
+  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security', '@nuxtjs/sitemap'],
   css: ["~/assets/css/main.css"],
   vite: { plugins: [tailwindcss(),], },
   shadcn: {
@@ -25,20 +25,20 @@ export default defineNuxtConfig({
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { name: "description", content: "App Rust Nuxt Store" },
-        { name: "robots", content: "noindex, nofollow" }, // keep off search engines
+        { name: "description", content: "App Rust Nuxt Store - Sua loja online com Rust e Nuxt" },
+        { name: "robots", content: "index, follow" },
         { name: "theme-color", content: "#FF6F00" },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "App Rust Nuxt Store" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      link: [
+        { rel: "canonical", href: "https://app-rust-nuxt-store.com" },
       ],
     },
 
-    pageTransition: {
-      name: 'fade',
-      mode: 'out-in' // default
-    },
-    layoutTransition: {
-      name: 'layout',
-      mode: 'out-in' // default
-    }
+    // pageTransition: { name: 'fade',  mode: 'out-in' }, // default
+    // layoutTransition: { name: 'layout', mode: 'out-in' } // default
   },
   
   runtimeConfig: {
@@ -116,11 +116,22 @@ export default defineNuxtConfig({
     defaultLocale: "pt-BR",
     strategy: "prefix_except_default",
     lazy: true,
+    seo: true,
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "i18n_redirected",
       redirectOn: "root",
     },
+  },
+
+  sitemap: {
+    sources: ["/api/__sitemap__/urls"],
+    strictNuxtContentPaths: true,
+    xslColumns: [
+      { label: "URL", width: "60%" },
+      { label: "Freq", width: "15%" },
+      { label: "Priority", width: "15%" },
+    ],
   },
 
   // security: {

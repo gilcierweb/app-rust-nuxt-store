@@ -180,25 +180,30 @@
   "pages": {
     "home": {
       "title": "Home",
+      "description": "App Rust Nuxt Store - Your complete online store with the best products",
       "categories": "Categories",
       "products": "Products",
-      "autoImport": "This is an auto-imported component"
+      "autoImport": "This is an automatically imported component"
     },
     "about": {
       "title": "About Us",
       "description": "This page will be displayed at the /about route."
     },
     "terms": {
-      "title": "Terms of Use"
+      "title": "Terms of Use",
+      "description": "Terms of use for App Rust Nuxt Store"
     },
     "privacy": {
-      "title": "Privacy Policy"
+      "title": "Privacy Policy",
+      "description": "Privacy policy for App Rust Nuxt Store"
     },
     "contact": {
-      "title": "Contact"
+      "title": "Contact",
+      "description": "Get in touch with App Rust Nuxt Store"
     },
     "categories": {
       "title": "Categories",
+      "description": "Explore our product categories",
       "search": {
         "placeholder": "Search categories..."
       },
@@ -251,6 +256,7 @@
     },
     "products": {
       "title": "Products",
+      "description": "Check out our complete product list",
       "loading": "Loading...",
       "reviews": "Reviews",
       "writeReview": "Write a review",
@@ -296,6 +302,7 @@
     },
     "posts": {
       "title": "Posts",
+      "description": "Read our posts and articles",
       "loading": "Loading...",
       "readMore": "Read more →",
       "readMoreBtn": "Read More",
@@ -380,12 +387,14 @@
     },
     "wishlist": {
       "title": "Wishlist",
+      "description": "Your personalized wishlist",
       "empty": "Your wishlist is empty",
       "continueShopping": "Continue Shopping",
       "viewProduct": "View Product"
     },
     "profiles": {
       "title": "Profiles",
+      "description": "User profiles on the platform",
       "loading": "Loading...",
       "readMore": "Read More",
       "detail": {
@@ -422,6 +431,7 @@
     },
     "stores": {
       "title": "Stores",
+      "description": "Meet our partner stores",
       "buy": "Buy Now",
       "addToCart": "Add to cart"
     }

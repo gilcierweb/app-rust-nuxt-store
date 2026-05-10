@@ -75,61 +75,63 @@
         <p>{{ product?.description }}</p>
       </div>
     </div>
-  <!-- Reviews Section -->
-  <div class="mt-12 border-t pt-8">
-    <h2 class="text-2xl font-bold mb-6">{{ t('pages.products.reviews') }}</h2>
 
-    <!-- Existing Reviews -->
-    <div v-if="reviews && reviews.length > 0" class="space-y-4 mb-8">
-      <div v-for="review in reviews" :key="review.id" class="rounded-box border p-4">
-        <div class="flex items-center gap-2 mb-2">
-          <div class="flex text-warning">
-            <i v-for="n in 5" :key="n"
-               :class="n <= (review.rating || 0) ? 'icon-[tabler--star-filled] text-warning' : 'icon-[tabler--star] text-gray-300'"
-               class="size-5"></i>
-          </div>
-          <span v-if="review.verified_purchase" class="badge badge-success badge-xs">Compra verificada</span>
-        </div>
-        <p v-if="review.title" class="font-semibold">{{ review.title }}</p>
-        <p v-if="review.comment" class="text-sm text-base-content/70 mt-1">{{ review.comment }}</p>
-        <p class="text-xs text-base-content/40 mt-2">{{ new Date(review.created_at).toLocaleDateString('pt-BR') }}</p>
-      </div>
-    </div>
-    <p v-else class="text-base-content/60 mb-8">Nenhuma avaliação ainda. Seja o primeiro!</p>
+    <!-- Reviews Section - Only show when not loading -->
+    <div v-if="!pendingApi && !pending" class="mt-12 border-t pt-8">
+      <h2 class="text-2xl font-bold mb-6">{{ t('pages.products.reviews') }}</h2>
 
-    <!-- Review Form -->
-    <div class="rounded-box border p-6 max-w-xl">
-      <h3 class="text-lg font-semibold mb-4">{{ t('pages.products.writeReview') }}</h3>
-
-      <AppAlert v-if="reviewSuccess" type="success" :message="reviewSuccess" :auto-close="3000" @close="reviewSuccess = ''" />
-      <AppAlert v-if="reviewError" type="error" :message="reviewError" :auto-close="5000" @close="reviewError = ''" :dismissible="true" />
-
-      <form @submit.prevent="submitReview" class="space-y-4">
-        <div class="form-control">
-          <label class="label"><span class="label-text">Avaliação</span></label>
-          <div class="flex items-center gap-2">
-            <input v-model.number="reviewForm.rating" type="range" min="1" max="5" class="range range-primary flex-1" />
-            <span class="text-xl font-bold w-6 text-center">{{ reviewForm.rating }}</span>
+      <!-- Existing Reviews -->
+      <div v-if="reviews && reviews.length > 0" class="space-y-4 mb-8">
+        <div v-for="review in reviews" :key="review.id" class="rounded-box border p-4">
+          <div class="flex items-center gap-2 mb-2">
             <div class="flex text-warning">
               <i v-for="n in 5" :key="n"
-                 :class="n <= reviewForm.rating ? 'icon-[tabler--star-filled] text-warning' : 'icon-[tabler--star] text-gray-300'"
-                 class="size-6"></i>
+                 :class="n <= (review.rating || 0) ? 'icon-[tabler--star-filled] text-warning' : 'icon-[tabler--star] text-gray-300'"
+                 class="size-5"></i>
+            </div>
+            <span v-if="review.verified_purchase" class="badge badge-success badge-xs">Compra verificada</span>
+          </div>
+          <p v-if="review.title" class="font-semibold">{{ review.title }}</p>
+          <p v-if="review.comment" class="text-sm text-base-content/70 mt-1">{{ review.comment }}</p>
+          <p class="text-xs text-base-content/40 mt-2">{{ new Date(review.created_at).toLocaleDateString('pt-BR') }}</p>
+        </div>
+      </div>
+      <p v-else class="text-base-content/60 mb-8">Nenhuma avaliação ainda. Seja o primeiro!</p>
+
+      <!-- Review Form -->
+      <div class="rounded-box border p-6 max-w-xl">
+        <h3 class="text-lg font-semibold mb-4">{{ t('pages.products.writeReview') }}</h3>
+
+        <AppAlert v-if="reviewSuccess" type="success" :message="reviewSuccess" :auto-close="3000" @close="reviewSuccess = ''" />
+        <AppAlert v-if="reviewError" type="error" :message="reviewError" :auto-close="5000" @close="reviewError = ''" :dismissible="true" />
+
+        <form @submit.prevent="submitReview" class="space-y-4">
+          <div class="form-control">
+            <label class="label"><span class="label-text">Avaliação</span></label>
+            <div class="flex items-center gap-2">
+              <input v-model.number="reviewForm.rating" type="range" min="1" max="5" class="range range-primary flex-1" />
+              <span class="text-xl font-bold w-6 text-center">{{ reviewForm.rating }}</span>
+              <div class="flex text-warning">
+                <i v-for="n in 5" :key="n"
+                   :class="n <= reviewForm.rating ? 'icon-[tabler--star-filled] text-warning' : 'icon-[tabler--star] text-gray-300'"
+                   class="size-6"></i>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text">Título (opcional)</span></label>
-          <input v-model="reviewForm.title" type="text" placeholder="Resumo da sua avaliação" class="input input-bordered" />
-        </div>
-        <div class="form-control">
-          <label class="label"><span class="label-text">Comentário (opcional)</span></label>
-          <textarea v-model="reviewForm.comment" class="textarea textarea-bordered" rows="3" placeholder="Conte sua experiência..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary" :disabled="reviewSubmitting">
-          <span v-if="reviewSubmitting" class="loading loading-spinner loading-sm"></span>
-          Enviar Avaliação
-        </button>
-      </form>
+          <div class="form-control">
+            <label class="label"><span class="label-text">Título (opcional)</span></label>
+            <input v-model="reviewForm.title" type="text" placeholder="Resumo da sua avaliação" class="input input-bordered" />
+          </div>
+          <div class="form-control">
+            <label class="label"><span class="label-text">Comentário (opcional)</span></label>
+            <textarea v-model="reviewForm.comment" class="textarea textarea-bordered" rows="3" placeholder="Conte sua experiência..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" :disabled="reviewSubmitting">
+            <span v-if="reviewSubmitting" class="loading loading-spinner loading-sm"></span>
+            Enviar Avaliação
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -137,6 +139,13 @@
 <script setup lang="ts">
 import type { Product, ProductApi, ProductVariant, Review } from '~/types'
 const { t } = useI18n()
+useSeoMeta({
+  title: computed(() => productApi.value?.name || product.value?.title || t('pages.products.title')),
+  ogTitle: computed(() => productApi.value?.name || product.value?.title || t('pages.products.title')),
+  description: computed(() => productApi.value?.description || product.value?.description || ''),
+  ogDescription: computed(() => productApi.value?.description || product.value?.description || ''),
+  ogImage: computed(() => productApi.value?.images?.[0]?.image || product.value?.thumbnail || ''),
+})
 const config = useRuntimeConfig()
 const route = useRoute()
 const cartStore = useCartStore()

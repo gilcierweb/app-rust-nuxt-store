@@ -8,6 +8,12 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
+useSeoMeta({
+  title: t('pages.products.title'),
+  ogTitle: t('pages.products.title'),
+  description: t('pages.products.description'),
+  ogDescription: t('pages.products.description'),
+})
 import ProductList from "~/components/ProductList.vue";
 </script>
 
