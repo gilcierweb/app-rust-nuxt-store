@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-6">
-      <h1 class="h1">{{ $t('admin.profiles.title') }}</h1>
+      <h1 class="h1">{{ $t('admin.customers.title') }}</h1>
     </div>
 
     <div class="mb-6 justify-between flex items-center">
@@ -10,20 +10,20 @@
           <input
             v-model="searchQuery"
             type="text"
-            :placeholder="$t('admin.profiles.searchPlaceholder')"
+            :placeholder="$t('admin.customers.searchPlaceholder')"
             class="input input-bordered w-full mb-4"
           />
           <button type="submit" class="btn btn-primary">{{ $t('common.search') }}</button>
         </div>
       </form>
 
-      <NuxtLink to="/admin/profiles/new" class="btn btn-success">{{ $t('admin.profiles.add') }}</NuxtLink>
+      <NuxtLink to="/admin/customers/new" class="btn btn-success">{{ $t('admin.customers.add') }}</NuxtLink>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">{{ $t('admin.profiles.loading') }}</span>
+      <span class="ml-3">{{ $t('admin.customers.loading') }}</span>
     </div>
 
     <!-- Error State -->
@@ -31,13 +31,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span>{{ $t('admin.profiles.error', { message: error.message }) }}</span>
+      <span>{{ $t('admin.customers.error', { message: error.message }) }}</span>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="filteredProfiles.length === 0" class="text-center py-12">
-      <p class="text-gray-500 text-lg">{{ $t('admin.profiles.notFound') }}</p>
-      <NuxtLink to="/admin/profiles/new" class="btn btn-primary mt-4">{{ $t('admin.profiles.createFirst') }}</NuxtLink>
+      <p class="text-gray-500 text-lg">{{ $t('admin.customers.notFound') }}</p>
+      <NuxtLink to="/admin/customers/new" class="btn btn-primary mt-4">{{ $t('admin.customers.createFirst') }}</NuxtLink>
     </div>
 
     <!-- Profiles Table -->
@@ -45,12 +45,12 @@
       <table class="table">
         <thead>
           <tr>
-            <th>{{ $t('admin.profiles.table.name') }}</th>
-            <th>{{ $t('admin.profiles.table.username') }}</th>
-            <th>{{ $t('admin.profiles.table.phone') }}</th>
-            <th>{{ $t('admin.profiles.table.user') }}</th>
-            <th>{{ $t('admin.profiles.table.date') }}</th>
-            <th>{{ $t('admin.profiles.table.actions') }}</th>
+            <th>{{ $t('admin.customers.table.name') }}</th>
+            <th>{{ $t('admin.customers.table.username') }}</th>
+            <th>{{ $t('admin.customers.table.phone') }}</th>
+            <th>{{ $t('admin.customers.table.user') }}</th>
+            <th>{{ $t('admin.customers.table.date') }}</th>
+            <th>{{ $t('admin.customers.table.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -76,14 +76,14 @@
             <td>{{ formatDate(profile.created_at) }}</td>
             <td>
               <NuxtLink
-                :to="`/admin/profiles/${profile.id}`"
+                :to="`/admin/customers/${profile.id}`"
                 class="btn btn-circle btn-text btn-sm"
                 :aria-label="$t('common.view')"
               >
                 <i class="icon-[tabler--eye] size-5"></i>
               </NuxtLink>
               <NuxtLink
-                :to="`/admin/profiles/${profile.id}/edit`"
+                :to="`/admin/customers/${profile.id}/edit`"
                 class="btn btn-circle btn-text btn-sm"
                 :aria-label="$t('common.edit')"
               >
@@ -159,14 +159,14 @@ const handleSearch = () => {
 // Delete confirmation
 const confirmDelete = async (profile: Profile) => {
   const name = profile.full_name || `${profile.first_name} ${profile.last_name}`
-  if (confirm(t('admin.profiles.detail.confirmDelete', { name }))) {
+  if (confirm(t('admin.customers.detail.confirmDelete', { name }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/profiles/${profile.id}`, {
         method: 'DELETE'
       })
       await refresh()
     } catch (err) {
-      alert(t('admin.profiles.detail.errorDelete'))
+      alert(t('admin.customers.detail.errorDelete'))
       console.error(err)
     }
   }

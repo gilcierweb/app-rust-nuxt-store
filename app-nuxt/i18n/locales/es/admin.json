@@ -337,14 +337,14 @@
         "errorDelete": "Error al eliminar la publicación"
       }
     },
-    "profiles": {
-      "title": "Perfiles",
-      "searchPlaceholder": "Buscar perfiles",
+    "customers": {
+      "title": "Clientes",
+      "searchPlaceholder": "Buscar clientes",
       "add": "Añadir",
-      "loading": "Cargando perfiles...",
-      "error": "Error al cargar perfiles: {message}",
-      "notFound": "No se encontraron perfiles.",
-      "createFirst": "Crear primer perfil",
+      "loading": "Cargando clientes...",
+      "error": "Error al cargar clientes: {message}",
+      "notFound": "No se encontraron clientes.",
+      "createFirst": "Crear primer cliente",
       "table": {
         "name": "Nombre",
         "username": "Nombre de usuario",
@@ -354,7 +354,7 @@
         "actions": "Acciones"
       },
       "detail": {
-        "title": "Detalles del Perfil",
+        "title": "Detalles del Cliente",
         "personalInfo": "Información Personal",
         "firstName": "Nombre",
         "lastName": "Apellido",
@@ -363,9 +363,31 @@
         "phone": "Teléfono",
         "bio": "Biografía",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar el perfil de \"{name}\"?",
-        "errorDelete": "Error al eliminar el perfil"
+        "confirmDelete": "¿Estás seguro de que deseas eliminar el cliente \"{name}\"?",
+        "errorDelete": "Error al eliminar el cliente"
       }
+    },
+    "users": {
+      "title": "Usuarios",
+      "searchPlaceholder": "Buscar usuarios",
+      "add": "Añadir",
+      "loading": "Cargando usuarios...",
+      "error": "Error al cargar usuarios: {message}",
+      "notFound": "No se encontraron usuarios.",
+      "table": {
+        "email": "E-mail",
+        "role": "Rol",
+        "status": "Estado",
+        "date": "Fecha",
+        "actions": "Acciones"
+      }
+    },
+    "settings": {
+      "title": "Configuración",
+      "general": "General",
+      "seo": "SEO",
+      "api": "API",
+      "save": "Guardar Configuración"
     },
     "reviews": {
       "title": "Reseñas",

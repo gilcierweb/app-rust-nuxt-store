@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AdminProfilesForm @saved="handleSaved" @cancel="navigateTo('/admin/profiles')" />
+    <AdminProfilesForm @saved="handleSaved" @cancel="navigateTo('/admin/customers')" />
   </div>
 </template>
 
@@ -12,7 +12,7 @@ definePageMeta({
 })
 
 const handleSaved = (profile: Profile) => {
-  navigateTo('/admin/profiles')
+  navigateTo('/admin/customers')
 }
 </script>
 

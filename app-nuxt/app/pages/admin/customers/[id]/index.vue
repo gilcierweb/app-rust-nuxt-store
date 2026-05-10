@@ -3,7 +3,7 @@
     <!-- Header with Back Button -->
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <NuxtLink to="/admin/profiles" class="btn btn-ghost btn-circle">
+        <NuxtLink to="/admin/customers" class="btn btn-ghost btn-circle">
           <i class="icon-[tabler--arrow-left] size-6"></i>
         </NuxtLink>
         <div>
@@ -17,7 +17,7 @@
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
           Excluir
         </button>
-        <NuxtLink :to="`/admin/profiles/${route.params.id}/edit`" class="btn btn-primary">
+        <NuxtLink :to="`/admin/customers/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2"></i>
           Editar
         </NuxtLink>
@@ -147,7 +147,7 @@
     <div v-else class="alert alert-warning">
       <i class="icon-[tabler--alert-triangle] size-6"></i>
       <span>Perfil não encontrado.</span>
-      <NuxtLink to="/admin/profiles" class="btn btn-sm">Voltar para lista</NuxtLink>
+      <NuxtLink to="/admin/customers" class="btn btn-sm">Voltar para lista</NuxtLink>
     </div>
   </div>
 </template>
@@ -198,7 +198,7 @@ const deleteProfile = async () => {
       await $fetch(`${config.public.baseURL}/api/profiles/${profile.value.id}`, {
         method: 'DELETE'
       })
-      router.push('/admin/profiles')
+      router.push('/admin.customers')
     } catch (err) {
       alert('Erro ao excluir perfil')
       console.error(err)

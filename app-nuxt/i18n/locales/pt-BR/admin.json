@@ -337,14 +337,14 @@
         "errorDelete": "Erro ao excluir post"
       }
     },
-    "profiles": {
-      "title": "Perfis",
-      "searchPlaceholder": "Buscar perfis",
+    "customers": {
+      "title": "Clientes",
+      "searchPlaceholder": "Buscar clientes",
       "add": "Adicionar",
-      "loading": "Carregando perfis...",
-      "error": "Erro ao carregar perfis: {message}",
-      "notFound": "Nenhum perfil encontrado.",
-      "createFirst": "Criar primeiro perfil",
+      "loading": "Carregando clientes...",
+      "error": "Erro ao carregar clientes: {message}",
+      "notFound": "Nenhum cliente encontrado.",
+      "createFirst": "Criar primeiro cliente",
       "table": {
         "name": "Nome",
         "username": "Username",
@@ -354,7 +354,7 @@
         "actions": "Ações"
       },
       "detail": {
-        "title": "Detalhes do Perfil",
+        "title": "Detalhes do Cliente",
         "personalInfo": "Informações Pessoais",
         "firstName": "Nome",
         "lastName": "Sobrenome",
@@ -363,9 +363,31 @@
         "phone": "Telefone",
         "bio": "Bio",
         "back": "Voltar para lista",
-        "confirmDelete": "Tem certeza que deseja excluir o perfil de \"{name}\"?",
-        "errorDelete": "Erro ao excluir perfil"
+        "confirmDelete": "Tem certeza que deseja excluir o cliente \"{name}\"?",
+        "errorDelete": "Erro ao excluir cliente"
       }
+    },
+    "users": {
+      "title": "Usuários",
+      "searchPlaceholder": "Buscar usuários",
+      "add": "Adicionar",
+      "loading": "Carregando usuários...",
+      "error": "Erro ao carregar usuários: {message}",
+      "notFound": "Nenhum usuário encontrado.",
+      "table": {
+        "email": "E-mail",
+        "role": "Papel",
+        "status": "Status",
+        "date": "Data",
+        "actions": "Ações"
+      }
+    },
+    "settings": {
+      "title": "Configurações",
+      "general": "Geral",
+      "seo": "SEO",
+      "api": "API",
+      "save": "Salvar Configurações"
     },
     "reviews": {
       "title": "Avaliações",

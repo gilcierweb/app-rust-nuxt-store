@@ -13,7 +13,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span>Erro ao carregar perfil: {{ error.message }}</span>
-        <NuxtLink to="/admin/profiles" class="btn btn-sm">Voltar</NuxtLink>
+        <NuxtLink to="/admin/customers" class="btn btn-sm">Voltar</NuxtLink>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
       :profile="profile"
       :is-editing="true"
       @saved="handleSaved"
-      @cancel="navigateTo('/admin/profiles')"
+      @cancel="navigateTo('/admin/customers')"
     />
   </div>
 </template>
@@ -43,7 +43,7 @@ const { data: profile, pending, error } = useLazyFetch<Profile>(
 )
 
 const handleSaved = (savedProfile: Profile) => {
-  navigateTo('/admin/profiles')
+  navigateTo('/admin.customers')
 }
 </script>
 
