@@ -69,6 +69,16 @@ impl Hooks for App {
             .add_route(controllers::auth::routes())
             .add_route(controllers::shipment::routes())
     }
+
+    async fn after_routes(router: axum::Router, _ctx: &AppContext) -> Result<axum::Router> {
+        use utoipa::OpenApi;
+        use utoipa_swagger_ui::SwaggerUi;
+        
+        let swagger = SwaggerUi::new("/api/docs")
+            .url("/api-docs/openapi.json", crate::openapi::ApiDoc::openapi());
+            
+        Ok(router.merge(swagger))
+    }
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())

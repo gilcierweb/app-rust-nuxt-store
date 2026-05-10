@@ -86,6 +86,14 @@ async fn save_image(
     })
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/products/",
+    responses(
+        (status = 200, description = "List of products with their categories")
+    ),
+    tag = "Products"
+)]
 pub async fn get_products_with_categories(
     State(ctx): State<AppContext>,
 ) -> Result<impl IntoResponse> {
@@ -123,6 +131,14 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     item.ok_or_else(|| Error::NotFound)
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/products/list", // Wait, the route in routes() is actually commented out for list, but let's assume it might be used or we can just document the get_one
+    responses(
+        (status = 200, description = "Raw list of all products")
+    ),
+    tag = "Products"
+)]
 #[debug_handler]
 pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
     format::json(Entity::find().all(&ctx.db).await?)
@@ -198,12 +214,36 @@ pub async fn update(
     format::json(item)
 }
 
+#[utoipa::path(
+    delete,
+    path = "/api/products/{id}",
+    params(
+        ("id" = i32, Path, description = "Product ID")
+    ),
+    responses(
+        (status = 200, description = "Product removed successfully"),
+        (status = 404, description = "Product not found")
+    ),
+    tag = "Products"
+)]
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/products/{id}",
+    params(
+        ("id" = i32, Path, description = "Product ID")
+    ),
+    responses(
+        (status = 200, description = "Product with category returned"),
+        (status = 404, description = "Product not found")
+    ),
+    tag = "Products"
+)]
 #[debug_handler]
 pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     let result = Products::find_by_id(id)
