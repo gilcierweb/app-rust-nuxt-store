@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-6">
-      <h1 class="h1">Posts</h1>
+      <h1 class="h1">{{ $t('admin.posts.title') }}</h1>
     </div>
 
     <div class="mb-6 justify-between flex items-center">
@@ -10,20 +10,20 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Buscar posts"
+            :placeholder="$t('admin.posts.searchPlaceholder')"
             class="input input-bordered w-full mb-4"
           />
-          <button type="submit" class="btn btn-primary">Buscar</button>
+          <button type="submit" class="btn btn-primary">{{ $t('common.search') }}</button>
         </div>
       </form>
 
-      <NuxtLink to="/admin/posts/new" class="btn btn-success">Adicionar</NuxtLink>
+      <NuxtLink to="/admin/posts/new" class="btn btn-success">{{ $t('admin.posts.add') }}</NuxtLink>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">Carregando posts...</span>
+      <span class="ml-3">{{ $t('admin.posts.loading') }}</span>
     </div>
 
     <!-- Error State -->
@@ -31,13 +31,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span>Erro ao carregar posts: {{ error.message }}</span>
+      <span>{{ $t('admin.posts.error', { message: error.message }) }}</span>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="filteredPosts.length === 0" class="text-center py-12">
-      <p class="text-gray-500 text-lg">Nenhum post encontrado.</p>
-      <NuxtLink to="/admin/posts/new" class="btn btn-primary mt-4">Criar primeiro post</NuxtLink>
+      <p class="text-gray-500 text-lg">{{ $t('admin.posts.notFound') }}</p>
+      <NuxtLink to="/admin/posts/new" class="btn btn-primary mt-4">{{ $t('admin.posts.createFirst') }}</NuxtLink>
     </div>
 
     <!-- Posts Table -->
@@ -45,19 +45,19 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Título</th>
-            <th>Status</th>
-            <th>Usuário ID</th>
-            <th>Data</th>
-            <th>Ações</th>
+            <th>{{ $t('admin.posts.table.title') }}</th>
+            <th>{{ $t('admin.posts.table.status') }}</th>
+            <th>{{ $t('admin.posts.table.author') }}</th>
+            <th>{{ $t('admin.posts.table.date') }}</th>
+            <th>{{ $t('admin.posts.table.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="post in filteredPosts" :key="post.id" class="row-hover">
-            <td class="font-medium">{{ post.title || '(Sem título)' }}</td>
+            <td class="font-medium">{{ post.title || $t('admin.posts.noTitle') }}</td>
             <td>
               <span :class="['badge badge-soft text-xs', statusBadgeClass(post.status)]">
-                {{ PostStatusLabels[post.status || 1] }}
+                {{ getStatusLabel(post.status) }}
               </span>
             </td>
             <td>{{ post.user_id }}</td>
@@ -66,21 +66,21 @@
               <NuxtLink
                 :to="`/admin/posts/${post.id}`"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Ver detalhes"
+                :aria-label="$t('common.view')"
               >
                 <i class="icon-[tabler--eye] size-5"></i>
               </NuxtLink>
               <NuxtLink
                 :to="`/admin/posts/${post.id}/edit`"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Editar"
+                :aria-label="$t('common.edit')"
               >
                 <i class="icon-[tabler--pencil] size-5"></i>
               </NuxtLink>
               <button
                 type="button"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Excluir"
+                :aria-label="$t('common.delete')"
                 @click="confirmDelete(post)"
               >
                 <span class="icon-[tabler--trash] size-5"></span>
@@ -95,7 +95,6 @@
 
 <script setup lang="ts">
 import type { Post } from '~/types'
-import { PostStatusLabels } from '~/types'
 
 definePageMeta({
   layout: 'admin'
@@ -103,6 +102,7 @@ definePageMeta({
 
 const config = useRuntimeConfig()
 const { $truncate } = useNuxtApp()
+const { t } = useI18n()
 
 const searchQuery = ref('')
 
@@ -121,6 +121,21 @@ const filteredPosts = computed(() => {
     post.content?.toLowerCase().includes(query)
   )
 })
+
+// Status label
+const getStatusLabel = (status?: number) => {
+  switch (status) {
+    case 1: return t('admin.posts.status.draft')
+    case 2: return t('admin.posts.status.pending')
+    case 3: return t('admin.posts.status.scheduled')
+    case 4: return t('admin.posts.status.published')
+    case 5: return t('admin.posts.status.private')
+    case 6: return t('admin.posts.status.archived')
+    case 7: return t('admin.posts.status.trashed')
+    case 8: return t('admin.posts.status.rejected')
+    default: return t('admin.posts.status.unknown')
+  }
+}
 
 // Status badge class
 const statusBadgeClass = (status?: number) => {
@@ -154,14 +169,14 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (post: Post) => {
-  if (confirm(`Tem certeza que deseja excluir o post "${post.title || '(Sem título)'}"?`)) {
+  if (confirm(t('admin.posts.detail.confirmDelete', { name: post.title || t('admin.posts.noTitle') }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/posts/${post.id}`, {
         method: 'DELETE'
       })
       await refresh()
     } catch (err) {
-      alert('Erro ao excluir post')
+      alert(t('admin.posts.detail.errorDelete'))
       console.error(err)
     }
   }

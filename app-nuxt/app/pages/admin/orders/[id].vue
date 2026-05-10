@@ -5,9 +5,9 @@
     </div>
 
     <div v-else-if="!order" class="flex flex-col items-center justify-center py-20">
-      <p class="text-lg text-base-content/60">{{ t('admin.statusLabels.unknown') }}</p>
+      <p class="text-lg text-base-content/60">{{ $t('common.status.unknown') }}</p>
       <NuxtLink to="/admin/orders" class="btn btn-primary mt-4">
-        {{ t('pages.orders.backToOrders') }}
+        {{ $t('admin.orders.detail.back') }}
       </NuxtLink>
     </div>
 
@@ -15,9 +15,9 @@
       <div class="mb-6 flex items-center justify-between">
         <div>
           <NuxtLink to="/admin/orders" class="link link-hover text-sm text-base-content/60">
-            &larr; {{ t('pages.orders.backToOrders') }}
+            &larr; {{ $t('admin.orders.detail.back') }}
           </NuxtLink>
-          <h1 class="h1 mt-1">{{ t('pages.orders.detail') }} - {{ order.order_number || '#' + order.id }}</h1>
+          <h1 class="h1 mt-1">{{ $t('admin.orders.detail.title') }} - {{ order.order_number || '#' + order.id }}</h1>
         </div>
         <span :class="statusBadgeClass(order.status)" class="text-sm">
           {{ statusLabel(order.status) }}
@@ -27,14 +27,14 @@
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="lg:col-span-2 space-y-6">
           <div class="rounded-box border p-6">
-            <h3 class="mb-4 font-semibold">{{ t('pages.orders.items') }}</h3>
+            <h3 class="mb-4 font-semibold">{{ $t('admin.orders.table.items') }}</h3>
             <table class="table w-full">
               <thead>
                 <tr>
-                  <th>{{ t('pages.products.table.name') }}</th>
-                  <th>{{ t('cart.quantity') }}</th>
-                  <th class="text-right">{{ t('pages.products.table.price') }}</th>
-                  <th class="text-right">{{ t('pages.orders.total') }}</th>
+                  <th>{{ $t('admin.products.table.name') }}</th>
+                  <th>{{ $t('common.actions.quantity') }}</th>
+                  <th class="text-right">{{ $t('admin.products.table.price') }}</th>
+                  <th class="text-right">{{ $t('admin.orders.table.total') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -51,39 +51,39 @@
 
         <div class="space-y-6">
           <div class="rounded-box border p-6">
-            <h3 class="mb-4 font-semibold">{{ t('order.updateStatus') }}</h3>
+            <h3 class="mb-4 font-semibold">{{ $t('order.updateStatus') }}</h3>
             <select v-model="selectedStatus" class="select w-full">
-              <option value="" disabled>{{ t('order.selectStatus') }}</option>
+              <option value="" disabled>{{ $t('order.selectStatus') }}</option>
               <option v-for="s in availableStatuses" :key="s.value" :value="s.value">
                 {{ s.label }}
               </option>
             </select>
             <button class="btn btn-primary mt-3 w-full" :disabled="!selectedStatus || updating" @click="updateStatus">
               <span v-if="updating" class="loading loading-spinner" />
-              {{ t('admin.products.edit') }}
+              {{ $t('common.save') }}
             </button>
             <p v-if="statusMsg" class="mt-2 text-center text-sm" :class="statusMsgType">{{ statusMsg }}</p>
           </div>
 
           <div class="rounded-box border p-6">
-            <h3 class="mb-4 font-semibold">{{ t('pages.orders.status') }}</h3>
+            <h3 class="mb-4 font-semibold">{{ $t('admin.orders.table.status') }}</h3>
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-base-content/60">{{ t('pages.orders.status') }}</span>
+                <span class="text-base-content/60">{{ $t('admin.orders.table.status') }}</span>
                 <span :class="statusBadgeClass(order.status)">{{ statusLabel(order.status) }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-base-content/60">{{ t('order.paymentStatus.paid') }}</span>
+                <span class="text-base-content/60">{{ $t('admin.orders.table.payment') }}</span>
                 <span :class="paymentBadgeClass(order.payment_status)">
                   {{ paymentLabel(order.payment_status) }}
                 </span>
               </div>
               <div class="flex justify-between">
-                <span class="text-base-content/60">{{ t('pages.orders.date') }}</span>
+                <span class="text-base-content/60">{{ $t('admin.orders.table.date') }}</span>
                 <span>{{ formatDate(order.created_at) }}</span>
               </div>
               <div class="flex justify-between border-t pt-2 mt-2 text-base font-bold">
-                <span>{{ t('pages.orders.total') }}</span>
+                <span>{{ $t('admin.orders.table.total') }}</span>
                 <span class="text-primary">{{ formatNumberBR(order.total_amount) }}</span>
               </div>
             </div>
@@ -137,7 +137,7 @@ const availableStatuses = computed(() => {
 
 function statusLabel(status: unknown): string {
   if (status == null) return '-'
-  return statusMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+  return statusMap[status as number]?.label ?? t('common.status.unknown')
 }
 function statusBadgeClass(status: unknown): string {
   if (status == null) return 'badge-soft'
@@ -145,7 +145,7 @@ function statusBadgeClass(status: unknown): string {
 }
 function paymentLabel(status: unknown): string {
   if (status == null) return '-'
-  return paymentMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+  return paymentMap[status as number]?.label ?? t('common.status.unknown')
 }
 function paymentBadgeClass(status: unknown): string {
   if (status == null) return 'badge-soft'
@@ -163,11 +163,11 @@ async function updateStatus() {
       body: { status: Number(selectedStatus.value) },
     })
     order.value.status = Number(selectedStatus.value)
-    statusMsg.value = t('admin.statusLabels.completed')
+    statusMsg.value = t('common.status.completed')
     statusMsgType.value = 'text-success'
     selectedStatus.value = ''
   } catch (err: any) {
-    statusMsg.value = err?.data?.message || err?.message || t('admin.statusLabels.unknown')
+    statusMsg.value = err?.data?.message || err?.message || t('common.status.unknown')
     statusMsgType.value = 'text-error'
   } finally {
     updating.value = false

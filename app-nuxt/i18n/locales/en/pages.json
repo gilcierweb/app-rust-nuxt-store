@@ -1,0 +1,259 @@
+{
+  "home": {
+    "title": "Home",
+    "description": "App Rust Nuxt Store - Your complete online store with the best products",
+    "categories": "Categories",
+    "products": "Products",
+    "autoImport": "This is an automatically imported component"
+  },
+  "about": {
+    "title": "About Us",
+    "description": "This page will be displayed at the /about route."
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "description": "Terms of use for App Rust Nuxt Store"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "Privacy policy for App Rust Nuxt Store"
+  },
+  "contact": {
+    "title": "Contact",
+    "description": "Get in touch with App Rust Nuxt Store"
+  },
+  "categories": {
+    "title": "Categories",
+    "description": "Explore our product categories",
+    "search": {
+      "placeholder": "Search categories..."
+    },
+    "loading": "Loading categories...",
+    "error": "Error loading categories: {message}",
+    "notFound": "No categories found.",
+    "createFirst": "Create first category"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping",
+    "remove": "Remove",
+    "quantity": "Qty",
+    "total": "Total",
+    "summary": "Order Summary",
+    "itemAdded": "Item added to cart",
+    "viewCart": "View Cart",
+    "clearCart": "Clear Cart",
+    "cartTotal": "Cart Total",
+    "itemsCount": "{count} items",
+    "item": "Item"
+  },
+  "orders": {
+    "title": "My Orders",
+    "empty": "No orders yet",
+    "number": "Order #",
+    "date": "Date",
+    "status": "Status",
+    "total": "Total",
+    "items": "Items",
+    "detail": "Order Details",
+    "backToOrders": "Back to Orders",
+    "payment": "Payment"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "placeOrder": "Place Order",
+    "orderSummary": "Order Summary",
+    "confirming": "Confirming your order...",
+    "discount": "Discount"
+  },
+  "confirmation": {
+    "title": "Order Confirmed",
+    "success": "Your order has been placed successfully!",
+    "number": "Order Number",
+    "emailSent": "A confirmation email has been sent."
+  },
+  "products": {
+    "title": "Products",
+    "description": "Check out our complete product list",
+    "loading": "Loading...",
+    "reviews": "Reviews",
+    "writeReview": "Write a review",
+    "buy": "Buy Now",
+    "back": "Back to Products",
+    "backList": "← Back to List",
+    "create": {
+      "title": "Create New Product",
+      "cancel": "Cancel",
+      "saved": "Product created successfully"
+    },
+    "edit": {
+      "title": "Edit Product",
+      "titleWithName": "Edit: {name}",
+      "loading": "Loading product...",
+      "error": "Error loading product: {message}",
+      "updated": "Product updated successfully"
+    },
+    "detail": {
+      "price": "Price",
+      "cost": "Cost Price",
+      "compare": "Compare Price",
+      "shortDescription": "Short Description",
+      "fullDescription": "Full Description",
+      "images": "Image Gallery",
+      "cover": "Cover",
+      "active": "Active",
+      "inactive": "Inactive",
+      "information": "Information"
+    },
+    "table": {
+      "name": "Name",
+      "price": "Price",
+      "description": "Description",
+      "status": "Status",
+      "category": "Category",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "search": {
+      "placeholder": "Search products..."
+    }
+  },
+  "posts": {
+    "title": "Posts",
+    "description": "Read our posts and articles",
+    "loading": "Loading...",
+    "readMore": "Read more →",
+    "readMoreBtn": "Read More",
+    "loadMore": "Load More Posts",
+    "hero": {
+      "title": "Latest News",
+      "description": "Discover the hottest e-commerce trends",
+      "cta": "Explore Posts"
+    },
+    "detail": {
+      "loading": "Loading...",
+      "breadcrumb": {
+        "home": "Home",
+        "blog": "Blog",
+        "guides": "Shopping Guides"
+      },
+      "category": "Shopping Guides",
+      "author": {
+        "name": "Maria Silva",
+        "role": "E-commerce Specialist",
+        "bio": "Over 8 years helping people make smart online purchases."
+      },
+      "meta": {
+        "readingTime": "{n} min read",
+        "views": "{n} views"
+      },
+      "sections": {
+        "introduction": "Choosing the right product may seem simple, but with so many options available online, it's easy to get lost among technical specifications, reviews, and prices. This guide will help you make more assertive decisions.",
+        "step1": "Define Your Needs",
+        "step2": "Research and Compare",
+        "step3": "Make the Final Decision",
+        "tipTitle": "Important Tip",
+        "tipText": "Always consider long-term cost-benefit. A more expensive product today may be more economical over time.",
+        "reviewTitle": "Reviews",
+        "reviewText": "Always read the latest reviews and look for detailed comments about product usage."
+      },
+      "checklist": {
+        "title": "Shopping Checklist",
+        "items": {
+          "specs": "Checked technical specifications",
+          "reviews": "Read at least 5 recent reviews",
+          "prices": "Compared prices across 3 stores",
+          "returnPolicy": "Checked exchange and return policies",
+          "warranty": "Confirmed product warranty"
+        }
+      },
+      "cta": {
+        "title": "Ready to Apply These Tips?",
+        "description": "Explore our community-recommended product selection.",
+        "button": "View Recommended Products"
+      },
+      "tags": {
+        "onlineShopping": "#online-shopping",
+        "guides": "#guides",
+        "ecommerce": "#ecommerce",
+        "tips": "#tips"
+      },
+      "share": {
+        "title": "Enjoyed the content?",
+        "description": "Share with your friends!",
+        "facebook": "Share",
+        "twitter": "Tweet"
+      },
+      "sidebar": {
+        "aboutAuthor": "About the Author",
+        "followAuthor": "Follow Author",
+        "relatedPosts": "Related Posts",
+        "newsletter": "📧 Newsletter",
+        "newsletterText": "Get weekly smart shopping tips!",
+        "newsletterPlaceholder": "Your email",
+        "newsletterButton": "Subscribe Free"
+      },
+      "relatedPosts": {
+        "post1": "10 Common Online Shopping Mistakes",
+        "post2": "How to Save Money on Black Friday",
+        "post3": "Best Selling Products of the Month",
+        "time1": "5 min read",
+        "time2": "7 min read",
+        "time3": "3 min read"
+      }
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "description": "Your personalized wishlist",
+    "empty": "Your wishlist is empty",
+    "continueShopping": "Continue Shopping",
+    "viewProduct": "View Product"
+  },
+  "profiles": {
+    "title": "Profiles",
+    "description": "User profiles on the platform",
+    "loading": "Loading...",
+    "readMore": "Read More",
+    "detail": {
+      "loading": "Loading...",
+      "photoAlt": "Profile Photo",
+      "premiumSince": "Premium Customer since 2020",
+      "stats": {
+        "orders": "Orders",
+        "totalSpent": "Total Spent",
+        "rating": "Rating"
+      },
+      "personalInfo": "Personal Information",
+      "edit": "Edit",
+      "fields": {
+        "fullName": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "birthDate": "Birth Date"
+      },
+      "lastOrders": "Last Orders",
+      "viewAllOrders": "View All Orders",
+      "totalOrders": "Total Orders",
+      "favorites": "Favorite Items",
+      "premiumStatus": "Premium Status",
+      "savedAddresses": "Saved Addresses",
+      "addresses": {
+        "home": "Home",
+        "work": "Work",
+        "main": "Main",
+        "add": "Add Address"
+      },
+      "coupons": "Available Coupons"
+    }
+  },
+  "stores": {
+    "title": "Stores",
+    "description": "Meet our partner stores",
+    "buy": "Buy Now",
+    "addToCart": "Add to cart"
+  }
+}

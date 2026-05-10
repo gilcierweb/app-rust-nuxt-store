@@ -1,0 +1,259 @@
+{
+  "home": {
+    "title": "Página Inicial",
+    "description": "App Rust Nuxt Store - Sua loja online completa com os melhores produtos",
+    "categories": "Categorias",
+    "products": "Produtos",
+    "autoImport": "Este é um componente importado automaticamente"
+  },
+  "about": {
+    "title": "Sobre Nós",
+    "description": "Esta página será exibida na rota /about."
+  },
+  "terms": {
+    "title": "Termos de Uso",
+    "description": "Termos de uso da App Rust Nuxt Store"
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "description": "Política de privacidade da App Rust Nuxt Store"
+  },
+  "contact": {
+    "title": "Contato",
+    "description": "Entre em contato com a App Rust Nuxt Store"
+  },
+  "categories": {
+    "title": "Categorias",
+    "description": "Explore nossas categorias de produtos",
+    "search": {
+      "placeholder": "Buscar categorias..."
+    },
+    "loading": "Carregando categorias...",
+    "error": "Erro ao carregar categorias: {message}",
+    "notFound": "Nenhuma categoria encontrada.",
+    "createFirst": "Criar primeira categoria"
+  },
+  "cart": {
+    "title": "Carrinho",
+    "empty": "Seu carrinho está vazio",
+    "subtotal": "Subtotal",
+    "checkout": "Finalizar Compra",
+    "continueShopping": "Continuar Comprando",
+    "remove": "Remover",
+    "quantity": "Qtd",
+    "total": "Total",
+    "summary": "Resumo do Pedido",
+    "itemAdded": "Item adicionado ao carrinho",
+    "viewCart": "Ver Carrinho",
+    "clearCart": "Limpar Carrinho",
+    "cartTotal": "Total do Carrinho",
+    "itemsCount": "{count} itens",
+    "item": "Item"
+  },
+  "orders": {
+    "title": "Meus Pedidos",
+    "empty": "Nenhum pedido ainda",
+    "number": "Pedido #",
+    "date": "Data",
+    "status": "Status",
+    "total": "Total",
+    "items": "Itens",
+    "detail": "Detalhes do Pedido",
+    "backToOrders": "Voltar aos Pedidos",
+    "payment": "Pagamento"
+  },
+  "checkout": {
+    "title": "Finalizar Compra",
+    "placeOrder": "Confirmar Pedido",
+    "orderSummary": "Resumo do Pedido",
+    "confirming": "Confirmando seu pedido...",
+    "discount": "Desconto"
+  },
+  "confirmation": {
+    "title": "Pedido Confirmado",
+    "success": "Seu pedido foi realizado com sucesso!",
+    "number": "Número do Pedido",
+    "emailSent": "Um e-mail de confirmação foi enviado."
+  },
+  "products": {
+    "title": "Produtos",
+    "description": "Confira nossa lista completa de produtos",
+    "loading": "Carregando...",
+    "reviews": "Avaliações",
+    "writeReview": "Escrever uma avaliação",
+    "buy": "Comprar Agora",
+    "back": "Voltar para Produtos",
+    "backList": "← Voltar para Lista",
+    "create": {
+      "title": "Criar Novo Produto",
+      "cancel": "Cancelar",
+      "saved": "Produto criado com sucesso"
+    },
+    "edit": {
+      "title": "Editar Produto",
+      "titleWithName": "Editar: {name}",
+      "loading": "Carregando produto...",
+      "error": "Erro ao carregar produto: {message}",
+      "updated": "Produto atualizado com sucesso"
+    },
+    "detail": {
+      "price": "Preço",
+      "cost": "Preço de Custo",
+      "compare": "Preço Comparativo",
+      "shortDescription": "Descrição Curta",
+      "fullDescription": "Descrição Completa",
+      "images": "Galeria de Imagens",
+      "cover": "Capa",
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "information": "Informações"
+    },
+    "table": {
+      "name": "Nome",
+      "price": "Preço",
+      "description": "Descrição",
+      "status": "Status",
+      "category": "Categoria",
+      "date": "Data",
+      "actions": "Ações"
+    },
+    "search": {
+      "placeholder": "Buscar produtos..."
+    }
+  },
+  "posts": {
+    "title": "Posts",
+    "description": "Leia nossos posts e artigos",
+    "loading": "Carregando...",
+    "readMore": "Ler mais →",
+    "readMoreBtn": "Read More",
+    "loadMore": "Carregar Mais Posts",
+    "hero": {
+      "title": "Últimas Novidades",
+      "description": "Descubra as tendências mais quentes do e-commerce",
+      "cta": "Explorar Posts"
+    },
+    "detail": {
+      "loading": "Carregando...",
+      "breadcrumb": {
+        "home": "Home",
+        "blog": "Blog",
+        "guides": "Guias de Compra"
+      },
+      "category": "Guias de Compra",
+      "author": {
+        "name": "Maria Silva",
+        "role": "Especialista em E-commerce",
+        "bio": "Mais de 8 anos ajudando pessoas a fazer compras inteligentes online."
+      },
+      "meta": {
+        "readingTime": "{n} min de leitura",
+        "views": "{n} visualizações"
+      },
+      "sections": {
+        "introduction": "Escolher o produto certo pode parecer simples, mas com tantas opções disponíveis no mercado online, é fácil se perder entre especificações técnicas, avaliações e preços. Este guia vai te ajudar a tomar decisões mais assertivas.",
+        "step1": "Defina Suas Necessidades",
+        "step2": "Pesquise e Compare",
+        "step3": "Tome a Decisão Final",
+        "tipTitle": "Dica Importante",
+        "tipText": "Sempre considere o custo-benefício a longo prazo. Um produto mais caro hoje pode ser mais econômico ao longo do tempo.",
+        "reviewTitle": "Avaliações",
+        "reviewText": "Leia sempre as avaliações mais recentes e procure por comentários detalhados sobre o uso do produto."
+      },
+      "checklist": {
+        "title": "Checklist de Compra",
+        "items": {
+          "specs": "Verifiquei as especificações técnicas",
+          "reviews": "Li pelo menos 5 avaliações recentes",
+          "prices": "Comparei preços em 3 lojas diferentes",
+          "returnPolicy": "Verifiquei as políticas de troca e devolução",
+          "warranty": "Confirmei a garantia do produto"
+        }
+      },
+      "cta": {
+        "title": "Pronto para Aplicar Essas Dicas?",
+        "description": "Explore nossa seleção de produtos recomendados pela comunidade.",
+        "button": "Ver Produtos Recomendados"
+      },
+      "tags": {
+        "onlineShopping": "#compras-online",
+        "guides": "#guias",
+        "ecommerce": "#ecommerce",
+        "tips": "#dicas"
+      },
+      "share": {
+        "title": "Gostou do conteúdo?",
+        "description": "Compartilhe com seus amigos!",
+        "facebook": "Compartilhar",
+        "twitter": "Tweet"
+      },
+      "sidebar": {
+        "aboutAuthor": "Sobre a Autora",
+        "followAuthor": "Seguir Autora",
+        "relatedPosts": "Posts Relacionados",
+        "newsletter": "📧 Newsletter",
+        "newsletterText": "Receba dicas semanais sobre compras inteligentes!",
+        "newsletterPlaceholder": "Seu e-mail",
+        "newsletterButton": "Assinar Grátis"
+      },
+      "relatedPosts": {
+        "post1": "10 Erros Comuns ao Comprar Online",
+        "post2": "Como Economizar nas Compras de Black Friday",
+        "post3": "Produtos Mais Vendidos do Mês",
+        "time1": "5 min de leitura",
+        "time2": "7 min de leitura",
+        "time3": "3 min de leitura"
+      }
+    }
+  },
+  "wishlist": {
+    "title": "Lista de Desejos",
+    "description": "Sua lista de desejos personalizada",
+    "empty": "Sua lista de desejos está vazia",
+    "continueShopping": "Continuar Comprando",
+    "viewProduct": "Ver Produto"
+  },
+  "profiles": {
+    "title": "Perfis",
+    "description": "Perfis de usuários da plataforma",
+    "loading": "Carregando...",
+    "readMore": "Read More",
+    "detail": {
+      "loading": "Carregando...",
+      "photoAlt": "Foto do Perfil",
+      "premiumSince": "Cliente Premium desde 2020",
+      "stats": {
+        "orders": "Pedidos",
+        "totalSpent": "Total Gasto",
+        "rating": "Avaliação"
+      },
+      "personalInfo": "Informações Pessoais",
+      "edit": "Editar",
+      "fields": {
+        "fullName": "Nome Completo",
+        "email": "Email",
+        "phone": "Telefone",
+        "birthDate": "Data de Nascimento"
+      },
+      "lastOrders": "Últimos Pedidos",
+      "viewAllOrders": "Ver Todos os Pedidos",
+      "totalOrders": "Total de Pedidos",
+      "favorites": "Itens Favoritos",
+      "premiumStatus": "Status Premium",
+      "savedAddresses": "Endereços Salvos",
+      "addresses": {
+        "home": "Casa",
+        "work": "Trabalho",
+        "main": "Principal",
+        "add": "Adicionar Endereço"
+      },
+      "coupons": "Cupons Disponíveis"
+    }
+  },
+  "stores": {
+    "title": "Lojas",
+    "description": "Conheça nossas lojas parceiras",
+    "buy": "Buy Now",
+    "addToCart": "Add to cart"
+  }
+}

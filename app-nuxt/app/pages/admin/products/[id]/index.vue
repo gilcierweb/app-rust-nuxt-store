@@ -3,7 +3,7 @@
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">Carregando produto...</span>
+      <span class="ml-3">{{ $t('admin.products.detail.loading') }}</span>
     </div>
 
     <!-- Error State -->
@@ -11,8 +11,8 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span>Erro ao carregar produto: {{ error.message }}</span>
-      <NuxtLink to="/admin/products" class="btn btn-sm">Voltar</NuxtLink>
+      <span>{{ $t('admin.products.detail.error', { message: error.message }) }}</span>
+      <NuxtLink to="/admin/products" class="btn btn-sm">{{ $t('common.back') }}</NuxtLink>
     </div>
 
     <!-- Product Details -->
@@ -26,10 +26,10 @@
           </div>
           <div class="flex gap-2">
             <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-primary btn-sm">
-              Editar
+              {{ $t('common.edit') }}
             </NuxtLink>
             <button type="button" class="btn btn-error btn-sm" @click="confirmDelete">
-              Excluir
+              {{ $t('common.delete') }}
             </button>
           </div>
         </div>
@@ -37,10 +37,10 @@
         <!-- Status Badges -->
         <div class="flex gap-2 mb-6">
           <span :class="['badge', product.active ? 'badge-success' : 'badge-error']">
-            {{ product.active ? 'Ativo' : 'Inativo' }}
+            {{ product.active ? $t('admin.products.detail.active') : $t('admin.products.detail.inactive') }}
           </span>
           <span v-if="product.featured" class="badge badge-warning">
-            Destaque
+            {{ $t('common.status.featured') }}
           </span>
           <span :class="['badge', statusBadgeClass]">
             {{ statusLabel }}
@@ -60,7 +60,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Pricing -->
           <div class="space-y-3">
-            <h3 class="font-semibold text-lg border-b pb-2">Preços</h3>
+            <h3 class="font-semibold text-lg border-b pb-2">{{ $t('admin.products.detail.prices') }}</h3>
             <div class="flex justify-between">
               <span class="text-gray-600">Preço de Venda:</span>
               <span class="font-bold text-primary">{{ formatCurrency(product.price) }}</span>
@@ -77,7 +77,7 @@
 
           <!-- Info -->
           <div class="space-y-3">
-            <h3 class="font-semibold text-lg border-b pb-2">Informações</h3>
+            <h3 class="font-semibold text-lg border-b pb-2">{{ $t('admin.products.detail.information') }}</h3>
             <div v-if="product.slug" class="flex justify-between">
               <span class="text-gray-600">Slug:</span>
               <span class="font-mono text-sm">{{ product.slug }}</span>
@@ -91,18 +91,18 @@
 
         <!-- Descriptions -->
         <div v-if="product.shortDescription" class="mt-6">
-          <h3 class="font-semibold text-lg border-b pb-2 mb-3">Descrição Curta</h3>
+          <h3 class="font-semibold text-lg border-b pb-2 mb-3">{{ $t('admin.products.detail.shortDescription') }}</h3>
           <p class="text-gray-700">{{ product.shortDescription }}</p>
         </div>
 
         <div v-if="product.description" class="mt-6">
-          <h3 class="font-semibold text-lg border-b pb-2 mb-3">Descrição Completa</h3>
+          <h3 class="font-semibold text-lg border-b pb-2 mb-3">{{ $t('admin.products.detail.fullDescription') }}</h3>
           <p class="text-gray-700 whitespace-pre-wrap">{{ product.description }}</p>
         </div>
 
         <!-- Images Gallery -->
         <div v-if="product.images && product.images.length > 0" class="mt-6">
-          <h3 class="font-semibold text-lg border-b pb-2 mb-3">Galeria de Imagens</h3>
+          <h3 class="font-semibold text-lg border-b pb-2 mb-3">{{ $t('admin.products.detail.images') }}</h3>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div
               v-for="image in product.images"
@@ -115,7 +115,7 @@
                 class="w-full h-32 object-cover rounded-lg"
               />
               <span v-if="image.cover" class="absolute top-1 left-1 badge badge-primary badge-sm">
-                Capa
+                {{ $t('admin.products.detail.cover') }}
               </span>
             </div>
           </div>
@@ -125,14 +125,14 @@
         <div class="mt-6 pt-4 border-t">
           <NuxtLink :to="`/admin/products/${product.id}/variants`" class="btn btn-outline btn-primary">
             <span class="icon-[tabler--box] size-5"></span>
-            Gerenciar Variações
+            {{ $t('admin.products.detail.manageVariants') }}
           </NuxtLink>
         </div>
 
         <!-- Back Button -->
         <div class="mt-4">
           <NuxtLink to="/admin/products" class="btn btn-outline">
-            ← Voltar para Lista
+            {{ $t('admin.products.detail.backList') }}
           </NuxtLink>
         </div>
       </div>
@@ -149,6 +149,7 @@ definePageMeta({
 
 const route = useRoute()
 const config = useRuntimeConfig()
+const { t } = useI18n()
 
 const { data: product, pending, error } = useLazyFetch<ProductApi>(
   `${config.public.baseURL}/api/products/${route.params.id}`
@@ -163,10 +164,10 @@ const coverImage = computed(() => {
 // Status helpers
 const statusLabel = computed(() => {
   switch (product.value?.status) {
-    case 0: return 'Inativo'
-    case 1: return 'Ativo'
-    case 2: return 'Rascunho'
-    default: return 'Desconhecido'
+    case 0: return t('admin.products.detail.inactive')
+    case 1: return t('admin.products.detail.active')
+    case 2: return t('admin.products.detail.draft')
+    default: return t('admin.products.detail.unknown')
   }
 })
 
@@ -192,14 +193,14 @@ const formatCurrency = (value: number | undefined) => {
 const confirmDelete = async () => {
   if (!product.value) return
   
-  if (confirm(`Tem certeza que deseja excluir "${product.value.name}"?`)) {
+  if (confirm(t('admin.products.confirmDelete', { name: product.value.name }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/products/${product.value.id}`, {
         method: 'DELETE'
       })
       navigateTo('/admin/products')
     } catch (err) {
-      alert('Erro ao excluir produto')
+      alert(t('admin.products.errorDelete'))
       console.error(err)
     }
   }

@@ -1,0 +1,484 @@
+{
+  "section": "Admin",
+  "title": "Operations overview",
+  "description": "Monitor critical modules and track the current administration status.",
+  "statusLabels": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "archived": "Archived",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "paid": "Paid",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "unknown": "Unknown"
+  },
+  "module": "Module",
+  "modules": {
+    "dashboard": {
+      "description": "Consolidated KPIs and operational visibility."
+    }
+  },
+  "navbar": {
+    "search": {
+      "placeholder": "Search...",
+      "ariaLabel": "Search"
+    },
+    "profile": {
+      "ariaLabel": "Profile",
+      "avatarAlt": "User avatar",
+      "myAccount": "My account",
+      "settings": "Settings",
+      "logout": "Logout",
+      "defaultName": "Admin"
+    },
+    "activity": {
+      "title": "Activity"
+    }
+  },
+  "account": {
+    "section": "Account",
+    "title": "My account",
+    "description": "Basic data for the authenticated admin user.",
+    "profileTitle": "Profile",
+    "permissionsTitle": "Permissions",
+    "fields": {
+      "id": "ID",
+      "email": "E-mail",
+      "profile": "Profile"
+    },
+    "emptyRoles": "No assigned role.",
+    "goSettings": "Go to settings"
+  },
+  "sidebar": {
+    "closeSidebar": "Close sidebar",
+    "close": "Close",
+    "avatarAlt": "User avatar",
+    "admin": "Admin",
+    "apiDocs": "API Documentation",
+    "reports": "Reports",
+    "alerts": "Alerts",
+    "telemetry": "Telemetry",
+    "dashboard": "Dashboard",
+    "default": "Default",
+    "core": "Core",
+    "coreResources": "Core Resources",
+    "operations": "Operations",
+    "fieldOperations": "Field Operations",
+    "monitoring": "Monitoring",
+    "monitoringAndReports": "Monitoring & Reports",
+    "quickLinks": "Quick Links",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "workspace": "Workspace",
+    "alertsHub": "Alerts Hub",
+    "reportsHub": "Reports Hub",
+    "openApiDocs": "Open API Documentation"
+  },
+  "dashboard": {
+    "title": "Admin Dashboard",
+    "search": {
+      "placeholder": "Type to Search...",
+      "ariaLabel": "Search"
+    },
+    "profile": {
+      "title": "Profile",
+      "myAccount": "My account",
+      "settings": "Settings",
+      "billing": "Billing",
+      "manageTeam": "Manage team",
+      "customisation": "Customisation",
+      "addTeamAccount": "Add team account",
+      "logout": "Logout"
+    },
+    "activity": {
+      "title": "Activity",
+      "time": {
+        "minsAgo": "{n} mins ago",
+        "hourAgo": "1 hour ago",
+        "hoursAgo": "{n} hours ago",
+        "daysAgo": "{n} days ago"
+      }
+    },
+    "sidebar": {
+      "pages": "Pages",
+      "dashboard": "Dashboard",
+      "default": "Default",
+      "analytics": "Analytics",
+      "ecommerce": "eCommerce",
+      "accountSetting": "Account Setting",
+      "account": "Account",
+      "security": "Security",
+      "billingPlans": "Billing & Plans",
+      "notifications": "Notifications",
+      "connections": "Connections",
+      "misc": "Misc",
+      "error": "Error",
+      "underMaintenance": "Under Maintenance",
+      "authentications": "Authentications"
+    },
+    "workspace": {
+      "title": "Workspace",
+      "flyonui": "FlyonUI"
+    },
+    "stats": {
+      "order": "Orders",
+      "orderProgress": "{current} of {total} orders",
+      "revenue": "Revenue",
+      "revenueProgress": "${current} of ${total}",
+      "invoice": "Invoice",
+      "invoiceProgress": "${current} of ${total}",
+      "orderProgressbar": "Order Progress",
+      "revenueProgressbar": "Revenue Progress",
+      "invoiceProgressbar": "Invoice Progress",
+      "websiteTraffic": "Website Traffic",
+      "trafficChange": "{percent}% ↗ than last week",
+      "newSignups": "New Signups",
+      "signupsChange": "{percent}% increase this month",
+      "customerRetention": "Customer Retention",
+      "retentionChange": "Steady over last quarter",
+      "totalPageViews": "Total page views",
+      "pageViewsChange": "{percent}% ↗ than last month",
+      "totalSales": "Total Sales",
+      "activeCustomers": "Active Customers",
+      "period": "From {start} to {end}",
+      "subscription": "Subscription Plan",
+      "subscriptionPlan": "Premium",
+      "upgradePlan": "Upgrade Plan",
+      "nextBilling": "Next Billing Date",
+      "nextBillingDate": "Oct 15, 2024",
+      "viewDetails": "View Details",
+      "changePayment": "Change Payment Method"
+    }
+  },
+  "products": {
+    "title": "Products",
+    "searchPlaceholder": "Search products...",
+    "add": "Add",
+    "table": {
+      "name": "Name",
+      "price": "Price",
+      "description": "Description",
+      "status": "Status",
+      "category": "Category",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "confirmDelete": "Are you sure you want to delete \"{name}\"?",
+    "errorDelete": "Error deleting product",
+    "detail": {
+      "title": "Product Details",
+      "loading": "Loading product...",
+      "error": "Error loading product: {message}",
+      "back": "Back",
+      "backList": "← Back to List",
+      "active": "Active",
+      "inactive": "Inactive",
+      "draft": "Draft",
+      "featured": "Featured",
+      "unknown": "Unknown",
+      "prices": "Prices",
+      "information": "Information",
+      "shortDescription": "Short Description",
+      "fullDescription": "Full Description",
+      "images": "Images Gallery",
+      "cover": "Cover",
+      "manageVariants": "Manage Variants"
+    },
+    "new": {
+      "title": "Add New Product"
+    },
+    "editTitle": "Edit Product",
+    "loading": "Loading product...",
+    "error": "Error loading product: {message}"
+  },
+  "categories": {
+    "title": "Categories",
+    "searchPlaceholder": "Search categories",
+    "add": "Add",
+    "loading": "Loading categories...",
+    "error": "Error loading categories: {message}",
+    "notFound": "No categories found.",
+    "createFirst": "Create first category",
+    "table": {
+      "name": "Name",
+      "slug": "Slug",
+      "description": "Description",
+      "status": "Status",
+      "position": "Position",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "detail": {
+      "title": "Category Details",
+      "loading": "Loading category details...",
+      "error": "Error loading category: {message}",
+      "tryAgain": "Try again",
+      "notFound": "Category not found.",
+      "back": "Back to list",
+      "mainInfo": "Main Information",
+      "name": "Name",
+      "slug": "Slug",
+      "description": "Description",
+      "noDescription": "No description",
+      "settings": "Settings",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "position": "Position",
+      "createdAt": "Created at:",
+      "updatedAt": "Updated at:",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete category \"{name}\"?",
+      "errorDelete": "Error deleting category"
+    }
+  },
+  "coupons": {
+    "title": "Coupons",
+    "searchPlaceholder": "Search coupons",
+    "add": "Add",
+    "loading": "Loading coupons...",
+    "error": "Error loading coupons: {message}",
+    "notFound": "No coupons found.",
+    "createFirst": "Create first coupon",
+    "table": {
+      "code": "Code",
+      "type": "Type",
+      "value": "Value",
+      "usage": "Used/Limit",
+      "expiration": "Expiration",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "types": {
+      "percentage": "Percentage",
+      "fixed": "Fixed Amount",
+      "freeShipping": "Free Shipping",
+      "unknown": "Unknown"
+    },
+    "detail": {
+      "title": "Coupon Details",
+      "info": "Coupon Information",
+      "usage": "Coupon Usage",
+      "active": "Active",
+      "inactive": "Inactive",
+      "expiresAt": "Expiration",
+      "neverExpires": "Never expires",
+      "minAmount": "Minimum Amount",
+      "maxDiscount": "Maximum Discount",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete coupon \"{name}\"?",
+      "errorDelete": "Error deleting coupon"
+    }
+  },
+  "orders": {
+    "title": "Orders",
+    "table": {
+      "number": "Number",
+      "date": "Date",
+      "status": "Status",
+      "payment": "Payment",
+      "total": "Total",
+      "items": "Items"
+    },
+    "detail": {
+      "title": "Order Details",
+      "customer": "Customer",
+      "shippingAddress": "Shipping Address",
+      "paymentMethod": "Payment Method",
+      "orderItems": "Order Items",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "discount": "Discount",
+      "total": "Total",
+      "back": "Back to list"
+    }
+  },
+  "posts": {
+    "title": "Posts",
+    "searchPlaceholder": "Search posts",
+    "add": "Add",
+    "loading": "Loading posts...",
+    "error": "Error loading posts: {message}",
+    "notFound": "No posts found.",
+    "createFirst": "Create first post",
+    "noTitle": "(No title)",
+    "table": {
+      "title": "Title",
+      "status": "Status",
+      "author": "Author ID",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "scheduled": "Scheduled",
+      "published": "Published",
+      "private": "Private",
+      "archived": "Archived",
+      "trashed": "Trashed",
+      "rejected": "Rejected",
+      "unknown": "Unknown"
+    },
+    "detail": {
+      "title": "Post Details",
+      "content": "Content",
+      "noContent": "No content",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete post \"{name}\"?",
+      "errorDelete": "Error deleting post"
+    }
+  },
+  "profiles": {
+    "title": "Profiles",
+    "searchPlaceholder": "Search profiles",
+    "add": "Add",
+    "loading": "Loading profiles...",
+    "error": "Error loading profiles: {message}",
+    "notFound": "No profiles found.",
+    "createFirst": "Create first profile",
+    "table": {
+      "name": "Name",
+      "username": "Username",
+      "phone": "Phone",
+      "user": "User ID",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "detail": {
+      "title": "Profile Details",
+      "personalInfo": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "fullName": "Full Name",
+      "username": "Username",
+      "phone": "Phone",
+      "bio": "Bio",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete profile for \"{name}\"?",
+      "errorDelete": "Error deleting profile"
+    }
+  },
+  "reviews": {
+    "title": "Reviews",
+    "searchPlaceholder": "Search reviews",
+    "add": "Add",
+    "loading": "Loading reviews...",
+    "error": "Error loading reviews: {message}",
+    "notFound": "No reviews found.",
+    "createFirst": "Create first review",
+    "table": {
+      "product": "Product ID",
+      "user": "User ID",
+      "rating": "Rating",
+      "title": "Title",
+      "verified": "Verified",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "verified": "Yes",
+      "notVerified": "No"
+    },
+    "detail": {
+      "title": "Review Details",
+      "comment": "Comment",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete review #{id}?",
+      "errorDelete": "Error deleting review"
+    }
+  },
+  "shipments": {
+    "title": "Shipments",
+    "searchPlaceholder": "Search shipments",
+    "add": "Create Shipment",
+    "loading": "Loading shipments...",
+    "error": "Error loading shipments: {message}",
+    "notFound": "No shipments found.",
+    "table": {
+      "order": "Order",
+      "tracking": "Tracking",
+      "carrier": "Carrier",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "detail": {
+      "title": "Shipment Details",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete shipment #{id}?",
+      "errorDelete": "Error deleting shipment"
+    }
+  },
+  "shippings": {
+    "title": "Shipping Methods",
+    "searchPlaceholder": "Search shipping methods",
+    "add": "Add",
+    "loading": "Loading shipping methods...",
+    "error": "Error loading shipping methods: {message}",
+    "notFound": "No shipping methods found.",
+    "createFirst": "Create first method",
+    "table": {
+      "name": "Name",
+      "code": "Code",
+      "basePrice": "Base Price",
+      "freeThreshold": "Free Shipping",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions"
+    },
+    "status": {
+      "above": "Above {threshold}",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "detail": {
+      "title": "Shipping Method Details",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete shipping method \"{name}\"?",
+      "errorDelete": "Error deleting shipping method"
+    }
+  },
+  "addresses": {
+    "title": "Addresses",
+    "searchPlaceholder": "Search addresses",
+    "add": "Add",
+    "loading": "Loading addresses...",
+    "error": "Error loading addresses: {message}",
+    "notFound": "No addresses found.",
+    "createFirst": "Create first address",
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "address": "Address",
+      "cityState": "City/State",
+      "default": "Default",
+      "user": "User ID",
+      "actions": "Actions"
+    },
+    "types": {
+      "home": "Home",
+      "work": "Work",
+      "other": "Other"
+    },
+    "status": {
+      "default": "Default"
+    },
+    "detail": {
+      "title": "Address Details",
+      "back": "Back to list",
+      "confirmDelete": "Are you sure you want to delete address for \"{name}\"?",
+      "errorDelete": "Error deleting address"
+    }
+  }
+}

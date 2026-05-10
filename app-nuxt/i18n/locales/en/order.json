@@ -1,0 +1,30 @@
+{
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "paymentStatus": {
+    "unpaid": "Unpaid",
+    "paid": "Paid",
+    "refunded": "Refunded",
+    "partiallyRefunded": "Partially Refunded"
+  },
+  "fulfillmentStatus": {
+    "unfulfilled": "Unfulfilled",
+    "fulfilled": "Fulfilled",
+    "partial": "Partial"
+  },
+  "number": "Order {number}",
+  "date": "Date",
+  "total": "Total",
+  "items": "{count} items",
+  "details": "View Details",
+  "adminTitle": "Orders",
+  "adminSearch": "Search orders...",
+  "updateStatus": "Update Status",
+  "selectStatus": "Select new status"
+}

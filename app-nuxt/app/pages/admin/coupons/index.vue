@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-6">
-      <h1 class="h1">Cupons</h1>
+      <h1 class="h1">{{ $t('admin.coupons.title') }}</h1>
     </div>
 
     <div class="mb-6 justify-between flex items-center">
@@ -10,20 +10,20 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Buscar cupons"
+            :placeholder="$t('admin.coupons.searchPlaceholder')"
             class="input input-bordered w-full mb-4"
           />
-          <button type="submit" class="btn btn-primary">Buscar</button>
+          <button type="submit" class="btn btn-primary">{{ $t('common.search') }}</button>
         </div>
       </form>
 
-      <NuxtLink to="/admin/coupons/new" class="btn btn-success">Adicionar</NuxtLink>
+      <NuxtLink to="/admin/coupons/new" class="btn btn-success">{{ $t('admin.coupons.add') }}</NuxtLink>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">Carregando cupons...</span>
+      <span class="ml-3">{{ $t('admin.coupons.loading') }}</span>
     </div>
 
     <!-- Error State -->
@@ -31,13 +31,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span>Erro ao carregar cupons: {{ error.message }}</span>
+      <span>{{ $t('admin.coupons.error', { message: error.message }) }}</span>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="filteredCoupons.length === 0" class="text-center py-12">
-      <p class="text-gray-500 text-lg">Nenhum cupom encontrado.</p>
-      <NuxtLink to="/admin/coupons/new" class="btn btn-primary mt-4">Criar primeiro cupom</NuxtLink>
+      <p class="text-gray-500 text-lg">{{ $t('admin.coupons.notFound') }}</p>
+      <NuxtLink to="/admin/coupons/new" class="btn btn-primary mt-4">{{ $t('admin.coupons.createFirst') }}</NuxtLink>
     </div>
 
     <!-- Coupons Table -->
@@ -45,13 +45,13 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Código</th>
-            <th>Tipo</th>
-            <th>Valor</th>
-            <th>Usado/Limite</th>
-            <th>Expiração</th>
-            <th>Status</th>
-            <th>Ações</th>
+            <th>{{ $t('admin.coupons.table.code') }}</th>
+            <th>{{ $t('admin.coupons.table.type') }}</th>
+            <th>{{ $t('admin.coupons.table.value') }}</th>
+            <th>{{ $t('admin.coupons.table.usage') }}</th>
+            <th>{{ $t('admin.coupons.table.expiration') }}</th>
+            <th>{{ $t('admin.coupons.table.status') }}</th>
+            <th>{{ $t('admin.coupons.table.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -78,28 +78,28 @@
             </td>
             <td>
               <span :class="['badge badge-soft text-xs', coupon.active ? 'badge-success' : 'badge-error']">
-                {{ coupon.active ? 'Ativo' : 'Inativo' }}
+                {{ coupon.active ? $t('admin.coupons.detail.active') : $t('admin.coupons.detail.inactive') }}
               </span>
             </td>
             <td>
               <NuxtLink
                 :to="`/admin/coupons/${coupon.id}`"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Ver detalhes"
+                :aria-label="$t('common.view')"
               >
                 <i class="icon-[tabler--eye] size-5"></i>
               </NuxtLink>
               <NuxtLink
                 :to="`/admin/coupons/${coupon.id}/edit`"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Editar"
+                :aria-label="$t('common.edit')"
               >
                 <i class="icon-[tabler--pencil] size-5"></i>
               </NuxtLink>
               <button
                 type="button"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Excluir"
+                :aria-label="$t('common.delete')"
                 @click="confirmDelete(coupon)"
               >
                 <span class="icon-[tabler--trash] size-5"></span>
@@ -120,6 +120,7 @@ definePageMeta({
 })
 
 const config = useRuntimeConfig()
+const { t } = useI18n()
 
 const searchQuery = ref('')
 
@@ -141,10 +142,10 @@ const filteredCoupons = computed(() => {
 // Discount type label
 const discountTypeLabel = (type?: number) => {
   switch (type) {
-    case 1: return 'Porcentagem'
-    case 2: return 'Valor Fixo'
-    case 3: return 'Frete Grátis'
-    default: return 'Desconhecido'
+    case 1: return t('admin.coupons.types.percentage')
+    case 2: return t('admin.coupons.types.fixed')
+    case 3: return t('admin.coupons.types.freeShipping')
+    default: return t('admin.coupons.types.unknown')
   }
 }
 
@@ -187,14 +188,14 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (coupon: Coupon) => {
-  if (confirm(`Tem certeza que deseja excluir o cupom "${coupon.code}"?`)) {
+  if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.code }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/coupons/${coupon.id}`, {
         method: 'DELETE'
       })
       await refresh()
     } catch (err) {
-      alert('Erro ao excluir cupom')
+      alert(t('admin.coupons.detail.errorDelete'))
       console.error(err)
     }
   }

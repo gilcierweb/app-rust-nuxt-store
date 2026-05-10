@@ -1,0 +1,46 @@
+{
+  "badges": {
+    "inStock": "In Stock",
+    "lastUnits": "Last Units",
+    "offer": "Offer",
+    "new": "New",
+    "trending": "Trending",
+    "bestseller": "Bestseller"
+  },
+  "addToCart": "Add to Cart",
+  "loadMore": "Load more products",
+  "found": "{count} products found",
+  "filters": {
+    "title": "Filters:",
+    "allBrands": "All brands",
+    "price": "Price",
+    "lowestPrice": "Lowest price",
+    "highestPrice": "Highest price",
+    "rating": "Rating",
+    "fiveStars": "5 stars",
+    "fourPlusStars": "4+ stars",
+    "threePlusStars": "3+ stars"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "categories": "Categories"
+  },
+  "featuredCategories": "Featured Categories",
+  "specialOffer": {
+    "title": "Special Offer of the Day!",
+    "description": "Up to 50% OFF on selected products + Free Shipping",
+    "cta": "View Offers"
+  },
+  "flashDeal": {
+    "title": "Flash Deal",
+    "description": "Up to 70% OFF on selected products",
+    "cta": "View Offers"
+  },
+  "details": {
+    "rating": "{count} reviews",
+    "avgRating": "{rating}/5 average rating",
+    "fastDelivery": "Fast delivery",
+    "discount": "-{percent}%",
+    "reviews": "({count} reviews)"
+  }
+}

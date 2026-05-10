@@ -1,0 +1,23 @@
+{
+  "title": "Variações",
+  "select": "Selecionar variação",
+  "noVariants": "Nenhuma variação disponível",
+  "sku": "SKU",
+  "price": "Preço",
+  "inStock": "Em estoque",
+  "outOfStock": "Fora de estoque",
+  "name": "Nome",
+  "inventory": "Estoque",
+  "weight": "Peso",
+  "barcode": "Código de barras",
+  "position": "Posição",
+  "active": "Ativo",
+  "add": "Adicionar Variação",
+  "edit": "Editar Variação",
+  "list": "Variações do Produto",
+  "saveSuccess": "Variação salva com sucesso",
+  "deleteConfirm": "Tem certeza que deseja excluir esta variação?",
+  "deleted": "Variação excluída com sucesso",
+  "costPrice": "Preço de custo",
+  "comparePrice": "Preço comparativo"
+}

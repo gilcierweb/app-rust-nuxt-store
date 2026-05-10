@@ -1,0 +1,12 @@
+{
+  "categories": {
+    "technology": "Tecnologia",
+    "marketing": "Marketing",
+    "sustainability": "Sustentabilidade",
+    "innovation": "Inovação",
+    "security": "Segurança",
+    "social": "Social"
+  },
+  "authorBy": "Por {name}",
+  "readMore": "Ler mais →"
+}

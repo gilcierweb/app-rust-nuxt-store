@@ -1,22 +1,22 @@
 <template>
   <div>
     <div class="mb-6 flex items-center justify-between">
-      <h1 class="h1">{{ t('shipping.list') }}</h1>
-      <NuxtLink to="/admin/shipments/new" class="btn btn-success">{{ t('common.actions.add') }}</NuxtLink>
+      <h1 class="h1">{{ $t('admin.shipments.title') }}</h1>
+      <NuxtLink to="/admin/shipments/new" class="btn btn-success">{{ $t('admin.shipments.add') }}</NuxtLink>
     </div>
 
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12" />
-      <span class="ml-3">{{ t('common.loading') }}</span>
+      <span class="ml-3">{{ $t('admin.shipments.loading') }}</span>
     </div>
 
     <div v-else-if="error" class="alert alert-error">
-      <span>{{ t('common.errorLoad', { resource: t('shipping.list') }) }}</span>
+      <span>{{ $t('admin.shipments.error', { message: error.message }) }}</span>
     </div>
 
     <div v-else-if="shipments.length === 0" class="text-center py-12">
-      <p class="text-base-content/60 text-lg">{{ t('shipping.noShipments') }}</p>
-      <NuxtLink to="/admin/shipments/new" class="btn btn-primary mt-4">{{ t('shipping.createShipment') }}</NuxtLink>
+      <p class="text-base-content/60 text-lg">{{ $t('admin.shipments.notFound') }}</p>
+      <NuxtLink to="/admin/shipments/new" class="btn btn-primary mt-4">{{ $t('admin.shipments.add') }}</NuxtLink>
     </div>
 
     <div v-else class="w-full overflow-x-auto">
@@ -24,12 +24,12 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>{{ t('shipping.order') }}</th>
-            <th>{{ t('shipping.trackingNumber') }}</th>
-            <th>{{ t('shipping.carrier') }}</th>
-            <th>{{ t('pages.orders.status') }}</th>
-            <th>{{ t('common.table.date') }}</th>
-            <th>{{ t('common.table.actions') }}</th>
+            <th>{{ $t('admin.shipments.table.order') }}</th>
+            <th>{{ $t('admin.shipments.table.tracking') }}</th>
+            <th>{{ $t('admin.shipments.table.carrier') }}</th>
+            <th>{{ $t('admin.shipments.table.status') }}</th>
+            <th>{{ $t('admin.shipments.table.date') }}</th>
+            <th>{{ $t('admin.shipments.table.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -49,13 +49,13 @@
             </td>
             <td>{{ formatDate(shipment.created_at) }}</td>
             <td>
-              <NuxtLink :to="`/admin/shipments/${shipment.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="t('common.actions.show')">
+              <NuxtLink :to="`/admin/shipments/${shipment.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                 <i class="icon-[tabler--eye] size-5" />
               </NuxtLink>
-              <NuxtLink :to="`/admin/shipments/${shipment.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="t('common.actions.edit')">
+              <NuxtLink :to="`/admin/shipments/${shipment.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.edit')">
                 <i class="icon-[tabler--pencil] size-5" />
               </NuxtLink>
-              <button type="button" class="btn btn-circle btn-text btn-sm" :aria-label="t('common.actions.delete')" @click="confirmDelete(shipment)">
+              <button type="button" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.delete')" @click="confirmDelete(shipment)">
                 <span class="icon-[tabler--trash] size-5" />
               </button>
             </td>
@@ -85,7 +85,7 @@ const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
 
 function statusLabel(status: unknown): string {
   if (status == null) return '-'
-  return shipmentStatusMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+  return shipmentStatusMap[status as number]?.label ?? t('common.status.unknown')
 }
 
 function statusBadgeClass(status: unknown): string {
@@ -99,12 +99,12 @@ const formatDate = (dateString: string) => {
 }
 
 const confirmDelete = async (shipment: Shipment) => {
-  if (confirm(`Delete shipment #${shipment.id}?`)) {
+  if (confirm(t('admin.shipments.detail.confirmDelete', { id: shipment.id }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/shipments/${shipment.id}`, { method: 'DELETE' })
       await refresh()
     } catch {
-      alert(t('common.error'))
+      alert(t('admin.shipments.detail.errorDelete'))
     }
   }
 }

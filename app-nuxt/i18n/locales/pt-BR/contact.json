@@ -1,0 +1,10 @@
+{
+  "title": "Contato",
+  "form": {
+    "name": "Nome",
+    "email": "E-mail",
+    "subject": "Assunto",
+    "message": "Mensagem",
+    "submit": "Enviar Mensagem"
+  }
+}

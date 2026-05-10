@@ -1,0 +1,30 @@
+{
+  "status": {
+    "pending": "Pendente",
+    "confirmed": "Confirmado",
+    "processing": "Processando",
+    "shipped": "Enviado",
+    "delivered": "Entregue",
+    "cancelled": "Cancelado"
+  },
+  "paymentStatus": {
+    "unpaid": "Não Pago",
+    "paid": "Pago",
+    "refunded": "Reembolsado",
+    "partiallyRefunded": "Parcialmente Reembolsado"
+  },
+  "fulfillmentStatus": {
+    "unfulfilled": "Não Atendido",
+    "fulfilled": "Atendido",
+    "partial": "Parcial"
+  },
+  "number": "Pedido {number}",
+  "date": "Data",
+  "total": "Total",
+  "items": "{count} itens",
+  "details": "Ver Detalhes",
+  "adminTitle": "Pedidos",
+  "adminSearch": "Buscar pedidos...",
+  "updateStatus": "Atualizar Status",
+  "selectStatus": "Selecionar novo status"
+}

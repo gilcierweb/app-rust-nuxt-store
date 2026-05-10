@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-6">
-      <h1 class="h1">Avaliações</h1>
+      <h1 class="h1">{{ $t('admin.reviews.title') }}</h1>
     </div>
 
     <div class="mb-6 justify-between flex items-center">
@@ -10,20 +10,20 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Buscar avaliações"
+            :placeholder="$t('admin.reviews.searchPlaceholder')"
             class="input input-bordered w-full mb-4"
           />
-          <button type="submit" class="btn btn-primary">Buscar</button>
+          <button type="submit" class="btn btn-primary">{{ $t('common.search') }}</button>
         </div>
       </form>
 
-      <NuxtLink to="/admin/reviews/new" class="btn btn-success">Adicionar</NuxtLink>
+      <NuxtLink to="/admin/reviews/new" class="btn btn-success">{{ $t('admin.reviews.add') }}</NuxtLink>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">Carregando avaliações...</span>
+      <span class="ml-3">{{ $t('admin.reviews.loading') }}</span>
     </div>
 
     <!-- Error State -->
@@ -31,13 +31,13 @@
       <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <span>Erro ao carregar avaliações: {{ error.message }}</span>
+      <span>{{ $t('admin.reviews.error', { message: error.message }) }}</span>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="filteredReviews.length === 0" class="text-center py-12">
-      <p class="text-gray-500 text-lg">Nenhuma avaliação encontrada.</p>
-      <NuxtLink to="/admin/reviews/new" class="btn btn-primary mt-4">Criar primeira avaliação</NuxtLink>
+      <p class="text-gray-500 text-lg">{{ $t('admin.reviews.notFound') }}</p>
+      <NuxtLink to="/admin/reviews/new" class="btn btn-primary mt-4">{{ $t('admin.reviews.createFirst') }}</NuxtLink>
     </div>
 
     <!-- Reviews Table -->
@@ -45,14 +45,14 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Produto ID</th>
-            <th>Usuário ID</th>
-            <th>Avaliação</th>
-            <th>Título</th>
-            <th>Verificada</th>
-            <th>Status</th>
-            <th>Data</th>
-            <th>Ações</th>
+            <th>{{ $t('admin.reviews.table.product') }}</th>
+            <th>{{ $t('admin.reviews.table.user') }}</th>
+            <th>{{ $t('admin.reviews.table.rating') }}</th>
+            <th>{{ $t('admin.reviews.table.title') }}</th>
+            <th>{{ $t('admin.reviews.table.verified') }}</th>
+            <th>{{ $t('admin.reviews.table.status') }}</th>
+            <th>{{ $t('admin.reviews.table.date') }}</th>
+            <th>{{ $t('admin.reviews.table.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -69,13 +69,13 @@
             <td>
               <span v-if="review.verified_purchase" class="badge badge-success badge-sm">
                 <i class="icon-[tabler--check] size-3 mr-1"></i>
-                Sim
+                {{ $t('admin.reviews.status.verified') }}
               </span>
-              <span v-else class="badge badge-ghost badge-sm">Não</span>
+              <span v-else class="badge badge-ghost badge-sm">{{ $t('admin.reviews.status.notVerified') }}</span>
             </td>
             <td>
               <span :class="['badge badge-soft text-xs', review.active ? 'badge-success' : 'badge-error']">
-                {{ review.active ? 'Ativa' : 'Inativa' }}
+                {{ review.active ? $t('admin.reviews.status.active') : $t('admin.reviews.status.inactive') }}
               </span>
             </td>
             <td>{{ formatDate(review.created_at) }}</td>
@@ -83,21 +83,21 @@
               <NuxtLink
                 :to="`/admin/reviews/${review.id}`"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Ver detalhes"
+                :aria-label="$t('common.view')"
               >
                 <i class="icon-[tabler--eye] size-5"></i>
               </NuxtLink>
               <NuxtLink
                 :to="`/admin/reviews/${review.id}/edit`"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Editar"
+                :aria-label="$t('common.edit')"
               >
                 <i class="icon-[tabler--pencil] size-5"></i>
               </NuxtLink>
               <button
                 type="button"
                 class="btn btn-circle btn-text btn-sm"
-                aria-label="Excluir"
+                :aria-label="$t('common.delete')"
                 @click="confirmDelete(review)"
               >
                 <span class="icon-[tabler--trash] size-5"></span>
@@ -118,6 +118,7 @@ definePageMeta({
 })
 
 const config = useRuntimeConfig()
+const { t } = useI18n()
 
 const searchQuery = ref('')
 
@@ -154,14 +155,14 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (review: Review) => {
-  if (confirm(`Tem certeza que deseja excluir a avaliação #${review.id}?`)) {
+  if (confirm(t('admin.reviews.detail.confirmDelete', { id: review.id }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/reviews/${review.id}`, {
         method: 'DELETE'
       })
       await refresh()
     } catch (err) {
-      alert('Erro ao excluir avaliação')
+      alert(t('admin.reviews.detail.errorDelete'))
       console.error(err)
     }
   }

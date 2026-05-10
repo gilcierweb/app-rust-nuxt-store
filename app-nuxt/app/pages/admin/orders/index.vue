@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="mb-6">
-      <h1 class="h1">{{ t('order.adminTitle') }}</h1>
+      <h1 class="h1">{{ $t('admin.orders.title') }}</h1>
     </div>
 
     <div v-if="pending" class="flex items-center justify-center h-96">
@@ -12,12 +12,12 @@
       <table class="table">
         <thead>
           <tr>
-            <th>{{ t('pages.orders.number') }}</th>
-            <th>{{ t('pages.orders.date') }}</th>
-            <th>{{ t('pages.orders.status') }}</th>
-            <th>{{ t('order.paymentStatus.paid') }}</th>
-            <th class="text-right">{{ t('pages.orders.total') }}</th>
-            <th>{{ t('pages.orders.items') }}</th>
+            <th>{{ $t('admin.orders.table.number') }}</th>
+            <th>{{ $t('admin.orders.table.date') }}</th>
+            <th>{{ $t('admin.orders.table.status') }}</th>
+            <th>{{ $t('admin.orders.table.payment') }}</th>
+            <th class="text-right">{{ $t('admin.orders.table.total') }}</th>
+            <th>{{ $t('admin.orders.table.items') }}</th>
             <th />
           </tr>
         </thead>
@@ -38,7 +38,7 @@
             <td class="text-right font-semibold">{{ formatNumberBR(order.total_amount) }}</td>
             <td>{{ order.items?.length ?? '-' }}</td>
             <td>
-              <NuxtLink :to="`/admin/orders/${order.id}`" class="btn btn-circle btn-text btn-sm">
+              <NuxtLink :to="`/admin/orders/${order.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                 <i class="icon-[tabler--eye] size-5" />
               </NuxtLink>
             </td>
