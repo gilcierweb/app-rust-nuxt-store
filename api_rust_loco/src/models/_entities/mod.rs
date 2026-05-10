@@ -2,9 +2,25 @@
 
 pub mod prelude;
 
+pub mod addresses;
+pub mod cart_items;
+pub mod carts;
 pub mod categories;
+pub mod coupon_usages;
+pub mod coupons;
+pub mod order_items;
+pub mod orders;
+pub mod payment_methods;
+pub mod payments;
 pub mod posts;
 pub mod product_images;
+pub mod product_variant_options;
+pub mod product_variants;
 pub mod products;
 pub mod profiles;
+pub mod reviews;
+pub mod shipments;
+pub mod shipping_methods;
 pub mod users;
+pub mod variant_options;
+pub mod wishlists;

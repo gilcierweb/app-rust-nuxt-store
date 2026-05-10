@@ -28,10 +28,46 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::addresses::Entity")]
+    Addresses,
+    #[sea_orm(has_many = "super::carts::Entity")]
+    Carts,
+    #[sea_orm(has_many = "super::coupon_usages::Entity")]
+    CouponUsages,
+    #[sea_orm(has_many = "super::orders::Entity")]
+    Orders,
     #[sea_orm(has_many = "super::posts::Entity")]
     Posts,
     #[sea_orm(has_many = "super::profiles::Entity")]
     Profiles,
+    #[sea_orm(has_many = "super::reviews::Entity")]
+    Reviews,
+    #[sea_orm(has_many = "super::wishlists::Entity")]
+    Wishlists,
+}
+
+impl Related<super::addresses::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Addresses.def()
+    }
+}
+
+impl Related<super::carts::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Carts.def()
+    }
+}
+
+impl Related<super::coupon_usages::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::CouponUsages.def()
+    }
+}
+
+impl Related<super::orders::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Orders.def()
+    }
 }
 
 impl Related<super::posts::Entity> for Entity {
@@ -43,5 +79,17 @@ impl Related<super::posts::Entity> for Entity {
 impl Related<super::profiles::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Profiles.def()
+    }
+}
+
+impl Related<super::reviews::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Reviews.def()
+    }
+}
+
+impl Related<super::wishlists::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Wishlists.def()
     }
 }

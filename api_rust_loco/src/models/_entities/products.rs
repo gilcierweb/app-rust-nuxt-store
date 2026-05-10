@@ -28,6 +28,8 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(has_many = "super::cart_items::Entity")]
+    CartItems,
     #[sea_orm(
         belongs_to = "super::categories::Entity",
         from = "Column::CategoryId",
@@ -36,8 +38,22 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Categories,
+    #[sea_orm(has_many = "super::order_items::Entity")]
+    OrderItems,
     #[sea_orm(has_many = "super::product_images::Entity")]
     ProductImages,
+    #[sea_orm(has_many = "super::product_variants::Entity")]
+    ProductVariants,
+    #[sea_orm(has_many = "super::reviews::Entity")]
+    Reviews,
+    #[sea_orm(has_many = "super::wishlists::Entity")]
+    Wishlists,
+}
+
+impl Related<super::cart_items::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::CartItems.def()
+    }
 }
 
 impl Related<super::categories::Entity> for Entity {
@@ -46,8 +62,32 @@ impl Related<super::categories::Entity> for Entity {
     }
 }
 
+impl Related<super::order_items::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::OrderItems.def()
+    }
+}
+
 impl Related<super::product_images::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::ProductImages.def()
+    }
+}
+
+impl Related<super::product_variants::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::ProductVariants.def()
+    }
+}
+
+impl Related<super::reviews::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Reviews.def()
+    }
+}
+
+impl Related<super::wishlists::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Wishlists.def()
     }
 }

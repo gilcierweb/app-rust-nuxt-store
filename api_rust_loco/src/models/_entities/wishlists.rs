@@ -4,17 +4,13 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "product_images")]
+#[sea_orm(table_name = "wishlists")]
 pub struct Model {
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key)]
     pub id: i32,
-    pub image: Option<String>,
-    pub alt_text: Option<String>,
-    pub active: Option<bool>,
-    pub cover: Option<bool>,
-    pub position: Option<i32>,
+    pub user_id: i32,
     pub product_id: i32,
 }
 
@@ -28,10 +24,24 @@ pub enum Relation {
         on_delete = "Cascade"
     )]
     Products,
+    #[sea_orm(
+        belongs_to = "super::users::Entity",
+        from = "Column::UserId",
+        to = "super::users::Column::Id",
+        on_update = "Cascade",
+        on_delete = "Cascade"
+    )]
+    Users,
 }
 
 impl Related<super::products::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Products.def()
+    }
+}
+
+impl Related<super::users::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Users.def()
     }
 }
