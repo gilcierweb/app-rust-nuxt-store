@@ -6,10 +6,12 @@
       <p class="text-xl text-base-content/60 max-w-2xl mx-auto">{{ t('pages.categories.description') }}</p>
       
       <div class="max-w-xl mx-auto mt-10">
-        <div class="relative">
-          <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
+        <div class="join w-full">
           <input type="text" :placeholder="t('pages.categories.search.placeholder')" 
-            class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
+            class="input input-lg bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-14" />
+          <button class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
+            <span class="icon-[tabler--search] size-5"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -30,7 +32,10 @@
         </div>
         
         <div class="absolute top-8 right-8">
-          <span class="badge badge-primary badge-soft">{{ cat.productsCount || 0 }} Products</span>
+          <span class="badge badge-primary badge-soft flex items-center gap-1">
+            <span class="icon-[tabler--box] size-3"></span>
+            {{ cat.productsCount || 0 }} Products
+          </span>
         </div>
         
         <div class="absolute bottom-8 right-8 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-500">
@@ -41,8 +46,17 @@
 
     <!-- Empty State -->
     <div v-if="allCategories.length === 0" class="text-center py-20">
-      <span class="icon-[tabler--category-2] size-16 text-base-content/20 mb-4"></span>
-      <h3 class="text-xl font-bold">No categories found</h3>
+      <div class="alert alert-warning max-w-md mx-auto">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--category-2] size-8 text-warning"></span>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg">No categories found</h3>
+            <p class="text-sm opacity-80 mt-1">Try adjusting your search or browse all products</p>
+          </div>
+        </div>
+      </div>
       <NuxtLink to="/products" class="btn btn-primary mt-6">Browse All Products</NuxtLink>
     </div>
   </div>

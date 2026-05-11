@@ -8,11 +8,18 @@
 
     <!-- Empty State -->
     <div v-if="cartStore.isEmpty" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
-      <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mb-6">
-        <span class="icon-[tabler--shopping-cart-off] size-12 opacity-20" />
+      <div class="alert alert-warning max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--shopping-cart-off] size-8 text-warning" />
+          </div>
+          <div>
+            <h2 class="font-bold text-lg">{{ t('cart.empty') }}</h2>
+            <p class="text-sm opacity-80 mt-1">Your cart is empty. Add some products to proceed with checkout.</p>
+          </div>
+        </div>
       </div>
-      <h2 class="h3 mb-2">{{ t('cart.empty') }}</h2>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
         {{ t('cart.continueShopping') }}
       </NuxtLink>
     </div>
@@ -28,38 +35,42 @@
             <h2 class="h4">{{ t('pages.checkout.step1') }}</h2>
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="join join-vertical w-full">
             <div class="form-control">
               <label class="form-label">{{ t('shipping.firstName') }}</label>
-              <input v-model="address.firstName" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.firstName')" />
+              <input v-model="address.firstName" type="text" class="input input-lg bg-base-200/50 border-none rounded-t-2xl h-14 join-item" :placeholder="t('shipping.firstName')" />
             </div>
             <div class="form-control">
               <label class="form-label">{{ t('shipping.lastName') }}</label>
-              <input v-model="address.lastName" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.lastName')" />
+              <input v-model="address.lastName" type="text" class="input input-lg bg-base-200/50 border-none h-14 join-item" :placeholder="t('shipping.lastName')" />
             </div>
-            <div class="form-control md:col-span-2">
+            <div class="form-control">
               <label class="form-label">{{ t('shipping.address1') }}</label>
-              <input v-model="address.address1" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.address1')" />
+              <input v-model="address.address1" type="text" class="input input-lg bg-base-200/50 border-none h-14 join-item" :placeholder="t('shipping.address1')" />
             </div>
-            <div class="form-control md:col-span-2">
+            <div class="form-control">
               <label class="form-label">{{ t('shipping.address2') }} ({{ t('common.optional') || 'Opcional' }})</label>
-              <input v-model="address.address2" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.address2')" />
+              <input v-model="address.address2" type="text" class="input input-lg bg-base-200/50 border-none h-14 join-item" :placeholder="t('shipping.address2')" />
             </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.city') }}</label>
-              <input v-model="address.city" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.city')" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-control">
+                <label class="form-label">{{ t('shipping.city') }}</label>
+                <input v-model="address.city" type="text" class="input input-lg bg-base-200/50 border-none rounded-bl-2xl h-14 join-item" :placeholder="t('shipping.city')" />
+              </div>
+              <div class="form-control">
+                <label class="form-label">{{ t('shipping.state') }}</label>
+                <input v-model="address.state" type="text" class="input input-lg bg-base-200/50 border-none rounded-br-2xl h-14 join-item" :placeholder="t('shipping.state')" />
+              </div>
             </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.state') }}</label>
-              <input v-model="address.state" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.state')" />
-            </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.zipCode') }}</label>
-              <input v-model="address.zipCode" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.zipCode')" />
-            </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.phone') }}</label>
-              <input v-model="address.phone" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="+55 00 00000-0000" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="form-control">
+                <label class="form-label">{{ t('shipping.zipCode') }}</label>
+                <input v-model="address.zipCode" type="text" class="input input-lg bg-base-200/50 border-none rounded-bl-2xl h-14 join-item" :placeholder="t('shipping.zipCode')" />
+              </div>
+              <div class="form-control">
+                <label class="form-label">{{ t('shipping.phone') }}</label>
+                <input v-model="address.phone" type="text" class="input input-lg bg-base-200/50 border-none rounded-br-2xl h-14 join-item" placeholder="+55 00 00000-0000" />
+              </div>
             </div>
           </div>
         </div>
@@ -71,8 +82,9 @@
             <h2 class="h4">{{ t('pages.checkout.step2') }}</h2>
           </div>
           
-          <div v-if="shippingMethods.length === 0" class="flex items-center justify-center py-10 opacity-40">
-            <span class="loading loading-spinner loading-md"></span>
+          <div v-if="shippingMethods.length === 0" class="flex items-center justify-center py-10">
+            <div class="loading loading-spinner loading-md"></div>
+            <span class="ml-3 text-base-content/60">Loading shipping methods...</span>
           </div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label v-for="method in shippingMethods" :key="method.id"
@@ -98,8 +110,9 @@
             <h2 class="h4">{{ t('pages.checkout.step3') }}</h2>
           </div>
           
-          <div v-if="paymentMethods.length === 0" class="flex items-center justify-center py-10 opacity-40">
-            <span class="loading loading-spinner loading-md"></span>
+          <div v-if="paymentMethods.length === 0" class="flex items-center justify-center py-10">
+            <div class="loading loading-spinner loading-md"></div>
+            <span class="ml-3 text-base-content/60">Loading payment methods...</span>
           </div>
           <div v-else class="space-y-4">
             <label v-for="method in paymentMethods" :key="method.id"
@@ -138,16 +151,22 @@
 
           <!-- Coupon -->
           <div class="mb-8">
-            <div class="relative group">
+            <div class="alert alert-info mb-4">
+              <div class="flex items-center gap-2">
+                <span class="icon-[tabler--discount-2] size-5"></span>
+                <span class="text-sm">Have a promo code? Apply it here for discounts!</span>
+              </div>
+            </div>
+            <div class="join w-full">
               <input v-model="couponCode" type="text" :placeholder="t('pages.checkout.promoCode')" 
-                class="input bg-base-200/50 border-none rounded-2xl h-14 w-full pr-24 uppercase font-bold tracking-widest placeholder:normal-case placeholder:font-normal placeholder:tracking-normal"
+                class="input bg-base-200/50 border-none rounded-l-2xl h-14 grow join-item uppercase font-bold tracking-widest placeholder:normal-case placeholder:font-normal placeholder:tracking-normal"
                 :disabled="couponApplied || couponChecking" @keyup.enter="applyCoupon" />
               <button v-if="!couponApplied" @click="applyCoupon" :disabled="!couponCode.trim() || couponChecking"
-                class="btn btn-primary btn-sm absolute right-2 top-2 h-10 px-4 rounded-xl">
+                class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
                 <span v-if="couponChecking" class="loading loading-spinner loading-xs"></span>
                 <span v-else>{{ t('pages.checkout.apply') }}</span>
               </button>
-              <button v-else @click="removeCoupon" class="btn btn-ghost btn-circle btn-sm absolute right-2 top-2 h-10 w-10 text-error">
+              <button v-else @click="removeCoupon" class="btn btn-error join-item rounded-r-2xl h-14 px-6">
                 <span class="icon-[tabler--x] size-5"></span>
               </button>
             </div>
@@ -163,17 +182,23 @@
               <span>{{ t('cart.subtotal') }}</span>
               <span>{{ formatNumberBR(cartStore.totalPrice) }}</span>
             </div>
-            <div v-if="selectedShippingCost" class="flex justify-between text-base-content/60">
+            <div v-if="selectedShippingCost" class="flex justify-between items-center gap-2">
               <span>{{ t('shipping.title') }}</span>
-              <span>{{ formatNumberBR(selectedShippingCost) }}</span>
+              <span class="badge badge-info badge-sm">{{ formatNumberBR(selectedShippingCost) }}</span>
             </div>
-            <div v-if="couponDiscount" class="flex justify-between text-success font-medium">
+            <div v-if="couponDiscount" class="flex justify-between items-center gap-2">
               <span>{{ t('pages.checkout.discount') }}</span>
-              <span>-{{ formatNumberBR(couponDiscount) }}</span>
+              <span class="badge badge-success badge-sm">-{{ formatNumberBR(couponDiscount) }}</span>
             </div>
           </div>
           
           <div class="pt-6 border-t border-base-200 mb-8">
+            <div class="alert alert-success mb-4">
+              <div class="flex items-center gap-2">
+                <span class="icon-[tabler--shield-check] size-5"></span>
+                <span class="text-sm">Secure checkout with encrypted payment</span>
+              </div>
+            </div>
             <div class="flex justify-between items-end">
               <span class="font-bold text-lg text-base-content/60">{{ t('cart.total') }}</span>
               <div class="text-right">
@@ -184,7 +209,7 @@
           </div>
           
           <div class="space-y-4">
-            <button class="btn btn-primary btn-lg w-full h-16 rounded-2xl shadow-xl shadow-primary/20 text-lg transition-transform hover:scale-[1.02]"
+            <button class="btn btn-primary btn-lg w-full h-16 rounded-2xl shadow-xl shadow-primary/20 text-lg transition-all hover:scale-[1.02] hover:shadow-primary/30"
               :disabled="submitting || !selectedPaymentMethod" @click="placeOrder">
               <span v-if="submitting" class="loading loading-spinner mr-2" />
               <span v-else class="icon-[tabler--lock] size-5 mr-2"></span>

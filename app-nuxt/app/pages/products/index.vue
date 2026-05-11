@@ -8,12 +8,18 @@
       
       <div class="flex items-center gap-3 w-full md:w-auto">
         <div class="relative grow md:w-80">
-          <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
+          <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40 z-10"></span>
           <input type="text" :placeholder="t('pages.products.search.placeholder')" 
-            class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
+            class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 pr-14 w-full h-14" />
+          <div class="absolute right-2 top-1/2 -translate-y-1/2">
+            <button class="btn btn-ghost btn-square btn-sm rounded-lg">
+              <span class="icon-[tabler--adjustments-horizontal] size-5"></span>
+            </button>
+          </div>
         </div>
         <button class="btn btn-square btn-lg bg-base-200/50 border-none rounded-2xl h-14 w-14 lg:hidden" 
-          aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-drawer" data-overlay="#filter-drawer">
+          onclick="document.getElementById('filter-drawer').classList.toggle('overlay-open')"
+          aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-drawer">
           <span class="icon-[tabler--filter] size-6"></span>
         </button>
       </div>
@@ -32,9 +38,10 @@
           <div class="space-y-4">
             <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.categories') }}</h4>
             <div class="space-y-2">
-              <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 cursor-pointer group">
+              <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 cursor-pointer group hover:bg-base-300/30 p-2 rounded-lg transition-colors">
                 <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-lg" />
                 <span class="text-sm group-hover:text-primary transition-colors">{{ cat }}</span>
+                <span class="badge badge-ghost badge-sm ml-auto">12</span>
               </label>
             </div>
           </div>
@@ -45,7 +52,11 @@
           <div class="space-y-4">
             <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.priceRange') }}</h4>
             <div class="space-y-4">
-              <input type="range" min="0" max="1000" class="range range-primary range-sm" />
+              <div class="join">
+                <input type="range" min="0" max="1000" class="range range-primary range-sm join-item" />
+                <input type="number" placeholder="Min" class="input input-sm input-bordered join-item w-20" />
+                <input type="number" placeholder="Max" class="input input-sm input-bordered join-item w-20" />
+              </div>
               <div class="flex items-center justify-between text-xs font-medium">
                 <span>R$ 0</span>
                 <span>R$ 1.000+</span>
@@ -59,24 +70,31 @@
           <div class="space-y-4">
             <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.rating') }}</h4>
             <div class="space-y-2">
-              <label v-for="i in [5, 4, 3, 2, 1]" :key="i" class="flex items-center gap-3 cursor-pointer group">
+              <label v-for="i in [5, 4, 3, 2, 1]" :key="i" class="flex items-center gap-3 cursor-pointer group hover:bg-base-300/30 p-2 rounded-lg transition-colors">
                 <input type="radio" name="rating" class="radio radio-primary radio-sm" />
                 <div class="flex items-center gap-1 text-warning">
                   <span v-for="star in 5" :key="star" 
                     :class="[star <= i ? 'icon-[tabler--star-filled]' : 'icon-[tabler--star]', 'size-3.5']"></span>
                 </div>
                 <span class="text-xs font-medium">{{ t('pages.products.filters.andUp') }}</span>
+                <span class="badge badge-ghost badge-xs ml-auto">{{ 6 - i }}k</span>
               </label>
             </div>
           </div>
         </div>
         
         <!-- Promotion Card -->
-        <div class="bg-gradient-to-br from-primary to-secondary p-6 rounded-3xl text-primary-content relative overflow-hidden">
-          <div class="absolute top-0 right-0 -mt-4 -mr-4 size-20 bg-white/20 rounded-full blur-xl"></div>
-          <h4 class="font-bold text-lg mb-2">{{ t('pages.products.promo.title') }}</h4>
-          <p class="text-xs opacity-80 mb-4">{{ t('pages.products.promo.description') }}</p>
-          <button class="btn btn-white btn-sm w-full rounded-xl">{{ t('pages.products.promo.button') }}</button>
+        <div class="alert alert-success rounded-3xl">
+          <div class="flex items-start gap-4">
+            <div class="size-12 rounded-xl bg-success/20 flex items-center justify-center shrink-0">
+              <span class="icon-[tabler--tag] size-6 text-success"></span>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg mb-1">{{ t('pages.products.promo.title') }}</h4>
+              <p class="text-sm opacity-80 mb-3">{{ t('pages.products.promo.description') }}</p>
+              <button class="btn btn-success btn-sm w-full rounded-xl">{{ t('pages.products.promo.button') }}</button>
+            </div>
+          </div>
         </div>
       </aside>
 

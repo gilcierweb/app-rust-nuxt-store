@@ -7,9 +7,17 @@
         <p class="text-base-content/60">{{ t('pages.orders.description') }}</p>
       </div>
       <div class="flex items-center gap-3">
-        <button class="btn btn-ghost btn-square rounded-2xl bg-base-200/50">
-          <span class="icon-[tabler--filter] size-5"></span>
-        </button>
+        <div class="dropdown dropdown-end">
+          <button tabindex="0" class="btn btn-ghost btn-square rounded-2xl bg-base-200/50" role="button">
+            <span class="icon-[tabler--filter] size-5"></span>
+          </button>
+          <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-52">
+            <li><a>All Orders</a></li>
+            <li><a>Pending</a></li>
+            <li><a>Completed</a></li>
+            <li><a>Cancelled</a></li>
+          </ul>
+        </div>
         <button class="btn btn-ghost btn-square rounded-2xl bg-base-200/50">
           <span class="icon-[tabler--refresh] size-5"></span>
         </button>
@@ -18,25 +26,33 @@
 
     <!-- Loading State -->
     <div v-if="pending" class="flex flex-col items-center justify-center py-32">
-      <div class="relative">
-        <div class="size-20 rounded-3xl border-4 border-primary/20 animate-pulse"></div>
-        <div class="absolute inset-0 flex items-center justify-center">
-          <span class="loading loading-ring loading-lg text-primary"></span>
+      <div class="alert alert-info max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="loading loading-spinner loading-md"></div>
+          <div>
+            <p class="font-bold">Loading your orders</p>
+            <p class="text-sm opacity-80">Please wait while we fetch your order history...</p>
+          </div>
         </div>
       </div>
-      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">{{ t('pages.orders.syncing') }}</p>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="orders.length === 0" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
-      <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mb-6">
-        <span class="icon-[tabler--package-off] size-12 opacity-20" />
+      <div class="alert alert-warning max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--package-off] size-8 text-warning" />
+          </div>
+          <div>
+            <h2 class="font-bold text-lg">{{ t('pages.orders.empty') }}</h2>
+            <p class="text-sm opacity-80 mt-1">
+              {{ t('pages.orders.description') }}
+            </p>
+          </div>
+        </div>
       </div>
-      <h2 class="h3 mb-2">{{ t('pages.orders.empty') }}</h2>
-      <p class="mb-8 text-base-content/50 max-w-sm text-center">
-        {{ t('pages.orders.description') }}
-      </p>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
         {{ t('cart.continueShopping') }}
       </NuxtLink>
     </div>
@@ -67,8 +83,11 @@
           <div class="lg:w-1/4 flex flex-row lg:flex-col gap-3">
             <div class="flex flex-col gap-1">
               <span class="text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.status') }}</span>
-              <div :class="['badge badge-lg rounded-xl font-bold py-5 px-6', statusBadgeClass(order.status)]">
-                {{ statusLabel(order.status) }}
+              <div :class="['badge badge-lg rounded-xl font-bold py-3 px-4', statusBadgeClass(order.status)]">
+                <span class="flex items-center gap-2">
+                  <span :class="getStatusIcon(order.status)" class="size-4"></span>
+                  {{ statusLabel(order.status) }}
+                </span>
               </div>
             </div>
           </div>
@@ -76,8 +95,11 @@
           <div class="lg:w-1/4 flex flex-row lg:flex-col gap-3">
             <div class="flex flex-col gap-1">
               <span class="text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.payment') }}</span>
-              <div :class="['badge badge-lg rounded-xl font-bold py-5 px-6', paymentBadgeClass(order.payment_status)]">
-                {{ paymentLabel(order.payment_status) }}
+              <div :class="['badge badge-lg rounded-xl font-bold py-3 px-4', paymentBadgeClass(order.payment_status)]">
+                <span class="flex items-center gap-2">
+                  <span :class="getPaymentIcon(order.payment_status)" class="size-4"></span>
+                  {{ paymentLabel(order.payment_status) }}
+                </span>
               </div>
             </div>
           </div>
@@ -88,10 +110,18 @@
               <span class="block text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.amount') }}</span>
               <span class="text-3xl font-black text-primary">{{ formatNumberBR(order.total_amount) }}</span>
             </div>
-            <NuxtLink :to="`/orders/confirmation/${order.id}`" class="btn btn-ghost hover:bg-primary/10 hover:text-primary rounded-xl px-6 group-hover:translate-x-1 transition-all">
-              {{ t('pages.orders.detail') }}
-              <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
-            </NuxtLink>
+            <div class="dropdown dropdown-left dropdown-end">
+              <button tabindex="0" class="btn btn-ghost hover:bg-primary/10 hover:text-primary rounded-xl px-6 group-hover:translate-x-1 transition-all" role="button">
+                {{ t('pages.orders.detail') }}
+                <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
+              </button>
+              <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48">
+                <li><NuxtLink :to="`/orders/confirmation/${order.id}`">View Details</NuxtLink></li>
+                <li><a>Track Order</a></li>
+                <li><a>Download Invoice</a></li>
+                <li><a class="text-error">Cancel Order</a></li>
+              </ul>
+            </div>
           </div>
         </div>
         
@@ -158,6 +188,28 @@ function paymentLabel(status: unknown): string {
 function paymentBadgeClass(status: unknown): string {
   if (status == null) return 'badge-soft'
   return paymentMap[status as number]?.badge ?? 'badge-soft'
+}
+
+function getStatusIcon(status: unknown): string {
+  const iconMap: Record<number, string> = {
+    1: 'icon-[tabler--clock]',
+    2: 'icon-[tabler--check]',
+    3: 'icon-[tabler--loader]',
+    4: 'icon-[tabler--truck]',
+    5: 'icon-[tabler--circle-check]',
+    6: 'icon-[tabler--x]'
+  }
+  return iconMap[status as number] ?? 'icon-[tabler--help-circle]'
+}
+
+function getPaymentIcon(status: unknown): string {
+  const iconMap: Record<number, string> = {
+    1: 'icon-[tabler--alert-circle]',
+    2: 'icon-[tabler--check]',
+    3: 'icon-[tabler--refresh]',
+    4: 'icon-[tabler--alert-triangle]'
+  }
+  return iconMap[status as number] ?? 'icon-[tabler--help-circle]'
 }
 </script>
 

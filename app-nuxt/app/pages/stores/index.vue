@@ -6,10 +6,12 @@
       <p class="text-xl text-base-content/60 max-w-2xl mx-auto">{{ t('pages.stores.description') }}</p>
       
       <div class="max-w-xl mx-auto mt-10">
-        <div class="relative">
-          <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
+        <div class="join w-full">
           <input type="text" :placeholder="t('pages.stores.search')" 
-            class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
+            class="input input-lg bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-14" />
+          <button class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
+            <span class="icon-[tabler--search] size-5"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -26,7 +28,10 @@
              <span class="icon-[tabler--map-pin] size-16"></span>
           </div>
           <div class="absolute top-4 right-4">
-            <span class="badge badge-primary backdrop-blur-md font-bold px-4 py-3 rounded-xl shadow-lg">{{ t('pages.stores.openNow') }}</span>
+            <span class="badge badge-success backdrop-blur-md font-bold px-4 py-2 rounded-xl shadow-lg flex items-center gap-1">
+              <span class="icon-[tabler--circle-check] size-3"></span>
+              {{ t('pages.stores.openNow') }}
+            </span>
           </div>
         </div>
         
@@ -50,21 +55,40 @@
           </div>
           
           <div class="grid grid-cols-2 gap-4">
-            <button class="btn btn-primary rounded-xl shadow-lg shadow-primary/10">
+            <button class="btn btn-primary rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2">
+              <span class="icon-[tabler--navigation] size-4"></span>
               {{ t('pages.stores.directions') }}
             </button>
-            <button class="btn btn-ghost rounded-xl bg-base-200/50">
-              {{ t('pages.stores.details') }}
-            </button>
+            <div class="dropdown dropdown-end">
+              <button tabindex="0" class="btn btn-ghost rounded-xl bg-base-200/50 w-full" role="button">
+                {{ t('pages.stores.details') }}
+                <span class="icon-[tabler--chevron-down] size-4 ml-1"></span>
+              </button>
+              <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48">
+                <li><a>View Details</a></li>
+                <li><a>Get Directions</a></li>
+                <li><a>Call Store</a></li>
+                <li><a>Share Location</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- CTA Section -->
-    <div class="mt-20 p-12 bg-base-200 rounded-[3rem] text-center">
-      <h2 class="h3 mb-4">{{ t('pages.stores.cta.title') }}</h2>
-      <p class="text-base-content/60 mb-8">{{ t('pages.stores.cta.description') }}</p>
+    <div class="mt-20 p-12 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-[3rem] text-center">
+      <div class="alert alert-success max-w-md mx-auto mb-8">
+        <div class="flex items-center gap-4">
+          <div class="size-12 rounded-full bg-success/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--map-pin] size-6 text-success"></span>
+          </div>
+          <div>
+            <h2 class="font-bold">{{ t('pages.stores.cta.title') }}</h2>
+            <p class="text-sm opacity-80 mt-1">{{ t('pages.stores.cta.description') }}</p>
+          </div>
+        </div>
+      </div>
       <NuxtLink to="/products" class="btn btn-primary btn-lg px-12 rounded-2xl">{{ t('pages.stores.cta.button') }}</NuxtLink>
     </div>
   </div>

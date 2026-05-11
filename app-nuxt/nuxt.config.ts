@@ -133,7 +133,6 @@ export default defineNuxtConfig({
         name: "Português Brasil",
       },
     ],
-    lazy: true,
     langDir: "locales",
     defaultLocale: "pt-BR",
     strategy: "prefix_except_default",
@@ -234,7 +233,13 @@ export default defineNuxtConfig({
     // csrf: true,
     headers: {
       contentSecurityPolicy: {
+        'default-src': ["'self'"],
+        'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        'script-src-attr': ["'self'", "'unsafe-inline'"],
         'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com'],
+        'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+        'font-src': ["'self'", "https://cdnjs.cloudflare.com"],
+        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com"],
       }
     }
   },

@@ -7,32 +7,42 @@
         <p class="text-base-content/60">{{ t('pages.wishlist.description') }}</p>
       </div>
       <div class="flex items-center gap-3">
-        <span class="badge badge-primary badge-soft px-4 py-2 font-bold">{{ t('pages.wishlist.savedItems', { count: wishlist.length }) }}</span>
+        <div class="badge badge-primary badge-soft px-4 py-2 font-bold flex items-center gap-2">
+          <span class="icon-[tabler--heart-filled] size-4"></span>
+          {{ t('pages.wishlist.savedItems', { count: wishlist.length }) }}
+        </div>
       </div>
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-32">
-      <div class="relative">
-        <div class="size-20 rounded-full border-4 border-primary/20 animate-ping absolute"></div>
-        <div class="size-20 rounded-full border-4 border-primary/10 animate-pulse"></div>
-        <div class="absolute inset-0 flex items-center justify-center">
-          <span class="icon-[tabler--heart-filled] size-8 text-primary animate-bounce"></span>
+      <div class="alert alert-info max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="loading loading-spinner loading-md"></div>
+          <div>
+            <p class="font-bold">Loading your wishlist</p>
+            <p class="text-sm opacity-80">Please wait while we fetch your saved items...</p>
+          </div>
         </div>
       </div>
-      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">{{ t('pages.wishlist.loading') }}</p>
     </div>
 
     <!-- Empty State -->
     <div v-else-if="wishlist.length === 0" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
-      <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mb-6">
-        <span class="icon-[tabler--heart-off] size-12 opacity-20" />
+      <div class="alert alert-warning max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--heart-off] size-8 text-warning" />
+          </div>
+          <div>
+            <h2 class="font-bold text-lg">{{ t('pages.wishlist.empty') }}</h2>
+            <p class="text-sm opacity-80 mt-1">
+              {{ t('pages.wishlist.description') }}
+            </p>
+          </div>
+        </div>
       </div>
-      <h2 class="h3 mb-2">{{ t('pages.wishlist.empty') }}</h2>
-      <p class="mb-8 text-base-content/50 max-w-sm text-center">
-        {{ t('pages.wishlist.description') }}
-      </p>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
         {{ t('pages.wishlist.continueShopping') }}
       </NuxtLink>
     </div>
@@ -53,7 +63,10 @@
            </button>
            
            <div class="absolute bottom-4 left-4">
-             <span class="badge badge-primary badge-soft backdrop-blur-md">{{ t('pages.wishlist.savedAt', { date: new Date(item.created_at).toLocaleDateString(locale) }) }}</span>
+             <span class="badge badge-primary badge-soft backdrop-blur-md flex items-center gap-1">
+               <span class="icon-[tabler--calendar] size-3"></span>
+               {{ t('pages.wishlist.savedAt', { date: new Date(item.created_at).toLocaleDateString(locale) }) }}
+             </span>
            </div>
         </div>
         
@@ -64,9 +77,16 @@
             <NuxtLink :to="`/products/${item.product_id}`" class="btn btn-primary grow rounded-xl shadow-lg shadow-primary/10">
               {{ t('pages.wishlist.viewProduct') }}
             </NuxtLink>
-            <button class="btn btn-square btn-ghost rounded-xl bg-base-200/50">
-              <span class="icon-[tabler--shopping-cart-plus] size-5"></span>
-            </button>
+            <div class="dropdown dropdown-end">
+              <button tabindex="0" class="btn btn-square btn-ghost rounded-xl bg-base-200/50" role="button">
+                <span class="icon-[tabler--dots-vertical] size-5"></span>
+              </button>
+              <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48">
+                <li><a @click="removeFromWishlist(item)" class="text-error">Remove from wishlist</a></li>
+                <li><a>Add to cart</a></li>
+                <li><a>Share product</a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -8,14 +8,20 @@
 
     <!-- Empty State -->
     <div v-if="cartStore.isEmpty" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
-      <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mb-6">
-        <span class="icon-[tabler--shopping-cart-off] size-12 opacity-20" />
+      <div class="alert alert-info max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-info/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--shopping-cart-off] size-8 text-info" />
+          </div>
+          <div>
+            <h2 class="font-bold text-lg">{{ t('cart.empty') }}</h2>
+            <p class="text-sm opacity-80 mt-1">
+              Looks like you haven't added anything to your cart yet. Explore our products and find something you love!
+            </p>
+          </div>
+        </div>
       </div>
-      <h2 class="h3 mb-2">{{ t('cart.empty') }}</h2>
-      <p class="mb-8 text-base-content/50 max-w-sm text-center">
-        Looks like you haven't added anything to your cart yet. Explore our products and find something you love!
-      </p>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
         {{ t('cart.continueShopping') }}
       </NuxtLink>
     </div>
@@ -71,9 +77,15 @@
                     {{ formatNumberBR(item.price * item.quantity) }}
                   </td>
                   <td class="py-6 text-right">
-                    <button class="btn btn-circle btn-ghost btn-sm text-error/40 hover:text-error hover:bg-error/10 transition-all" @click="cartStore.removeItem(item.productId)">
-                      <span class="icon-[tabler--trash] size-5" />
-                    </button>
+                    <div class="dropdown dropdown-left dropdown-end">
+                      <button tabindex="0" class="btn btn-circle btn-ghost btn-sm text-error/40 hover:text-error hover:bg-error/10 transition-all" role="button">
+                        <span class="icon-[tabler--trash] size-5" />
+                      </button>
+                      <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-52">
+                        <li><a @click="cartStore.removeItem(item.productId)" class="text-error">Remove item</a></li>
+                        <li><a @click="cartStore.updateQuantity(item.productId, 0)" class="text-warning">Remove all</a></li>
+                      </ul>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -82,14 +94,16 @@
         </div>
         
         <div class="flex flex-wrap items-center justify-between gap-4 px-4">
-          <NuxtLink to="/products" class="btn btn-ghost gap-2 rounded-xl">
-            <span class="icon-[tabler--arrow-left] size-4" />
-            {{ t('cart.continueShopping') }}
-          </NuxtLink>
-          <button class="btn btn-ghost text-error/60 gap-2 rounded-xl" @click="cartStore.clearCart()">
-            <span class="icon-[tabler--trash-x] size-4" />
-            {{ t('cart.clearCart') }}
-          </button>
+          <div class="join">
+            <NuxtLink to="/products" class="btn btn-ghost gap-2 rounded-xl join-item">
+              <span class="icon-[tabler--arrow-left] size-4" />
+              {{ t('cart.continueShopping') }}
+            </NuxtLink>
+            <button class="btn btn-ghost text-error/60 gap-2 rounded-xl join-item" @click="cartStore.clearCart()">
+              <span class="icon-[tabler--trash-x] size-4" />
+              {{ t('cart.clearCart') }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -100,21 +114,27 @@
           
           <div class="space-y-4 mb-8">
             <div class="flex justify-between text-base-content/60">
-              <span>Subtotal ({{ cartStore.totalItems }} items)</span>
+              <span>Subtotal</span>
+              <span class="badge badge-ghost">{{ cartStore.totalItems }} items</span>
               <span>{{ formatNumberBR(cartStore.totalPrice) }}</span>
             </div>
-            <div class="flex justify-between text-base-content/60">
+            <div class="flex justify-between items-center gap-2">
               <span>Shipping</span>
-              <span class="text-success font-medium">Free</span>
+              <span class="badge badge-success badge-sm">Free</span>
             </div>
           </div>
           
           <div class="pt-6 border-t border-base-200 mb-8">
+            <div class="alert alert-info mb-4">
+              <div class="flex items-center gap-2">
+                <span class="icon-[tabler--info-circle] size-5"></span>
+                <span class="text-sm">Taxes included in total price</span>
+              </div>
+            </div>
             <div class="flex justify-between items-end">
               <span class="font-bold text-lg text-base-content/60">Total</span>
               <div class="text-right">
                 <span class="block text-3xl font-black text-primary">{{ formatNumberBR(cartStore.totalPrice) }}</span>
-                <span class="text-[10px] text-base-content/40 uppercase tracking-widest">Taxes included</span>
               </div>
             </div>
           </div>

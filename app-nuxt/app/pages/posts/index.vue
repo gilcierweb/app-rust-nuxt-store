@@ -44,9 +44,13 @@
       </div>
       
       <div class="relative w-full md:w-80">
-        <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
-        <input type="text" :placeholder="t('pages.posts.hero.cta')" 
-          class="input bg-base-200/50 border-none rounded-2xl pl-12 w-full h-12" />
+        <div class="join w-full">
+          <input type="text" :placeholder="t('pages.posts.hero.cta')" 
+            class="input bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-12" />
+          <button class="btn btn-primary join-item rounded-r-2xl h-12 px-6">
+            <span class="icon-[tabler--search] size-5"></span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -70,7 +74,10 @@
             <span class="icon-[tabler--article] size-16 text-base-content/10 group-hover:scale-110 transition-transform duration-700"></span>
           </div>
           <div class="absolute top-4 left-4">
-            <span class="badge badge-primary backdrop-blur-md font-bold px-3 py-3 rounded-lg">{{ t('pages.posts.categories.technology') }}</span>
+            <span class="badge badge-primary backdrop-blur-md font-bold px-3 py-2 rounded-lg flex items-center gap-1">
+              <span class="icon-[tabler--tag] size-3"></span>
+              {{ t('pages.posts.categories.technology') }}
+            </span>
           </div>
         </div>
         
@@ -103,15 +110,26 @@
 
     <!-- Empty State -->
     <div v-if="!pending && (!posts || posts.length === 0)" class="text-center py-20">
-      <span class="icon-[tabler--news-off] size-16 text-base-content/20 mb-4"></span>
-      <h3 class="text-xl font-bold">{{ t('pages.posts.detail.sidebar.newsletterButton') }}</h3>
-      <p class="text-base-content/50 mt-2">{{ t('pages.posts.detail.sidebar.newsletterText') }}</p>
+      <div class="alert alert-warning max-w-md mx-auto">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--news-off] size-8 text-warning"></span>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg">{{ t('pages.posts.detail.sidebar.newsletterButton') }}</h3>
+            <p class="text-sm opacity-80 mt-1">{{ t('pages.posts.detail.sidebar.newsletterText') }}</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Load More -->
     <div v-if="!pending && posts && posts.length > 0" class="text-center mt-16">
-      <button class="btn btn-ghost btn-lg rounded-2xl px-12 border-2 border-base-200 hover:border-primary/20 hover:bg-primary/5">
-        {{ t('pages.posts.loadMore') }}
+      <button class="btn btn-ghost btn-lg rounded-2xl px-12 border-2 border-base-200 hover:border-primary/20 hover:bg-primary/5 transition-all">
+        <span class="flex items-center gap-2">
+          {{ t('pages.posts.loadMore') }}
+          <span class="icon-[tabler--arrow-down] size-5"></span>
+        </span>
       </button>
     </div>
   </div>

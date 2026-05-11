@@ -23,7 +23,7 @@
     </div>
 
     <!-- Product Detail -->
-    <div v-else>
+    <div v-else-if="productApi">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-10">
         <!-- Gallery -->
         <div class="space-y-6">
@@ -61,7 +61,6 @@
             <h1 class="h1 mb-4">{{ productApi.name }}</h1>
             <div class="flex items-baseline gap-4">
               <span class="text-4xl font-black text-primary">{{ formatNumberBR(selectedPrice) }}</span>
-              <span v-if="productApi.old_price" class="text-xl text-base-content/30 line-through font-bold">{{ formatNumberBR(productApi.old_price) }}</span>
             </div>
           </div>
 
@@ -88,16 +87,16 @@
           <div class="mt-auto flex flex-col sm:flex-row gap-4">
             <button 
               class="btn btn-primary btn-lg grow h-16 rounded-[1.5rem] shadow-xl shadow-primary/20 text-lg transition-transform hover:scale-[1.02]" 
-              @click="addToCartApi(productApi!)"
+              @click="addToCartApi(productApi)"
             >
               <span class="icon-[tabler--shopping-cart-plus] size-6 mr-2"></span>
               {{ t('product.addToCart') }}
             </button>
             <button 
               class="btn btn-square btn-lg h-16 w-16 rounded-[1.5rem] border-2 border-base-200 hover:border-error/20 hover:bg-error/5 hover:text-error group transition-all"
-              @click="toggleWishlist(productApi!.id)"
+              @click="toggleWishlist(productApi.id)"
             >
-              <span :class="[isInWishlist(productApi!.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-7 group-hover:scale-110 transition-transform']"></span>
+              <span :class="[isInWishlist(productApi.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-7 group-hover:scale-110 transition-transform']"></span>
             </button>
           </div>
 
@@ -201,20 +200,26 @@ const { openCart } = useCartUI()
 
 const productId = computed(() => route.params.id as string)
 
-// SEO
-useSeoMeta({
-  title: computed(() => productApi.value?.name || t('pages.products.title')),
-  ogTitle: computed(() => productApi.value?.name || t('pages.products.title')),
-  description: computed(() => productApi.value?.description || ''),
-  ogDescription: computed(() => productApi.value?.description || ''),
-  ogImage: computed(() => productApi.value?.images?.[0]?.image || ''),
-})
-
 // Fetching Product
 const { data: productApi, pending: pendingApi } = await useFetch<ProductApi>(
   () => `${config.public.baseURL}/api/products/${productId.value}`,
   { key: `product-${productId.value}` }
 )
+
+// SEO - Moved after productApi is defined
+useSeoMeta({
+  title: computed(() => {
+    if (!productApi.value) return t('pages.products.title')
+    return productApi.value.name || t('pages.products.title')
+  }),
+  ogTitle: computed(() => {
+    if (!productApi.value) return t('pages.products.title')
+    return productApi.value.name || t('pages.products.title')
+  }),
+  description: computed(() => productApi.value?.description || ''),
+  ogDescription: computed(() => productApi.value?.description || ''),
+  ogImage: computed(() => productApi.value?.images?.[0]?.image || ''),
+})
 
 // Fetching Variants
 const { data: variants } = await useFetch<ProductVariant[]>(
@@ -231,7 +236,8 @@ const selectedVariant = computed(() => {
 
 const selectedPrice = computed(() => {
   if (selectedVariant.value?.price) return selectedVariant.value.price
-  return productApi.value?.price ?? 0
+  if (!productApi.value) return 0
+  return productApi.value.price ?? 0
 })
 
 watch(variants, (newVariants) => {
@@ -242,7 +248,7 @@ watch(variants, (newVariants) => {
 
 // Cart & Wishlist
 function addToCartApi(product: ProductApi) {
-  if (!product?.id) return
+  if (!product.id) return
   
   cartStore.addItem({
     productId: product.id,
@@ -274,7 +280,7 @@ const reviewError = ref('')
 const reviewSuccess = ref('')
 
 async function submitReview() {
-  if (!productApi.value) return
+  if (!productApi.value?.id) return
   reviewSubmitting.value = true
   reviewError.value = ''
   reviewSuccess.value = ''

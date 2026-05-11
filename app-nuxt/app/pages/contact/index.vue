@@ -70,14 +70,14 @@
           <div class="bg-base-100 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-base-200">
             <h2 class="h3 mb-8">{{ t('pages.contact.form.submit') }}</h2>
             <form @submit.prevent class="space-y-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="join join-vertical w-full">
                 <div class="form-control">
                   <label class="form-label">{{ t('pages.contact.form.name') }}</label>
-                  <input type="text" :placeholder="t('pages.contact.form.placeholders.name')" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" />
+                  <input type="text" :placeholder="t('pages.contact.form.placeholders.name')" class="input input-lg bg-base-200/50 border-none rounded-t-2xl h-14 join-item" />
                 </div>
                 <div class="form-control">
                   <label class="form-label">{{ t('pages.contact.form.email') }}</label>
-                  <input type="email" :placeholder="t('pages.contact.form.placeholders.email')" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" />
+                  <input type="email" :placeholder="t('pages.contact.form.placeholders.email')" class="input input-lg bg-base-200/50 border-none h-14 join-item" />
                 </div>
               </div>
               
@@ -94,10 +94,10 @@
 
               <div class="form-control">
                 <label class="form-label">{{ t('pages.contact.form.message') }}</label>
-                <textarea class="textarea textarea-lg bg-base-200/50 border-none rounded-2xl min-h-40" :placeholder="t('pages.contact.form.placeholders.message')"></textarea>
+                <textarea class="textarea textarea-lg bg-base-200/50 border-none rounded-2xl min-h-40 resize-none" :placeholder="t('pages.contact.form.placeholders.message')"></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-lg w-full h-14 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-[1.02]">
+              <button type="submit" class="btn btn-primary btn-lg w-full h-14 rounded-2xl shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] hover:shadow-primary/30">
                 <span class="icon-[tabler--send] size-5 mr-2"></span>
                 {{ t('pages.contact.form.submit') }}
               </button>

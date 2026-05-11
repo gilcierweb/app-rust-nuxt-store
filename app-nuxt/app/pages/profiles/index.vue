@@ -8,18 +8,27 @@
       </div>
       
       <div class="max-w-xl mx-auto w-full md:w-80">
-        <div class="relative">
-          <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
+        <div class="join w-full">
           <input type="text" :placeholder="t('pages.profiles.search')" 
-            class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
+            class="input input-lg bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-14" />
+          <button class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
+            <span class="icon-[tabler--search] size-5"></span>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex flex-col items-center justify-center py-24">
-      <span class="loading loading-spinner text-primary size-16 mb-4"></span>
-      <p class="text-base-content/40 font-medium tracking-wider uppercase text-xs">{{ t('pages.profiles.loading') }}</p>
+      <div class="alert alert-info max-w-md">
+        <div class="flex items-center gap-4">
+          <div class="loading loading-spinner loading-md"></div>
+          <div>
+            <p class="font-bold">Loading profiles</p>
+            <p class="text-sm opacity-80">Please wait while we fetch user profiles...</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Profiles Grid -->
@@ -40,8 +49,18 @@
           <p class="text-sm text-base-content/50 mb-6 line-clamp-1 px-4">{{ profile?.full_name }}</p>
           
           <div class="flex items-center justify-center gap-3 mb-8">
-            <div class="badge badge-soft badge-primary rounded-lg px-3 py-3">{{ t('pages.profiles.explorer') }}</div>
-            <div class="badge badge-soft badge-secondary rounded-lg px-3 py-3">{{ t('pages.profiles.member') }}</div>
+            <div class="badge badge-soft badge-primary rounded-lg px-3 py-2">
+              <span class="flex items-center gap-1">
+                <span class="icon-[tabler--compass] size-3"></span>
+                {{ t('pages.profiles.explorer') }}
+              </span>
+            </div>
+            <div class="badge badge-soft badge-secondary rounded-lg px-3 py-2">
+              <span class="flex items-center gap-1">
+                <span class="icon-[tabler--user-check] size-3"></span>
+                {{ t('pages.profiles.member') }}
+              </span>
+            </div>
           </div>
           
           <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary btn-md w-full rounded-xl shadow-lg shadow-primary/10">
@@ -54,9 +73,17 @@
 
     <!-- Empty State -->
     <div v-if="!pending && (!profiles || profiles.length === 0)" class="text-center py-20">
-      <span class="icon-[tabler--users-group] size-16 text-base-content/20 mb-4"></span>
-      <h3 class="text-xl font-bold">{{ t('categories.notFound') }}</h3>
-      <p class="text-base-content/50 mt-2">{{ t('pages.profiles.description') }}</p>
+      <div class="alert alert-warning max-w-md mx-auto">
+        <div class="flex items-center gap-4">
+          <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--users-group] size-8 text-warning"></span>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg">{{ t('categories.notFound') }}</h3>
+            <p class="text-sm opacity-80 mt-1">{{ t('pages.profiles.description') }}</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
