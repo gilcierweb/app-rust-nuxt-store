@@ -6,88 +6,64 @@
 
 @plugin "@iconify/tailwind4";
 
-@theme {
-  --font-sans: "Inter", "Outfit", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-display: "Outfit", var(--font-sans);
 
-  --color-brand-50: oklch(0.97 0.01 260);
-  --color-brand-100: oklch(0.93 0.03 260);
-  --color-brand-200: oklch(0.87 0.06 260);
-  --color-brand-300: oklch(0.78 0.11 260);
-  --color-brand-400: oklch(0.65 0.18 260);
-  --color-brand-500: oklch(0.55 0.22 260);
-  --color-brand-600: oklch(0.48 0.20 260);
-  --color-brand-700: oklch(0.40 0.17 260);
-  --color-brand-800: oklch(0.32 0.14 260);
-  --color-brand-900: oklch(0.25 0.11 260);
-  --color-brand-950: oklch(0.18 0.08 260);
+.h1 {
+    @apply text-base-content text-4xl;
+}
+.h2 {
+    @apply text-base-content text-3xl;
+}
+.h3 {
+    @apply text-base-content text-2xl;
+}
+.h4 {
+    @apply text-base-content text-xl;
+}
+.h5 {
+    @apply text-base-content text-lg;
+}
+.h6 {
+    @apply text-base-content text-base;
+}
+.form-label{
+    @apply text-gray-800 text-sm mb-2 block;
 }
 
-/* Custom base styles */
-body {
-    @apply font-sans antialiased text-base-content bg-base-100;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-bold tracking-tight;
-}
-
-.h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
-.h2 { @apply text-3xl md:text-4xl; }
-.h3 { @apply text-2xl md:text-3xl; }
-.h4 { @apply text-xl md:text-2xl; }
-.h5 { @apply text-lg md:text-xl; }
-.h6 { @apply text-base md:text-lg; }
-
-.form-label {
-    @apply text-base-content/80 text-sm font-medium mb-1.5 block;
-}
-
-/* Premium Utilities */
-.glass-effect {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
-}
-
-.dark .glass-effect {
-    @apply bg-black/40 backdrop-blur-md border border-white/10 shadow-xl;
-}
-
-.gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
-}
-
-.hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
-}
-
-/* Transitions custom nuxt */
+/* transations custom nuxt */
 .layout-enter-active,
 .layout-leave-active {
-  transition: all 0.3s ease-out;
+    transition: all 0.2s;
 }
 .layout-enter-from,
 .layout-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
+    filter: grayscale(1);
 }
 
 .page-enter-active,
 .page-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s;
 }
 .page-enter-from,
 .page-leave-to {
-  opacity: 0;
-  filter: blur(8px);
-  transform: scale(0.98);
+    opacity: 0;
+    filter: blur(1rem);
+}
+
+.rotate-enter-active,
+.rotate-leave-active {
+    transition: all 0.2s;
+}
+.rotate-enter-from,
+.rotate-leave-to {
+    opacity: 0;
+    transform: rotate3d(1, 1, 1, 15deg);
 }
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.2s ease;
+    transition: all 0.2s;
 }
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.fade-enter,
+.fade-leave-active {
+    opacity: 0; filter: blur(1rem);
 }
-
