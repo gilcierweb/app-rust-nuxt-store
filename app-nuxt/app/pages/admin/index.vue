@@ -3,17 +3,17 @@
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="h1">{{ $t('admin.dashboard.title') }}</h1>
-        <p class="text-gray-500">Bem-vindo ao painel operacional da sua loja.</p>
+        <h1 class="h1">{{ t('admin.dashboard.title') }}</h1>
+        <p class="text-gray-500">{{ t('admin.dashboard.welcome') }}</p>
       </div>
       <div class="flex gap-2">
         <button class="btn btn-soft btn-sm">
           <i class="icon-[tabler--calendar] size-4 mr-2"></i>
-          Últimos 30 dias
+          {{ t('admin.dashboard.last30Days') }}
         </button>
         <button class="btn btn-primary btn-sm">
           <i class="icon-[tabler--download] size-4 mr-2"></i>
-          Relatório
+          {{ t('admin.dashboard.report') }}
         </button>
       </div>
     </div>
@@ -26,7 +26,7 @@
             <i :class="[stat.icon, 'size-6', stat.textClass]"></i>
           </div>
           <div>
-            <p class="text-sm text-gray-500">{{ stat.title }}</p>
+            <p class="text-sm text-gray-500">{{ t(stat.title) }}</p>
             <div class="flex items-baseline gap-2">
               <h3 class="text-2xl font-bold">{{ stat.value }}</h3>
               <span :class="['text-xs font-medium', stat.trendUp ? 'text-success' : 'text-error']">
@@ -44,10 +44,10 @@
       <div class="lg:col-span-2 card bg-base-100 shadow-sm border">
         <div class="card-body p-4">
           <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-lg">Evolução de Vendas</h3>
+            <h3 class="font-bold text-lg">{{ t('admin.dashboard.charts.salesEvolution') }}</h3>
             <div class="flex gap-1">
-              <button class="btn btn-xs btn-ghost text-primary">Diário</button>
-              <button class="btn btn-xs btn-ghost">Mensal</button>
+              <button class="btn btn-xs btn-ghost text-primary">{{ t('admin.dashboard.charts.daily') }}</button>
+              <button class="btn btn-xs btn-ghost">{{ t('admin.dashboard.charts.monthly') }}</button>
             </div>
           </div>
           <div class="h-80 w-full">
@@ -71,7 +71,7 @@
       <!-- Donut Chart -->
       <div class="card bg-base-100 shadow-sm border">
         <div class="card-body p-4 text-center">
-          <h3 class="font-bold text-lg mb-6 text-left">Vendas por Categoria</h3>
+          <h3 class="font-bold text-lg mb-6 text-left">{{ t('admin.dashboard.charts.salesByCategory') }}</h3>
           <div class="h-64 w-full relative flex items-center justify-center">
             <ClientOnly>
               <DonutChart 
@@ -86,7 +86,7 @@
             </ClientOnly>
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span class="text-3xl font-bold">1.2k</span>
-              <span class="text-xs text-gray-400">Total Vendas</span>
+              <span class="text-xs text-gray-400">{{ t('admin.dashboard.charts.totalSales') }}</span>
             </div>
           </div>
           <div class="mt-4 space-y-2">
@@ -107,7 +107,7 @@
        <!-- Top Products Bar Chart -->
        <div class="card bg-base-100 shadow-sm border">
         <div class="card-body p-4">
-          <h3 class="font-bold text-lg mb-6">Produtos Mais Vendidos</h3>
+          <h3 class="font-bold text-lg mb-6">{{ t('admin.dashboard.charts.topProducts') }}</h3>
           <div class="h-80 w-full">
             <ClientOnly>
               <BarChart 
@@ -129,18 +129,18 @@
       <div class="card bg-base-100 shadow-sm border overflow-hidden">
         <div class="card-body p-0">
           <div class="p-4 flex justify-between items-center border-b bg-base-200/30">
-            <h3 class="font-bold text-lg">Pedidos Recentes</h3>
-            <NuxtLink to="/admin/orders" class="btn btn-link btn-sm text-primary no-underline">Ver todos</NuxtLink>
+            <h3 class="font-bold text-lg">{{ t('admin.dashboard.charts.recentOrders') }}</h3>
+            <NuxtLink to="/admin/orders" class="btn btn-link btn-sm text-primary no-underline">{{ t('admin.dashboard.charts.viewAll') }}</NuxtLink>
           </div>
           <div class="overflow-x-auto">
             <table class="table table-sm">
               <thead class="bg-base-200/50">
                 <tr>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th class="text-right">Ação</th>
+                  <th>{{ t('admin.account.fields.id') }}</th>
+                  <th>{{ t('admin.products.table.name') }}</th>
+                  <th>{{ t('common.table.total') }}</th>
+                  <th>{{ t('common.table.status') }}</th>
+                  <th class="text-right">{{ t('common.table.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -152,7 +152,7 @@
                   <td class="font-bold">R$ {{ order.total.toFixed(2) }}</td>
                   <td>
                     <span :class="['badge badge-soft text-[10px] h-5', order.statusClass]">
-                      {{ order.status }}
+                      {{ order.statusLabel }}
                     </span>
                   </td>
                   <td class="text-right">
@@ -177,10 +177,12 @@ definePageMeta({
   layout: 'admin'
 })
 
+const { t } = useI18n()
+
 // KPI Data
 const kpiStats = [
   { 
-    title: 'Faturamento Mensal', 
+    title: 'admin.dashboard.kpis.monthlyRevenue', 
     value: 'R$ 45.280,00', 
     trend: '12%', 
     trendUp: true, 
@@ -189,7 +191,7 @@ const kpiStats = [
     textClass: 'text-success' 
   },
   { 
-    title: 'Novos Pedidos', 
+    title: 'admin.dashboard.kpis.newOrders', 
     value: '342', 
     trend: '8%', 
     trendUp: true, 
@@ -198,7 +200,7 @@ const kpiStats = [
     textClass: 'text-primary' 
   },
   { 
-    title: 'Novos Clientes', 
+    title: 'admin.dashboard.kpis.newCustomers', 
     value: '84', 
     trend: '3%', 
     trendUp: false, 
@@ -207,7 +209,7 @@ const kpiStats = [
     textClass: 'text-info' 
   },
   { 
-    title: 'Taxa de Conversão', 
+    title: 'admin.dashboard.kpis.conversionRate', 
     value: '3.42%', 
     trend: '0.5%', 
     trendUp: true, 
@@ -229,8 +231,8 @@ const salesData = [
 ]
 
 const salesCategories = {
-  sales: { name: 'Vendas (R$)', color: '#FF6F00' },
-  orders: { name: 'Pedidos', color: '#3B82F6' }
+  sales: { name: t('admin.dashboard.kpis.monthlyRevenue'), color: '#FF6F00' },
+  orders: { name: t('admin.dashboard.kpis.newOrders'), color: '#3B82F6' }
 }
 
 const salesXFormatter = (tick: number) => {
@@ -262,7 +264,7 @@ const topProducts = [
 ]
 
 const productCategories = {
-  sales: { name: 'Unidades Vendidas', color: '#3B82F6' }
+  sales: { name: t('admin.products.table.actions'), color: '#3B82F6' } // Unidades Vendidas
 }
 
 const productXFormatter = (i: number) => {
@@ -271,11 +273,11 @@ const productXFormatter = (i: number) => {
 
 // Recent Orders
 const recentOrders = [
-  { id: 1042, customer: 'Gilcier Junior', total: 1250.00, status: 'Pago', statusClass: 'badge-success' },
-  { id: 1041, customer: 'Maria Silva', total: 450.20, status: 'Pendente', statusClass: 'badge-warning' },
-  { id: 1040, customer: 'João Oliveira', total: 89.90, status: 'Cancelado', statusClass: 'badge-error' },
-  { id: 1039, customer: 'Ana Costa', total: 2100.00, status: 'Pago', statusClass: 'badge-success' },
-  { id: 1038, customer: 'Carlos Pereira', total: 120.00, status: 'Pago', statusClass: 'badge-success' },
+  { id: 1042, customer: 'Gilcier Junior', total: 1250.00, status: 'paid', statusLabel: t('admin.statusLabels.paid'), statusClass: 'badge-success' },
+  { id: 1041, customer: 'Maria Silva', total: 450.20, status: 'pending', statusLabel: t('admin.statusLabels.pending'), statusClass: 'badge-warning' },
+  { id: 1040, customer: 'João Oliveira', total: 1040, status: 'cancelled', statusLabel: t('admin.statusLabels.cancelled'), statusClass: 'badge-error' },
+  { id: 1039, customer: 'Ana Costa', total: 2100.00, status: 'paid', statusLabel: t('admin.statusLabels.paid'), statusClass: 'badge-success' },
+  { id: 1038, customer: 'Carlos Pereira', total: 120.00, status: 'paid', statusLabel: t('admin.statusLabels.paid'), statusClass: 'badge-success' },
 ]
 </script>
 

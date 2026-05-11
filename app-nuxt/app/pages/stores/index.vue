@@ -79,12 +79,12 @@ useSeoMeta({
   ogDescription: t('pages.stores.description'),
 })
 
-const stores = [
-  { name: 'São Paulo Flagship', address: 'Av. Paulista, 1000 - Bela Vista', phone: '+55 (11) 9999-9999', hours: 'Mon-Sat: 10:00 - 22:00' },
-  { name: 'Rio de Janeiro Central', address: 'Rua Visconde de Pirajá, 500 - Ipanema', phone: '+55 (21) 8888-8888', hours: 'Mon-Sat: 10:00 - 20:00' },
-  { name: 'Curitiba Design Hub', address: 'Av. do Batel, 1500 - Batel', phone: '+55 (41) 7777-7777', hours: 'Mon-Sat: 11:00 - 19:00' },
-  { name: 'Belo Horizonte Studio', address: 'Rua de Bahia, 1200 - Lourdes', phone: '+55 (31) 6666-6666', hours: 'Mon-Sat: 09:00 - 21:00' },
-  { name: 'Porto Alegre Tech Lab', address: 'Av. Nilo Peçanha, 2000 - Boa Vista', phone: '+55 (51) 5555-5555', hours: 'Mon-Fri: 10:00 - 20:00' },
-  { name: 'Brasília Modern Store', address: 'SCLS 403 Bloco B - Asa Sul', phone: '+55 (61) 4444-4444', hours: 'Mon-Sat: 10:00 - 22:00' }
-]
+const stores = computed(() => [
+  { name: t('pages.stores.locations.sp.name'), address: t('pages.stores.locations.sp.address'), phone: '+55 (11) 9999-9999', hours: t('pages.stores.locations.sp.hours') },
+  { name: t('pages.stores.locations.rj.name'), address: t('pages.stores.locations.rj.address'), phone: '+55 (21) 8888-8888', hours: t('pages.stores.locations.rj.hours') },
+  { name: t('pages.stores.locations.curitiba.name'), address: t('pages.stores.locations.curitiba.address'), phone: '+55 (41) 7777-7777', hours: t('pages.stores.locations.curitiba.hours') },
+  { name: t('pages.stores.locations.bh.name'), address: t('pages.stores.locations.bh.address'), phone: '+55 (31) 6666-6666', hours: t('pages.stores.locations.bh.hours') },
+  { name: t('pages.stores.locations.poa.name'), address: t('pages.stores.locations.poa.address'), phone: '+55 (51) 5555-5555', hours: t('pages.stores.locations.poa.hours') },
+  { name: t('pages.stores.locations.brasilia.name'), address: t('pages.stores.locations.brasilia.address'), phone: '+55 (61) 4444-4444', hours: t('pages.stores.locations.brasilia.hours') }
+])
 </script>

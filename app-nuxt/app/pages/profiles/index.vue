@@ -40,8 +40,8 @@
           <p class="text-sm text-base-content/50 mb-6 line-clamp-1 px-4">{{ profile?.full_name }}</p>
           
           <div class="flex items-center justify-center gap-3 mb-8">
-            <div class="badge badge-soft badge-primary rounded-lg px-3 py-3">Explorer</div>
-            <div class="badge badge-soft badge-secondary rounded-lg px-3 py-3">Member</div>
+            <div class="badge badge-soft badge-primary rounded-lg px-3 py-3">{{ t('pages.profiles.explorer') }}</div>
+            <div class="badge badge-soft badge-secondary rounded-lg px-3 py-3">{{ t('pages.profiles.member') }}</div>
           </div>
           
           <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary btn-md w-full rounded-xl shadow-lg shadow-primary/10">

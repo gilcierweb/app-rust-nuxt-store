@@ -8,12 +8,11 @@
                         <div class="logo mb-4">
                             <a href="/">
                             <i class="icon-[tabler--building-store] text-2xl text-primary mr-2"></i>
-                                <!-- <img src="" alt="Rust Loco Nuxt Store"> -->
                                 Rust Loco Nuxt Store
                             </a>
                         </div>
-                        <p class="mb-4">Ecommerce Rust Loco Nuxt Store.</p>
-                        <h4 class="social-title text-2xl mb-2 text-white">Siga-nos em:</h4>
+                        <p class="mb-4">{{ t('footer.brandDescription') }}</p>
+                        <h4 class="social-title text-2xl mb-2 text-white">{{ t('footer.socialTitle') }}</h4>
                         <ul class="social flex list-inside gap-4">
                             <li><a href=""><i class="icon-[tabler--brand-facebook]"></i></a></li>
                             <li><a href=""><i class="icon-[tabler--brand-instagram]"></i></a></li>
@@ -25,43 +24,42 @@
                     </div>
 
                     <nav>
-                        <h3 class="text-2xl mb-2 text-white">Links</h3>
+                        <h3 class="text-2xl mb-2 text-white">{{ t('footer.links.title') }}</h3>
                         <ul>
-                            <li><a href="" class="link link-primary link-animated">Quem Somos</a></li>
-                            <li><a href="" class="link link-primary link-animated">FAQ</a></li>
-                            <li><a href="" class="link link-primary link-animated">Como Funciona</a></li>
-                            <li><a href="" class="link link-primary link-animated">Planos</a></li>
-                            <li><a href="" class="link link-primary link-animated">Privacidade</a></li>
-                            <li><a href="" class="link link-primary link-animated">Termos</a></li>
-                            <li><a href="" class="link link-primary link-animated">Contatos</a></li>
+                            <li><NuxtLink to="/about" class="link link-primary link-animated">{{ t('footer.links.about') }}</NuxtLink></li>
+                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.links.faq') }}</NuxtLink></li>
+                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.links.howItWorks') }}</NuxtLink></li>
+                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.links.plans') }}</NuxtLink></li>
+                            <li><NuxtLink to="/privacy" class="link link-primary link-animated">{{ t('footer.links.privacy') }}</NuxtLink></li>
+                            <li><NuxtLink to="/terms" class="link link-primary link-animated">{{ t('footer.links.terms') }}</NuxtLink></li>
+                            <li><NuxtLink to="/contact" class="link link-primary link-animated">{{ t('footer.links.contact') }}</NuxtLink></li>
                         </ul>
                     </nav>
 
                     <nav>
-                        <h3 class="text-2xl mb-2 text-white">Menu</h3>
+                        <h3 class="text-2xl mb-2 text-white">{{ t('footer.menu.title') }}</h3>
                         <ul>
-
-                            <li><a href="" class="link link-primary link-animated">Home</a></li>
-                            <li><a href="" class="link link-primary link-animated">Produtos</a></li>
-                            <li><a href="" class="link link-primary link-animated">Lojas</a></li>
-                            <li><a href="" class="link link-primary link-animated">Anuncie</a></li>
+                            <li><NuxtLink to="/" class="link link-primary link-animated">{{ t('footer.menu.home') }}</NuxtLink></li>
+                            <li><NuxtLink to="/products" class="link link-primary link-animated">{{ t('footer.menu.products') }}</NuxtLink></li>
+                            <li><NuxtLink to="/stores" class="link link-primary link-animated">{{ t('footer.menu.stores') }}</NuxtLink></li>
+                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.menu.advertise') }}</NuxtLink></li>
                         </ul>
                     </nav>
 
                     <nav>
-                        <h3 class="text-2xl mb-2">Inscreva-se</h3>
-                        <p class="mb-4">Inscreva-se em nossa newsletter para as últimas atualizações</p>
+                        <h3 class="text-2xl mb-2">{{ t('footer.subscribe.title') }}</h3>
+                        <p class="mb-4">{{ t('footer.subscribe.description') }}</p>
                         <form action="#" method="get" target="_blank" class="newsletter-form">
                             <div
                                 class="flex flex-col items-center gap-2 sm:flex-row sm:gap-3 bg-white rounded-lg p-2 dark:bg-neutral-900">
-                                <input name="EMAIL" placeholder="Endereço de email" required="required" type="email"
+                                <input name="EMAIL" :placeholder="t('footer.subscribe.placeholder')" required="required" type="email"
                                     class="input py-3 px-4 block w-full border-transparent rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-transparent dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-                                <button class="btn btn-primary" title="Inscreva-se">
-                                    <i class="fas fa-paper-plane"></i>
+                                <button class="btn btn-primary" :title="t('footer.subscribe.button')">
+                                    <i class="icon-[tabler--send] size-5"></i>
                                 </button>
                             </div>
                         </form>
-                        <p class="float-end mt-4"><a href="#">Voltar ao topo</a></p>
+                        <p class="float-end mt-4"><a href="#">{{ t('footer.backToTop') }}</a></p>
                     </nav>
                 </div>
             </div>
@@ -69,14 +67,14 @@
 
         <footer class="w-full bg-base-200/60 text-base-content/90 text-center">
             <div class="container mx-auto p-4">
-                <p>Copyright &copy; {{ new Date().getFullYear() }} App Nuxt - All Rights Reserved - <a
+                <p>Copyright &copy; {{ new Date().getFullYear() }} App Nuxt - {{ t('footer.copyright') }} - <a
                         href="https://gilcierweb.com.br" title="GilcierWeb"
-                        class="link link-primary link-animated">GilcierWeb</a> - Site criado com o
+                        class="link link-primary link-animated">GilcierWeb</a> - {{ t('footer.createdBy') }}
                     <a href="https://nuxt.com/" title="Nuxt 4" class="link link-primary link-animated">Nuxt 4</a>
                 </p>
 
                 <div class="col-12 text-center">
-                    <p class="p-small">Site melhor visualizado com navegadores modernos como:
+                    <p class="p-small">{{ t('footer.bestViewed') }}
                         <a href="https://browsehappy.com/" title="Mozilla Firefox" target="_blank"
                             class="link link-primary link-animated">Firefox</a>,
                         <a href="https://browsehappy.com/" title="Opera" target="_blank"
@@ -96,3 +94,7 @@
         </footer>
     </div>
 </template>
+
+<script setup lang="ts">
+const { t } = useI18n()
+</script>

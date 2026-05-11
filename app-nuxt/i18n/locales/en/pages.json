@@ -5,11 +5,80 @@
       "description": "App Rust Nuxt Store - Your complete online store with the best products",
       "categories": "Categories",
       "products": "Products",
-      "autoImport": "This is an automatically imported component"
+      "autoImport": "This is an automatically imported component",
+      "productsSubtitle": "Our special selection for you",
+      "shopAll": "Shop All",
+      "newsletter": {
+        "title": "Stay Ahead",
+        "description": "Subscribe to our newsletter and get exclusive access to news, special offers and early discounts.",
+        "placeholder": "Your email address",
+        "button": "Subscribe Now"
+      },
+      "features": {
+        "shipping": {
+          "title": "Fast & Free Delivery",
+          "description": "Free shipping on all orders over $200.00."
+        },
+        "payments": {
+          "title": "Secure Payments",
+          "description": "Your data is always safe and encrypted."
+        },
+        "support": {
+          "title": "24/7 Support",
+          "description": "Our team is always here to help you."
+        }
+      }
     },
     "about": {
       "title": "About Us",
-      "description": "This page will be displayed at the /about route."
+      "description": "Discover our story and values",
+      "hero": {
+        "badge": "About our Journey",
+        "title": "Elevating the E-commerce Experience",
+        "description": "We are more than just a store. We are a team of enthusiasts dedicated to bringing the best products combined with cutting-edge technology."
+      },
+      "story": {
+        "title": "Our Story",
+        "p1": "Founded in 2024, App Rust Nuxt Store started with a simple idea: to create a seamless shopping experience that combines the performance of Rust with the flexibility of Nuxt.",
+        "p2": "What started as a small project has grown into a full-scale platform serving customers worldwide. We believe in quality, transparency, and innovation.",
+        "stats": {
+          "customers": "Happy Customers",
+          "products": "Premium Products"
+        }
+      },
+      "mission": {
+        "title": "Our Mission",
+        "description": "To provide an unparalleled shopping experience, selecting the best products and delivering them with speed and security."
+      },
+      "vision": {
+        "title": "Our Vision",
+        "description": "To become the leading e-commerce platform recognized for its technological excellence and customer-centric approach."
+      },
+      "values": {
+        "title": "Core Values",
+        "quality": {
+          "title": "Quality First",
+          "description": "We never compromise on the quality of our products."
+        },
+        "innovation": {
+          "title": "Innovation",
+          "description": "Constantly improving our technology for better performance."
+        },
+        "customerLove": {
+          "title": "Customer Focus",
+          "description": "Your satisfaction is our primary goal."
+        },
+        "integrity": {
+          "title": "Integrity",
+          "description": "Transparent and honest in all transactions."
+        }
+      },
+      "cta": {
+        "title": "Want to know more about us?",
+        "description": "We are always open for questions and partnerships.",
+        "contact": "Get in Touch",
+        "browse": "View Products"
+      }
     },
     "terms": {
       "title": "Terms of Use",
@@ -17,11 +86,45 @@
     },
     "privacy": {
       "title": "Privacy Policy",
-      "description": "Privacy policy for App Rust Nuxt Store"
+      "description": "Privacy policy for App Rust Nuxt Store",
+      "questions": "By subscribing, you agree to our {contact}."
     },
     "contact": {
       "title": "Contact",
-      "description": "Get in touch with App Rust Nuxt Store"
+      "description": "Get in touch with us for any questions or support",
+      "hero": {
+        "title": "Let's Talk",
+        "description": "Have any questions or want to know more about our products? Our team is ready to help you."
+      },
+      "info": {
+        "title": "Contact Information",
+        "address": "1000 Paulista Ave - São Paulo, SP",
+        "phone": "+55 (11) 9999-9999",
+        "email": "contact{'@'}rustnuxtstore.com",
+        "hours": "Monday to Friday: 9am to 6pm"
+      },
+      "form": {
+        "name": "Full Name",
+        "email": "Your Email",
+        "subject": "Subject",
+        "message": "Your Message",
+        "submit": "Send Message",
+        "success": "Message sent successfully!",
+        "placeholders": {
+          "name": "What should we call you?",
+          "email": "example{'@'}email.com",
+          "subject": "What do you want to talk about?",
+          "message": "Write your message here...",
+          "subjects": {
+            "general": "General Inquiry",
+            "support": "Technical Support",
+            "sales": "Sales & Partnerships",
+            "other": "Other"
+          }
+        }
+      },
+      "mapPlaceholder": "Interactive Map",
+      "followUs": "Follow Us"
     },
     "categories": {
       "title": "Categories",
@@ -41,7 +144,7 @@
       "checkout": "Checkout",
       "continueShopping": "Continue Shopping",
       "remove": "Remove",
-      "quantity": "Qty",
+      "quantity": "Quantity",
       "total": "Total",
       "summary": "Order Summary",
       "itemAdded": "Item added to cart",
@@ -53,7 +156,8 @@
     },
     "orders": {
       "title": "My Orders",
-      "empty": "No orders yet",
+      "description": "Track your recent orders and purchase history.",
+      "empty": "You haven't placed any orders yet.",
       "number": "Order #",
       "date": "Date",
       "status": "Status",
@@ -61,14 +165,24 @@
       "items": "Items",
       "detail": "Order Details",
       "backToOrders": "Back to Orders",
-      "payment": "Payment"
+      "payment": "Payment",
+      "syncing": "Syncing your orders...",
+      "amount": "Total Amount",
+      "finalPrice": "Final Price"
     },
     "checkout": {
       "title": "Checkout",
-      "placeOrder": "Place Order",
+      "description": "Complete your purchase by providing delivery and payment details.",
+      "placeOrder": "Confirm Order",
       "orderSummary": "Order Summary",
       "confirming": "Confirming your order...",
-      "discount": "Discount"
+      "discount": "Discount",
+      "step1": "Shipping Address",
+      "step2": "Shipping Method",
+      "step3": "Payment Method",
+      "securePayment": "Secure Payment with 256-bit SSL Encryption",
+      "promoCode": "Promo Code",
+      "apply": "Apply"
     },
     "confirmation": {
       "title": "Order Confirmed",
@@ -78,184 +192,119 @@
     },
     "products": {
       "title": "Products",
-      "description": "Check out our complete product list",
-      "loading": "Loading...",
+      "description": "Check our complete list of products",
+      "loading": "Syncing products...",
       "reviews": "Reviews",
       "writeReview": "Write a review",
       "buy": "Buy Now",
       "back": "Back to Products",
       "backList": "← Back to List",
-      "create": {
-        "title": "Create New Product",
-        "cancel": "Cancel",
-        "saved": "Product created successfully"
-      },
-      "edit": {
-        "title": "Edit Product",
-        "titleWithName": "Edit: {name}",
-        "loading": "Loading product...",
-        "error": "Error loading product: {message}",
-        "updated": "Product updated successfully"
-      },
-      "detail": {
-        "price": "Price",
-        "cost": "Cost Price",
-        "compare": "Compare Price",
-        "shortDescription": "Short Description",
-        "fullDescription": "Full Description",
-        "images": "Image Gallery",
-        "cover": "Cover",
-        "active": "Active",
-        "inactive": "Inactive",
-        "information": "Information"
-      },
-      "table": {
-        "name": "Name",
-        "price": "Price",
-        "description": "Description",
-        "status": "Status",
-        "category": "Category",
-        "date": "Date",
-        "actions": "Actions"
-      },
       "search": {
         "placeholder": "Search products..."
+      },
+      "filters": {
+        "title": "Filters",
+        "categories": "Categories",
+        "priceRange": "Price Range",
+        "rating": "Rating",
+        "apply": "Apply Filters",
+        "andUp": "and up"
+      },
+      "promo": {
+        "title": "Summer Offer!",
+        "description": "Get up to 50% off on selected items.",
+        "button": "View Offers"
       }
     },
     "posts": {
-      "title": "Posts",
-      "description": "Read our posts and articles",
-      "loading": "Loading...",
-      "readMore": "Read more →",
-      "readMoreBtn": "Read More",
-      "loadMore": "Load More Posts",
+      "title": "Blog",
+      "description": "Read our posts and articles about trends and news",
+      "loading": "Loading articles...",
+      "readMore": "Read More",
+      "loadMore": "Load More Articles",
+      "featured": "Featured Article",
+      "readTime": "{n} min read",
       "hero": {
         "title": "Latest News",
         "description": "Discover the hottest e-commerce trends",
         "cta": "Explore Posts"
       },
-      "detail": {
-        "loading": "Loading...",
-        "breadcrumb": {
-          "home": "Home",
-          "blog": "Blog",
-          "guides": "Shopping Guides"
-        },
-        "category": "Shopping Guides",
-        "author": {
-          "name": "Maria Silva",
-          "role": "E-commerce Specialist",
-          "bio": "Over 8 years helping people make smart online purchases."
-        },
-        "meta": {
-          "readingTime": "{n} min read",
-          "views": "{n} views"
-        },
-        "sections": {
-          "introduction": "Choosing the right product may seem simple, but with so many options available online, it's easy to get lost among technical specifications, reviews, and prices. This guide will help you make more assertive decisions.",
-          "step1": "Define Your Needs",
-          "step2": "Research and Compare",
-          "step3": "Make the Final Decision",
-          "tipTitle": "Important Tip",
-          "tipText": "Always consider long-term cost-benefit. A more expensive product today may be more economical over time.",
-          "reviewTitle": "Reviews",
-          "reviewText": "Always read the latest reviews and look for detailed comments about product usage."
-        },
-        "checklist": {
-          "title": "Shopping Checklist",
-          "items": {
-            "specs": "Checked technical specifications",
-            "reviews": "Read at least 5 recent reviews",
-            "prices": "Compared prices across 3 stores",
-            "returnPolicy": "Checked exchange and return policies",
-            "warranty": "Confirmed product warranty"
-          }
-        },
-        "cta": {
-          "title": "Ready to Apply These Tips?",
-          "description": "Explore our community-recommended product selection.",
-          "button": "View Recommended Products"
-        },
-        "tags": {
-          "onlineShopping": "#online-shopping",
-          "guides": "#guides",
-          "ecommerce": "#ecommerce",
-          "tips": "#tips"
-        },
-        "share": {
-          "title": "Enjoyed the content?",
-          "description": "Share with your friends!",
-          "facebook": "Share",
-          "twitter": "Tweet"
-        },
-        "sidebar": {
-          "aboutAuthor": "About the Author",
-          "followAuthor": "Follow Author",
-          "relatedPosts": "Related Posts",
-          "newsletter": "📧 Newsletter",
-          "newsletterText": "Get weekly smart shopping tips!",
-          "newsletterPlaceholder": "Your email",
-          "newsletterButton": "Subscribe Free"
-        },
-        "relatedPosts": {
-          "post1": "10 Common Online Shopping Mistakes",
-          "post2": "How to Save Money on Black Friday",
-          "post3": "Best Selling Products of the Month",
-          "time1": "5 min read",
-          "time2": "7 min read",
-          "time3": "3 min read"
-        }
+      "featuredTitle": "Mastering the Future of E-commerce in 2026",
+      "featuredDescription": "Explore how AI, serverless architectures, and premium UX design are reshaping the way we build and shop online.",
+      "authorRole": "Lead Developer",
+      "categories": {
+        "all": "All",
+        "technology": "Technology",
+        "marketing": "Marketing",
+        "innovation": "Innovation",
+        "security": "Security",
+        "lifestyle": "Lifestyle"
       }
     },
     "wishlist": {
       "title": "Wishlist",
-      "description": "Your personalized wishlist",
-      "empty": "Your wishlist is empty",
+      "description": "Your collection of favorite items.",
+      "empty": "Your wishlist is waiting for some love.",
       "continueShopping": "Continue Shopping",
-      "viewProduct": "View Product"
+      "viewProduct": "View Product",
+      "savedItems": "{count} Saved Items",
+      "loading": "Loading your wishlist...",
+      "savedAt": "Saved at {date}",
+      "product": "Product"
     },
     "profiles": {
-      "title": "Profiles",
-      "description": "User profiles on the platform",
-      "loading": "Loading...",
-      "readMore": "Read More",
-      "detail": {
-        "loading": "Loading...",
-        "photoAlt": "Profile Photo",
-        "premiumSince": "Premium Customer since 2020",
-        "stats": {
-          "orders": "Orders",
-          "totalSpent": "Total Spent",
-          "rating": "Rating"
-        },
-        "personalInfo": "Personal Information",
-        "edit": "Edit",
-        "fields": {
-          "fullName": "Full Name",
-          "email": "Email",
-          "phone": "Phone",
-          "birthDate": "Birth Date"
-        },
-        "lastOrders": "Last Orders",
-        "viewAllOrders": "View All Orders",
-        "totalOrders": "Total Orders",
-        "favorites": "Favorite Items",
-        "premiumStatus": "Premium Status",
-        "savedAddresses": "Saved Addresses",
-        "addresses": {
-          "home": "Home",
-          "work": "Work",
-          "main": "Main",
-          "add": "Add Address"
-        },
-        "coupons": "Available Coupons"
-      }
+      "title": "Community",
+      "description": "Meet the members of our platform",
+      "loading": "Loading profiles...",
+      "readMore": "View Profile",
+      "search": "Search profiles...",
+      "explorer": "Explorer",
+      "member": "Member"
     },
     "stores": {
-      "title": "Stores",
-      "description": "Meet our partner stores",
-      "buy": "Buy Now",
-      "addToCart": "Add to cart"
+      "title": "Our Stores",
+      "description": "Find the nearest physical store to you",
+      "search": "Search by city or neighborhood...",
+      "openNow": "Open Now",
+      "directions": "Directions",
+      "details": "Details",
+      "cta": {
+        "title": "Didn't find a store near you?",
+        "description": "Don't worry! We ship worldwide and offer 24/7 online support.",
+        "button": "Shop Online Now"
+      },
+      "locations": {
+        "sp": {
+          "name": "São Paulo Flagship",
+          "address": "1000 Paulista Ave - Bela Vista",
+          "hours": "Mon-Sat: 10:00 - 22:00"
+        },
+        "rj": {
+          "name": "Rio de Janeiro Central",
+          "address": "500 Visconde de Pirajá St - Ipanema",
+          "hours": "Mon-Sat: 10:00 - 20:00"
+        },
+        "curitiba": {
+          "name": "Curitiba Design Hub",
+          "address": "1500 Batel Ave - Batel",
+          "hours": "Mon-Sat: 11:00 - 19:00"
+        },
+        "bh": {
+          "name": "Belo Horizonte Studio",
+          "address": "1200 Bahia St - Lourdes",
+          "hours": "Mon-Sat: 09:00 - 21:00"
+        },
+        "poa": {
+          "name": "Porto Alegre Tech Lab",
+          "address": "2000 Nilo Peçanha Ave - Boa Vista",
+          "hours": "Mon-Fri: 10:00 - 20:00"
+        },
+        "brasilia": {
+          "name": "Brasília Modern Store",
+          "address": "SCLS 403 Block B - Asa Sul",
+          "hours": "Mon-Sat: 10:00 - 22:00"
+        }
+      }
     }
   }
 }

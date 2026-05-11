@@ -18,7 +18,7 @@
               :placeholder="$t('admin.navbar.search.placeholder')" 
               id="kbdInput" 
             />
-            <label class="sr-only" for="kbdInput">Search</label>
+            <label class="sr-only" for="kbdInput">{{ t('admin.navbar.search.ariaLabel') }}</label>
           </div>
         </div>
 
@@ -158,30 +158,30 @@ const localizedRouteName = computed(() => {
   return module.charAt(0).toUpperCase() + module.slice(1).replace(/-/g, ' ')
 })
 
-const activities = [
+const activities = computed(() => [
   { 
     id: 1, 
     user: 'Gilcier Junior', 
-    message: 'atualizou o status do pedido #1042', 
-    time: '18 min atrás', 
+    message: t('admin.dashboard.activity.messages.orderUpdate', { id: '#1042' }), 
+    time: t('admin.dashboard.activity.time.minsAgo', { n: 18 }), 
     avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
     content: 'O status foi alterado de pendente para pago após confirmação do gateway.'
   },
   { 
     id: 2, 
     user: 'Maria Silva', 
-    message: 'adicionou um novo cupom de desconto', 
-    time: '1 hora atrás', 
+    message: t('admin.dashboard.activity.messages.couponAdd'), 
+    time: t('admin.dashboard.activity.time.hourAgo'), 
     avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png'
   },
   { 
     id: 3, 
     user: 'Sistema', 
-    message: 'backup diário concluído com sucesso', 
-    time: '3 horas atrás', 
+    message: t('admin.dashboard.activity.messages.backupComplete'), 
+    time: t('admin.dashboard.activity.time.hoursAgo', { n: 3 }), 
     avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png'
   }
-]
+])
 
 function handleLogout() {
   logout()

@@ -103,7 +103,8 @@ export default defineNuxtConfig({
           "en/admin.json", "en/auth.json", "en/cart.json", "en/common.json",
           "en/contact.json", "en/order.json", "en/pages.json", "en/payment.json",
           "en/post.json", "en/privacy.json", "en/product.json", "en/profile.json",
-          "en/seed.json", "en/shipping.json", "en/terms.json", "en/variant.json"
+          "en/seed.json", "en/shipping.json", "en/terms.json", "en/variant.json",
+          "en/header.json", "en/footer.json"
         ],
         name: "English",
       },
@@ -114,7 +115,8 @@ export default defineNuxtConfig({
           "es/admin.json", "es/auth.json", "es/cart.json", "es/common.json",
           "es/contact.json", "es/order.json", "es/pages.json", "es/payment.json",
           "es/post.json", "es/privacy.json", "es/product.json", "es/profile.json",
-          "es/seed.json", "es/shipping.json", "es/terms.json", "es/variant.json"
+          "es/seed.json", "es/shipping.json", "es/terms.json", "es/variant.json",
+          "es/header.json", "es/footer.json"
         ],
         name: "Español",
       },
@@ -125,7 +127,8 @@ export default defineNuxtConfig({
           "pt-BR/admin.json", "pt-BR/auth.json", "pt-BR/cart.json", "pt-BR/common.json",
           "pt-BR/contact.json", "pt-BR/order.json", "pt-BR/pages.json", "pt-BR/payment.json",
           "pt-BR/post.json", "pt-BR/privacy.json", "pt-BR/product.json", "pt-BR/profile.json",
-          "pt-BR/seed.json", "pt-BR/shipping.json", "pt-BR/terms.json", "pt-BR/variant.json"
+          "pt-BR/seed.json", "pt-BR/shipping.json", "pt-BR/terms.json", "pt-BR/variant.json",
+          "pt-BR/header.json", "pt-BR/footer.json"
         ],
         name: "Português Brasil",
       },

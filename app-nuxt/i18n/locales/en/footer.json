@@ -1,0 +1,33 @@
+{
+  "footer": {
+    "brandDescription": "Your premium destination for high-quality products, built with the power of Rust and Nuxt.",
+    "socialTitle": "Follow Us",
+    "links": {
+      "title": "Company",
+      "about": "About Us",
+      "faq": "FAQ",
+      "howItWorks": "How it Works",
+      "plans": "Plans & Pricing",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "contact": "Contact Us"
+    },
+    "menu": {
+      "title": "Quick Menu",
+      "home": "Home",
+      "products": "Products",
+      "stores": "Our Stores",
+      "advertise": "Advertise with Us"
+    },
+    "subscribe": {
+      "title": "Stay Ahead",
+      "description": "Subscribe to our newsletter and get exclusive access to news, special offers and early discounts.",
+      "placeholder": "Your email address",
+      "button": "Subscribe Now"
+    },
+    "backToTop": "Back to top",
+    "copyright": "© {year} App Rust Nuxt Store. All rights reserved.",
+    "createdBy": "Created by Gilcierweb",
+    "bestViewed": "Best viewed in modern browsers."
+  }
+}

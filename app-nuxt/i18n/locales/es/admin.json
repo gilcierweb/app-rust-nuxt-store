@@ -1,17 +1,20 @@
 {
   "admin": {
     "section": "Admin",
-    "title": "Resumen operativo",
-    "description": "Monitorea los módulos críticos y sigue el estado actual de la administración.",
+    "title": "Resumen operacional",
+    "description": "Monitore los módulos críticos y siga el estado actual de la administración.",
     "statusLabels": {
       "active": "Activo",
       "inactive": "Inactivo",
       "pending": "Pendiente",
       "archived": "Archivado",
-      "inProgress": "En curso",
+      "inProgress": "En progreso",
       "completed": "Completado",
       "cancelled": "Cancelado",
       "paid": "Pagado",
+      "confirmed": "Confirmado",
+      "shipped": "Enviado",
+      "delivered": "Entregado",
       "approved": "Aprobado",
       "rejected": "Rechazado",
       "unknown": "Desconocido"
@@ -47,7 +50,7 @@
       "permissionsTitle": "Permisos",
       "fields": {
         "id": "ID",
-        "email": "Correo electrónico",
+        "email": "E-mail",
         "profile": "Perfil"
       },
       "emptyRoles": "Ningún rol asignado.",
@@ -74,18 +77,22 @@
       "terms": "Términos",
       "privacy": "Privacidad",
       "workspace": "Espacio de Trabajo",
-      "alertsHub": "Centro de Alertas",
-      "reportsHub": "Centro de Informes",
-      "openApiDocs": "Abrir Documentación de la API",
-      "category_ecommerce": "Comercio",
+      "alertsHub": "Central de Alertas",
+      "reportsHub": "Central de Informes",
+      "openApiDocs": "Abrir Documentación de API",
+      "category_ecommerce": "E-commerce",
       "category_logistics": "Logística",
       "category_content": "Contenido",
       "category_admin": "Administración"
     },
     "dashboard": {
       "title": "Admin Dashboard",
+      "welcome": "Bienvenido al panel operativo de su tienda.",
+      "last30Days": "Últimos 30 días",
+      "report": "Informe",
+      "syncing": "Sincronizando sus pedidos...",
       "search": {
-        "placeholder": "Escribe para buscar...",
+        "placeholder": "Escriba para buscar...",
         "ariaLabel": "Buscar"
       },
       "profile": {
@@ -93,9 +100,9 @@
         "myAccount": "Mi cuenta",
         "settings": "Configuración",
         "billing": "Facturación",
-        "manageTeam": "Administrar equipo",
+        "manageTeam": "Gestionar equipo",
         "customisation": "Personalización",
-        "addTeamAccount": "Agregar cuenta de equipo",
+        "addTeamAccount": "Añadir cuenta de equipo",
         "logout": "Cerrar sesión"
       },
       "activity": {
@@ -105,23 +112,28 @@
           "hourAgo": "Hace 1 hora",
           "hoursAgo": "Hace {n} horas",
           "daysAgo": "Hace {n} días"
+        },
+        "messages": {
+          "orderUpdate": "actualizó el estado del pedido {id}",
+          "couponAdd": "añadió un nuevo cupón de descuento",
+          "backupComplete": "copia de seguridad diaria completada con éxito"
         }
       },
       "sidebar": {
         "pages": "Páginas",
         "dashboard": "Panel",
         "default": "Predeterminado",
-        "analytics": "Analíticas",
+        "analytics": "Análisis",
         "ecommerce": "Comercio",
-        "accountSetting": "Configuración de cuenta",
+        "accountSetting": "Configuración de Cuenta",
         "account": "Cuenta",
         "security": "Seguridad",
-        "billingPlans": "Facturación y planes",
+        "billingPlans": "Facturación y Planes",
         "notifications": "Notificaciones",
         "connections": "Conexiones",
         "misc": "Varios",
         "error": "Error",
-        "underMaintenance": "En mantenimiento",
+        "underMaintenance": "En Mantenimiento",
         "authentications": "Autenticaciones"
       },
       "workspace": {
@@ -136,32 +148,48 @@
         "invoice": "Facturación",
         "invoiceProgress": "${current} de ${total}",
         "orderProgressbar": "Progreso de Pedidos",
-        "revenueProgressbar": "Progreso de Ingresos",
-        "invoiceProgressbar": "Progreso de Facturación",
+        "revenueProgressbar": "Progresso de Ingresos",
+        "invoiceProgressbar": "Progresso de Facturación",
         "websiteTraffic": "Tráfico del Sitio",
         "trafficChange": "{percent}% ↗ que la semana pasada",
         "newSignups": "Nuevos Registros",
         "signupsChange": "{percent}% de aumento este mes",
         "customerRetention": "Retención de Clientes",
         "retentionChange": "Estable en el último trimestre",
-        "totalPageViews": "Total de visitas",
+        "totalPageViews": "Total de visualizaciones",
         "pageViewsChange": "{percent}% ↗ que el mes pasado",
         "totalSales": "Total de Ventas",
         "activeCustomers": "Clientes Activos",
         "period": "De {start} a {end}",
         "subscription": "Plan de Suscripción",
         "subscriptionPlan": "Premium",
-        "upgradePlan": "Actualizar Plan",
-        "nextBilling": "Próxima Facturación",
+        "upgradePlan": "Mejorar Plan",
+        "nextBilling": "Próximo Cobro",
         "nextBillingDate": "15 de Oct, 2024",
         "viewDetails": "Ver Detalles",
         "changePayment": "Cambiar Método de Pago"
+      },
+      "charts": {
+        "salesEvolution": "Evolución de Ventas",
+        "daily": "Diario",
+        "monthly": "Mensual",
+        "salesByCategory": "Ventas por Categoría",
+        "totalSales": "Total Ventas",
+        "topProducts": "Productos Más Vendidos",
+        "recentOrders": "Pedidos Recientes",
+        "viewAll": "Ver todos"
+      },
+      "kpis": {
+        "monthlyRevenue": "Facturación Mensual",
+        "newOrders": "Nuevos Pedidos",
+        "newCustomers": "Nuevos Clientes",
+        "conversionRate": "Tasa de Conversión"
       }
     },
     "products": {
       "title": "Productos",
       "searchPlaceholder": "Buscar productos...",
-      "add": "Agregar",
+      "add": "Añadir",
       "table": {
         "name": "Nombre",
         "price": "Precio",
@@ -173,15 +201,15 @@
       },
       "edit": "Editar",
       "delete": "Eliminar",
-      "view": "Ver",
+      "view": "Visualizar",
       "confirmDelete": "¿Está seguro de que desea eliminar \"{name}\"?",
-      "errorDelete": "Error al eliminar producto",
+      "errorDelete": "Error al eliminar el producto",
       "detail": {
         "title": "Detalles del Producto",
         "loading": "Cargando producto...",
-        "error": "Error al cargar producto: {message}",
+        "error": "Error al cargar el producto: {message}",
         "back": "Volver",
-        "backList": "← Volver a la Lista",
+        "backList": "← Voltar para Lista",
         "active": "Activo",
         "inactive": "Inactivo",
         "draft": "Borrador",
@@ -193,19 +221,19 @@
         "fullDescription": "Descripción Completa",
         "images": "Galería de Imágenes",
         "cover": "Portada",
-        "manageVariants": "Gestionar Variaciones"
+        "manageVariants": "Gestionar Variantes"
       },
       "new": {
-        "title": "Agregar Nuevo Producto"
+        "title": "Añadir Nuevo Producto"
       },
       "editTitle": "Editar Producto",
       "loading": "Cargando producto...",
-      "error": "Error al cargar producto: {message}"
+      "error": "Error al cargar el producto: {message}"
     },
     "categories": {
       "title": "Categorías",
       "searchPlaceholder": "Buscar categorías",
-      "add": "Agregar",
+      "add": "Añadir",
       "loading": "Cargando categorías...",
       "error": "Error al cargar categorías: {message}",
       "notFound": "No se encontraron categorías.",
@@ -222,7 +250,7 @@
       "detail": {
         "title": "Detalles de la Categoría",
         "loading": "Cargando detalles de la categoría...",
-        "error": "Error al cargar categoría: {message}",
+        "error": "Error al cargar la categoría: {message}",
         "tryAgain": "Intentar de nuevo",
         "notFound": "Categoría no encontrada.",
         "back": "Volver a la lista",
@@ -241,7 +269,7 @@
         "edit": "Editar",
         "delete": "Eliminar",
         "confirmDelete": "¿Está seguro de que desea eliminar la categoría \"{name}\"?",
-        "errorDelete": "Error al eliminar categoría"
+        "errorDelete": "Error al eliminar la categoría"
       }
     },
     "coupons": {
@@ -263,7 +291,7 @@
       },
       "types": {
         "percentage": "Porcentaje",
-        "fixed": "Valor Fixo",
+        "fixed": "Valor Fijo",
         "freeShipping": "Envío Gratis",
         "unknown": "Desconocido"
       },
@@ -275,10 +303,10 @@
         "inactive": "Inactivo",
         "expiresAt": "Expiración",
         "neverExpires": "No expira",
-        "minAmount": "Monto Mínimo",
+        "minAmount": "Valor Mínimo",
         "maxDiscount": "Descuento Máximo",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar el cupón \"{name}\"?",
+        "confirmDelete": "¿Está seguro de que desea eliminar el cupón \"{name}\"?",
         "errorDelete": "Error al eliminar el cupón"
       }
     },
@@ -306,18 +334,18 @@
       }
     },
     "posts": {
-      "title": "Publicaciones",
-      "searchPlaceholder": "Buscar publicaciones",
+      "title": "Posts",
+      "searchPlaceholder": "Buscar posts",
       "add": "Añadir",
-      "loading": "Cargando publicaciones...",
-      "error": "Error al cargar publicaciones: {message}",
-      "notFound": "No se encontraron publicaciones.",
-      "createFirst": "Crear primera publicación",
+      "loading": "Cargando posts...",
+      "error": "Error al cargar posts: {message}",
+      "notFound": "No se encontraron posts.",
+      "createFirst": "Crear primer post",
       "noTitle": "(Sin título)",
       "table": {
         "title": "Título",
         "status": "Estado",
-        "author": "ID de Autor",
+        "author": "Autor ID",
         "date": "Fecha",
         "actions": "Acciones"
       },
@@ -333,12 +361,12 @@
         "unknown": "Desconocido"
       },
       "detail": {
-        "title": "Detalles de la Publicación",
+        "title": "Detalles del Post",
         "content": "Contenido",
         "noContent": "Sin contenido",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar la publicación \"{name}\"?",
-        "errorDelete": "Error al eliminar la publicación"
+        "confirmDelete": "¿Está seguro de que desea eliminar el post \"{name}\"?",
+        "errorDelete": "Error al eliminar el post"
       }
     },
     "customers": {
@@ -351,9 +379,9 @@
       "createFirst": "Crear primer cliente",
       "table": {
         "name": "Nombre",
-        "username": "Nombre de usuario",
+        "username": "Username",
         "phone": "Teléfono",
-        "user": "ID de Usuario",
+        "user": "Usuario ID",
         "date": "Fecha",
         "actions": "Acciones"
       },
@@ -363,12 +391,12 @@
         "firstName": "Nombre",
         "lastName": "Apellido",
         "fullName": "Nombre Completo",
-        "username": "Nombre de usuario",
+        "username": "Username",
         "phone": "Teléfono",
-        "bio": "Biografía",
+        "bio": "Bio",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar el cliente \"{name}\"?",
-        "errorDelete": "Error al eliminar el cliente"
+        "confirmDelete": "¿Está seguro de que desea eliminar al cliente \"{name}\"?",
+        "errorDelete": "Error al eliminar al cliente"
       }
     },
     "users": {
@@ -402,8 +430,8 @@
       "notFound": "No se encontraron reseñas.",
       "createFirst": "Crear primera reseña",
       "table": {
-        "product": "ID de Producto",
-        "user": "ID de Usuario",
+        "product": "Producto ID",
+        "user": "Usuario ID",
         "rating": "Calificación",
         "title": "Título",
         "verified": "Verificada",
@@ -421,7 +449,7 @@
         "title": "Detalles de la Reseña",
         "comment": "Comentario",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar la reseña #{id}?",
+        "confirmDelete": "¿Está seguro de que desea eliminar la reseña #{id}?",
         "errorDelete": "Error al eliminar la reseña"
       }
     },
@@ -434,7 +462,7 @@
       "notFound": "No se encontraron envíos.",
       "table": {
         "order": "Pedido",
-        "tracking": "Rastreo",
+        "tracking": "Seguimiento",
         "carrier": "Transportista",
         "status": "Estado",
         "date": "Fecha",
@@ -443,7 +471,7 @@
       "detail": {
         "title": "Detalles del Envío",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar el envío #{id}?",
+        "confirmDelete": "¿Está seguro de que desea eliminar el envío #{id}?",
         "errorDelete": "Error al eliminar el envío"
       }
     },
@@ -472,7 +500,7 @@
       "detail": {
         "title": "Detalles del Método de Envío",
         "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar el método de envío \"{name}\"?",
+        "confirmDelete": "¿Está seguro de que desea eliminar el método de envío \"{name}\"?",
         "errorDelete": "Error al eliminar el método de envío"
       }
     },
@@ -489,8 +517,8 @@
         "type": "Tipo",
         "address": "Dirección",
         "cityState": "Ciudad/Estado",
-        "default": "Predeterminada",
-        "user": "ID de Usuario",
+        "default": "Predeterminado",
+        "user": "Usuario ID",
         "actions": "Acciones"
       },
       "types": {
@@ -499,12 +527,10 @@
         "other": "Otro"
       },
       "status": {
-        "default": "Predeterminada"
+        "default": "Predeterminado"
       },
       "detail": {
-        "title": "Detalles de la Dirección",
-        "back": "Volver a la lista",
-        "confirmDelete": "¿Estás seguro de que deseas eliminar la dirección de \"{name}\"?",
+        "confirmDelete": "¿Está seguro de que desea eliminar la dirección de \"{name}\"?",
         "errorDelete": "Error al eliminar la dirección"
       }
     }

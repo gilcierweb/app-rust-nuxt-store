@@ -1,0 +1,18 @@
+{
+  "header": {
+    "home": "Home",
+    "categories": "Categorias",
+    "products": "Produtos",
+    "stores": "Lojas",
+    "posts": "Blog",
+    "profiles": "Comunidade",
+    "contact": "Contato",
+    "about": "Sobre",
+    "cart": "Carrinho",
+    "admin": "Admin",
+    "profile": "Perfil",
+    "signOut": "Sair",
+    "logIn": "Entrar",
+    "getStarted": "Começar"
+  }
+}

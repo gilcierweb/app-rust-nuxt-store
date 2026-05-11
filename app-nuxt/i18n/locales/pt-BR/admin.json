@@ -12,6 +12,9 @@
       "completed": "Concluído",
       "cancelled": "Cancelado",
       "paid": "Pago",
+      "confirmed": "Confirmado",
+      "shipped": "Enviado",
+      "delivered": "Entregue",
       "approved": "Aprovado",
       "rejected": "Rejeitado",
       "unknown": "Desconhecido"
@@ -84,6 +87,10 @@
     },
     "dashboard": {
       "title": "Admin Dashboard",
+      "welcome": "Bem-vindo ao painel operacional da sua loja.",
+      "last30Days": "Últimos 30 dias",
+      "report": "Relatório",
+      "syncing": "Sincronizando seus pedidos...",
       "search": {
         "placeholder": "Digite para buscar...",
         "ariaLabel": "Buscar"
@@ -105,6 +112,11 @@
           "hourAgo": "Há 1 hora",
           "hoursAgo": "Há {n} horas",
           "daysAgo": "Há {n} dias"
+        },
+        "messages": {
+          "orderUpdate": "atualizou o status do pedido {id}",
+          "couponAdd": "adicionou um novo cupom de desconto",
+          "backupComplete": "backup diário concluído com sucesso"
         }
       },
       "sidebar": {
@@ -156,6 +168,22 @@
         "nextBillingDate": "15 de Out, 2024",
         "viewDetails": "Ver Detalhes",
         "changePayment": "Alterar Método de Pagamento"
+      },
+      "charts": {
+        "salesEvolution": "Evolução de Vendas",
+        "daily": "Diário",
+        "monthly": "Mensal",
+        "salesByCategory": "Vendas por Categoria",
+        "totalSales": "Total Vendas",
+        "topProducts": "Produtos Mais Vendidos",
+        "recentOrders": "Pedidos Recentes",
+        "viewAll": "Ver todos"
+      },
+      "kpis": {
+        "monthlyRevenue": "Faturamento Mensal",
+        "newOrders": "Novos Pedidos",
+        "newCustomers": "Novos Clientes",
+        "conversionRate": "Taxa de Conversão"
       }
     },
     "products": {

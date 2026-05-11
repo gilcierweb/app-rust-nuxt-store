@@ -7,9 +7,9 @@
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div class="space-y-6">
             <span class="badge badge-primary badge-soft px-4 py-1.5 rounded-lg">{{ t('pages.posts.featured') }}</span>
-            <h1 class="h1 leading-tight gradient-text">Mastering the Future of E-commerce in 2026</h1>
+            <h1 class="h1 leading-tight gradient-text">{{ t('pages.posts.featuredTitle') }}</h1>
             <p class="text-xl text-base-content/60 leading-relaxed">
-              Explore how AI, serverless architectures, and premium UX design are reshaping the way we build and shop online.
+              {{ t('pages.posts.featuredDescription') }}
             </p>
             <div class="flex items-center gap-4 pt-4">
               <div class="size-12 rounded-2xl bg-white shadow-sm border border-base-200 flex items-center justify-center">
@@ -17,7 +17,7 @@
               </div>
               <div>
                 <p class="font-bold">Gabriel Rocha</p>
-                <p class="text-xs text-base-content/40">Lead Developer • {{ t('pages.posts.readTime', { n: 5 }) }}</p>
+                <p class="text-xs text-base-content/40">{{ t('pages.posts.authorRole') }} • {{ t('pages.posts.readTime', { n: 5 }) }}</p>
               </div>
             </div>
             <button class="btn btn-primary btn-lg rounded-2xl px-10 shadow-xl shadow-primary/20">{{ t('pages.posts.readMore') }}</button>
@@ -36,10 +36,10 @@
     <!-- Categories & Search -->
     <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
       <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full md:w-auto">
-        <button v-for="cat in blogCategories" :key="cat" 
+        <button v-for="cat in blogCategories" :key="cat.key" 
           class="btn btn-soft btn-sm rounded-xl px-6 whitespace-nowrap"
-          :class="cat === 'All' ? 'btn-primary' : ''">
-          {{ cat }}
+          :class="cat.key === 'all' ? 'btn-primary' : ''">
+          {{ t(cat.label) }}
         </button>
       </div>
       
@@ -70,13 +70,13 @@
             <span class="icon-[tabler--article] size-16 text-base-content/10 group-hover:scale-110 transition-transform duration-700"></span>
           </div>
           <div class="absolute top-4 left-4">
-            <span class="badge badge-primary backdrop-blur-md font-bold px-3 py-3 rounded-lg">Tech</span>
+            <span class="badge badge-primary backdrop-blur-md font-bold px-3 py-3 rounded-lg">{{ t('pages.posts.categories.technology') }}</span>
           </div>
         </div>
         
         <div class="p-8">
           <div class="flex items-center gap-3 text-xs text-base-content/40 mb-4">
-            <span class="flex items-center gap-1"><span class="icon-[tabler--calendar] size-3.5"></span> July 15, 2025</span>
+            <span class="flex items-center gap-1"><span class="icon-[tabler--calendar] size-3.5"></span> {{ new Date('2025-07-15').toLocaleDateString(locale) }}</span>
             <span class="flex items-center gap-1"><span class="icon-[tabler--clock] size-3.5"></span> {{ t('pages.posts.readTime', { n: 5 }) }}</span>
           </div>
           
@@ -119,7 +119,7 @@
 
 <script setup lang="ts">
 import type { Post } from '~/types';
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();
 
@@ -132,7 +132,14 @@ useSeoMeta({
 
 const { pending, data: posts } = await useLazyFetch<Post[]>(`${config.public.baseURL}/api/posts`)
 
-const blogCategories = ['All', 'Technology', 'Marketing', 'Innovation', 'Security', 'Lifestyle']
+const blogCategories = [
+  { key: 'all', label: 'pages.posts.categories.all' },
+  { key: 'technology', label: 'pages.posts.categories.technology' },
+  { key: 'marketing', label: 'pages.posts.categories.marketing' },
+  { key: 'innovation', label: 'pages.posts.categories.innovation' },
+  { key: 'security', label: 'pages.posts.categories.security' },
+  { key: 'lifestyle', label: 'pages.posts.categories.lifestyle' }
+]
 </script>
 
 <style scoped>

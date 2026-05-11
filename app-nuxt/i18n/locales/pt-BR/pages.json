@@ -86,13 +86,14 @@
     },
     "privacy": {
       "title": "Política de Privacidade",
-      "description": "Política de privacidade da App Rust Nuxt Store"
+      "description": "Política de privacidade da App Rust Nuxt Store",
+      "questions": "Ao se inscrever, você concorda com nossa {contact}."
     },
     "contact": {
       "title": "Contato",
       "description": "Entre em contato conosco para qualquer dúvida ou suporte",
       "hero": {
-        "title": "Vamos Conversar",
+        "title": "Let's Talk",
         "description": "Tem alguma dúvida ou quer saber mais sobre nossos produtos? Nossa equipe está pronta para ajudar você."
       },
       "info": {
@@ -113,9 +114,17 @@
           "name": "Como devemos te chamar?",
           "email": "exemplo{'@'}email.com",
           "subject": "Sobre o que você quer falar?",
-          "message": "Escreva aqui sua mensagem..."
+          "message": "Escreva aqui sua mensagem...",
+          "subjects": {
+            "general": "Assunto Geral",
+            "support": "Suporte Técnico",
+            "sales": "Vendas e Parcerias",
+            "other": "Outro"
+          }
         }
-      }
+      },
+      "mapPlaceholder": "Mapa Interativo",
+      "followUs": "Siga-nos"
     },
     "categories": {
       "title": "Categorias",
@@ -135,7 +144,7 @@
       "checkout": "Finalizar Compra",
       "continueShopping": "Continuar Comprando",
       "remove": "Remover",
-      "quantity": "Qtd",
+      "quantity": "Quantidade",
       "total": "Total",
       "summary": "Resumo do Pedido",
       "itemAdded": "Item adicionado ao carrinho",
@@ -219,6 +228,17 @@
         "title": "Últimas Novidades",
         "description": "Descubra as tendências mais quentes do e-commerce",
         "cta": "Explorar Posts"
+      },
+      "featuredTitle": "Dominando o Futuro do E-commerce em 2026",
+      "featuredDescription": "Explore como IA, arquiteturas serverless e design UX premium estão remodelando a maneira como construímos e compramos online.",
+      "authorRole": "Desenvolvedor Líder",
+      "categories": {
+        "all": "Tudo",
+        "technology": "Tecnologia",
+        "marketing": "Marketing",
+        "innovation": "Inovação",
+        "security": "Segurança",
+        "lifestyle": "Estilo de Vida"
       }
     },
     "wishlist": {
@@ -228,14 +248,18 @@
       "continueShopping": "Continuar Comprando",
       "viewProduct": "Ver Produto",
       "savedItems": "{count} Itens Salvos",
-      "loading": "Carregando sua lista de desejos..."
+      "loading": "Carregando sua lista de desejos...",
+      "savedAt": "Salvo em {date}",
+      "product": "Produto"
     },
     "profiles": {
       "title": "Comunidade",
       "description": "Conheça os membros da nossa plataforma",
       "loading": "Carregando perfis...",
       "readMore": "Ver Perfil",
-      "search": "Buscar perfis..."
+      "search": "Buscar perfis...",
+      "explorer": "Explorador",
+      "member": "Membro"
     },
     "stores": {
       "title": "Nossas Lojas",
@@ -248,6 +272,38 @@
         "title": "Não encontrou uma loja perto de você?",
         "description": "Não se preocupe! Enviamos para todo o mundo e oferecemos suporte 24/7 online.",
         "button": "Compre Online Agora"
+      },
+      "locations": {
+        "sp": {
+          "name": "São Paulo Flagship",
+          "address": "Av. Paulista, 1000 - Bela Vista",
+          "hours": "Seg-Sáb: 10:00 - 22:00"
+        },
+        "rj": {
+          "name": "Rio de Janeiro Central",
+          "address": "Rua Visconde de Pirajá, 500 - Ipanema",
+          "hours": "Seg-Sáb: 10:00 - 20:00"
+        },
+        "curitiba": {
+          "name": "Curitiba Design Hub",
+          "address": "Av. do Batel, 1500 - Batel",
+          "hours": "Seg-Sáb: 11:00 - 19:00"
+        },
+        "bh": {
+          "name": "Belo Horizonte Studio",
+          "address": "Rua de Bahia, 1200 - Lourdes",
+          "hours": "Seg-Sáb: 09:00 - 21:00"
+        },
+        "poa": {
+          "name": "Porto Alegre Tech Lab",
+          "address": "Av. Nilo Peçanha, 2000 - Boa Vista",
+          "hours": "Seg-Sex: 10:00 - 20:00"
+        },
+        "brasilia": {
+          "name": "Brasília Modern Store",
+          "address": "SCLS 403 Bloco B - Asa Sul",
+          "hours": "Seg-Sáb: 10:00 - 22:00"
+        }
       }
     }
   }

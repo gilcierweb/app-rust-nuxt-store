@@ -129,7 +129,7 @@
               <span class="icon-[tabler--brand-visa] size-8"></span>
               <span class="icon-[tabler--brand-mastercard] size-8"></span>
               <span class="icon-[tabler--brand-paypal] size-8"></span>
-              <span class="icon-[tabler--brand-apple-pay] size-8"></span>
+              <span class="icon-[logos--apple-pay] size-8"></span>
             </div>
           </div>
         </div>

@@ -53,12 +53,12 @@
            </button>
            
            <div class="absolute bottom-4 left-4">
-             <span class="badge badge-primary badge-soft backdrop-blur-md">Saved {{ new Date(item.created_at).toLocaleDateString('pt-BR') }}</span>
+             <span class="badge badge-primary badge-soft backdrop-blur-md">{{ t('pages.wishlist.savedAt', { date: new Date(item.created_at).toLocaleDateString(locale) }) }}</span>
            </div>
         </div>
         
         <div class="p-8">
-          <h3 class="h4 mb-6 group-hover:text-primary transition-colors">Produto #{{ item.product_id }}</h3>
+          <h3 class="h4 mb-6 group-hover:text-primary transition-colors">{{ t('pages.wishlist.product') }} #{{ item.product_id }}</h3>
           
           <div class="flex gap-3">
             <NuxtLink :to="`/products/${item.product_id}`" class="btn btn-primary grow rounded-xl shadow-lg shadow-primary/10">
@@ -76,7 +76,7 @@
 
 <script setup lang="ts">
 import type { WishlistItem } from '~/types'
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { wishlist, fetchWishlist, toggleWishlist } = useWishlist()
 const loading = ref(true)
 

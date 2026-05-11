@@ -8,14 +8,14 @@
             </div>
             <div class="navbar-center max-md:hidden">
                 <ul class="menu menu-horizontal p-0 font-medium">
-                    <li><NuxtLink to="/">Home</NuxtLink></li>
-                    <li><NuxtLink to="/categories">Categories</NuxtLink></li>
-                    <li><NuxtLink to="/products">Products</NuxtLink></li>
-                    <li><NuxtLink to="/stores">Stores</NuxtLink></li>
-                    <li><NuxtLink to="/posts">Posts</NuxtLink></li>
-                    <li><NuxtLink to="/profiles">Profiles</NuxtLink></li>
-                    <li><NuxtLink to="/contact">Contact</NuxtLink></li>
-                    <li><NuxtLink to="/about">About</NuxtLink></li>
+                    <li><NuxtLink to="/">{{ t('header.home') }}</NuxtLink></li>
+                    <li><NuxtLink to="/categories">{{ t('header.categories') }}</NuxtLink></li>
+                    <li><NuxtLink to="/products">{{ t('header.products') }}</NuxtLink></li>
+                    <li><NuxtLink to="/stores">{{ t('header.stores') }}</NuxtLink></li>
+                    <li><NuxtLink to="/posts">{{ t('header.posts') }}</NuxtLink></li>
+                    <li><NuxtLink to="/profiles">{{ t('header.profiles') }}</NuxtLink></li>
+                    <li><NuxtLink to="/contact">{{ t('header.contact') }}</NuxtLink></li>
+                    <li><NuxtLink to="/about">{{ t('header.about') }}</NuxtLink></li>
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
@@ -37,18 +37,18 @@
                     </button>
                     <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu"
                         aria-orientation="vertical" aria-labelledby="dropdown-default">
-                        <li><NuxtLink to="/" class="dropdown-item">Home</NuxtLink></li>
-                        <li><NuxtLink to="/categories" class="dropdown-item">Categories</NuxtLink></li>
-                        <li><NuxtLink to="/products" class="dropdown-item">Products</NuxtLink></li>
-                        <li><NuxtLink to="/cart" class="dropdown-item">Cart</NuxtLink></li>
-                        <li><NuxtLink to="/stores" class="dropdown-item">Stores</NuxtLink></li>
-                        <li><NuxtLink to="/posts" class="dropdown-item">Posts</NuxtLink></li>
-                        <li><NuxtLink to="/profiles" class="dropdown-item">Profiles</NuxtLink></li>
-                        <li><NuxtLink to="/contact" class="dropdown-item">Contact</NuxtLink></li>
-                        <li><NuxtLink to="/about" class="dropdown-item">About</NuxtLink></li>
+                        <li><NuxtLink to="/" class="dropdown-item">{{ t('header.home') }}</NuxtLink></li>
+                        <li><NuxtLink to="/categories" class="dropdown-item">{{ t('header.categories') }}</NuxtLink></li>
+                        <li><NuxtLink to="/products" class="dropdown-item">{{ t('header.products') }}</NuxtLink></li>
+                        <li><NuxtLink to="/cart" class="dropdown-item">{{ t('header.cart') }}</NuxtLink></li>
+                        <li><NuxtLink to="/stores" class="dropdown-item">{{ t('header.stores') }}</NuxtLink></li>
+                        <li><NuxtLink to="/posts" class="dropdown-item">{{ t('header.posts') }}</NuxtLink></li>
+                        <li><NuxtLink to="/profiles" class="dropdown-item">{{ t('header.profiles') }}</NuxtLink></li>
+                        <li><NuxtLink to="/contact" class="dropdown-item">{{ t('header.contact') }}</NuxtLink></li>
+                        <li><NuxtLink to="/about" class="dropdown-item">{{ t('header.about') }}</NuxtLink></li>
                         <li v-if="isAuthenticated"><hr class="my-1" /></li>
                         <li v-if="isAuthenticated">
-                            <NuxtLink to="/admin" class="dropdown-item">Admin</NuxtLink>
+                            <NuxtLink to="/admin" class="dropdown-item">{{ t('header.admin') }}</NuxtLink>
                         </li>
                     </ul>
                 </div>
@@ -56,26 +56,26 @@
                 <template v-if="isAuthenticated">
                     <NuxtLink to="/admin" class="btn btn-text btn-sm max-md:hidden">
                         <span class="icon-[tabler--layout-dashboard] size-4"></span>
-                        Admin
+                        {{ t('header.admin') }}
                     </NuxtLink>
                     <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
                         <button type="button" class="dropdown-toggle btn btn-text flex items-center gap-2" aria-haspopup="menu" aria-expanded="false">
                             <span class="icon-[tabler--user] size-4"></span>
-                            <span class="max-md:hidden">{{ user?.name || 'User' }}</span>
+                            <span class="max-md:hidden">{{ user?.name || t('header.profile') }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu">
-                            <li><NuxtLink to="/profiles" class="dropdown-item">Profile</NuxtLink></li>
-                            <li><button class="dropdown-item" @click="handleLogout">Sign out</button></li>
+                            <li><NuxtLink to="/profiles" class="dropdown-item">{{ t('header.profile') }}</NuxtLink></li>
+                            <li><button class="dropdown-item" @click="handleLogout">{{ t('header.signOut') }}</button></li>
                         </ul>
                     </div>
                 </template>
                 <template v-else>
                     <NuxtLink to="/users/sessions" class="btn max-md:btn-square btn-text">
-                        <span class="max-md:hidden">Log in</span>
+                        <span class="max-md:hidden">{{ t('header.logIn') }}</span>
                         <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
                     </NuxtLink>
                     <NuxtLink to="/users/registrations" class="btn max-md:btn-square btn-primary">
-                        <span class="max-md:hidden">Get started</span>
+                        <span class="max-md:hidden">{{ t('header.getStarted') }}</span>
                         <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
                     </NuxtLink>
                 </template>
@@ -85,6 +85,7 @@
 </template>
 
 <script lang="ts" setup>
+const { t } = useI18n()
 const { isAuthenticated, user, logout } = useAuth()
 const { toggleCart } = useCartUI()
 const cartStore = useCartStore()

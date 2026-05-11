@@ -1,0 +1,33 @@
+{
+  "footer": {
+    "brandDescription": "Ecommerce Rust Loco Nuxt Store.",
+    "socialTitle": "Siga-nos em:",
+    "links": {
+      "title": "Links",
+      "about": "Quem Somos",
+      "faq": "FAQ",
+      "howItWorks": "Como Funciona",
+      "plans": "Planos",
+      "privacy": "Privacidade",
+      "terms": "Termos",
+      "contact": "Contatos"
+    },
+    "menu": {
+      "title": "Menu",
+      "home": "Home",
+      "products": "Produtos",
+      "stores": "Lojas",
+      "advertise": "Anuncie"
+    },
+    "subscribe": {
+      "title": "Inscreva-se",
+      "description": "Inscreva-se em nossa newsletter para as últimas atualizações",
+      "placeholder": "Endereço de email",
+      "button": "Inscrever"
+    },
+    "backToTop": "Voltar ao topo",
+    "copyright": "Todos os direitos reservados",
+    "createdBy": "Site criado com o",
+    "bestViewed": "Site melhor visualizado com navegadores modernos como:"
+  }
+}

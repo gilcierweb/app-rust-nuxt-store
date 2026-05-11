@@ -12,6 +12,9 @@
       "completed": "Completed",
       "cancelled": "Cancelled",
       "paid": "Paid",
+      "confirmed": "Confirmed",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
       "approved": "Approved",
       "rejected": "Rejected",
       "unknown": "Unknown"
@@ -84,6 +87,10 @@
     },
     "dashboard": {
       "title": "Admin Dashboard",
+      "welcome": "Welcome to your store's operational dashboard.",
+      "last30Days": "Last 30 days",
+      "report": "Report",
+      "syncing": "Syncing your orders...",
       "search": {
         "placeholder": "Type to Search...",
         "ariaLabel": "Search"
@@ -105,6 +112,11 @@
           "hourAgo": "1 hour ago",
           "hoursAgo": "{n} hours ago",
           "daysAgo": "{n} days ago"
+        },
+        "messages": {
+          "orderUpdate": "updated order status {id}",
+          "couponAdd": "added a new discount coupon",
+          "backupComplete": "daily backup completed successfully"
         }
       },
       "sidebar": {
@@ -156,6 +168,22 @@
         "nextBillingDate": "Oct 15, 2024",
         "viewDetails": "View Details",
         "changePayment": "Change Payment Method"
+      },
+      "charts": {
+        "salesEvolution": "Sales Evolution",
+        "daily": "Daily",
+        "monthly": "Monthly",
+        "salesByCategory": "Sales by Category",
+        "totalSales": "Total Sales",
+        "topProducts": "Top Selling Products",
+        "recentOrders": "Recent Orders",
+        "viewAll": "View all"
+      },
+      "kpis": {
+        "monthlyRevenue": "Monthly Revenue",
+        "newOrders": "New Orders",
+        "newCustomers": "New Customers",
+        "conversionRate": "Conversion Rate"
       }
     },
     "products": {

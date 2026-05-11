@@ -5,11 +5,80 @@
       "description": "App Rust Nuxt Store - Tu tienda online completa con los mejores productos",
       "categories": "Categorías",
       "products": "Productos",
-      "autoImport": "Este es un componente importado automáticamente"
+      "autoImport": "Este es un componente importado automáticamente",
+      "productsSubtitle": "Nuestra selección especial para ti",
+      "shopAll": "Ver Todo",
+      "newsletter": {
+        "title": "Mantente Adelante",
+        "description": "Suscríbete a nuestro boletín y obtén acceso exclusivo a noticias, ofertas especiales y descuentos anticipados.",
+        "placeholder": "Tu dirección de correo",
+        "button": "Suscribirse Ahora"
+      },
+      "features": {
+        "shipping": {
+          "title": "Entrega Rápida y Gratis",
+          "description": "Envío gratis en todos los pedidos superiores a $200.00."
+        },
+        "payments": {
+          "title": "Pagos Seguros",
+          "description": "Tus datos están siempre seguros y encriptados."
+        },
+        "support": {
+          "title": "Soporte 24/7",
+          "description": "Nuestro equipo está siempre aquí para ayudarte."
+        }
+      }
     },
     "about": {
       "title": "Sobre Nosotros",
-      "description": "Esta página se mostrará en la ruta /about."
+      "description": "Conoce nuestra historia y valores",
+      "hero": {
+        "badge": "Sobre nuestra Trayectoria",
+        "title": "Elevando la Experiencia de E-commerce",
+        "description": "Somos más que una tienda. Somos un equipo de entusiastas dedicados a traer los mejores productos combinados con tecnología de punta."
+      },
+      "story": {
+        "title": "Nuestra Historia",
+        "p1": "Fundada en 2024, App Rust Nuxt Store comenzó con una idea simple: crear una experiencia de compra perfecta que combina el rendimiento de Rust con la flexibilidad de Nuxt.",
+        "p2": "Lo que comenzó como un pequeño proyecto creció hasta convertirse en una plataforma de escala completa que atiende a clientes en todo el mundo. Creemos en la calidad, la transparencia y la innovación.",
+        "stats": {
+          "customers": "Clientes Felices",
+          "products": "Productos Premium"
+        }
+      },
+      "mission": {
+        "title": "Nuestra Misión",
+        "description": "Brindar una experiencia de compra inigualable, seleccionando los mejores productos y entregándolos con velocidad y seguridad."
+      },
+      "vision": {
+        "title": "Nuestra Visión",
+        "description": "Convertirnos en la plataforma de e-commerce líder reconocida por su excelencia tecnológica y enfoque centrado en el cliente."
+      },
+      "values": {
+        "title": "Valores Principales",
+        "quality": {
+          "title": "Calidad Primero",
+          "description": "Nunca comprometemos la calidad de nuestros productos."
+        },
+        "innovation": {
+          "title": "Innovación",
+          "description": "Mejorando constantemente nuestra tecnología para un mejor desempeño."
+        },
+        "customerLove": {
+          "title": "Enfoque en el Cliente",
+          "description": "Tu satisfacción es nuestro objetivo principal."
+        },
+        "integrity": {
+          "title": "Integridad",
+          "description": "Transparentes y honestos en todas las transacciones."
+        }
+      },
+      "cta": {
+        "title": "¿Quieres saber más sobre nosotros?",
+        "description": "Estamos siempre abiertos a preguntas y asociaciones.",
+        "contact": "Ponte en Contacto",
+        "browse": "Ver Productos"
+      }
     },
     "terms": {
       "title": "Términos de Uso",
@@ -17,11 +86,45 @@
     },
     "privacy": {
       "title": "Política de Privacidad",
-      "description": "Política de privacidad de App Rust Nuxt Store"
+      "description": "Política de privacidad de App Rust Nuxt Store",
+      "questions": "Al suscribirte, aceptas nuestra {contact}."
     },
     "contact": {
       "title": "Contacto",
-      "description": "Ponte en contacto con App Rust Nuxt Store"
+      "description": "Ponte en contacto con nosotros para cualquier duda o soporte",
+      "hero": {
+        "title": "Hablemos",
+        "description": "¿Tienes alguna duda o quieres saber más sobre nuestros productos? Nuestro equipo está listo para ayudarte."
+      },
+      "info": {
+        "title": "Información de Contacto",
+        "address": "Av. Paulista, 1000 - São Paulo, SP",
+        "phone": "+55 (11) 9999-9999",
+        "email": "contacto{'@'}rustnuxtstore.com",
+        "hours": "Lunes a Viernes: 9h a 18h"
+      },
+      "form": {
+        "name": "Nombre Completo",
+        "email": "Tu E-mail",
+        "subject": "Asunto",
+        "message": "Tu Mensaje",
+        "submit": "Enviar Mensaje",
+        "success": "¡Mensaje enviado con éxito!",
+        "placeholders": {
+          "name": "¿Cómo debemos llamarte?",
+          "email": "ejemplo{'@'}email.com",
+          "subject": "¿Sobre qué quieres hablar?",
+          "message": "Escribe aquí tu mensaje...",
+          "subjects": {
+            "general": "Asunto General",
+            "support": "Soporte Técnico",
+            "sales": "Ventas y Asociaciones",
+            "other": "Otro"
+          }
+        }
+      },
+      "mapPlaceholder": "Mapa Interactivo",
+      "followUs": "Síguenos"
     },
     "categories": {
       "title": "Categorías",
@@ -39,223 +142,169 @@
       "empty": "Tu carrito está vacío",
       "subtotal": "Subtotal",
       "checkout": "Finalizar Compra",
-      "continueShopping": "Seguir Comprando",
+      "continueShopping": "Continuar Comprando",
       "remove": "Eliminar",
-      "quantity": "Cant",
+      "quantity": "Cantidad",
       "total": "Total",
       "summary": "Resumen del Pedido",
-      "itemAdded": "Artículo agregado al carrito",
+      "itemAdded": "Artículo añadido al carrito",
       "viewCart": "Ver Carrito",
-      "clearCart": "Vaciar Carrito",
+      "clearCart": "Limpiar Carrito",
       "cartTotal": "Total del Carrito",
       "itemsCount": "{count} artículos",
       "item": "Artículo"
     },
     "orders": {
       "title": "Mis Pedidos",
-      "empty": "No hay pedidos aún",
+      "description": "Sigue tus pedidos recientes e historial de compras.",
+      "empty": "Aún no has realizado ningún pedido.",
       "number": "Pedido #",
       "date": "Fecha",
       "status": "Estado",
       "total": "Total",
       "items": "Artículos",
       "detail": "Detalles del Pedido",
-      "backToOrders": "Volver a Pedidos",
-      "payment": "Pago"
+      "backToOrders": "Volver a los Pedidos",
+      "payment": "Pago",
+      "syncing": "Sincronizando sus pedidos...",
+      "amount": "Valor Total",
+      "finalPrice": "Precio Final"
     },
     "checkout": {
       "title": "Finalizar Compra",
+      "description": "Completa tu compra proporcionando los detalles de entrega y pago.",
       "placeOrder": "Confirmar Pedido",
       "orderSummary": "Resumen del Pedido",
       "confirming": "Confirmando tu pedido...",
-      "discount": "Descuento"
+      "discount": "Descuento",
+      "step1": "Dirección de Envío",
+      "step2": "Método de Envío",
+      "step3": "Forma de Pago",
+      "securePayment": "Pago Seguro con Criptografía SSL de 256 bits",
+      "promoCode": "Cupón de Descuento",
+      "apply": "Aplicar"
     },
     "confirmation": {
       "title": "Pedido Confirmado",
-      "success": "¡Tu pedido se ha realizado con éxito!",
+      "success": "¡Tu pedido ha sido realizado con éxito!",
       "number": "Número de Pedido",
-      "emailSent": "Se ha enviado un correo de confirmación."
+      "emailSent": "Se ha enviado un correo electrónico de confirmación."
     },
     "products": {
       "title": "Productos",
       "description": "Consulta nuestra lista completa de productos",
-      "loading": "Cargando...",
+      "loading": "Sincronizando productos...",
       "reviews": "Reseñas",
       "writeReview": "Escribir una reseña",
       "buy": "Comprar Ahora",
       "back": "Volver a Productos",
       "backList": "← Volver a la Lista",
-      "create": {
-        "title": "Crear Nuevo Producto",
-        "cancel": "Cancelar",
-        "saved": "Producto creado con éxito"
-      },
-      "edit": {
-        "title": "Editar Producto",
-        "titleWithName": "Editar: {name}",
-        "loading": "Cargando producto...",
-        "error": "Error al cargar producto: {message}",
-        "updated": "Producto actualizado con éxito"
-      },
-      "detail": {
-        "price": "Precio",
-        "cost": "Precio de Costo",
-        "compare": "Precio Comparativo",
-        "shortDescription": "Descripción Corta",
-        "fullDescription": "Descripción Completa",
-        "images": "Galería de Imágenes",
-        "cover": "Portada",
-        "active": "Activo",
-        "inactive": "Inactivo",
-        "information": "Información"
-      },
-      "table": {
-        "name": "Nombre",
-        "price": "Precio",
-        "description": "Descripción",
-        "status": "Estado",
-        "category": "Categoría",
-        "date": "Fecha",
-        "actions": "Acciones"
-      },
       "search": {
         "placeholder": "Buscar productos..."
+      },
+      "filters": {
+        "title": "Filtros",
+        "categories": "Categorías",
+        "priceRange": "Rango de Precios",
+        "rating": "Calificación",
+        "apply": "Aplicar Filtros",
+        "andUp": "y superior"
+      },
+      "promo": {
+        "title": "¡Oferta de Verano!",
+        "description": "Obtén hasta un 50% de descuento en artículos seleccionados.",
+        "button": "Ver Ofertas"
       }
     },
     "posts": {
-      "title": "Posts",
-      "description": "Lee nuestros posts y artículos",
-      "loading": "Cargando...",
-      "readMore": "Leer más →",
-      "readMoreBtn": "Read More",
-      "loadMore": "Cargar Más Posts",
+      "title": "Blog",
+      "description": "Lee nuestros posts y artículos sobre tendencias y novedades",
+      "loading": "Cargando artículos...",
+      "readMore": "Leer Más",
+      "loadMore": "Cargar Más Artículos",
+      "featured": "Artículo Destacado",
+      "readTime": "{n} min de lectura",
       "hero": {
         "title": "Últimas Novedades",
-        "description": "Descubre las tendencias más populares del e-commerce",
+        "description": "Descubre las tendencias más calientes del e-commerce",
         "cta": "Explorar Posts"
       },
-      "detail": {
-        "loading": "Cargando...",
-        "breadcrumb": {
-          "home": "Inicio",
-          "blog": "Blog",
-          "guides": "Guías de Compra"
-        },
-        "category": "Guías de Compra",
-        "author": {
-          "name": "María Silva",
-          "role": "Especialista en E-commerce",
-          "bio": "Más de 8 años ayudando a personas a hacer compras inteligentes en línea."
-        },
-        "meta": {
-          "readingTime": "{n} min de lectura",
-          "views": "{n} visitas"
-        },
-        "sections": {
-          "introduction": "Elegir el producto adecuado puede parecer simple, pero con tantas opciones disponibles en línea, es fácil perderse entre especificaciones técnicas, evaluaciones y precios. Esta guía te ayudará a tomar decisiones más asertivas.",
-          "step1": "Define tus Necesidades",
-          "step2": "Investiga y Compara",
-          "step3": "Toma la Decisión Final",
-          "tipTitle": "Consejo Importante",
-          "tipText": "Siempre considera la relación costo-beneficio a largo plazo. Un producto más caro hoy puede ser más económico con el tiempo.",
-          "reviewTitle": "Evaluaciones",
-          "reviewText": "Lee siempre las evaluaciones más recientes y busca comentarios detallados sobre el uso del producto."
-        },
-        "checklist": {
-          "title": "Lista de Verificación",
-          "items": {
-            "specs": "Verifiqué las especificaciones técnicas",
-            "reviews": "Leí al menos 5 evaluaciones recientes",
-            "prices": "Comparé precios en 3 tiendas diferentes",
-            "returnPolicy": "Verifiqué las políticas de cambio y devolución",
-            "warranty": "Confirmé la garantía del producto"
-          }
-        },
-        "cta": {
-          "title": "¿Listo para Aplicar Estos Consejos?",
-          "description": "Explora nuestra selección de productos recomendados por la comunidad.",
-          "button": "Ver Productos Recomendados"
-        },
-        "tags": {
-          "onlineShopping": "#compras-en-línea",
-          "guides": "#guías",
-          "ecommerce": "#ecommerce",
-          "tips": "#consejos"
-        },
-        "share": {
-          "title": "¿Te gustó el contenido?",
-          "description": "¡Compártelo con tus amigos!",
-          "facebook": "Compartir",
-          "twitter": "Tweet"
-        },
-        "sidebar": {
-          "aboutAuthor": "Sobre la Autora",
-          "followAuthor": "Seguir Autora",
-          "relatedPosts": "Posts Relacionados",
-          "newsletter": "📧 Newsletter",
-          "newsletterText": "¡Recibe consejos semanales de compras inteligentes!",
-          "newsletterPlaceholder": "Tu correo electrónico",
-          "newsletterButton": "Suscribirse Gratis"
-        },
-        "relatedPosts": {
-          "post1": "10 Errores Comunes al Comprar en Línea",
-          "post2": "Cómo Ahorrar en las Compras de Black Friday",
-          "post3": "Productos Más Vendidos del Mes",
-          "time1": "5 min de lectura",
-          "time2": "7 min de lectura",
-          "time3": "3 min de lectura"
-        }
+      "featuredTitle": "Dominando el Futuro del E-commerce en 2026",
+      "featuredDescription": "Explora cómo la IA, las arquitecturas serverless y el diseño UX premium están remodelando la forma en que construimos y compramos online.",
+      "authorRole": "Desarrollador Líder",
+      "categories": {
+        "all": "Todo",
+        "technology": "Tecnología",
+        "marketing": "Marketing",
+        "innovation": "Innovación",
+        "security": "Seguridad",
+        "lifestyle": "Estilo de Vida"
       }
     },
     "wishlist": {
       "title": "Lista de Deseos",
-      "description": "Tu lista de deseos personalizada",
-      "empty": "Tu lista de deseos está vacía",
-      "continueShopping": "Seguir Comprando",
-      "viewProduct": "Ver Producto"
+      "description": "Tu colección de artículos favoritos.",
+      "empty": "Tu lista de deseos está esperando un poco de amor.",
+      "continueShopping": "Continuar Comprando",
+      "viewProduct": "Ver Producto",
+      "savedItems": "{count} Artículos Guardados",
+      "loading": "Cargando tu lista de deseos...",
+      "savedAt": "Guardado el {date}",
+      "product": "Producto"
     },
     "profiles": {
-      "title": "Perfiles",
-      "description": "Perfiles de usuarios de la plataforma",
-      "loading": "Cargando...",
-      "readMore": "Read More",
-      "detail": {
-        "loading": "Cargando...",
-        "photoAlt": "Foto de Perfil",
-        "premiumSince": "Cliente Premium desde 2020",
-        "stats": {
-          "orders": "Pedidos",
-          "totalSpent": "Total Gastado",
-          "rating": "Evaluación"
-        },
-        "personalInfo": "Información Personal",
-        "edit": "Editar",
-        "fields": {
-          "fullName": "Nombre Completo",
-          "email": "Correo electrónico",
-          "phone": "Teléfono",
-          "birthDate": "Fecha de Nacimiento"
-        },
-        "lastOrders": "Últimos Pedidos",
-        "viewAllOrders": "Ver Todos los Pedidos",
-        "totalOrders": "Total de Pedidos",
-        "favorites": "Artículos Favoritos",
-        "premiumStatus": "Estado Premium",
-        "savedAddresses": "Direcciones Guardadas",
-        "addresses": {
-          "home": "Casa",
-          "work": "Trabajo",
-          "main": "Principal",
-          "add": "Agregar Dirección"
-        },
-        "coupons": "Cupones Disponibles"
-      }
+      "title": "Comunidad",
+      "description": "Conoce a los miembros de nuestra plataforma",
+      "loading": "Cargando perfiles...",
+      "readMore": "Ver Perfil",
+      "search": "Buscar perfiles...",
+      "explorer": "Explorador",
+      "member": "Miembro"
     },
     "stores": {
-      "title": "Tiendas",
-      "description": "Conoce nuestras tiendas asociadas",
-      "buy": "Buy Now",
-      "addToCart": "Add to cart"
+      "title": "Nuestras Tiendas",
+      "description": "Encuentra la tienda física más cercana a ti",
+      "search": "Buscar por ciudad o barrio...",
+      "openNow": "Abierto Ahora",
+      "directions": "Cómo Llegar",
+      "details": "Detalles",
+      "cta": {
+        "title": "¿No encontraste una tienda cerca de ti?",
+        "description": "¡No te preocupes! Enviamos a todo el mundo y ofrecemos soporte online 24/7.",
+        "button": "Compra Online Ahora"
+      },
+      "locations": {
+        "sp": {
+          "name": "São Paulo Flagship",
+          "address": "Av. Paulista, 1000 - Bela Vista",
+          "hours": "Lun-Sáb: 10:00 - 22:00"
+        },
+        "rj": {
+          "name": "Rio de Janeiro Central",
+          "address": "Rua Visconde de Pirajá, 500 - Ipanema",
+          "hours": "Lun-Sáb: 10:00 - 20:00"
+        },
+        "curitiba": {
+          "name": "Curitiba Design Hub",
+          "address": "Av. do Batel, 1500 - Batel",
+          "hours": "Lun-Sáb: 11:00 - 19:00"
+        },
+        "bh": {
+          "name": "Belo Horizonte Studio",
+          "address": "Rua de Bahia, 1200 - Lourdes",
+          "hours": "Lun-Sáb: 09:00 - 21:00"
+        },
+        "poa": {
+          "name": "Porto Alegre Tech Lab",
+          "address": "Av. Nilo Peçanha, 2000 - Boa Vista",
+          "hours": "Lun-Vie: 10:00 - 20:00"
+        },
+        "brasilia": {
+          "name": "Brasília Modern Store",
+          "address": "SCLS 403 Bloque B - Asa Sul",
+          "hours": "Lun-Sáb: 10:00 - 22:00"
+        }
+      }
     }
   }
 }

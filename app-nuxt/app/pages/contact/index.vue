@@ -15,10 +15,10 @@
             <div class="space-y-6">
               <div class="flex items-start gap-4">
                 <div class="size-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-                  <span class="icon-[tabler--mail] size-6 text-primary"></span>
+                   <span class="icon-[tabler--mail] size-6 text-primary"></span>
                 </div>
                 <div>
-                  <h4 class="font-bold">Email</h4>
+                  <h4 class="font-bold">{{ t('admin.account.fields.email') }}</h4>
                   <p class="text-base-content/60">{{ t('pages.contact.info.email') }}</p>
                 </div>
               </div>
@@ -45,7 +45,7 @@
 
             <!-- Social Links -->
             <div class="mt-12 pt-8 border-t border-base-200">
-              <h4 class="font-bold mb-4">Follow Us</h4>
+              <h4 class="font-bold mb-4">{{ t('pages.contact.followUs') }}</h4>
               <div class="flex gap-4">
                 <a v-for="social in socials" :key="social.icon" href="#" 
                   class="btn btn-square btn-ghost hover:bg-primary/10 hover:text-primary transition-all rounded-xl">
@@ -60,7 +60,7 @@
             <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10"></div>
             <div class="flex items-center justify-center h-full flex-col gap-2 text-base-content/20">
               <span class="icon-[tabler--map-2] size-12"></span>
-              <span class="font-medium text-sm">Interactive Map</span>
+              <span class="font-medium text-sm">{{ t('pages.contact.mapPlaceholder') }}</span>
             </div>
           </div>
         </div>
@@ -85,10 +85,10 @@
                 <label class="form-label">{{ t('pages.contact.form.subject') }}</label>
                 <select class="select select-lg bg-base-200/50 border-none rounded-2xl h-14 w-full">
                   <option disabled selected>{{ t('pages.contact.form.placeholders.subject') }}</option>
-                  <option>General Inquiry</option>
-                  <option>Technical Support</option>
-                  <option>Sales & Partnerships</option>
-                  <option>Other</option>
+                  <option>{{ t('pages.contact.form.placeholders.subjects.general') }}</option>
+                  <option>{{ t('pages.contact.form.placeholders.subjects.support') }}</option>
+                  <option>{{ t('pages.contact.form.placeholders.subjects.sales') }}</option>
+                  <option>{{ t('pages.contact.form.placeholders.subjects.other') }}</option>
                 </select>
               </div>
 
