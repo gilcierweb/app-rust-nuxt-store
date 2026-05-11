@@ -2,7 +2,7 @@
 @plugin "flyonui";
 @import "flyonui/variants.css";
 
-@source "../../node_modules/flyonui/flyonui.js"; 
+@source "../../node_modules/flyonui/flyonui.js";
 
 @plugin "@iconify/tailwind4";
 
@@ -10,22 +10,28 @@
 .h1 {
     @apply text-base-content text-4xl;
 }
+
 .h2 {
     @apply text-base-content text-3xl;
 }
+
 .h3 {
     @apply text-base-content text-2xl;
 }
+
 .h4 {
     @apply text-base-content text-xl;
 }
+
 .h5 {
     @apply text-base-content text-lg;
 }
+
 .h6 {
     @apply text-base-content text-base;
 }
-.form-label{
+
+.form-label {
     @apply text-gray-800 text-sm mb-2 block;
 }
 
@@ -34,6 +40,7 @@
 .layout-leave-active {
     transition: all 0.2s;
 }
+
 .layout-enter-from,
 .layout-leave-to {
     filter: grayscale(1);
@@ -43,6 +50,7 @@
 .page-leave-active {
     transition: all 0.2s;
 }
+
 .page-enter-from,
 .page-leave-to {
     opacity: 0;
@@ -53,6 +61,7 @@
 .rotate-leave-active {
     transition: all 0.2s;
 }
+
 .rotate-enter-from,
 .rotate-leave-to {
     opacity: 0;
@@ -63,7 +72,9 @@
 .fade-leave-active {
     transition: all 0.2s;
 }
+
 .fade-enter,
 .fade-leave-active {
-    opacity: 0; filter: blur(1rem);
+    opacity: 0;
+    filter: blur(1rem);
 }
