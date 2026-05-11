@@ -59,3 +59,15 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+definePageMeta({
+  layout: 'admin'
+})
+
+const mockUsers = [
+  { id: 1, email: 'admin@example.com', role: 'Admin', status: 'Active', date: '2024-01-01' },
+  { id: 2, email: 'manager@example.com', role: 'Manager', status: 'Active', date: '2024-02-15' },
+  { id: 3, email: 'editor@example.com', role: 'Editor', status: 'Inactive', date: '2024-03-20' },
+]
+</script>

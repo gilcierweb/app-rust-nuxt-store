@@ -120,3 +120,62 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Review } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: reviews, error, refresh } = useLazyFetch<Review[]>(
+  `${config.public.baseURL}/api/reviews`
+)
+
+// Filtered reviews based on search
+const filteredReviews = computed(() => {
+  if (!reviews.value) return []
+  if (!searchQuery.value.trim()) return reviews.value
+
+  const query = searchQuery.value.toLowerCase()
+  return reviews.value.filter(review =>
+    review.title?.toLowerCase().includes(query) ||
+    review.comment?.toLowerCase().includes(query)
+  )
+})
+
+// Format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(dateString))
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (review: Review) => {
+  if (confirm(t('admin.reviews.detail.confirmDelete', { id: review.id }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/reviews/${review.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.reviews.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>

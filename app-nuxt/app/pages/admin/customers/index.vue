@@ -106,3 +106,71 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Profile } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: profiles, error, refresh } = useLazyFetch<Profile[]>(
+  `${config.public.baseURL}/api/profiles`
+)
+
+// Filtered profiles based on search
+const filteredProfiles = computed(() => {
+  if (!profiles.value) return []
+  if (!searchQuery.value.trim()) return profiles.value
+
+  const query = searchQuery.value.toLowerCase()
+  return profiles.value.filter(profile =>
+    profile.first_name?.toLowerCase().includes(query) ||
+    profile.last_name?.toLowerCase().includes(query) ||
+    profile.full_name?.toLowerCase().includes(query) ||
+    profile.username?.toLowerCase().includes(query)
+  )
+})
+
+// Get initials from name
+const getInitials = (name?: string) => {
+  if (!name) return '?'
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+}
+
+// Format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(dateString))
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (profile: Profile) => {
+  const name = profile.full_name || `${profile.first_name} ${profile.last_name}`
+  if (confirm(t('admin.customers.detail.confirmDelete', { name }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/profiles/${profile.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.customers.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>

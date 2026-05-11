@@ -122,3 +122,65 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Address } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: addresses, error, refresh } = useLazyFetch<Address[]>(
+  `${config.public.baseURL}/api/addresses`
+)
+
+// Filtered addresses based on search
+const filteredAddresses = computed(() => {
+  if (!addresses.value) return []
+  if (!searchQuery.value.trim()) return addresses.value
+
+  const query = searchQuery.value.toLowerCase()
+  return addresses.value.filter(address =>
+    address.first_name?.toLowerCase().includes(query) ||
+    address.last_name?.toLowerCase().includes(query) ||
+    address.city?.toLowerCase().includes(query) ||
+    address.address1?.toLowerCase().includes(query)
+  )
+})
+
+// Type label
+const typeLabel = (type?: string) => {
+  switch (type) {
+    case 'home': return t('admin.addresses.types.home')
+    case 'work': return t('admin.addresses.types.work')
+    case 'other': return t('admin.addresses.types.other')
+    default: return t('admin.addresses.types.other')
+  }
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (address: Address) => {
+  const name = `${address.first_name} ${address.last_name}`
+  if (confirm(t('admin.addresses.detail.confirmDelete', { name }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/addresses/${address.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.addresses.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>

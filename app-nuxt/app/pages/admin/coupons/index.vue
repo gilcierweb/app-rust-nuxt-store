@@ -113,3 +113,93 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Coupon } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: coupons, error, refresh } = useLazyFetch<Coupon[]>(
+  `${config.public.baseURL}/api/coupons`
+)
+
+// Filtered coupons based on search
+const filteredCoupons = computed(() => {
+  if (!coupons.value) return []
+  if (!searchQuery.value.trim()) return coupons.value
+
+  const query = searchQuery.value.toLowerCase()
+  return coupons.value.filter(coupon =>
+    coupon.code?.toLowerCase().includes(query)
+  )
+})
+
+// Discount type label
+const discountTypeLabel = (type?: number) => {
+  switch (type) {
+    case 1: return t('admin.coupons.types.percentage')
+    case 2: return t('admin.coupons.types.fixed')
+    case 3: return t('admin.coupons.types.freeShipping')
+    default: return t('admin.coupons.types.unknown')
+  }
+}
+
+// Format discount value
+const formatDiscountValue = (coupon: Coupon) => {
+  if (coupon.discount_type === 1) {
+    return `${coupon.discount_value}%`
+  } else if (coupon.discount_type === 2) {
+    return `R$ ${coupon.discount_value?.toFixed(2) || '0.00'}`
+  }
+  return '-'
+}
+
+// Usage percentage for progress bar
+const usagePercentage = (coupon: Coupon) => {
+  if (!coupon.usage_limit || coupon.usage_limit === 0) return 0
+  const used = coupon.used_count || 0
+  return Math.min((used / coupon.usage_limit) * 100, 100)
+}
+
+// Check if expired
+const isExpired = (expiresAt: string) => {
+  return new Date(expiresAt) < new Date()
+}
+
+// Format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(dateString))
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (coupon: Coupon) => {
+  if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.code }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/coupons/${coupon.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.coupons.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>

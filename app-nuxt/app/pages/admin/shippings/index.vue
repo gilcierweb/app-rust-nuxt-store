@@ -117,3 +117,71 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { ShippingMethod } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: shippings, error, refresh } = useLazyFetch<ShippingMethod[]>(
+  `${config.public.baseURL}/api/shippings`
+)
+
+// Filtered shippings based on search
+const filteredShippings = computed(() => {
+  if (!shippings.value) return []
+  if (!searchQuery.value.trim()) return shippings.value
+
+  const query = searchQuery.value.toLowerCase()
+  return shippings.value.filter(shipping =>
+    shipping.name?.toLowerCase().includes(query) ||
+    shipping.code?.toLowerCase().includes(query)
+  )
+})
+
+// Format currency
+const formatCurrency = (value: number | undefined) => {
+  if (value === undefined || value === null) return '-'
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value)
+}
+
+// Format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(dateString))
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (shipping: ShippingMethod) => {
+  if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.name }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/shippings/${shipping.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.shippings.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>

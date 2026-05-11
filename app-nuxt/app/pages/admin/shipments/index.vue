@@ -76,3 +76,47 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Shipment } from '~/types'
+
+definePageMeta({ layout: 'admin' })
+
+const { t } = useI18n()
+const config = useRuntimeConfig()
+
+const { pending, data: shipments, error, refresh } = useLazyFetch<Shipment[]>(`${config.public.baseURL}/api/shipments`)
+
+const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
+  1: { label: t('shipping.status.pending'), badge: 'badge-warning' },
+  2: { label: t('shipping.status.shipped'), badge: 'badge-info' },
+  3: { label: t('shipping.status.delivered'), badge: 'badge-success' },
+  4: { label: t('shipping.status.cancelled'), badge: 'badge-error' },
+}
+
+function statusLabel(status: unknown): string {
+  if (status == null) return '-'
+  return shipmentStatusMap[status as number]?.label ?? t('common.status.unknown')
+}
+
+function statusBadgeClass(status: unknown): string {
+  if (status == null) return ''
+  return shipmentStatusMap[status as number]?.badge ?? ''
+}
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(dateString))
+}
+
+const confirmDelete = async (shipment: Shipment) => {
+  if (confirm(t('admin.shipments.detail.confirmDelete', { id: shipment.id }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/shipments/${shipment.id}`, { method: 'DELETE' })
+      await refresh()
+    } catch {
+      alert(t('admin.shipments.detail.errorDelete'))
+    }
+  }
+}
+</script>

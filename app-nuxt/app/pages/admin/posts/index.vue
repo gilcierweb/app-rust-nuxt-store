@@ -120,3 +120,92 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Post } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: posts, error, refresh } = useLazyFetch<Post[]>(
+  `${config.public.baseURL}/api/posts`
+)
+
+// Filtered posts based on search
+const filteredPosts = computed(() => {
+  if (!posts.value) return []
+  if (!searchQuery.value.trim()) return posts.value
+
+  const query = searchQuery.value.toLowerCase()
+  return posts.value.filter(post =>
+    post.title?.toLowerCase().includes(query) ||
+    post.content?.toLowerCase().includes(query)
+  )
+})
+
+// Status label
+const getStatusLabel = (status?: number) => {
+  switch (status) {
+    case 1: return t('admin.posts.status.draft')
+    case 2: return t('admin.posts.status.pending')
+    case 3: return t('admin.posts.status.scheduled')
+    case 4: return t('admin.posts.status.published')
+    case 5: return t('admin.posts.status.private')
+    case 6: return t('admin.posts.status.archived')
+    case 7: return t('admin.posts.status.trashed')
+    case 8: return t('admin.posts.status.rejected')
+    default: return t('admin.posts.status.unknown')
+  }
+}
+
+// Status badge class
+const statusBadgeClass = (status?: number) => {
+  switch (status) {
+    case 4: return 'badge-success' // Published
+    case 1: return 'badge-warning' // Draft
+    case 2: return 'badge-info' // Pending Review
+    case 3: return 'badge-primary' // Scheduled
+    case 5: return 'badge-secondary' // Private
+    case 6: return 'badge-ghost' // Archived
+    case 7: return 'badge-error' // Trashed
+    case 8: return 'badge-error' // Rejected
+    default: return 'badge-ghost'
+  }
+}
+
+// Format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(dateString))
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (post: Post) => {
+  if (confirm(t('admin.posts.detail.confirmDelete', { name: post.title || t('admin.posts.noTitle') }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/posts/${post.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.posts.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>

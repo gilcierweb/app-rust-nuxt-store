@@ -98,3 +98,64 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import type { Category } from '~/types'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const config = useRuntimeConfig()
+const { $truncate } = useNuxtApp()
+const { t } = useI18n()
+
+const searchQuery = ref('')
+
+const { pending, data: categories, error, refresh } = useLazyFetch<Category[]>(
+  `${config.public.baseURL}/api/categories`
+)
+
+// Filtered categories based on search
+const filteredCategories = computed(() => {
+  if (!categories.value) return []
+  if (!searchQuery.value.trim()) return categories.value
+  
+  const query = searchQuery.value.toLowerCase()
+  return categories.value.filter(cat =>
+    cat.name.toLowerCase().includes(query) ||
+    cat.slug?.toLowerCase().includes(query) ||
+    cat.description?.toLowerCase().includes(query)
+  )
+})
+
+// Format date
+const formatDate = (dateString: string) => {
+  if (!dateString) return '-'
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(dateString))
+}
+
+// Search handler
+const handleSearch = () => {
+  // Search is handled reactively via computed
+}
+
+// Delete confirmation
+const confirmDelete = async (category: Category) => {
+  if (confirm(t('admin.categories.detail.confirmDelete', { name: category.name }))) {
+    try {
+      await $fetch(`${config.public.baseURL}/api/categories/${category.id}`, {
+        method: 'DELETE'
+      })
+      await refresh()
+    } catch (err) {
+      alert(t('admin.categories.detail.errorDelete'))
+      console.error(err)
+    }
+  }
+}
+</script>
