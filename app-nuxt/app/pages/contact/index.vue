@@ -11,16 +11,15 @@
         <!-- Contact Info -->
         <div class="lg:col-span-5 space-y-8">
           <div class="bg-base-200/50 p-8 rounded-[2.5rem] border border-base-200">
-            <h2 class="h3 mb-8">Get in Touch</h2>
+            <h2 class="h3 mb-8">{{ t('pages.contact.info.title') }}</h2>
             <div class="space-y-6">
               <div class="flex items-start gap-4">
                 <div class="size-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
                   <span class="icon-[tabler--mail] size-6 text-primary"></span>
                 </div>
                 <div>
-                  <h4 class="font-bold">Email Us</h4>
-                  <p class="text-base-content/60">support@apprustnuxt.store</p>
-                  <p class="text-base-content/60">sales@apprustnuxt.store</p>
+                  <h4 class="font-bold">Email</h4>
+                  <p class="text-base-content/60">{{ t('pages.contact.info.email') }}</p>
                 </div>
               </div>
               <div class="flex items-start gap-4">
@@ -28,9 +27,9 @@
                   <span class="icon-[tabler--phone] size-6 text-primary"></span>
                 </div>
                 <div>
-                  <h4 class="font-bold">Call Us</h4>
-                  <p class="text-base-content/60">+55 (11) 9999-9999</p>
-                  <p class="text-sm text-base-content/40 mt-1">Mon-Fri from 9am to 6pm</p>
+                  <h4 class="font-bold">{{ t('profiles.detail.fields.phone') }}</h4>
+                  <p class="text-base-content/60">{{ t('pages.contact.info.phone') }}</p>
+                  <p class="text-sm text-base-content/40 mt-1">{{ t('pages.contact.info.hours') }}</p>
                 </div>
               </div>
               <div class="flex items-start gap-4">
@@ -38,9 +37,8 @@
                   <span class="icon-[tabler--map-pin] size-6 text-primary"></span>
                 </div>
                 <div>
-                  <h4 class="font-bold">Our Office</h4>
-                  <p class="text-base-content/60">Av. Paulista, 1000 - Bela Vista</p>
-                  <p class="text-base-content/60">São Paulo - SP, 01310-100</p>
+                  <h4 class="font-bold">{{ t('stores.details') }}</h4>
+                  <p class="text-base-content/60">{{ t('pages.contact.info.address') }}</p>
                 </div>
               </div>
             </div>
@@ -70,23 +68,23 @@
         <!-- Contact Form -->
         <div class="lg:col-span-7">
           <div class="bg-base-100 p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/5 border border-base-200">
-            <h2 class="h3 mb-8">Send us a message</h2>
+            <h2 class="h3 mb-8">{{ t('pages.contact.form.submit') }}</h2>
             <form @submit.prevent class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="form-control">
-                  <label class="form-label">Full Name</label>
-                  <input type="text" placeholder="John Doe" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" />
+                  <label class="form-label">{{ t('pages.contact.form.name') }}</label>
+                  <input type="text" :placeholder="t('pages.contact.form.placeholders.name')" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" />
                 </div>
                 <div class="form-control">
-                  <label class="form-label">Email Address</label>
-                  <input type="email" placeholder="john@example.com" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" />
+                  <label class="form-label">{{ t('pages.contact.form.email') }}</label>
+                  <input type="email" :placeholder="t('pages.contact.form.placeholders.email')" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" />
                 </div>
               </div>
               
               <div class="form-control">
-                <label class="form-label">Subject</label>
+                <label class="form-label">{{ t('pages.contact.form.subject') }}</label>
                 <select class="select select-lg bg-base-200/50 border-none rounded-2xl h-14 w-full">
-                  <option disabled selected>How can we help you?</option>
+                  <option disabled selected>{{ t('pages.contact.form.placeholders.subject') }}</option>
                   <option>General Inquiry</option>
                   <option>Technical Support</option>
                   <option>Sales & Partnerships</option>
@@ -95,17 +93,17 @@
               </div>
 
               <div class="form-control">
-                <label class="form-label">Message</label>
-                <textarea class="textarea textarea-lg bg-base-200/50 border-none rounded-2xl min-h-40" placeholder="Tell us more about your needs..."></textarea>
+                <label class="form-label">{{ t('pages.contact.form.message') }}</label>
+                <textarea class="textarea textarea-lg bg-base-200/50 border-none rounded-2xl min-h-40" :placeholder="t('pages.contact.form.placeholders.message')"></textarea>
               </div>
 
               <button type="submit" class="btn btn-primary btn-lg w-full h-14 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-[1.02]">
                 <span class="icon-[tabler--send] size-5 mr-2"></span>
-                Send Message
+                {{ t('pages.contact.form.submit') }}
               </button>
               
               <p class="text-center text-xs text-base-content/40 mt-6">
-                We usually respond within 24 business hours.
+                {{ t('pages.contact.form.success') }}
               </p>
             </form>
           </div>

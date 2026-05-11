@@ -1,168 +1,228 @@
 <template>
-  <div>
-    <div v-if="pendingApi">
-      <div class="flex items-center justify-center h-96">
-        <span>{{ t('pages.products.loading') }}</span> <br>
-        <span class="loading loading-spinner text-info size-40"></span>
-      </div>
-    </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 ">
-      <div>
-        <div class="w-full md:w-1/2 px-4 mb-8">
-          <div class="flex gap-4 py-4 justify-center overflow-x-auto"></div>
+  <div class="pb-20">
+    <!-- Loading State -->
+    <div v-if="pendingApi" class="flex flex-col items-center justify-center py-32">
+      <div class="relative">
+        <div class="size-20 rounded-3xl border-4 border-primary/20 animate-pulse"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="loading loading-ring loading-lg text-primary"></span>
         </div>
       </div>
-      <div>
-        <h1 class="text-base-content text-4xl">{{ productApi?.name }}</h1>
-        <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(selectedPrice) }}</p>
-        <p class="my-3"><span class="badge badge-secondary">{{ productApi?.category?.name }}</span></p>
-        <div v-if="variants && variants.length > 0" class="my-4">
-          <label class="label">{{ t('variant.select') }}</label>
-          <select v-model="selectedVariantId" class="select select-bordered w-full max-w-xs">
-            <option :value="null">{{ t('variant.select') }}...</option>
-            <option v-for="v in variants" :key="v.id" :value="v.id">
-              {{ v.name || `${v.sku || ''}${v.price ? ' - ' + formatNumberBR(v.price) : ''}` }}
-            </option>
-          </select>
-        </div>
-        <div class="flex gap-2">
-          <button class="btn btn-primary btn-xl" @click="addToCartApi(productApi!)">
-            <span class="icon-[tabler--shopping-cart] size-5"></span>
-            {{ t('product.addToCart') }}
-          </button>
-          <button class="btn btn-ghost btn-circle btn-xl" @click="toggleWishlist(productApi!.id)">
-            <span :class="[isInWishlist(productApi!.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-6']"></span>
-          </button>
-        </div>
-      </div>
-      <div class="grid grid-cols-1">
-        <p>{{ productApi?.description }}</p>
-      </div>
+      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">{{ t('pages.products.loading') }}</p>
     </div>
 
-    <div v-if="pending">
-      <div class="flex items-center justify-center h-96">
-        <span>{{ t('pages.products.loading') }}</span> <br>
-        <span class="loading loading-spinner text-info size-40"></span>
+    <!-- Product Not Found -->
+    <div v-else-if="!productApi" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
+      <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mb-6">
+        <span class="icon-[tabler--package-off] size-12 opacity-20" />
       </div>
+      <h2 class="h3 mb-2">{{ t('product.notFound') }}</h2>
+      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+        {{ t('cart.continueShopping') }}
+      </NuxtLink>
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 ">
-      <div>
-        <div class="w-full md:w-1/2 px-4 mb-8">
-          <NuxtImg :src="product?.thumbnail" loading="lazy" class="w-full h-auto rounded-lg shadow-md mb-4" :alt="product?.title" />
-          <div class="flex gap-4 py-4 justify-center overflow-x-auto">
-            <div v-for="(item, index) in product?.images" :key="index">
-              <NuxtImg :src="item" loading="lazy" class="size-16 sm:size-20 object-cover rounded-md cursor-pointer opacity-60 hover:opacity-100 transition duration-300" :alt="product?.title" />
+
+    <!-- Product Detail -->
+    <div v-else>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-10">
+        <!-- Gallery -->
+        <div class="space-y-6">
+          <div class="aspect-square bg-base-100 rounded-[3rem] border border-base-200 overflow-hidden shadow-sm group">
+            <NuxtImg 
+              v-if="productApi.images && productApi.images.length > 0" 
+              :src="productApi.images[0].image" 
+              class="size-full object-cover group-hover:scale-105 transition-transform duration-700" 
+              :alt="productApi.name" 
+            />
+            <div v-else class="flex items-center justify-center h-full text-base-content/10">
+              <span class="icon-[tabler--photo] size-32"></span>
+            </div>
+          </div>
+          
+          <div v-if="productApi.images && productApi.images.length > 1" class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            <div v-for="(img, index) in productApi.images" :key="index" 
+              class="size-24 shrink-0 rounded-2xl border-2 border-base-200 overflow-hidden cursor-pointer hover:border-primary transition-colors">
+              <NuxtImg :src="img.image" class="size-full object-cover" :alt="productApi.name" />
             </div>
           </div>
         </div>
-      </div>
-      <div>
-        <h1 class="text-base-content text-4xl">{{ product?.title }}</h1>
-        <p class="text-success font-weight-bold mt-2">{{ formatNumberBR(product?.price) }}</p>
-        <p class="my-3"><span class="badge badge-secondary">{{ product?.category }}</span></p>
-        <div class="flex gap-2">
-          <button class="btn btn-primary btn-xl" @click="addToCart(product!)">
-            <span class="icon-[tabler--shopping-cart] size-5"></span>
-            {{ t('product.addToCart') }}
-          </button>
-          <button class="btn btn-ghost btn-circle btn-xl" @click="toggleWishlist(product!.id)">
-            <span :class="[isInWishlist(product!.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-6']"></span>
-          </button>
-        </div>
-      </div>
-      <div class="grid grid-cols-1">
-        <p>{{ product?.description }}</p>
-      </div>
-    </div>
 
-    <!-- Reviews Section - Only show when not loading -->
-    <div v-if="!pendingApi && !pending" class="mt-12 border-t pt-8">
-      <h2 class="text-2xl font-bold mb-6">{{ t('pages.products.reviews') }}</h2>
-
-      <!-- Existing Reviews -->
-      <div v-if="reviews && reviews.length > 0" class="space-y-4 mb-8">
-        <div v-for="review in reviews" :key="review.id" class="rounded-box border p-4">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="flex text-warning">
-              <i v-for="n in 5" :key="n"
-                 :class="n <= (review.rating || 0) ? 'icon-[tabler--star-filled] text-warning' : 'icon-[tabler--star] text-gray-300'"
-                 class="size-5"></i>
-            </div>
-            <span v-if="review.verified_purchase" class="badge badge-success badge-xs">Compra verificada</span>
-          </div>
-          <p v-if="review.title" class="font-semibold">{{ review.title }}</p>
-          <p v-if="review.comment" class="text-sm text-base-content/70 mt-1">{{ review.comment }}</p>
-          <p class="text-xs text-base-content/40 mt-2">{{ new Date(review.created_at).toLocaleDateString('pt-BR') }}</p>
-        </div>
-      </div>
-      <p v-else class="text-base-content/60 mb-8">Nenhuma avaliação ainda. Seja o primeiro!</p>
-
-      <!-- Review Form -->
-      <div class="rounded-box border p-6 max-w-xl">
-        <h3 class="text-lg font-semibold mb-4">{{ t('pages.products.writeReview') }}</h3>
-
-        <AppAlert v-if="reviewSuccess" type="success" :message="reviewSuccess" :auto-close="3000" @close="reviewSuccess = ''" />
-        <AppAlert v-if="reviewError" type="error" :message="reviewError" :auto-close="5000" @close="reviewError = ''" :dismissible="true" />
-
-        <form @submit.prevent="submitReview" class="space-y-4">
-          <div class="form-control">
-            <label class="label"><span class="label-text">Avaliação</span></label>
-            <div class="flex items-center gap-2">
-              <input v-model.number="reviewForm.rating" type="range" min="1" max="5" class="range range-primary flex-1" />
-              <span class="text-xl font-bold w-6 text-center">{{ reviewForm.rating }}</span>
-              <div class="flex text-warning">
-                <i v-for="n in 5" :key="n"
-                   :class="n <= reviewForm.rating ? 'icon-[tabler--star-filled] text-warning' : 'icon-[tabler--star] text-gray-300'"
-                   class="size-6"></i>
+        <!-- Info -->
+        <div class="flex flex-col">
+          <div class="mb-8">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="badge badge-primary badge-soft rounded-lg px-3 py-3 font-bold">{{ productApi.category?.name || 'Uncategorized' }}</span>
+              <div class="flex items-center gap-1 text-warning">
+                <span class="icon-[tabler--star-filled] size-4"></span>
+                <span class="text-sm font-black text-base-content">4.8</span>
+                <span class="text-xs text-base-content/40">(120 reviews)</span>
               </div>
             </div>
+            <h1 class="h1 mb-4">{{ productApi.name }}</h1>
+            <div class="flex items-baseline gap-4">
+              <span class="text-4xl font-black text-primary">{{ formatNumberBR(selectedPrice) }}</span>
+              <span v-if="productApi.old_price" class="text-xl text-base-content/30 line-through font-bold">{{ formatNumberBR(productApi.old_price) }}</span>
+            </div>
           </div>
-          <div class="form-control">
-            <label class="label"><span class="label-text">Título (opcional)</span></label>
-            <input v-model="reviewForm.title" type="text" placeholder="Resumo da sua avaliação" class="input input-bordered" />
+
+          <div class="prose prose-sm text-base-content/60 mb-10 leading-relaxed max-w-none">
+            {{ productApi.description }}
           </div>
-          <div class="form-control">
-            <label class="label"><span class="label-text">Comentário (opcional)</span></label>
-            <textarea v-model="reviewForm.comment" class="textarea textarea-bordered" rows="3" placeholder="Conte sua experiência..."></textarea>
+
+          <!-- Variants -->
+          <div v-if="variants && variants.length > 0" class="mb-10 space-y-4">
+            <label class="text-sm uppercase tracking-widest font-black text-base-content/40">{{ t('variant.select') }}</label>
+            <div class="flex flex-wrap gap-3">
+              <button 
+                v-for="v in variants" :key="v.id"
+                @click="selectedVariantId = v.id"
+                class="px-6 py-3 rounded-2xl border-2 transition-all duration-300 font-bold"
+                :class="selectedVariantId === v.id ? 'border-primary bg-primary/5 text-primary ring-4 ring-primary/10' : 'border-base-200 hover:border-base-300'"
+              >
+                {{ v.name || `${v.sku || 'Variant'}` }}
+              </button>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary" :disabled="reviewSubmitting">
-            <span v-if="reviewSubmitting" class="loading loading-spinner loading-sm"></span>
-            Enviar Avaliação
-          </button>
-        </form>
+
+          <!-- Actions -->
+          <div class="mt-auto flex flex-col sm:flex-row gap-4">
+            <button 
+              class="btn btn-primary btn-lg grow h-16 rounded-[1.5rem] shadow-xl shadow-primary/20 text-lg transition-transform hover:scale-[1.02]" 
+              @click="addToCartApi(productApi!)"
+            >
+              <span class="icon-[tabler--shopping-cart-plus] size-6 mr-2"></span>
+              {{ t('product.addToCart') }}
+            </button>
+            <button 
+              class="btn btn-square btn-lg h-16 w-16 rounded-[1.5rem] border-2 border-base-200 hover:border-error/20 hover:bg-error/5 hover:text-error group transition-all"
+              @click="toggleWishlist(productApi!.id)"
+            >
+              <span :class="[isInWishlist(productApi!.id) ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart]', 'size-7 group-hover:scale-110 transition-transform']"></span>
+            </button>
+          </div>
+
+          <!-- Features -->
+          <div class="grid grid-cols-2 gap-4 mt-10">
+            <div class="flex items-center gap-3 p-4 bg-base-200/50 rounded-2xl">
+              <span class="icon-[tabler--truck] text-primary size-5"></span>
+              <span class="text-xs font-bold">{{ t('shipping.free') }}</span>
+            </div>
+            <div class="flex items-center gap-3 p-4 bg-base-200/50 rounded-2xl">
+              <span class="icon-[tabler--shield-check] text-primary size-5"></span>
+              <span class="text-xs font-bold">2 Year Warranty</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="mt-24 pt-16 border-t border-base-200">
+        <div class="flex flex-col lg:flex-row gap-16">
+          <div class="lg:w-1/3">
+            <h2 class="h2 mb-6">{{ t('pages.products.reviews') }}</h2>
+            <div class="bg-base-200/50 p-8 rounded-[2.5rem] text-center">
+              <span class="text-6xl font-black text-primary">4.8</span>
+              <div class="flex justify-center text-warning my-4">
+                <span v-for="n in 5" :key="n" class="icon-[tabler--star-filled] size-6"></span>
+              </div>
+              <p class="text-base-content/40 font-bold uppercase tracking-widest text-xs">Based on 120 reviews</p>
+            </div>
+          </div>
+
+          <div class="lg:w-2/3">
+            <div v-if="reviews && reviews.length > 0" class="space-y-6">
+              <div v-for="review in reviews" :key="review.id" class="bg-base-100 p-8 rounded-[2rem] border border-base-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center gap-2">
+                    <div class="flex text-warning">
+                      <span v-for="n in 5" :key="n" 
+                        :class="n <= (review.rating || 0) ? 'icon-[tabler--star-filled]' : 'icon-[tabler--star] opacity-20'" 
+                        class="size-4"></span>
+                    </div>
+                    <span v-if="review.verified_purchase" class="badge badge-success badge-xs rounded-md">{{ t('product.verifiedPurchase') }}</span>
+                  </div>
+                  <span class="text-xs text-base-content/30 font-bold">{{ new Date(review.created_at).toLocaleDateString('pt-BR') }}</span>
+                </div>
+                <h4 v-if="review.title" class="font-black text-lg mb-2">{{ review.title }}</h4>
+                <p v-if="review.comment" class="text-base-content/60 leading-relaxed">{{ review.comment }}</p>
+              </div>
+            </div>
+            <div v-else class="py-12 text-center bg-base-200/30 rounded-[2rem] border-2 border-dashed border-base-200">
+              <span class="icon-[tabler--message-off] size-12 opacity-20 mb-4"></span>
+              <p class="text-base-content/60 font-medium">{{ t('product.noReviews') }}</p>
+            </div>
+
+            <!-- Review Form -->
+            <div class="mt-12 bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-xl shadow-primary/5">
+              <h3 class="h4 mb-8">{{ t('pages.products.writeReview') }}</h3>
+
+              <AppAlert v-if="reviewSuccess" type="success" :message="reviewSuccess" :auto-close="3000" @close="reviewSuccess = ''" />
+              <AppAlert v-if="reviewError" type="error" :message="reviewError" :auto-close="5000" @close="reviewError = ''" :dismissible="true" />
+
+              <form @submit.prevent="submitReview" class="space-y-6">
+                <div class="form-control">
+                  <label class="form-label mb-2">{{ t('product.rating') }}</label>
+                  <div class="flex items-center gap-6 p-4 bg-base-200/50 rounded-2xl">
+                    <input v-model.number="reviewForm.rating" type="range" min="1" max="5" class="range range-primary flex-1" />
+                    <div class="flex items-center gap-2 text-warning w-24 justify-end">
+                      <span class="text-2xl font-black text-base-content mr-2">{{ reviewForm.rating }}</span>
+                      <span class="icon-[tabler--star-filled] size-6"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-control">
+                  <label class="form-label">{{ t('product.reviewTitle') }}</label>
+                  <input v-model="reviewForm.title" type="text" placeholder="Excellent product!" class="input input-lg bg-base-200/50 border-none rounded-2xl" />
+                </div>
+                <div class="form-control">
+                  <label class="form-label">{{ t('product.reviewComment') }}</label>
+                  <textarea v-model="reviewForm.comment" class="textarea bg-base-200/50 border-none rounded-2xl min-h-32 p-4" placeholder="Share your experience with this item..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-full rounded-2xl shadow-lg shadow-primary/10 h-14" :disabled="reviewSubmitting">
+                  <span v-if="reviewSubmitting" class="loading loading-spinner loading-sm mr-2"></span>
+                  {{ t('product.submitReview') }}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Product, ProductApi, ProductVariant, Review } from '~/types'
+import type { ProductApi, ProductVariant, Review } from '~/types'
 const { t } = useI18n()
-useSeoMeta({
-  title: computed(() => productApi.value?.name || product.value?.title || t('pages.products.title')),
-  ogTitle: computed(() => productApi.value?.name || product.value?.title || t('pages.products.title')),
-  description: computed(() => productApi.value?.description || product.value?.description || ''),
-  ogDescription: computed(() => productApi.value?.description || product.value?.description || ''),
-  ogImage: computed(() => (productApi.value?.images?.[0]?.image) || (product.value?.thumbnail) || ''),
-})
 const config = useRuntimeConfig()
 const route = useRoute()
 const cartStore = useCartStore()
 const { openCart } = useCartUI()
 
-const id = computed(() => {
-  const routeId = route.params.id
-  return routeId as string || ''
+const productId = computed(() => route.params.id as string)
+
+// SEO
+useSeoMeta({
+  title: computed(() => productApi.value?.name || t('pages.products.title')),
+  ogTitle: computed(() => productApi.value?.name || t('pages.products.title')),
+  description: computed(() => productApi.value?.description || ''),
+  ogDescription: computed(() => productApi.value?.description || ''),
+  ogImage: computed(() => productApi.value?.images?.[0]?.image || ''),
 })
 
-const selectedVariantId = ref<number | null>(null)
-const { data: variants } = await useFetch<ProductVariant[]>(
-  `${config.public.baseURL}/api/variants/list?product_id=${id.value}`,
-  {
-    key: id.value
-  }
+// Fetching Product
+const { data: productApi, pending: pendingApi } = await useFetch<ProductApi>(
+  () => `${config.public.baseURL}/api/products/${productId.value}`,
+  { key: `product-${productId.value}` }
 )
+
+// Fetching Variants
+const { data: variants } = await useFetch<ProductVariant[]>(
+  () => `${config.public.baseURL}/api/variants/list?product_id=${productId.value}`,
+  { key: `variants-${productId.value}` }
+)
+
+const selectedVariantId = ref<number | null>(null)
 
 const selectedVariant = computed(() => {
   if (!selectedVariantId.value || !variants.value) return null
@@ -171,19 +231,23 @@ const selectedVariant = computed(() => {
 
 const selectedPrice = computed(() => {
   if (selectedVariant.value?.price) return selectedVariant.value.price
-  return (productApi.value?.price ?? product.value?.price ?? 0)
+  return productApi.value?.price ?? 0
 })
 
-function addToCartApi(product: ProductApi) {
-  if (!product?.id) {
-    console.error('Product ID is undefined')
-    return
+watch(variants, (newVariants) => {
+  if (newVariants && newVariants.length > 0 && !selectedVariantId.value) {
+    selectedVariantId.value = newVariants[0].id
   }
+}, { immediate: true })
+
+// Cart & Wishlist
+function addToCartApi(product: ProductApi) {
+  if (!product?.id) return
   
   cartStore.addItem({
     productId: product.id,
     name: product.name ?? 'Unknown Product',
-    price: (selectedPrice.value ?? product.price ?? 0),
+    price: selectedPrice.value,
     image: (product.images?.[0]?.image ?? ''),
     slug: (product.slug ?? ''),
     variantId: selectedVariantId.value ?? undefined,
@@ -191,24 +255,13 @@ function addToCartApi(product: ProductApi) {
   openCart()
 }
 
-function addToCart(product: Product) {
-  cartStore.addItem({
-    productId: product.id,
-    name: product.title,
-    price: product.price,
-    image: product.thumbnail,
-  })
-  openCart()
-}
-
 const { fetchWishlist, toggleWishlist, isInWishlist } = useWishlist()
 onMounted(() => { fetchWishlist() })
 
-const { data: productApi, pending: pendingApi } = await useFetch<ProductApi>(`${config.public.baseURL}/api/products/${id}`)
-const { data: product, pending } = await useLazyFetch<Product>(`https://dummyjson.com/products/${id}`)
-
-const { data: reviews, refresh: refreshReviews } = await useLazyFetch<Review[]>(
-  `${config.public.baseURL}/api/reviews?product_id=${id}`
+// Reviews
+const { data: reviews, refresh: refreshReviews } = await useFetch<Review[]>(
+  () => `${config.public.baseURL}/api/reviews?product_id=${productId.value}`,
+  { key: `reviews-${productId.value}` }
 )
 
 const reviewForm = reactive({
@@ -221,6 +274,7 @@ const reviewError = ref('')
 const reviewSuccess = ref('')
 
 async function submitReview() {
+  if (!productApi.value) return
   reviewSubmitting.value = true
   reviewError.value = ''
   reviewSuccess.value = ''
@@ -228,15 +282,15 @@ async function submitReview() {
     await $fetch(`${config.public.baseURL}/api/reviews`, {
       method: 'POST',
       body: {
-        product_id: Number(id),
-        user_id: 1,
+        product_id: Number(productId.value),
+        user_id: 1, // Static user for now, should be from auth store
         rating: reviewForm.rating,
         title: reviewForm.title.trim() || null,
         comment: reviewForm.comment.trim() || null,
         active: true,
       },
     })
-    reviewSuccess.value = 'Avaliação enviada com sucesso!'
+    reviewSuccess.value = t('product.reviewSuccess')
     reviewForm.rating = 5
     reviewForm.title = ''
     reviewForm.comment = ''
@@ -248,3 +302,13 @@ async function submitReview() {
   }
 }
 </script>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

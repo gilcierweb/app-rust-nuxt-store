@@ -16,10 +16,10 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h2 class="h3 gradient-text">{{ t('pages.home.products') }}</h2>
-          <p class="text-base-content/60 mt-1">Our handpicked selection for you</p>
+          <p class="text-base-content/60 mt-1">{{ t('pages.home.productsSubtitle') }}</p>
         </div>
         <NuxtLink to="/products" class="btn btn-primary btn-sm gap-2">
-          Shop All <span class="icon-[tabler--arrow-right] size-4"></span>
+          {{ t('pages.home.shopAll') }} <span class="icon-[tabler--arrow-right] size-4"></span>
         </NuxtLink>
       </div>
       <ProductList />
@@ -31,21 +31,25 @@
       <div class="absolute bottom-0 left-0 -mb-20 -ml-20 size-80 bg-secondary/20 rounded-full blur-3xl"></div>
       
       <div class="relative z-10 max-w-2xl mx-auto text-center">
-        <h2 class="text-3xl md:text-5xl font-bold mb-6">Stay Ahead of the Curve</h2>
+        <h2 class="text-3xl md:text-5xl font-bold mb-6">{{ t('pages.home.newsletter.title') }}</h2>
         <p class="text-primary-content/80 text-lg mb-10">
-          Subscribe to our newsletter and get exclusive access to new arrivals, special offers, and early-bird discounts.
+          {{ t('pages.home.newsletter.description') }}
         </p>
         
         <form class="flex flex-col sm:flex-row gap-4">
-          <input type="email" placeholder="Enter your email address" 
+          <input type="email" :placeholder="t('pages.home.newsletter.placeholder')" 
             class="input input-lg bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:bg-white/20 grow rounded-2xl h-14" />
           <button type="submit" class="btn btn-secondary btn-lg h-14 px-10 rounded-2xl shadow-xl shadow-secondary/20 transition-transform hover:scale-105">
-            Subscribe Now
+            {{ t('pages.home.newsletter.button') }}
           </button>
         </form>
         
         <p class="text-xs text-primary-content/40 mt-6">
-          By subscribing, you agree to our <NuxtLink to="/terms" class="underline">Terms</NuxtLink> and <NuxtLink to="/privacy" class="underline">Privacy Policy</NuxtLink>.
+          <i18n-t keypath="privacy.questions" tag="span">
+            <template #contact>
+              <span>{{ t('pages.privacy.title') }}</span>
+            </template>
+          </i18n-t>
         </p>
       </div>
     </section>
@@ -57,8 +61,8 @@
           <span class="icon-[tabler--truck-delivery] size-6 text-primary"></span>
         </div>
         <div>
-          <h3 class="font-bold mb-1">Fast & Free Shipping</h3>
-          <p class="text-sm text-base-content/60">Free shipping on all orders over R$ 200,00.</p>
+          <h3 class="font-bold mb-1">{{ t('pages.home.features.shipping.title') }}</h3>
+          <p class="text-sm text-base-content/60">{{ t('pages.home.features.shipping.description') }}</p>
         </div>
       </div>
       <div class="flex items-start gap-4 p-6 rounded-3xl bg-base-200/50">
@@ -66,8 +70,8 @@
           <span class="icon-[tabler--shield-check] size-6 text-primary"></span>
         </div>
         <div>
-          <h3 class="font-bold mb-1">Secure Payments</h3>
-          <p class="text-sm text-base-content/60">Your data is always safe and encrypted.</p>
+          <h3 class="font-bold mb-1">{{ t('pages.home.features.payments.title') }}</h3>
+          <p class="text-sm text-base-content/60">{{ t('pages.home.features.payments.description') }}</p>
         </div>
       </div>
       <div class="flex items-start gap-4 p-6 rounded-3xl bg-base-200/50">
@@ -75,8 +79,8 @@
           <span class="icon-[tabler--help-circle] size-6 text-primary"></span>
         </div>
         <div>
-          <h3 class="font-bold mb-1">24/7 Support</h3>
-          <p class="text-sm text-base-content/60">Our team is always here to help you.</p>
+          <h3 class="font-bold mb-1">{{ t('pages.home.features.support.title') }}</h3>
+          <p class="text-sm text-base-content/60">{{ t('pages.home.features.support.description') }}</p>
         </div>
       </div>
     </section>

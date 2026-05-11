@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 pt-10">
       <div>
         <h1 class="h2 gradient-text mb-2">{{ t('pages.orders.title') }}</h1>
-        <p class="text-base-content/60">Track your recent purchases and order history.</p>
+        <p class="text-base-content/60">{{ t('pages.orders.description') }}</p>
       </div>
       <div class="flex items-center gap-3">
         <button class="btn btn-ghost btn-square rounded-2xl bg-base-200/50">
@@ -24,7 +24,7 @@
           <span class="loading loading-ring loading-lg text-primary"></span>
         </div>
       </div>
-      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">Syncing your orders...</p>
+      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">{{ t('pages.orders.syncing') }}</p>
     </div>
 
     <!-- Empty State -->
@@ -34,7 +34,7 @@
       </div>
       <h2 class="h3 mb-2">{{ t('pages.orders.empty') }}</h2>
       <p class="mb-8 text-base-content/50 max-w-sm text-center">
-        You haven't placed any orders yet. Start shopping to see your history here!
+        {{ t('pages.orders.description') }}
       </p>
       <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
         {{ t('cart.continueShopping') }}
@@ -44,7 +44,7 @@
     <!-- Orders List -->
     <div v-else class="space-y-6">
       <div v-for="order in orders" :key="order.id" 
-        class="group bg-base-100 rounded-[2.5rem] border border-base-200 overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 hover:border-primary/20">
+        class="group bg-base-100 rounded-[2.5rem] border border-base-200 overflow-hidden hover-shadow-xl hover:shadow-primary/5 transition-all duration-500 hover:border-primary/20">
         <div class="p-8 md:p-10 flex flex-col lg:flex-row lg:items-center gap-8">
           
           <!-- Order Info -->
@@ -59,14 +59,14 @@
             </p>
             <p class="text-sm text-base-content/40 flex items-center gap-2">
               <span class="icon-[tabler--package] size-4"></span>
-              {{ order.items?.length || 0 }} Items
+              {{ order.items?.length || 0 }} {{ t('pages.orders.items') }}
             </p>
           </div>
           
           <!-- Status Badges -->
           <div class="lg:w-1/4 flex flex-row lg:flex-col gap-3">
             <div class="flex flex-col gap-1">
-              <span class="text-[10px] uppercase tracking-widest text-base-content/30 font-bold">Order Status</span>
+              <span class="text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.status') }}</span>
               <div :class="['badge badge-lg rounded-xl font-bold py-5 px-6', statusBadgeClass(order.status)]">
                 {{ statusLabel(order.status) }}
               </div>
@@ -75,7 +75,7 @@
           
           <div class="lg:w-1/4 flex flex-row lg:flex-col gap-3">
             <div class="flex flex-col gap-1">
-              <span class="text-[10px] uppercase tracking-widest text-base-content/30 font-bold">Payment Status</span>
+              <span class="text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.payment') }}</span>
               <div :class="['badge badge-lg rounded-xl font-bold py-5 px-6', paymentBadgeClass(order.payment_status)]">
                 {{ paymentLabel(order.payment_status) }}
               </div>
@@ -85,11 +85,11 @@
           <!-- Total & Actions -->
           <div class="lg:w-1/4 flex lg:flex-col lg:items-end justify-between items-center border-t lg:border-t-0 pt-6 lg:pt-0 border-base-200">
             <div class="text-right lg:mb-6">
-              <span class="block text-[10px] uppercase tracking-widest text-base-content/30 font-bold">Total Amount</span>
+              <span class="block text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.amount') }}</span>
               <span class="text-3xl font-black text-primary">{{ formatNumberBR(order.total_amount) }}</span>
             </div>
             <NuxtLink :to="`/orders/confirmation/${order.id}`" class="btn btn-ghost hover:bg-primary/10 hover:text-primary rounded-xl px-6 group-hover:translate-x-1 transition-all">
-              {{ t('order.details') }}
+              {{ t('pages.orders.detail') }}
               <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
             </NuxtLink>
           </div>
@@ -98,12 +98,11 @@
         <!-- Quick Preview of items (optional) -->
         <div v-if="order.items && order.items.length > 0" class="px-10 py-6 bg-base-200/20 border-t border-base-200 flex items-center gap-4 overflow-x-auto no-scrollbar">
           <div v-for="item in order.items.slice(0, 5)" :key="item.id" class="size-12 rounded-xl bg-white border border-base-200 shrink-0 overflow-hidden">
-             <!-- If we had item images in the order, we'd show them here -->
              <div class="flex items-center justify-center h-full text-base-content/10">
                <span class="icon-[tabler--photo] size-6"></span>
              </div>
           </div>
-          <span v-if="order.items.length > 5" class="text-xs font-bold text-base-content/30">+{{ order.items.length - 5 }} more</span>
+          <span v-if="order.items.length > 5" class="text-xs font-bold text-base-content/30">+{{ order.items.length - 5 }} {{ t('common.more') || 'mais' }}</span>
         </div>
       </div>
     </div>
@@ -136,7 +135,7 @@ const statusMap: Record<number, { label: string; badge: string }> = {
 
 function statusLabel(status: unknown): string {
   if (status == null) return '-'
-  return statusMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+  return statusMap[status as number]?.label ?? t('common.unknown')
 }
 
 function statusBadgeClass(status: unknown): string {
@@ -153,7 +152,7 @@ const paymentMap: Record<number, { label: string; badge: string }> = {
 
 function paymentLabel(status: unknown): string {
   if (status == null) return '-'
-  return paymentMap[status as number]?.label ?? t('admin.statusLabels.unknown')
+  return paymentMap[status as number]?.label ?? t('common.unknown')
 }
 
 function paymentBadgeClass(status: unknown): string {

@@ -1,5 +1,22 @@
 {
   "terms": {
-    "title": "Termos de Uso"
+    "title": "Termos de Uso",
+    "lastUpdated": "Última atualização: 10 de Maio de 2026",
+    "status": "Vigente",
+    "sections": {
+      "acceptance": {
+        "title": "Aceitação dos Termos",
+        "content": "Ao acessar e usar este site, você aceita e concorda em estar vinculado pelos termos e disposições deste contrato."
+      },
+      "usage": {
+        "title": "Licença de Uso",
+        "content": "É concedida permissão para baixar temporariamente uma cópia dos materiais no site para visualização transitória pessoal e não comercial apenas."
+      },
+      "disclaimer": {
+        "title": "Isenção de Responsabilidade",
+        "content": "Os materiais no site são fornecidos 'como estão'. Não oferecemos garantias, expressas ou implícitas, e por este meio isentamos e negamos todas as outras garantias."
+      }
+    },
+    "questions": "Para mais informações, entre em {contact} conosco."
   }
 }

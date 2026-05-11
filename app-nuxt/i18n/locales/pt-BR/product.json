@@ -11,6 +11,7 @@
     "addToCart": "Adicionar ao Carrinho",
     "loadMore": "Carregar mais produtos",
     "found": "{count} produtos encontrados",
+    "notFound": "Produto não encontrado",
     "filters": {
       "title": "Filtros:",
       "allBrands": "Todas as marcas",
@@ -43,6 +44,14 @@
       "fastDelivery": "Entrega rápida",
       "discount": "-{percent}%",
       "reviews": "({count} avaliações)"
-    }
+    },
+    "verifiedPurchase": "Compra verificada",
+    "noReviews": "Nenhuma avaliação ainda. Seja o primeiro!",
+    "rating": "Avaliação",
+    "reviewTitle": "Título da avaliação",
+    "reviewComment": "Comentário",
+    "submitReview": "Enviar Avaliação",
+    "reviewSuccess": "Avaliação enviada com sucesso!",
+    "reviewError": "Erro ao enviar avaliação"
   }
 }

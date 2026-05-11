@@ -4,10 +4,10 @@
     <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 pt-10">
       <div>
         <h1 class="h2 gradient-text mb-2">{{ t('pages.wishlist.title') }}</h1>
-        <p class="text-base-content/60">Your collection of must-have items.</p>
+        <p class="text-base-content/60">{{ t('pages.wishlist.description') }}</p>
       </div>
       <div class="flex items-center gap-3">
-        <span class="badge badge-primary badge-soft px-4 py-2 font-bold">{{ wishlist.length }} Saved Items</span>
+        <span class="badge badge-primary badge-soft px-4 py-2 font-bold">{{ t('pages.wishlist.savedItems', { count: wishlist.length }) }}</span>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
           <span class="icon-[tabler--heart-filled] size-8 text-primary animate-bounce"></span>
         </div>
       </div>
-      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">Loading your wishlist...</p>
+      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">{{ t('pages.wishlist.loading') }}</p>
     </div>
 
     <!-- Empty State -->
@@ -30,7 +30,7 @@
       </div>
       <h2 class="h3 mb-2">{{ t('pages.wishlist.empty') }}</h2>
       <p class="mb-8 text-base-content/50 max-w-sm text-center">
-        Your wishlist is waiting for some love. Find items you like and click the heart icon to save them!
+        {{ t('pages.wishlist.description') }}
       </p>
       <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
         {{ t('pages.wishlist.continueShopping') }}
@@ -43,7 +43,6 @@
         class="group bg-base-100 rounded-[2.5rem] border border-base-200 overflow-hidden hover-lift shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
         
         <div class="relative h-64 bg-base-200 overflow-hidden">
-           <!-- Ideally we'd have a product image here -->
            <div class="flex items-center justify-center h-full bg-gradient-to-br from-base-200 to-base-300 group-hover:scale-110 transition-transform duration-700">
              <span class="icon-[tabler--photo] size-20 text-base-content/10"></span>
            </div>
@@ -90,4 +89,3 @@ async function removeFromWishlist(item: WishlistItem) {
   await toggleWishlist(item.product_id)
 }
 </script>
-

@@ -25,12 +25,12 @@
         <div class="bg-base-200/50 p-6 rounded-3xl border border-base-200">
           <h3 class="font-bold mb-6 flex items-center gap-2">
             <span class="icon-[tabler--filter] size-5 text-primary"></span>
-            Filters
+            {{ t('pages.products.filters.title') }}
           </h3>
           
           <!-- Categories Filter -->
           <div class="space-y-4">
-            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Categories</h4>
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.categories') }}</h4>
             <div class="space-y-2">
               <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 cursor-pointer group">
                 <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-lg" />
@@ -43,7 +43,7 @@
 
           <!-- Price Filter -->
           <div class="space-y-4">
-            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Price Range</h4>
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.priceRange') }}</h4>
             <div class="space-y-4">
               <input type="range" min="0" max="1000" class="range range-primary range-sm" />
               <div class="flex items-center justify-between text-xs font-medium">
@@ -57,7 +57,7 @@
 
           <!-- Rating Filter -->
           <div class="space-y-4">
-            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Rating</h4>
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.rating') }}</h4>
             <div class="space-y-2">
               <label v-for="i in [5, 4, 3, 2, 1]" :key="i" class="flex items-center gap-3 cursor-pointer group">
                 <input type="radio" name="rating" class="radio radio-primary radio-sm" />
@@ -65,7 +65,7 @@
                   <span v-for="star in 5" :key="star" 
                     :class="[star <= i ? 'icon-[tabler--star-filled]' : 'icon-[tabler--star]', 'size-3.5']"></span>
                 </div>
-                <span class="text-xs font-medium">& Up</span>
+                <span class="text-xs font-medium">{{ t('pages.products.filters.andUp') }}</span>
               </label>
             </div>
           </div>
@@ -74,9 +74,9 @@
         <!-- Promotion Card -->
         <div class="bg-gradient-to-br from-primary to-secondary p-6 rounded-3xl text-primary-content relative overflow-hidden">
           <div class="absolute top-0 right-0 -mt-4 -mr-4 size-20 bg-white/20 rounded-full blur-xl"></div>
-          <h4 class="font-bold text-lg mb-2">Summer Sale!</h4>
-          <p class="text-xs opacity-80 mb-4">Get up to 50% off on selected summer items.</p>
-          <button class="btn btn-white btn-sm w-full rounded-xl">Check Deals</button>
+          <h4 class="font-bold text-lg mb-2">{{ t('pages.products.promo.title') }}</h4>
+          <p class="text-xs opacity-80 mb-4">{{ t('pages.products.promo.description') }}</p>
+          <button class="btn btn-white btn-sm w-full rounded-xl">{{ t('pages.products.promo.button') }}</button>
         </div>
       </aside>
 
@@ -90,15 +90,14 @@
     <div id="filter-drawer" class="overlay overlay-open:translate-x-0 drawer drawer-start hidden" role="dialog" tabindex="-1">
       <div class="drawer-content h-full p-6 bg-base-100 w-80">
         <div class="flex items-center justify-between mb-8">
-          <h3 class="font-bold text-lg">Filters</h3>
+          <h3 class="font-bold text-lg">{{ t('pages.products.filters.title') }}</h3>
           <button class="btn btn-circle btn-ghost btn-sm" data-overlay="#filter-drawer">
             <span class="icon-[tabler--x] size-5"></span>
           </button>
         </div>
-        <!-- Re-use sidebar content here if possible, but for simplicity I'll duplicate the logic or just leave it for now -->
         <div class="space-y-8">
           <div class="space-y-4">
-            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Categories</h4>
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">{{ t('pages.products.filters.categories') }}</h4>
             <div class="space-y-3">
               <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 cursor-pointer">
                 <input type="checkbox" class="checkbox checkbox-primary rounded-lg" />
@@ -106,7 +105,7 @@
               </label>
             </div>
           </div>
-          <button class="btn btn-primary w-full mt-8 rounded-2xl h-14" data-overlay="#filter-drawer">Apply Filters</button>
+          <button class="btn btn-primary w-full mt-8 rounded-2xl h-14" data-overlay="#filter-drawer">{{ t('pages.products.filters.apply') }}</button>
         </div>
       </div>
     </div>
@@ -124,4 +123,3 @@ useSeoMeta({
 
 const categories = ['Fashion', 'Technology', 'Books', 'Home', 'Vehicles', 'Art']
 </script>
-

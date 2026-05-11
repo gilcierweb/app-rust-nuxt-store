@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="mb-10 pt-10">
       <h1 class="h2 gradient-text">{{ t('pages.checkout.title') }}</h1>
-      <p class="text-base-content/60 mt-1">Complete your purchase by providing shipping and payment details.</p>
+      <p class="text-base-content/60 mt-1">{{ t('pages.checkout.description') }}</p>
     </div>
 
     <!-- Empty State -->
@@ -25,41 +25,41 @@
         <div class="bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-sm">
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">1</div>
-            <h2 class="h4">{{ t('shipping.address') }}</h2>
+            <h2 class="h4">{{ t('pages.checkout.step1') }}</h2>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
               <label class="form-label">{{ t('shipping.firstName') }}</label>
-              <input v-model="address.firstName" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="First Name" />
+              <input v-model="address.firstName" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.firstName')" />
             </div>
             <div class="form-control">
               <label class="form-label">{{ t('shipping.lastName') }}</label>
-              <input v-model="address.lastName" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="Last Name" />
+              <input v-model="address.lastName" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.lastName')" />
             </div>
             <div class="form-control md:col-span-2">
               <label class="form-label">{{ t('shipping.address1') }}</label>
-              <input v-model="address.address1" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="Street Address, P.O. box, etc." />
+              <input v-model="address.address1" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.address1')" />
             </div>
             <div class="form-control md:col-span-2">
-              <label class="form-label">{{ t('shipping.address2') }} (Optional)</label>
-              <input v-model="address.address2" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="Apartment, suite, unit, building, floor, etc." />
+              <label class="form-label">{{ t('shipping.address2') }} ({{ t('common.optional') || 'Opcional' }})</label>
+              <input v-model="address.address2" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.address2')" />
             </div>
             <div class="form-control">
               <label class="form-label">{{ t('shipping.city') }}</label>
-              <input v-model="address.city" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="City" />
+              <input v-model="address.city" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.city')" />
             </div>
             <div class="form-control">
               <label class="form-label">{{ t('shipping.state') }}</label>
-              <input v-model="address.state" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="State / Province" />
+              <input v-model="address.state" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.state')" />
             </div>
             <div class="form-control">
               <label class="form-label">{{ t('shipping.zipCode') }}</label>
-              <input v-model="address.zipCode" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="ZIP / Postal Code" />
+              <input v-model="address.zipCode" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" :placeholder="t('shipping.zipCode')" />
             </div>
             <div class="form-control">
               <label class="form-label">{{ t('shipping.phone') }}</label>
-              <input v-model="address.phone" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="+00 00000-0000" />
+              <input v-model="address.phone" type="text" class="input input-lg bg-base-200/50 border-none rounded-2xl h-14" placeholder="+55 00 00000-0000" />
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@
         <div class="bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-sm">
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">2</div>
-            <h2 class="h4">{{ t('shipping.method') }}</h2>
+            <h2 class="h4">{{ t('pages.checkout.step2') }}</h2>
           </div>
           
           <div v-if="shippingMethods.length === 0" class="flex items-center justify-center py-10 opacity-40">
@@ -81,7 +81,7 @@
               <input v-model="selectedShippingMethod" type="radio" name="shipping_method" :value="method.id" class="hidden" />
               <div class="grow">
                 <p class="font-bold mb-1">{{ method.name || method.code }}</p>
-                <p class="text-xs text-base-content/50">Delivery in 3-5 business days</p>
+                <p class="text-xs text-base-content/50">Entrega em 3-5 dias úteis</p>
               </div>
               <div class="text-right">
                 <p class="font-black text-primary">{{ method.base_price ? formatNumberBR(method.base_price) : t('shipping.free') }}</p>
@@ -95,7 +95,7 @@
         <div class="bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-sm">
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">3</div>
-            <h2 class="h4">{{ t('payment.select') }}</h2>
+            <h2 class="h4">{{ t('pages.checkout.step3') }}</h2>
           </div>
           
           <div v-if="paymentMethods.length === 0" class="flex items-center justify-center py-10 opacity-40">
@@ -130,7 +130,7 @@
               </div>
               <div class="grow min-w-0">
                 <p class="font-bold text-sm line-clamp-1">{{ item.name }}</p>
-                <p class="text-xs text-base-content/40">Qtd: {{ item.quantity }}</p>
+                <p class="text-xs text-base-content/40">{{ t('cart.quantity') }}: {{ item.quantity }}</p>
               </div>
               <div class="font-bold text-sm">{{ formatNumberBR(item.price * item.quantity) }}</div>
             </div>
@@ -139,13 +139,13 @@
           <!-- Coupon -->
           <div class="mb-8">
             <div class="relative group">
-              <input v-model="couponCode" type="text" placeholder="Promo Code" 
+              <input v-model="couponCode" type="text" :placeholder="t('pages.checkout.promoCode')" 
                 class="input bg-base-200/50 border-none rounded-2xl h-14 w-full pr-24 uppercase font-bold tracking-widest placeholder:normal-case placeholder:font-normal placeholder:tracking-normal"
                 :disabled="couponApplied || couponChecking" @keyup.enter="applyCoupon" />
               <button v-if="!couponApplied" @click="applyCoupon" :disabled="!couponCode.trim() || couponChecking"
                 class="btn btn-primary btn-sm absolute right-2 top-2 h-10 px-4 rounded-xl">
                 <span v-if="couponChecking" class="loading loading-spinner loading-xs"></span>
-                <span v-else>Apply</span>
+                <span v-else>{{ t('pages.checkout.apply') }}</span>
               </button>
               <button v-else @click="removeCoupon" class="btn btn-ghost btn-circle btn-sm absolute right-2 top-2 h-10 w-10 text-error">
                 <span class="icon-[tabler--x] size-5"></span>
@@ -160,25 +160,25 @@
           <!-- Pricing -->
           <div class="space-y-4 mb-8">
             <div class="flex justify-between text-base-content/60">
-              <span>Subtotal</span>
+              <span>{{ t('cart.subtotal') }}</span>
               <span>{{ formatNumberBR(cartStore.totalPrice) }}</span>
             </div>
             <div v-if="selectedShippingCost" class="flex justify-between text-base-content/60">
-              <span>{{ t('shipping.shipping') }}</span>
+              <span>{{ t('shipping.title') }}</span>
               <span>{{ formatNumberBR(selectedShippingCost) }}</span>
             </div>
             <div v-if="couponDiscount" class="flex justify-between text-success font-medium">
-              <span>Discount</span>
+              <span>{{ t('pages.checkout.discount') }}</span>
               <span>-{{ formatNumberBR(couponDiscount) }}</span>
             </div>
           </div>
           
           <div class="pt-6 border-t border-base-200 mb-8">
             <div class="flex justify-between items-end">
-              <span class="font-bold text-lg text-base-content/60">Total</span>
+              <span class="font-bold text-lg text-base-content/60">{{ t('cart.total') }}</span>
               <div class="text-right">
                 <span class="block text-3xl font-black text-primary">{{ formatNumberBR(totalAmount) }}</span>
-                <span class="text-[10px] text-base-content/40 uppercase tracking-widest">Final Price</span>
+                <span class="text-[10px] text-base-content/40 uppercase tracking-widest">{{ t('orders.finalPrice') }}</span>
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@
 
             <p class="text-center text-[10px] text-base-content/30 uppercase tracking-widest flex items-center justify-center gap-2 mt-6">
               <span class="icon-[tabler--shield-lock] size-4"></span>
-              Secure 256-bit SSL Encrypted Payment
+              {{ t('pages.checkout.securePayment') }}
             </p>
           </div>
         </div>
@@ -270,7 +270,7 @@ async function applyCoupon() {
       couponMessage.value = result.message
     }
   } catch {
-    couponMessage.value = 'Erro ao validar cupom'
+    couponMessage.value = t('product.reviewError')
   } finally {
     couponChecking.value = false
   }
@@ -339,7 +339,7 @@ async function placeOrder() {
     cartStore.clearCart()
     router.push(`/orders/confirmation/${data.id}`)
   } catch (err: any) {
-    error.value = err?.data?.message || err?.message || 'Error placing order'
+    error.value = err?.data?.message || err?.message || t('pages.products.edit.error', { message: '' })
   } finally {
     submitting.value = false
   }

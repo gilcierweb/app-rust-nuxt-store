@@ -1,5 +1,26 @@
 {
   "privacy": {
-    "title": "Política de Privacidade"
+    "title": "Política de Privacidade",
+    "lastUpdated": "Última atualização: 10 de Maio de 2026",
+    "status": "Ativa",
+    "sections": {
+      "intro": {
+        "title": "Introdução",
+        "content": "Na App Rust Nuxt Store, respeitamos sua privacidade e estamos comprometidos em protegê-la. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações ao visitar nosso site."
+      },
+      "collection": {
+        "title": "Coleta de Informações",
+        "content": "Coletamos informações que você nos fornece diretamente, como quando você cria uma conta, realiza uma compra ou entra em contato com nossa equipe de suporte. Isso pode incluir seu nome, e-mail e endereço de entrega."
+      },
+      "usage": {
+        "title": "Como Usamos Suas Informações",
+        "content": "Usamos as informações que coletamos para processar seus pedidos, fornecer suporte ao cliente e enviar atualizações sobre nossos serviços. Não vendemos seus dados pessoais a terceiros."
+      },
+      "cookies": {
+        "title": "Cookies e Rastreamento",
+        "content": "Usamos cookies para melhorar sua experiência de navegação e analisar o tráfego do site. Você pode optar por desativar os cookies nas configurações do seu navegador."
+      }
+    },
+    "questions": "Se você tiver alguma dúvida sobre esta política, por favor {contact}."
   }
 }

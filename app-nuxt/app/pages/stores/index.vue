@@ -8,7 +8,7 @@
       <div class="max-w-xl mx-auto mt-10">
         <div class="relative">
           <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
-          <input type="text" placeholder="Search by city or neighborhood..." 
+          <input type="text" :placeholder="t('pages.stores.search')" 
             class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
         </div>
       </div>
@@ -26,7 +26,7 @@
              <span class="icon-[tabler--map-pin] size-16"></span>
           </div>
           <div class="absolute top-4 right-4">
-            <span class="badge badge-primary backdrop-blur-md font-bold px-4 py-3 rounded-xl shadow-lg">Open Now</span>
+            <span class="badge badge-primary backdrop-blur-md font-bold px-4 py-3 rounded-xl shadow-lg">{{ t('pages.stores.openNow') }}</span>
           </div>
         </div>
         
@@ -51,10 +51,10 @@
           
           <div class="grid grid-cols-2 gap-4">
             <button class="btn btn-primary rounded-xl shadow-lg shadow-primary/10">
-              Directions
+              {{ t('pages.stores.directions') }}
             </button>
             <button class="btn btn-ghost rounded-xl bg-base-200/50">
-              Details
+              {{ t('pages.stores.details') }}
             </button>
           </div>
         </div>
@@ -63,9 +63,9 @@
 
     <!-- CTA Section -->
     <div class="mt-20 p-12 bg-base-200 rounded-[3rem] text-center">
-      <h2 class="h3 mb-4">Can't find a store near you?</h2>
-      <p class="text-base-content/60 mb-8">Don't worry! We ship worldwide and provide 24/7 support online.</p>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-12 rounded-2xl">Shop Online Now</NuxtLink>
+      <h2 class="h3 mb-4">{{ t('pages.stores.cta.title') }}</h2>
+      <p class="text-base-content/60 mb-8">{{ t('pages.stores.cta.description') }}</p>
+      <NuxtLink to="/products" class="btn btn-primary btn-lg px-12 rounded-2xl">{{ t('pages.stores.cta.button') }}</NuxtLink>
     </div>
   </div>
 </template>
@@ -88,4 +88,3 @@ const stores = [
   { name: 'Brasília Modern Store', address: 'SCLS 403 Bloco B - Asa Sul', phone: '+55 (61) 4444-4444', hours: 'Mon-Sat: 10:00 - 22:00' }
 ]
 </script>
-

@@ -6,7 +6,7 @@
         <div class="absolute top-0 right-0 -mt-20 -mr-20 size-80 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700"></div>
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div class="space-y-6">
-            <span class="badge badge-primary badge-soft px-4 py-1.5 rounded-lg">Featured Article</span>
+            <span class="badge badge-primary badge-soft px-4 py-1.5 rounded-lg">{{ t('pages.posts.featured') }}</span>
             <h1 class="h1 leading-tight gradient-text">Mastering the Future of E-commerce in 2026</h1>
             <p class="text-xl text-base-content/60 leading-relaxed">
               Explore how AI, serverless architectures, and premium UX design are reshaping the way we build and shop online.
@@ -17,10 +17,10 @@
               </div>
               <div>
                 <p class="font-bold">Gabriel Rocha</p>
-                <p class="text-xs text-base-content/40">Lead Developer • 5 min read</p>
+                <p class="text-xs text-base-content/40">Lead Developer • {{ t('pages.posts.readTime', { n: 5 }) }}</p>
               </div>
             </div>
-            <button class="btn btn-primary btn-lg rounded-2xl px-10 shadow-xl shadow-primary/20">Read Article</button>
+            <button class="btn btn-primary btn-lg rounded-2xl px-10 shadow-xl shadow-primary/20">{{ t('pages.posts.readMore') }}</button>
           </div>
           <div class="hidden lg:block relative">
             <div class="aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/50 bg-base-300">
@@ -45,7 +45,7 @@
       
       <div class="relative w-full md:w-80">
         <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
-        <input type="text" placeholder="Search articles..." 
+        <input type="text" :placeholder="t('pages.posts.hero.cta')" 
           class="input bg-base-200/50 border-none rounded-2xl pl-12 w-full h-12" />
       </div>
     </div>
@@ -77,7 +77,7 @@
         <div class="p-8">
           <div class="flex items-center gap-3 text-xs text-base-content/40 mb-4">
             <span class="flex items-center gap-1"><span class="icon-[tabler--calendar] size-3.5"></span> July 15, 2025</span>
-            <span class="flex items-center gap-1"><span class="icon-[tabler--clock] size-3.5"></span> 5 min read</span>
+            <span class="flex items-center gap-1"><span class="icon-[tabler--clock] size-3.5"></span> {{ t('pages.posts.readTime', { n: 5 }) }}</span>
           </div>
           
           <h3 class="h4 mb-4 group-hover:text-primary transition-colors line-clamp-2 leading-tight">{{ post.title }}</h3>
@@ -93,7 +93,7 @@
               <span class="text-xs font-bold">Admin</span>
             </div>
             <NuxtLink :to="`/posts/${post.id}`" class="btn btn-ghost btn-sm rounded-lg hover:bg-primary/10 hover:text-primary gap-1">
-              Read More
+              {{ t('pages.posts.readMore') }}
               <span class="icon-[tabler--arrow-right] size-4"></span>
             </NuxtLink>
           </div>
@@ -104,14 +104,14 @@
     <!-- Empty State -->
     <div v-if="!pending && (!posts || posts.length === 0)" class="text-center py-20">
       <span class="icon-[tabler--news-off] size-16 text-base-content/20 mb-4"></span>
-      <h3 class="text-xl font-bold">No articles found</h3>
-      <p class="text-base-content/50 mt-2">We're working on new content. Stay tuned!</p>
+      <h3 class="text-xl font-bold">{{ t('pages.posts.detail.sidebar.newsletterButton') }}</h3>
+      <p class="text-base-content/50 mt-2">{{ t('pages.posts.detail.sidebar.newsletterText') }}</p>
     </div>
 
     <!-- Load More -->
     <div v-if="!pending && posts && posts.length > 0" class="text-center mt-16">
       <button class="btn btn-ghost btn-lg rounded-2xl px-12 border-2 border-base-200 hover:border-primary/20 hover:bg-primary/5">
-        Load More Articles
+        {{ t('pages.posts.loadMore') }}
       </button>
     </div>
   </div>
@@ -144,4 +144,3 @@ const blogCategories = ['All', 'Technology', 'Marketing', 'Innovation', 'Securit
   scrollbar-width: none;
 }
 </style>
-

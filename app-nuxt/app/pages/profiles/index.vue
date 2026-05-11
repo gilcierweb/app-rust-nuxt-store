@@ -10,7 +10,7 @@
       <div class="max-w-xl mx-auto w-full md:w-80">
         <div class="relative">
           <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
-          <input type="text" placeholder="Search profiles..." 
+          <input type="text" :placeholder="t('pages.profiles.search')" 
             class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
         </div>
       </div>
@@ -55,8 +55,8 @@
     <!-- Empty State -->
     <div v-if="!pending && (!profiles || profiles.length === 0)" class="text-center py-20">
       <span class="icon-[tabler--users-group] size-16 text-base-content/20 mb-4"></span>
-      <h3 class="text-xl font-bold">No profiles found</h3>
-      <p class="text-base-content/50 mt-2">Try adjusting your search or check back later.</p>
+      <h3 class="text-xl font-bold">{{ t('categories.notFound') }}</h3>
+      <p class="text-base-content/50 mt-2">{{ t('pages.profiles.description') }}</p>
     </div>
   </div>
 </template>
@@ -75,4 +75,3 @@ useSeoMeta({
 
 const { pending, data: profiles } = await useLazyFetch<Profile[]>(`${config.public.baseURL}/api/profiles`)
 </script>
-
