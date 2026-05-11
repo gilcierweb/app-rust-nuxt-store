@@ -1,48 +1,42 @@
 <template>
-    <div class="my-6">
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div class="card-body flex items-center gap-2">
-                    <i class="icon-[tabler--shirt-filled] size-10 text-2xl text-primary"></i>
-                    <h5 class="text-lg font-bold">Fashion</h5>
-                </div>
-            </div>
-            <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div class="card-body flex items-center gap-2">
-                    <i class="icon-[tabler--device-laptop] size-10 text-2xl text-primary"></i>
-                    <h5 class="text-lg font-bold">Technology</h5>
-                </div>
-            </div>
-            <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div class="card-body flex items-center gap-2">
-                    <i class="icon-[tabler--book] size-10 text-2xl text-primary"></i>
-                    <h5 class="text-lg font-bold">Books</h5>
-                </div>
-            </div>
-            <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div class="card-body flex items-center gap-2">
-                    <i class="icon-[tabler--home-dot] size-10 text-2xl text-primary"></i>
-                    <h5 class="text-lg font-bold">Home</h5>
-                </div>
-            </div>
-            <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div class="card-body flex items-center gap-2">
-                    <i class="icon-[tabler--car] size-10 text-2xl text-primary"></i>
-                    <h5 class="text-lg font-bold">Vehicles</h5>
-                </div>
-            </div>
-            <div class="card bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div class="card-body flex items-center gap-2">
-                    <i class="icon-[tabler--palette] size-10 text-2xl text-primary"></i>
-                    <h5 class="text-lg font-bold">Art</h5>
-                </div>
-            </div>
-        </div>
+  <div class="py-12">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="h3 gradient-text">{{ t('pages.home.categories') }}</h2>
+        <p class="text-base-content/60 mt-1">Explore our curated collections</p>
+      </div>
+      <NuxtLink to="/categories" class="btn btn-ghost btn-sm gap-2">
+        View All <span class="icon-[tabler--arrow-right] size-4"></span>
+      </NuxtLink>
     </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+      <NuxtLink v-for="cat in staticCategories" :key="cat.name" 
+        :to="`/categories`"
+        class="group flex flex-col items-center gap-4 p-6 rounded-3xl bg-base-200/50 hover:bg-primary/10 transition-all duration-500 hover-lift border border-transparent hover:border-primary/20">
+        
+        <div class="size-16 rounded-2xl bg-white shadow-sm flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+          <span :class="[cat.icon, 'size-8 text-primary']"></span>
+        </div>
+        
+        <div class="text-center">
+          <h3 class="font-bold text-sm md:text-base group-hover:text-primary transition-colors">{{ cat.name }}</h3>
+          <span class="text-[10px] uppercase tracking-wider font-semibold text-base-content/40">12+ Products</span>
+        </div>
+      </NuxtLink>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 
+const staticCategories = [
+  { name: 'Fashion', icon: 'icon-[tabler--shirt-filled]' },
+  { name: 'Technology', icon: 'icon-[tabler--device-laptop]' },
+  { name: 'Books', icon: 'icon-[tabler--book]' },
+  { name: 'Home', icon: 'icon-[tabler--home-dot]' },
+  { name: 'Vehicles', icon: 'icon-[tabler--car]' },
+  { name: 'Art', icon: 'icon-[tabler--palette]' }
+]
 </script>
-
-<style scoped></style>

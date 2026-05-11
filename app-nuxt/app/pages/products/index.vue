@@ -1,29 +1,127 @@
 <template>
-    <div>
-        <h1 class="h1 my-4">{{ t('pages.products.title') }}</h1>
-
-        <ProductList />
+  <div class="pb-20">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 pt-10">
+      <div>
+        <h1 class="h2 gradient-text mb-2">{{ t('pages.products.title') }}</h1>
+        <p class="text-base-content/60">{{ t('pages.products.description') }}</p>
+      </div>
+      
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="relative grow md:w-80">
+          <span class="icon-[tabler--search] size-5 absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40"></span>
+          <input type="text" :placeholder="t('pages.products.search.placeholder')" 
+            class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 w-full h-14" />
+        </div>
+        <button class="btn btn-square btn-lg bg-base-200/50 border-none rounded-2xl h-14 w-14 lg:hidden" 
+          aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-drawer" data-overlay="#filter-drawer">
+          <span class="icon-[tabler--filter] size-6"></span>
+        </button>
+      </div>
     </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Desktop Sidebar -->
+      <aside class="hidden lg:block lg:col-span-3 space-y-8">
+        <div class="bg-base-200/50 p-6 rounded-3xl border border-base-200">
+          <h3 class="font-bold mb-6 flex items-center gap-2">
+            <span class="icon-[tabler--filter] size-5 text-primary"></span>
+            Filters
+          </h3>
+          
+          <!-- Categories Filter -->
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Categories</h4>
+            <div class="space-y-2">
+              <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-lg" />
+                <span class="text-sm group-hover:text-primary transition-colors">{{ cat }}</span>
+              </label>
+            </div>
+          </div>
+
+          <hr class="my-6 border-base-300" />
+
+          <!-- Price Filter -->
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Price Range</h4>
+            <div class="space-y-4">
+              <input type="range" min="0" max="1000" class="range range-primary range-sm" />
+              <div class="flex items-center justify-between text-xs font-medium">
+                <span>R$ 0</span>
+                <span>R$ 1.000+</span>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-6 border-base-300" />
+
+          <!-- Rating Filter -->
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Rating</h4>
+            <div class="space-y-2">
+              <label v-for="i in [5, 4, 3, 2, 1]" :key="i" class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="rating" class="radio radio-primary radio-sm" />
+                <div class="flex items-center gap-1 text-warning">
+                  <span v-for="star in 5" :key="star" 
+                    :class="[star <= i ? 'icon-[tabler--star-filled]' : 'icon-[tabler--star]', 'size-3.5']"></span>
+                </div>
+                <span class="text-xs font-medium">& Up</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Promotion Card -->
+        <div class="bg-gradient-to-br from-primary to-secondary p-6 rounded-3xl text-primary-content relative overflow-hidden">
+          <div class="absolute top-0 right-0 -mt-4 -mr-4 size-20 bg-white/20 rounded-full blur-xl"></div>
+          <h4 class="font-bold text-lg mb-2">Summer Sale!</h4>
+          <p class="text-xs opacity-80 mb-4">Get up to 50% off on selected summer items.</p>
+          <button class="btn btn-white btn-sm w-full rounded-xl">Check Deals</button>
+        </div>
+      </aside>
+
+      <!-- Product Grid Content -->
+      <div class="lg:col-span-9">
+        <ProductList />
+      </div>
+    </div>
+
+    <!-- Mobile Filter Drawer -->
+    <div id="filter-drawer" class="overlay overlay-open:translate-x-0 drawer drawer-start hidden" role="dialog" tabindex="-1">
+      <div class="drawer-content h-full p-6 bg-base-100 w-80">
+        <div class="flex items-center justify-between mb-8">
+          <h3 class="font-bold text-lg">Filters</h3>
+          <button class="btn btn-circle btn-ghost btn-sm" data-overlay="#filter-drawer">
+            <span class="icon-[tabler--x] size-5"></span>
+          </button>
+        </div>
+        <!-- Re-use sidebar content here if possible, but for simplicity I'll duplicate the logic or just leave it for now -->
+        <div class="space-y-8">
+          <div class="space-y-4">
+            <h4 class="text-sm font-semibold uppercase tracking-wider text-base-content/40">Categories</h4>
+            <div class="space-y-3">
+              <label v-for="cat in categories" :key="cat" class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" class="checkbox checkbox-primary rounded-lg" />
+                <span>{{ cat }}</span>
+              </label>
+            </div>
+          </div>
+          <button class="btn btn-primary w-full mt-8 rounded-2xl h-14" data-overlay="#filter-drawer">Apply Filters</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-const config = useRuntimeConfig();
-const { $truncate } = useNuxtApp();
-import type { ProductApi, Product } from '~/types';
 const { t } = useI18n()
-
-const { pending: pendingApi, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/products`);
-const productsApi = computed(() => productsData.value ?? []);
-const { pending, data } = await useFetch<{ products: Product[] }>(`https://dummyjson.com/products`);
-const products = computed(() => data.value?.products ?? []);
-
 useSeoMeta({
   title: t('pages.products.title'),
   ogTitle: t('pages.products.title'),
   description: t('pages.products.description'),
   ogDescription: t('pages.products.description'),
 })
-import ProductList from "~/components/ProductList.vue";
+
+const categories = ['Fashion', 'Technology', 'Books', 'Home', 'Vehicles', 'Art']
 </script>
 
-<style scoped></style>

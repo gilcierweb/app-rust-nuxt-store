@@ -5,7 +5,7 @@
                 <p>Copyright &copy; {{ new Date().getFullYear() }} App Nuxt - All Rights Reserved - <a
                         href="https://gilcierweb.com.br" title="GilcierWeb"
                         class="link link-primary link-animated">GilcierWeb</a> - Site criado com o
-                    <a href="https://nuxt.com/" title="Nuxt 3" class="link link-primary link-animated">Nuxt 3</a>
+                    <a href="https://nuxt.com/" title="Nuxt 4" class="link link-primary link-animated">Nuxt 4</a>
                 </p>
 
                 <div class="col-12 text-center">
