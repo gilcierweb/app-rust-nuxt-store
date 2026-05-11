@@ -41,121 +41,60 @@
     </div>
 
     <!-- Categories Table -->
-    <div v-else class="w-full overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{{ $t('admin.categories.table.name') }}</th>
-            <th>{{ $t('admin.categories.table.slug') }}</th>
-            <th>{{ $t('admin.categories.table.description') }}</th>
-            <th>{{ $t('admin.categories.table.status') }}</th>
-            <th>{{ $t('admin.categories.table.position') }}</th>
-            <th>{{ $t('admin.categories.table.date') }}</th>
-            <th>{{ $t('admin.categories.table.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="category in filteredCategories" :key="category.id" class="row-hover">
-            <td class="font-medium">{{ category.name }}</td>
-            <td class="font-mono text-sm text-gray-500">{{ category.slug }}</td>
-            <td>{{ $truncate(category.description || '', 50, '...') }}</td>
-            <td>
-              <span :class="['badge badge-soft text-xs', category.active ? 'badge-success' : 'badge-error']">
-                {{ category.active ? $t('admin.categories.detail.active') : $t('admin.categories.detail.inactive') }}
-              </span>
-            </td>
-            <td>{{ category.position ?? '-' }}</td>
-            <td>{{ formatDate(category.created_at) }}</td>
-            <td>
-              <NuxtLink
-                :to="`/admin/categories/${category.id}`"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.view')"
-              >
-                <i class="icon-[tabler--eye] size-5"></i>
-              </NuxtLink>
-              <NuxtLink
-                :to="`/admin/categories/${category.id}/edit`"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.edit')"
-              >
-                <i class="icon-[tabler--pencil] size-5"></i>
-              </NuxtLink>
-              <button
-                type="button"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.delete')"
-                @click="confirmDelete(category)"
-              >
-                <span class="icon-[tabler--trash] size-5"></span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ $t('admin.categories.table.name') }}</th>
+              <th>{{ $t('admin.categories.table.slug') }}</th>
+              <th>{{ $t('admin.categories.table.description') }}</th>
+              <th>{{ $t('admin.categories.table.status') }}</th>
+              <th>{{ $t('admin.categories.table.position') }}</th>
+              <th>{{ $t('admin.categories.table.date') }}</th>
+              <th>{{ $t('admin.categories.table.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="category in filteredCategories" :key="category.id" class="row-hover">
+              <td class="font-medium">{{ category.name }}</td>
+              <td class="font-mono text-sm text-gray-500">{{ category.slug }}</td>
+              <td>{{ $truncate(category.description || '', 50, '...') }}</td>
+              <td>
+                <span :class="['badge badge-soft text-xs', category.active ? 'badge-success' : 'badge-error']">
+                  {{ category.active ? $t('admin.categories.detail.active') : $t('admin.categories.detail.inactive') }}
+                </span>
+              </td>
+              <td>{{ category.position ?? '-' }}</td>
+              <td>{{ formatDate(category.created_at) }}</td>
+              <td>
+                <NuxtLink
+                  :to="`/admin/categories/${category.id}`"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.view')"
+                >
+                  <i class="icon-[tabler--eye] size-5"></i>
+                </NuxtLink>
+                <NuxtLink
+                  :to="`/admin/categories/${category.id}/edit`"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.edit')"
+                >
+                  <i class="icon-[tabler--pencil] size-5"></i>
+                </NuxtLink>
+                <button
+                  type="button"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.delete')"
+                  @click="confirmDelete(category)"
+                >
+                  <span class="icon-[tabler--trash] size-5"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Category } from '~/types'
-
-definePageMeta({
-  layout: 'admin'
-})
-
-const config = useRuntimeConfig()
-const { $truncate } = useNuxtApp()
-const { t } = useI18n()
-
-const searchQuery = ref('')
-
-const { pending, data: categories, error, refresh } = useLazyFetch<Category[]>(
-  `${config.public.baseURL}/api/categories`
-)
-
-// Filtered categories based on search
-const filteredCategories = computed(() => {
-  if (!categories.value) return []
-  if (!searchQuery.value.trim()) return categories.value
-  
-  const query = searchQuery.value.toLowerCase()
-  return categories.value.filter(cat =>
-    cat.name.toLowerCase().includes(query) ||
-    cat.slug?.toLowerCase().includes(query) ||
-    cat.description?.toLowerCase().includes(query)
-  )
-})
-
-// Format date
-const formatDate = (dateString: string) => {
-  if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date(dateString))
-}
-
-// Search handler
-const handleSearch = () => {
-  // Search is handled reactively via computed
-}
-
-// Delete confirmation
-const confirmDelete = async (category: Category) => {
-  if (confirm(t('admin.categories.detail.confirmDelete', { name: category.name }))) {
-    try {
-      await $fetch(`${config.public.baseURL}/api/categories/${category.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.categories.detail.errorDelete'))
-      console.error(err)
-    }
-  }
-}
-</script>
-
-<style scoped></style>

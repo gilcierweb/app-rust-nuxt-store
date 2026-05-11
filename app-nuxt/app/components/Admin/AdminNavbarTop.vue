@@ -1,133 +1,102 @@
 <template>
-  <nav class="navbar bg-base-100 border-b border-base-content/10 px-4 py-2 sticky top-0 z-50">
-    <div class="flex items-center gap-4 w-full">
-      <!-- Sidebar Toggle (Mobile) -->
-      <button type="button" class="btn btn-text btn-square sm:hidden" aria-haspopup="dialog"
-        aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar">
-        <span class="icon-[tabler--menu-2] size-6"></span>
-      </button>
-
-      <!-- Breadcrumbs / Title -->
-      <div class="flex-1 flex items-center gap-4">
-        <div class="hidden md:flex items-center gap-2 text-sm text-base-content/60">
-          <NuxtLink to="/admin" class="hover:text-primary transition-colors">Admin</NuxtLink>
-          <span class="icon-[tabler--chevron-right] size-4"></span>
-          <span class="text-base-content font-medium capitalize">{{ currentRouteName }}</span>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="flex items-center gap-2 md:gap-4">
-        
-        <!-- Search Bar (Desktop) -->
-        <div class="hidden lg:flex relative group">
-          <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 group-focus-within:text-primary transition-colors"></span>
-          <input 
-            type="text" 
-            :placeholder="$t('admin.navbar.search.placeholder')" 
-            class="input input-sm input-bordered pl-10 w-64 focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-base-200/50"
-          />
-        </div>
-
-        <!-- Language Switcher -->
-        <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-          <button id="lang-dropdown" type="button" class="dropdown-toggle btn btn-text btn-circle size-10" aria-haspopup="menu" aria-expanded="false">
-            <span class="icon-[tabler--language] size-5.5"></span>
+  <div class="bg-base-100 border-b border-base-content/10 lg:ps-75 sticky top-0 z-50 flex">
+    <div class="mx-auto w-full max-w-7xl">
+      <nav class="navbar py-2 px-4 md:px-6">
+        <div class="navbar-start flex items-center gap-4">
+          <!-- Mobile Toggle -->
+          <button type="button" class="btn btn-text btn-square lg:hidden" aria-haspopup="dialog"
+            aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar">
+            <span class="icon-[tabler--menu-2] size-5.5"></span>
           </button>
-          <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-32 shadow-lg border border-base-content/10" role="menu">
-            <li v-for="lang in availableLocales" :key="lang.code">
-              <button @click="setLocale(lang.code)" class="dropdown-item flex items-center gap-2" :class="{ 'active': locale === lang.code }">
-                <span class="text-lg">{{ lang.flag }}</span>
-                <span>{{ lang.name }}</span>
-              </button>
-            </li>
-          </ul>
+
+          <!-- Search (Integrated Pattern) -->
+          <div class="hidden md:flex items-center gap-2 bg-base-200/50 px-3 py-1.5 rounded-lg border border-transparent focus-within:border-primary/30 focus-within:bg-base-100 transition-all">
+            <span class="icon-[tabler--search] text-base-content/40 size-4.5"></span>
+            <input 
+              type="text" 
+              :placeholder="$t('admin.navbar.search.placeholder')" 
+              class="bg-transparent border-none focus:ring-0 text-sm w-48 lg:w-64"
+            />
+          </div>
         </div>
 
-        <!-- Notifications -->
-        <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-          <button id="notify-dropdown" type="button" class="dropdown-toggle btn btn-text btn-circle size-10" aria-haspopup="menu" aria-expanded="false">
+        <!-- Breadcrumbs (Legacy from my previous improvement, adapted) -->
+        <div class="hidden xl:flex flex-1 justify-center">
+           <div class="flex items-center gap-2 text-xs text-base-content/40 uppercase tracking-widest font-bold">
+              <span>Admin</span>
+              <span class="icon-[tabler--chevron-right] size-3"></span>
+              <span class="text-primary">{{ currentRouteName }}</span>
+           </div>
+        </div>
+
+        <div class="navbar-end flex items-center gap-2 md:gap-4">
+          <!-- Language Switcher -->
+          <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
+            <button id="lang-dropdown" type="button" class="dropdown-toggle btn btn-text btn-circle size-10" aria-haspopup="menu" aria-expanded="false">
+              <span class="icon-[tabler--language] size-5.5"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-32 shadow-xl border border-base-content/10 mt-2" role="menu">
+              <li v-for="lang in availableLocales" :key="lang.code">
+                <button @click="setLocale(lang.code)" class="dropdown-item flex items-center gap-2" :class="{ 'active': locale === lang.code }">
+                  <span class="text-lg">{{ lang.flag }}</span>
+                  <span>{{ lang.name }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Notifications -->
+          <button class="btn btn-text btn-circle size-10">
             <div class="indicator">
               <span class="indicator-item bg-primary size-2 rounded-full border-2 border-base-100"></span>
               <span class="icon-[tabler--bell] size-5.5"></span>
             </div>
           </button>
-          <div class="dropdown-menu dropdown-open:opacity-100 hidden w-80 shadow-xl border border-base-content/10" role="menu">
-            <div class="dropdown-header flex justify-between items-center border-b border-base-content/5 pb-3">
-              <h6 class="text-base font-bold">{{ $t('admin.navbar.activity.title') }}</h6>
-              <span class="badge badge-primary badge-sm">4 New</span>
-            </div>
-            <div class="max-h-80 overflow-y-auto py-2">
-              <div v-for="n in 3" :key="n" class="dropdown-item flex items-start gap-3 p-3 hover:bg-base-200/50 transition-colors cursor-pointer border-b border-base-content/5 last:border-0">
-                <div class="avatar avatar-sm placeholder">
-                  <div class="bg-primary/10 text-primary rounded-full size-10">
-                    <span class="icon-[tabler--user] size-5"></span>
-                  </div>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium truncate">New order #{{ 1024 + n }}</p>
-                  <p class="text-xs text-base-content/60 truncate">Received 2 minutes ago</p>
-                </div>
-              </div>
-            </div>
-            <div class="dropdown-footer p-2 text-center border-t border-base-content/5">
-              <button class="btn btn-ghost btn-xs btn-block text-primary">View all notifications</button>
-            </div>
-          </div>
-        </div>
 
-        <div class="divider divider-horizontal mx-0 hidden md:flex"></div>
-
-        <!-- User Profile -->
-        <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-          <button id="profile-dropdown" type="button" class="dropdown-toggle flex items-center gap-2 hover:bg-base-200 p-1 pr-2 rounded-full transition-colors" aria-haspopup="menu" aria-expanded="false">
-            <div class="avatar">
-              <div class="size-8 rounded-full border border-primary/20 p-0.5">
+          <!-- Profile Dropdown -->
+          <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
+            <button id="profile-dropdown" type="button" class="dropdown-toggle avatar" aria-haspopup="menu" aria-expanded="false">
+              <div class="size-9.5 rounded-full border border-primary/20 p-0.5">
                 <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
               </div>
-            </div>
-            <div class="hidden md:block text-left">
-              <p class="text-xs font-bold truncate max-w-24">{{ user?.name || 'Admin' }}</p>
-              <p class="text-[10px] text-base-content/50 uppercase tracking-wider">Super Admin</p>
-            </div>
-            <span class="icon-[tabler--chevron-down] size-4 text-base-content/40 hidden md:block"></span>
-          </button>
-          <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-56 shadow-xl border border-base-content/10 mt-2" role="menu">
-            <li class="dropdown-header gap-3 border-b border-base-content/5 pb-3 mb-2">
-              <div class="avatar">
-                <div class="size-10 rounded-full border border-primary/20 p-0.5">
-                  <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
+            </button>
+            <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60 shadow-xl border border-base-content/10 mt-2" role="menu">
+              <li class="dropdown-header gap-3 border-b border-base-content/5 pb-3 mb-2 px-5 pt-4">
+                <div class="avatar avatar-online-top">
+                  <div class="w-10 rounded-full border border-primary/10 p-0.5">
+                    <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
+                  </div>
                 </div>
-              </div>
-              <div class="min-w-0">
-                <h6 class="text-sm font-bold truncate">{{ user?.name || 'Administrator' }}</h6>
-                <p class="text-xs text-base-content/50 truncate">{{ user?.email || 'admin@store.com' }}</p>
-              </div>
-            </li>
-            <li>
-              <NuxtLink to="/admin/settings" class="dropdown-item">
-                <span class="icon-[tabler--settings] size-5"></span>
-                {{ $t('admin.navbar.profile.settings') }}
-              </NuxtLink>
-            </li>
-            <li>
-              <a href="#" class="dropdown-item">
-                <span class="icon-[tabler--help-triangle] size-5"></span>
-                {{ $t('common.help') || 'Help Center' }}
-              </a>
-            </li>
-            <div class="divider my-1 border-base-content/5"></div>
-            <li>
-              <button class="dropdown-item text-error hover:bg-error/10" @click="handleLogout">
-                <span class="icon-[tabler--logout] size-5"></span>
-                {{ $t('admin.navbar.profile.logout') }}
-              </button>
-            </li>
-          </ul>
+                <div class="min-w-0">
+                  <h6 class="text-sm font-bold truncate">{{ user?.name || 'Administrator' }}</h6>
+                  <p class="text-xs text-base-content/50 truncate">{{ user?.email || 'admin@store.com' }}</p>
+                </div>
+              </li>
+              <li>
+                <NuxtLink to="/admin/settings" class="dropdown-item px-4">
+                  <span class="icon-[tabler--user] size-5"></span>
+                  {{ $t('admin.navbar.profile.myAccount') || 'My Account' }}
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/admin/settings" class="dropdown-item px-4">
+                  <span class="icon-[tabler--settings] size-5"></span>
+                  {{ $t('admin.navbar.profile.settings') }}
+                </NuxtLink>
+              </li>
+              <div class="divider my-1 border-base-content/5"></div>
+              <li class="p-2">
+                <button class="btn btn-error btn-soft btn-block btn-sm" @click="handleLogout">
+                  <span class="icon-[tabler--logout] size-4"></span>
+                  {{ $t('admin.navbar.profile.logout') }}
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </nav>
     </div>
-  </nav>
+  </div>
 </template>
 
 <script lang="ts" setup>

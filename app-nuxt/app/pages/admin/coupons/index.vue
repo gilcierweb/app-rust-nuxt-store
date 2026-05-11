@@ -41,165 +41,75 @@
     </div>
 
     <!-- Coupons Table -->
-    <div v-else class="w-full overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{{ $t('admin.coupons.table.code') }}</th>
-            <th>{{ $t('admin.coupons.table.type') }}</th>
-            <th>{{ $t('admin.coupons.table.value') }}</th>
-            <th>{{ $t('admin.coupons.table.usage') }}</th>
-            <th>{{ $t('admin.coupons.table.expiration') }}</th>
-            <th>{{ $t('admin.coupons.table.status') }}</th>
-            <th>{{ $t('admin.coupons.table.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="coupon in filteredCoupons" :key="coupon.id" class="row-hover">
-            <td>
-              <span class="badge badge-primary badge-lg font-mono">{{ coupon.code }}</span>
-            </td>
-            <td>{{ discountTypeLabel(coupon.discount_type) }}</td>
-            <td>{{ formatDiscountValue(coupon) }}</td>
-            <td>
-              {{ coupon.used_count || 0 }}/{{ coupon.usage_limit || '∞' }}
-              <div class="w-24 h-1 bg-base-200 rounded mt-1">
-                <div 
-                  class="h-full bg-primary rounded" 
-                  :style="{ width: usagePercentage(coupon) + '%' }"
-                ></div>
-              </div>
-            </td>
-            <td>
-              <span v-if="coupon.expires_at" :class="isExpired(coupon.expires_at) ? 'text-error' : ''">
-                {{ formatDate(coupon.expires_at) }}
-              </span>
-              <span v-else class="text-gray-400">-</span>
-            </td>
-            <td>
-              <span :class="['badge badge-soft text-xs', coupon.active ? 'badge-success' : 'badge-error']">
-                {{ coupon.active ? $t('admin.coupons.detail.active') : $t('admin.coupons.detail.inactive') }}
-              </span>
-            </td>
-            <td>
-              <NuxtLink
-                :to="`/admin/coupons/${coupon.id}`"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.view')"
-              >
-                <i class="icon-[tabler--eye] size-5"></i>
-              </NuxtLink>
-              <NuxtLink
-                :to="`/admin/coupons/${coupon.id}/edit`"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.edit')"
-              >
-                <i class="icon-[tabler--pencil] size-5"></i>
-              </NuxtLink>
-              <button
-                type="button"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.delete')"
-                @click="confirmDelete(coupon)"
-              >
-                <span class="icon-[tabler--trash] size-5"></span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ $t('admin.coupons.table.code') }}</th>
+              <th>{{ $t('admin.coupons.table.type') }}</th>
+              <th>{{ $t('admin.coupons.table.value') }}</th>
+              <th>{{ $t('admin.coupons.table.usage') }}</th>
+              <th>{{ $t('admin.coupons.table.expiration') }}</th>
+              <th>{{ $t('admin.coupons.table.status') }}</th>
+              <th>{{ $t('admin.coupons.table.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="coupon in filteredCoupons" :key="coupon.id" class="row-hover">
+              <td>
+                <span class="badge badge-primary badge-lg font-mono">{{ coupon.code }}</span>
+              </td>
+              <td>{{ discountTypeLabel(coupon.discount_type) }}</td>
+              <td>{{ formatDiscountValue(coupon) }}</td>
+              <td>
+                {{ coupon.used_count || 0 }}/{{ coupon.usage_limit || '∞' }}
+                <div class="w-24 h-1 bg-base-200 rounded mt-1">
+                  <div 
+                    class="h-full bg-primary rounded" 
+                    :style="{ width: usagePercentage(coupon) + '%' }"
+                  ></div>
+                </div>
+              </td>
+              <td>
+                <span v-if="coupon.expires_at" :class="isExpired(coupon.expires_at) ? 'text-error' : ''">
+                  {{ formatDate(coupon.expires_at) }}
+                </span>
+                <span v-else class="text-gray-400">-</span>
+              </td>
+              <td>
+                <span :class="['badge badge-soft text-xs', coupon.active ? 'badge-success' : 'badge-error']">
+                  {{ coupon.active ? $t('admin.coupons.detail.active') : $t('admin.coupons.detail.inactive') }}
+                </span>
+              </td>
+              <td>
+                <NuxtLink
+                  :to="`/admin/coupons/${coupon.id}`"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.view')"
+                >
+                  <i class="icon-[tabler--eye] size-5"></i>
+                </NuxtLink>
+                <NuxtLink
+                  :to="`/admin/coupons/${coupon.id}/edit`"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.edit')"
+                >
+                  <i class="icon-[tabler--pencil] size-5"></i>
+                </NuxtLink>
+                <button
+                  type="button"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.delete')"
+                  @click="confirmDelete(coupon)"
+                >
+                  <span class="icon-[tabler--trash] size-5"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Coupon } from '~/types'
-
-definePageMeta({
-  layout: 'admin'
-})
-
-const config = useRuntimeConfig()
-const { t } = useI18n()
-
-const searchQuery = ref('')
-
-const { pending, data: coupons, error, refresh } = useLazyFetch<Coupon[]>(
-  `${config.public.baseURL}/api/coupons`
-)
-
-// Filtered coupons based on search
-const filteredCoupons = computed(() => {
-  if (!coupons.value) return []
-  if (!searchQuery.value.trim()) return coupons.value
-
-  const query = searchQuery.value.toLowerCase()
-  return coupons.value.filter(coupon =>
-    coupon.code?.toLowerCase().includes(query)
-  )
-})
-
-// Discount type label
-const discountTypeLabel = (type?: number) => {
-  switch (type) {
-    case 1: return t('admin.coupons.types.percentage')
-    case 2: return t('admin.coupons.types.fixed')
-    case 3: return t('admin.coupons.types.freeShipping')
-    default: return t('admin.coupons.types.unknown')
-  }
-}
-
-// Format discount value
-const formatDiscountValue = (coupon: Coupon) => {
-  if (coupon.discount_type === 1) {
-    return `${coupon.discount_value}%`
-  } else if (coupon.discount_type === 2) {
-    return `R$ ${coupon.discount_value?.toFixed(2) || '0.00'}`
-  }
-  return '-'
-}
-
-// Usage percentage for progress bar
-const usagePercentage = (coupon: Coupon) => {
-  if (!coupon.usage_limit || coupon.usage_limit === 0) return 0
-  const used = coupon.used_count || 0
-  return Math.min((used / coupon.usage_limit) * 100, 100)
-}
-
-// Check if expired
-const isExpired = (expiresAt: string) => {
-  return new Date(expiresAt) < new Date()
-}
-
-// Format date
-const formatDate = (dateString: string) => {
-  if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date(dateString))
-}
-
-// Search handler
-const handleSearch = () => {
-  // Search is handled reactively via computed
-}
-
-// Delete confirmation
-const confirmDelete = async (coupon: Coupon) => {
-  if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.code }))) {
-    try {
-      await $fetch(`${config.public.baseURL}/api/coupons/${coupon.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.coupons.detail.errorDelete'))
-      console.error(err)
-    }
-  }
-}
-</script>
-
-<style scoped></style>

@@ -41,136 +41,68 @@
     </div>
 
     <!-- Profiles Table -->
-    <div v-else class="w-full overflow-x-auto">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{{ $t('admin.customers.table.name') }}</th>
-            <th>{{ $t('admin.customers.table.username') }}</th>
-            <th>{{ $t('admin.customers.table.phone') }}</th>
-            <th>{{ $t('admin.customers.table.user') }}</th>
-            <th>{{ $t('admin.customers.table.date') }}</th>
-            <th>{{ $t('admin.customers.table.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="profile in filteredProfiles" :key="profile.id" class="row-hover">
-            <td>
-              <div class="flex items-center gap-3">
-                <div v-if="profile.avatar" class="avatar">
-                  <div class="mask mask-squircle w-10 h-10">
-                    <img :src="profile.avatar" :alt="profile.full_name" />
+    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{{ $t('admin.customers.table.name') }}</th>
+              <th>{{ $t('admin.customers.table.username') }}</th>
+              <th>{{ $t('admin.customers.table.phone') }}</th>
+              <th>{{ $t('admin.customers.table.user') }}</th>
+              <th>{{ $t('admin.customers.table.date') }}</th>
+              <th>{{ $t('admin.customers.table.actions') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="profile in filteredProfiles" :key="profile.id" class="row-hover">
+              <td>
+                <div class="flex items-center gap-3">
+                  <div v-if="profile.avatar" class="avatar">
+                    <div class="mask mask-squircle w-10 h-10">
+                      <img :src="profile.avatar" :alt="profile.full_name" />
+                    </div>
                   </div>
-                </div>
-                <div v-else class="avatar avatar-placeholder">
-                  <div class="bg-neutral text-neutral-content w-10 h-10 rounded-full">
-                    <span class="text-lg">{{ getInitials(profile.full_name) }}</span>
+                  <div v-else class="avatar avatar-placeholder">
+                    <div class="bg-neutral text-neutral-content w-10 h-10 rounded-full">
+                      <span class="text-lg">{{ getInitials(profile.full_name) }}</span>
+                    </div>
                   </div>
+                  <div class="font-medium">{{ profile.full_name || `${profile.first_name} ${profile.last_name}` }}</div>
                 </div>
-                <div class="font-medium">{{ profile.full_name || `${profile.first_name} ${profile.last_name}` }}</div>
-              </div>
-            </td>
-            <td>{{ profile.username || '-' }}</td>
-            <td>{{ profile.phone || '-' }}</td>
-            <td>{{ profile.user_id }}</td>
-            <td>{{ formatDate(profile.created_at) }}</td>
-            <td>
-              <NuxtLink
-                :to="`/admin/customers/${profile.id}`"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.view')"
-              >
-                <i class="icon-[tabler--eye] size-5"></i>
-              </NuxtLink>
-              <NuxtLink
-                :to="`/admin/customers/${profile.id}/edit`"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.edit')"
-              >
-                <i class="icon-[tabler--pencil] size-5"></i>
-              </NuxtLink>
-              <button
-                type="button"
-                class="btn btn-circle btn-text btn-sm"
-                :aria-label="$t('common.delete')"
-                @click="confirmDelete(profile)"
-              >
-                <span class="icon-[tabler--trash] size-5"></span>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td>{{ profile.username || '-' }}</td>
+              <td>{{ profile.phone || '-' }}</td>
+              <td>{{ profile.user_id }}</td>
+              <td>{{ formatDate(profile.created_at) }}</td>
+              <td>
+                <NuxtLink
+                  :to="`/admin/customers/${profile.id}`"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.view')"
+                >
+                  <i class="icon-[tabler--eye] size-5"></i>
+                </NuxtLink>
+                <NuxtLink
+                  :to="`/admin/customers/${profile.id}/edit`"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.edit')"
+                >
+                  <i class="icon-[tabler--pencil] size-5"></i>
+                </NuxtLink>
+                <button
+                  type="button"
+                  class="btn btn-circle btn-text btn-sm"
+                  :aria-label="$t('common.delete')"
+                  @click="confirmDelete(profile)"
+                >
+                  <span class="icon-[tabler--trash] size-5"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Profile } from '~/types'
-
-definePageMeta({
-  layout: 'admin'
-})
-
-const config = useRuntimeConfig()
-const { t } = useI18n()
-
-const searchQuery = ref('')
-
-const { pending, data: profiles, error, refresh } = useLazyFetch<Profile[]>(
-  `${config.public.baseURL}/api/profiles`
-)
-
-// Filtered profiles based on search
-const filteredProfiles = computed(() => {
-  if (!profiles.value) return []
-  if (!searchQuery.value.trim()) return profiles.value
-
-  const query = searchQuery.value.toLowerCase()
-  return profiles.value.filter(profile =>
-    profile.first_name?.toLowerCase().includes(query) ||
-    profile.last_name?.toLowerCase().includes(query) ||
-    profile.full_name?.toLowerCase().includes(query) ||
-    profile.username?.toLowerCase().includes(query)
-  )
-})
-
-// Get initials from name
-const getInitials = (name?: string) => {
-  if (!name) return '?'
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-}
-
-// Format date
-const formatDate = (dateString: string) => {
-  if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date(dateString))
-}
-
-// Search handler
-const handleSearch = () => {
-  // Search is handled reactively via computed
-}
-
-// Delete confirmation
-const confirmDelete = async (profile: Profile) => {
-  const name = profile.full_name || `${profile.first_name} ${profile.last_name}`
-  if (confirm(t('admin.customers.detail.confirmDelete', { name }))) {
-    try {
-      await $fetch(`${config.public.baseURL}/api/profiles/${profile.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.customers.detail.errorDelete'))
-      console.error(err)
-    }
-  }
-}
-</script>
-
-<style scoped></style>

@@ -55,7 +55,7 @@
     </div>
 
     <!-- Orders Table -->
-    <div v-else class="card bg-base-100 shadow-sm border overflow-hidden">
+    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
       <div class="overflow-x-auto">
         <table class="table table-lg">
           <thead class="bg-base-200/50">
@@ -102,7 +102,7 @@
                 {{ formatNumberBR(order.total_amount) }}
               </td>
               <td class="text-right">
-                <NuxtLink :to="`/admin/orders/${order.id}`" class="btn btn-circle btn-ghost btn-sm" :aria-label="$t('common.view')">
+                <NuxtLink :to="`/admin/orders/${order.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                   <i class="icon-[tabler--eye] size-5" />
                 </NuxtLink>
               </td>

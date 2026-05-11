@@ -64,7 +64,7 @@
     </div>
 
     <!-- Products Table -->
-    <div v-else class="card bg-base-100 shadow-sm border overflow-hidden">
+    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
       <div class="overflow-x-auto">
         <table class="table table-lg">
           <thead class="bg-base-200/50">
@@ -110,13 +110,13 @@
               </td>
               <td class="text-right">
                 <div class="flex justify-end gap-1">
-                  <NuxtLink :to="`/admin/products/${product.id}`" class="btn btn-square btn-ghost btn-sm" :aria-label="$t('common.view')">
+                  <NuxtLink :to="`/admin/products/${product.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                     <i class="icon-[tabler--eye] size-5"></i>
                   </NuxtLink>
-                  <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-square btn-ghost btn-sm" :aria-label="$t('common.edit')">
+                  <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.edit')">
                     <i class="icon-[tabler--pencil] size-5"></i>
                   </NuxtLink>
-                  <button class="btn btn-square btn-ghost btn-sm text-error" @click="confirmDelete(product)">
+                  <button class="btn btn-circle btn-text btn-sm text-error" @click="confirmDelete(product)">
                     <i class="icon-[tabler--trash] size-5"></i>
                   </button>
                 </div>

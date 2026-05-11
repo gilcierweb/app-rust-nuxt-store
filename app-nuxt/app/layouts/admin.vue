@@ -1,29 +1,30 @@
 <template>
-  <div class="min-h-screen bg-base-100 flex flex-col">
-
+  <!-- Layout wrapper -->
+  <div class="bg-base-200 flex min-h-screen flex-col">
+    
+    <!-- Layout Navbar (AdminNavbarTop now handles its own sticky and ps-75 container) -->
     <AdminNavbarTop />
 
-    <!-- Sidebar + Content -->
-    <div class="flex flex-1 overflow-hidden">
+    <!-- Layout Menu (AdminSidebar handles its own fixed/overlay logic) -->
+    <AdminSidebar />
 
-      <AdminSidebar />
-
-      <main class="flex-1 overflow-auto px-6 py-8 ml-0 sm:ml-64">
-       
-          <div class="container mx-auto">
-            <slot />        
-          </div>
-
-          <AppFooterGilcierweb />
-    
+    <!-- Layout Container -->
+    <div class="lg:ps-64 flex grow flex-col transition-all duration-300">
+      <!-- Content -->
+      <main class="mx-auto w-full max-w-7xl flex-1 grow space-y-6 p-4 md:p-6">
+        <slot />
       </main>
 
+      <!-- Footer -->
+      <AppFooterGilcierweb />
     </div>
-
   </div>
-
 </template>
 
+<script setup lang="ts">
+// Layout for Admin Dashboard
+</script>
+
 <style scoped>
-@import '~/assets/css/tailwind.css';
+/* Ensure the layout is responsive and smooth */
 </style>
