@@ -11,10 +11,7 @@ use loco_rs::{
     Result,
 };
 
-use crate::seeds::posts as posts_seeder;
-use crate::seeds::profiles as profiles_seeder;
-use crate::seeds::categories as categories_seeder;
-use crate::seeds::products as products_seeder;
+use crate::seeds;
 
 use migration::Migrator;
 use std::path::Path;
@@ -92,15 +89,13 @@ impl Hooks for App {
         truncate_table(&ctx.db, users::Entity).await?;
         Ok(())
     }
-    async fn seed(ctx: &AppContext, base: &Path) -> Result<()> {  
+    async fn seed(ctx: &AppContext, base: &Path) -> Result<()> {
+        // YAML-based seed for users (static data)
         db::seed::<users::ActiveModel>(&ctx.db, &base.join("users.yaml").display().to_string())
             .await?;
 
-        // Dynamic seed by code (with fakeit)
-        posts_seeder::seed(&ctx.db).await?;
-        profiles_seeder::seed(&ctx.db).await?;
-        categories_seeder::seed(&ctx.db).await?;
-        products_seeder::seed(&ctx.db).await?;
+        // Dynamic seed by code (with fakeit) - comprehensive seed for all entities
+        seeds::seed_all(&ctx.db).await?;
 
         Ok(())
     }
