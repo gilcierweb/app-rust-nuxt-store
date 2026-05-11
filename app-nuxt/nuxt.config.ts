@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security', '@nuxtjs/sitemap'],
+  modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security', '@nuxtjs/sitemap', 'nuxt-charts'],
   css: ["~/assets/css/main.css"],
 
   shadcn: {

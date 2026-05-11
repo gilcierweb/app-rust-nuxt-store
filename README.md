@@ -6,6 +6,8 @@ A production-ready e-commerce application featuring a high-performance REST API 
 
 ![App Nuxt](app-nuxt/app/assets/images/app-rust-nuxt-store.webp) 
 
+![App Nuxt](app-nuxt/app/assets/images/app-rust-nuxt-store-admin.webp)
+
 ---
 
 ## ✨ Key Features
