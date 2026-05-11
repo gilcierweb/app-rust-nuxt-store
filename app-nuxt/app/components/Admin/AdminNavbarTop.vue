@@ -1,35 +1,37 @@
 <template>
-  <div class="bg-base-100 border-b border-base-content/10 lg:ps-75 sticky top-0 z-50 flex">
+  <!-- ---------- HEADER ---------- -->
+  <div class="bg-base-100 border-base-content/20 lg:ps-75 sticky top-0 z-50 flex border-b">
     <div class="mx-auto w-full max-w-7xl">
       <nav class="navbar py-2 px-4 md:px-6">
-        <div class="navbar-start flex items-center gap-4">
+        <div class="navbar-start items-center gap-2">
           <!-- Mobile Toggle -->
-          <button type="button" class="btn btn-text btn-square lg:hidden" aria-haspopup="dialog"
-            aria-expanded="false" aria-controls="with-navbar-sidebar" data-overlay="#with-navbar-sidebar">
-            <span class="icon-[tabler--menu-2] size-5.5"></span>
+          <button type="button" class="btn btn-soft btn-square btn-sm lg:hidden" aria-haspopup="dialog" aria-expanded="false" aria-controls="layout-sidebar" data-overlay="#layout-sidebar">
+            <span class="icon-[tabler--menu-2] size-4.5"></span>
           </button>
 
-          <!-- Search (Integrated Pattern) -->
-          <div class="hidden md:flex items-center gap-2 bg-base-200/50 px-3 py-1.5 rounded-lg border border-transparent focus-within:border-primary/30 focus-within:bg-base-100 transition-all">
-            <span class="icon-[tabler--search] text-base-content/40 size-4.5"></span>
+          <!-- Search  -->
+          <div class="input no-focus border-0 px-0 hidden md:flex items-center">
+            <span class="icon-[tabler--search] text-base-content/80 my-auto me-2 size-4 shrink-0"></span>
             <input 
-              type="text" 
+              type="search" 
+              class="grow placeholder:text-sm bg-transparent border-none focus:ring-0" 
               :placeholder="$t('admin.navbar.search.placeholder')" 
-              class="bg-transparent border-none focus:ring-0 text-sm w-48 lg:w-64"
+              id="kbdInput" 
             />
+            <label class="sr-only" for="kbdInput">Search</label>
           </div>
         </div>
 
-        <!-- Breadcrumbs (Legacy from my previous improvement, adapted) -->
+        <!-- Breadcrumbs (Localized) -->
         <div class="hidden xl:flex flex-1 justify-center">
-           <div class="flex items-center gap-2 text-xs text-base-content/40 uppercase tracking-widest font-bold">
-              <span>Admin</span>
-              <span class="icon-[tabler--chevron-right] size-3"></span>
-              <span class="text-primary">{{ currentRouteName }}</span>
-           </div>
+          <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold">
+            <span class="text-base-content/40">Admin</span>
+            <span class="icon-[tabler--chevron-right] text-base-content/20 size-3"></span>
+            <span class="text-primary">{{ localizedRouteName }}</span>
+          </div>
         </div>
 
-        <div class="navbar-end flex items-center gap-2 md:gap-4">
+        <div class="navbar-end items-center gap-4">
           <!-- Language Switcher -->
           <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
             <button id="lang-dropdown" type="button" class="dropdown-toggle btn btn-text btn-circle size-10" aria-haspopup="menu" aria-expanded="false">
@@ -45,8 +47,8 @@
             </ul>
           </div>
 
-          <!-- Notifications -->
-          <button class="btn btn-text btn-circle size-10">
+          <!-- Activity/Notifications Button -->
+          <button type="button" class="btn btn-text btn-circle size-10" data-overlay="#activity-drawer">
             <div class="indicator">
               <span class="indicator-item bg-primary size-2 rounded-full border-2 border-base-100"></span>
               <span class="icon-[tabler--bell] size-5.5"></span>
@@ -54,28 +56,28 @@
           </button>
 
           <!-- Profile Dropdown -->
-          <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
-            <button id="profile-dropdown" type="button" class="dropdown-toggle avatar" aria-haspopup="menu" aria-expanded="false">
+          <div class="dropdown relative inline-flex [--offset:15] [--placement:bottom-end]">
+            <button id="profile-dropdown" type="button" class="dropdown-toggle avatar" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
               <div class="size-9.5 rounded-full border border-primary/20 p-0.5">
-                <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
+                <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="User Avatar" />
               </div>
             </button>
-            <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60 shadow-xl border border-base-content/10 mt-2" role="menu">
-              <li class="dropdown-header gap-3 border-b border-base-content/5 pb-3 mb-2 px-5 pt-4">
+            <ul class="dropdown-menu dropdown-open:opacity-100 max-w-75 hidden w-full space-y-0.5 shadow-xl border border-base-content/10 mt-2" role="menu">
+              <li class="dropdown-header pt-4.5 mb-1 gap-4 px-5 pb-3.5 border-b border-base-content/5">
                 <div class="avatar avatar-online-top">
                   <div class="w-10 rounded-full border border-primary/10 p-0.5">
                     <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
                   </div>
                 </div>
                 <div class="min-w-0">
-                  <h6 class="text-sm font-bold truncate">{{ user?.name || 'Administrator' }}</h6>
-                  <p class="text-xs text-base-content/50 truncate">{{ user?.email || 'admin@store.com' }}</p>
+                  <h6 class="text-base-content mb-0.5 font-semibold truncate">{{ user?.name || 'Administrator' }}</h6>
+                  <p class="text-base-content/60 text-xs font-medium truncate">{{ user?.email || 'admin@store.com' }}</p>
                 </div>
               </li>
               <li>
-                <NuxtLink to="/admin/settings" class="dropdown-item px-4">
+                <NuxtLink to="/admin/account" class="dropdown-item px-4">
                   <span class="icon-[tabler--user] size-5"></span>
-                  {{ $t('admin.navbar.profile.myAccount') || 'My Account' }}
+                  {{ $t('admin.navbar.profile.myAccount') }}
                 </NuxtLink>
               </li>
               <li>
@@ -84,10 +86,12 @@
                   {{ $t('admin.navbar.profile.settings') }}
                 </NuxtLink>
               </li>
-              <div class="divider my-1 border-base-content/5"></div>
-              <li class="p-2">
-                <button class="btn btn-error btn-soft btn-block btn-sm" @click="handleLogout">
-                  <span class="icon-[tabler--logout] size-4"></span>
+              <li>
+                <hr class="border-base-content/10 -mx-2 my-1" />
+              </li>
+              <li class="dropdown-footer p-2">
+                <button @click="handleLogout" class="btn btn-text btn-error btn-block h-11 justify-start px-3 font-normal">
+                  <span class="icon-[tabler--logout] size-5"></span>
                   {{ $t('admin.navbar.profile.logout') }}
                 </button>
               </li>
@@ -97,12 +101,45 @@
       </nav>
     </div>
   </div>
+
+  <!-- Activity Drawer Content  -->
+  <div id="activity-drawer" class="overlay overlay-open:translate-x-0 drawer drawer-end sm:max-w-104 hidden" role="dialog" tabindex="-1">
+    <div class="drawer-header border-base-content/20 border-b p-4">
+      <h3 class="drawer-title text-base font-semibold">{{ $t('admin.navbar.activity.title') }}</h3>
+      <button type="button" class="btn btn-text btn-circle btn-xs" aria-label="Close" data-overlay="#activity-drawer">
+        <span class="icon-[tabler--x] size-4"></span>
+      </button>
+    </div>
+    <div class="drawer-body p-0 overflow-y-auto">
+      <ul class="divide-y divide-base-content/10">
+        <li v-for="activity in activities" :key="activity.id" class="flex items-start gap-4 p-4 hover:bg-base-200/50 transition-colors">
+          <div class="avatar">
+            <div class="size-9 rounded-full border border-base-content/10">
+              <img :src="activity.avatar" :alt="activity.user" />
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="mb-1 leading-snug">
+              <span class="text-base-content font-bold text-sm mr-1">{{ activity.user }}</span>
+              <span class="text-base-content/80 text-sm">{{ activity.message }}</span>
+            </div>
+            <p class="text-base-content/40 text-[11px]">{{ activity.time }}</p>
+            
+            <div v-if="activity.content" class="mt-3 bg-base-200/50 rounded-lg border border-base-content/10 p-3">
+               <p class="text-base-content text-xs italic opacity-80">"{{ activity.content }}"</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <!-- ---------- END HEADER ---------- -->
 </template>
 
 <script lang="ts" setup>
 const { user, logout } = useAuth()
 const route = useRoute()
-const { locale, setLocale } = useI18n()
+const { t, locale, setLocale } = useI18n()
 
 const availableLocales = [
   { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
@@ -110,10 +147,41 @@ const availableLocales = [
   { code: 'es', name: 'Español', flag: '🇪🇸' }
 ]
 
-const currentRouteName = computed(() => {
+const localizedRouteName = computed(() => {
   const name = route.name?.toString() || ''
-  return name.replace('admin-', '').replace(/-/g, ' ') || 'Dashboard'
+  const baseName = name.split('___')[0]
+  if (!baseName || baseName === 'admin') return t('admin.sidebar.dashboard')
+  const module = baseName.replace('admin-', '')
+  const translationKey = `admin.${module}.title`
+  const translated = t(translationKey)
+  if (translated && translated !== translationKey) return translated
+  return module.charAt(0).toUpperCase() + module.slice(1).replace(/-/g, ' ')
 })
+
+const activities = [
+  { 
+    id: 1, 
+    user: 'Gilcier Junior', 
+    message: 'atualizou o status do pedido #1042', 
+    time: '18 min atrás', 
+    avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
+    content: 'O status foi alterado de pendente para pago após confirmação do gateway.'
+  },
+  { 
+    id: 2, 
+    user: 'Maria Silva', 
+    message: 'adicionou um novo cupom de desconto', 
+    time: '1 hora atrás', 
+    avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png'
+  },
+  { 
+    id: 3, 
+    user: 'Sistema', 
+    message: 'backup diário concluído com sucesso', 
+    time: '3 horas atrás', 
+    avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png'
+  }
+]
 
 function handleLogout() {
   logout()
@@ -123,6 +191,5 @@ function handleLogout() {
 <style scoped>
 .navbar {
   backdrop-filter: blur(8px);
-  background-color: rgba(var(--b1), 0.8);
 }
 </style>
