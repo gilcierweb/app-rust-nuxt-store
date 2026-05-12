@@ -20,3 +20,5 @@ target/
 *.sqlite-*
 
 uploads/
+deploy/
+deploy/server

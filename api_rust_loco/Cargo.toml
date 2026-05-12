@@ -46,6 +46,13 @@ name = "api_rust_loco-cli"
 path = "src/bin/main.rs"
 required-features = []
 
+[profile.release]
+lto = true
+opt-level = 3
+panic = "abort"
+strip = "symbols"
+codegen-units = 1
+
 [dev-dependencies]
 loco-rs = { workspace = true, features = ["testing"] }
 serial_test = { version = "3.1.1" }

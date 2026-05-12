@@ -44,10 +44,12 @@ export default defineNuxtConfig({
   },
   
   runtimeConfig: {
+    // private
+    // NUXT_BASE_URL: ''
     public: {
       ApiBaseUrl: '',
       ApiRustBaseUrl: '',
-      baseURL: process.env.NUXT_BASE_URL || 'http://localhost:5150' // Exposed to the frontend as well.
+      baseURL: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5150' // Exposed to the frontend as well.
     }
   },
   
@@ -195,6 +197,7 @@ export default defineNuxtConfig({
 
   // Nitro build optimization
   nitro: {
+    preset: 'cloudflare_pages',
     compressPublicAssets: true,
     minify: true,
     routeRules: {
@@ -239,7 +242,7 @@ export default defineNuxtConfig({
         'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com'],
         'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
         'font-src': ["'self'", "https://cdnjs.cloudflare.com"],
-        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com"],
+        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com", "https://romantic-freedom-production-386f.up.railway.app"],
       }
     }
   },

@@ -38,6 +38,10 @@ A production-ready e-commerce application featuring a high-performance REST API 
 | **PWA** | [@vite-pwa/nuxt](https://vite-pwa-org.netlify.app/frameworks/nuxt) |
 | **i18n** | [@nuxtjs/i18n](https://i18n.nuxtjs.org/) (pt-BR, en, es) |
 
+## Demo App
+
+https://app-nuxt-store.pages.dev/
+
 ## 📂 Project Structure
 
 ```
