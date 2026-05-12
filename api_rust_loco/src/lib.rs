@@ -1,3 +1,8 @@
+#[macro_use]
+extern crate rust_i18n;
+
+i18n!("locales", fallback = "pt-BR");
+
 pub mod app;
 pub mod controllers;
 pub mod data;

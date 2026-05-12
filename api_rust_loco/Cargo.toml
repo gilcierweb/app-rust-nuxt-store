@@ -40,6 +40,7 @@ rand = "0.9.1"
 rust_decimal = "1.37.2"
 utoipa = { version = "5", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "9", features = ["axum"] }
+rust-i18n = "4.0.0"
 
 # -- Utils
 urlencoding = "2.1"

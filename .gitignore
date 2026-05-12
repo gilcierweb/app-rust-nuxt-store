@@ -30,3 +30,4 @@ app-nuxt/node_modules/
 .agent/
 .windsurf
 .codex
+.cursor
