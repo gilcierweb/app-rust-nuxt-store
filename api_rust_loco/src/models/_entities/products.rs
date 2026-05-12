@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "products")]
-pub struct Model {
-    pub created_at: DateTimeWithTimeZone,
-    pub updated_at: DateTimeWithTimeZone,
+pub struct Model { 
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: Option<String>,
@@ -24,6 +22,8 @@ pub struct Model {
     pub active: Option<bool>,
     pub status: Option<i32>,
     pub category_id: i32,
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
