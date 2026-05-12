@@ -34,7 +34,7 @@
     <!-- Profiles Grid -->
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <div v-for="profile in profiles" :key="profile.id" 
-        class="group bg-base-100 rounded-[2.5rem] border border-base-200 overflow-hidden hover-lift shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+        class="card bg-base-100 shadow-soft border border-base-200 hover-lift group">
         
         <!-- Avatar/Cover Area -->
         <div class="relative h-32 bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -44,7 +44,7 @@
         </div>
         
         <!-- Content -->
-        <div class="pt-14 pb-8 px-6 text-center">
+        <div class="card-body pt-14 pb-8 px-6 text-center">
           <h3 class="font-black text-xl mb-1 group-hover:text-primary transition-colors">{{ profile?.nickname }}</h3>
           <p class="text-sm text-base-content/50 mb-6 line-clamp-1 px-4">{{ profile?.full_name }}</p>
           

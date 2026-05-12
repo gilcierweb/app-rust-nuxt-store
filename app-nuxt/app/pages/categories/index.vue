@@ -88,24 +88,6 @@
               <div class="size-16 rounded-3xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors duration-500">
                 <span :class="[cat.icon || 'icon-[tabler--category]', 'size-8 text-primary group-hover:text-white transition-colors duration-500']"></span>
               </div>
-              
-              <!-- Refined Dropdown Menu -->
-              <div class="dropdown dropdown-end">
-                <button tabindex="0" class="btn btn-ghost btn-sm btn-circle opacity-40 group-hover:opacity-100 transition-opacity">
-                  <span class="icon-[tabler--dots-vertical] size-5"></span>
-                </button>
-                <ul tabindex="0" class="dropdown-content menu p-2 shadow-xl bg-base-100 rounded-2xl w-48 border border-base-200 z-[100] mt-2">
-                  <li><a @click="viewCategory(cat.id)" class="py-3 px-4 rounded-xl flex items-center gap-3">
-                    <span class="icon-[tabler--eye] size-4"></span>Ver Detalhes
-                  </a></li>
-                  <li><a @click="editCategory(cat.id)" class="py-3 px-4 rounded-xl flex items-center gap-3 text-info">
-                    <span class="icon-[tabler--edit] size-4"></span>Editar
-                  </a></li>
-                  <li><a @click="deleteCategory(cat.id)" class="py-3 px-4 rounded-xl flex items-center gap-3 text-error">
-                    <span class="icon-[tabler--trash] size-4"></span>Excluir
-                  </a></li>
-                </ul>
-              </div>
             </div>
 
             <!-- Content -->

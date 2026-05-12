@@ -41,23 +41,27 @@
 
     <!-- Mission & Vision -->
     <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="card bg-base-200/50 p-10 rounded-[2rem] hover-lift">
-        <div class="size-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-          <span class="icon-[tabler--target-arrow] size-7 text-primary"></span>
+      <div class="card bg-base-100 shadow-soft border border-base-200 hover-lift">
+        <div class="card-body p-10">
+          <div class="size-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+            <span class="icon-[tabler--target-arrow] size-7 text-primary"></span>
+          </div>
+          <h3 class="card-title text-2xl mb-4">{{ t('pages.about.mission.title') }}</h3>
+          <p class="text-base-content/60 leading-relaxed">
+            {{ t('pages.about.mission.description') }}
+          </p>
         </div>
-        <h3 class="h3 mb-4">{{ t('pages.about.mission.title') }}</h3>
-        <p class="text-base-content/60 leading-relaxed">
-          {{ t('pages.about.mission.description') }}
-        </p>
       </div>
-      <div class="card bg-base-200/50 p-10 rounded-[2rem] hover-lift">
-        <div class="size-14 rounded-2xl bg-secondary/10 flex items-center justify-center mb-6">
-          <span class="icon-[tabler--eye] size-7 text-secondary"></span>
+      <div class="card bg-base-100 shadow-soft border border-base-200 hover-lift">
+        <div class="card-body p-10">
+          <div class="size-14 rounded-2xl bg-secondary/10 flex items-center justify-center mb-6">
+            <span class="icon-[tabler--eye] size-7 text-secondary"></span>
+          </div>
+          <h3 class="card-title text-2xl mb-4">{{ t('pages.about.vision.title') }}</h3>
+          <p class="text-base-content/60 leading-relaxed">
+            {{ t('pages.about.vision.description') }}
+          </p>
         </div>
-        <h3 class="h3 mb-4">{{ t('pages.about.vision.title') }}</h3>
-        <p class="text-base-content/60 leading-relaxed">
-          {{ t('pages.about.vision.description') }}
-        </p>
       </div>
     </section>
 

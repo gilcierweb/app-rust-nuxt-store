@@ -41,6 +41,11 @@ rust_decimal = "1.37.2"
 utoipa = { version = "5", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "9", features = ["axum"] }
 
+# -- Utils
+urlencoding = "2.1"
+unicode-normalization = "0.1.25"
+ammonia = "4.1.2"
+
 [[bin]]
 name = "api_rust_loco-cli"
 path = "src/bin/main.rs"

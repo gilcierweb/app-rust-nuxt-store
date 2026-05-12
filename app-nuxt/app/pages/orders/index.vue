@@ -7,17 +7,12 @@
         <p class="text-base-content/60">{{ t('pages.orders.description') }}</p>
       </div>
       <div class="flex items-center gap-3">
-        <div class="dropdown dropdown-end">
-          <button tabindex="0" class="btn btn-ghost btn-square rounded-2xl bg-base-200/50" role="button">
-            <span class="icon-[tabler--filter] size-5"></span>
-          </button>
-          <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-52">
-            <li><a>All Orders</a></li>
-            <li><a>Pending</a></li>
-            <li><a>Completed</a></li>
-            <li><a>Cancelled</a></li>
-          </ul>
-        </div>
+        <select class="select select-bordered select-sm rounded-xl bg-base-200/50">
+          <option>All Orders</option>
+          <option>Pending</option>
+          <option>Completed</option>
+          <option>Cancelled</option>
+        </select>
         <button class="btn btn-ghost btn-square rounded-2xl bg-base-200/50">
           <span class="icon-[tabler--refresh] size-5"></span>
         </button>
@@ -60,8 +55,8 @@
     <!-- Orders List -->
     <div v-else class="space-y-6">
       <div v-for="order in orders" :key="order.id" 
-        class="group bg-base-100 rounded-[2.5rem] border border-base-200 overflow-hidden hover-shadow-xl hover:shadow-primary/5 transition-all duration-500 hover:border-primary/20">
-        <div class="p-8 md:p-10 flex flex-col lg:flex-row lg:items-center gap-8">
+        class="card bg-base-100 shadow-soft border border-base-200 hover:shadow-xl hover:border-primary/20 transition-all duration-500 group">
+        <div class="card-body p-8 md:p-10 flex flex-col lg:flex-row lg:items-center gap-8">
           
           <!-- Order Info -->
           <div class="lg:w-1/4 space-y-2">
@@ -110,18 +105,10 @@
               <span class="block text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.amount') }}</span>
               <span class="text-3xl font-black text-primary">{{ formatNumberBR(order.total_amount) }}</span>
             </div>
-            <div class="dropdown dropdown-left dropdown-end">
-              <button tabindex="0" class="btn btn-ghost hover:bg-primary/10 hover:text-primary rounded-xl px-6 group-hover:translate-x-1 transition-all" role="button">
-                {{ t('pages.orders.detail') }}
-                <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
-              </button>
-              <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48">
-                <li><NuxtLink :to="`/orders/confirmation/${order.id}`">View Details</NuxtLink></li>
-                <li><a>Track Order</a></li>
-                <li><a>Download Invoice</a></li>
-                <li><a class="text-error">Cancel Order</a></li>
-              </ul>
-            </div>
+            <NuxtLink :to="`/orders/confirmation/${order.id}`" class="btn btn-outline btn-sm rounded-xl px-6 group-hover:bg-primary group-hover:text-primary-content transition-all">
+              {{ t('pages.orders.detail') }}
+              <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
+            </NuxtLink>
           </div>
         </div>
         

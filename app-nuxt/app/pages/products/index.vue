@@ -28,7 +28,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       <!-- Desktop Sidebar -->
       <aside class="hidden lg:block lg:col-span-3 space-y-8">
-        <div class="bg-base-200/50 p-6 rounded-3xl border border-base-200">
+        <div class="card bg-base-100 shadow-soft border border-base-200">
+          <div class="card-body p-6">
           <h3 class="font-bold mb-6 flex items-center gap-2">
             <span class="icon-[tabler--filter] size-5 text-primary"></span>
             {{ t('pages.products.filters.title') }}
@@ -81,6 +82,7 @@
               </label>
             </div>
           </div>
+        </div>
         </div>
         
         <!-- Promotion Card -->

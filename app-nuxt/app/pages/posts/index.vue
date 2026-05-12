@@ -66,7 +66,7 @@
     <!-- Posts Grid -->
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <article v-for="post in posts" :key="post.id" 
-        class="group bg-base-100 rounded-[2.5rem] border border-base-200 overflow-hidden hover-lift shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
+        class="card bg-base-100 shadow-soft border border-base-200 hover-lift group">
         
         <div class="relative h-56 bg-base-200">
           <NuxtImg v-if="post.image" :src="post.image" class="size-full object-cover group-hover:scale-110 transition-transform duration-700" :alt="post.title" />
@@ -81,7 +81,7 @@
           </div>
         </div>
         
-        <div class="p-8">
+        <div class="card-body p-8">
           <div class="flex items-center gap-3 text-xs text-base-content/40 mb-4">
             <span class="flex items-center gap-1"><span class="icon-[tabler--calendar] size-3.5"></span> {{ new Date('2025-07-15').toLocaleDateString(locale) }}</span>
             <span class="flex items-center gap-1"><span class="icon-[tabler--clock] size-3.5"></span> {{ t('pages.posts.readTime', { n: 5 }) }}</span>

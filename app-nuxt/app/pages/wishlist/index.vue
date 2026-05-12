@@ -77,16 +77,9 @@
             <NuxtLink :to="`/products/${item.product_id}`" class="btn btn-primary grow rounded-xl shadow-lg shadow-primary/10">
               {{ t('pages.wishlist.viewProduct') }}
             </NuxtLink>
-            <div class="dropdown dropdown-end">
-              <button tabindex="0" class="btn btn-square btn-ghost rounded-xl bg-base-200/50" role="button">
-                <span class="icon-[tabler--dots-vertical] size-5"></span>
-              </button>
-              <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48">
-                <li><a @click="removeFromWishlist(item)" class="text-error">Remove from wishlist</a></li>
-                <li><a>Add to cart</a></li>
-                <li><a>Share product</a></li>
-              </ul>
-            </div>
+            <button class="btn btn-square btn-outline btn-primary rounded-xl" aria-label="Add to cart">
+              <span class="icon-[tabler--shopping-cart-plus] size-5"></span>
+            </button>
           </div>
         </div>
       </div>

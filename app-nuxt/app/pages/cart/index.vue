@@ -77,15 +77,9 @@
                     {{ formatNumberBR(item.price * item.quantity) }}
                   </td>
                   <td class="py-6 text-right">
-                    <div class="dropdown dropdown-left dropdown-end">
-                      <button tabindex="0" class="btn btn-circle btn-ghost btn-sm text-error/40 hover:text-error hover:bg-error/10 transition-all" role="button">
-                        <span class="icon-[tabler--trash] size-5" />
-                      </button>
-                      <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-52">
-                        <li><a @click="cartStore.removeItem(item.productId)" class="text-error">Remove item</a></li>
-                        <li><a @click="cartStore.updateQuantity(item.productId, 0)" class="text-warning">Remove all</a></li>
-                      </ul>
-                    </div>
+                    <button @click="cartStore.removeItem(item.productId)" class="btn btn-circle btn-ghost btn-sm text-error/40 hover:text-error hover:bg-error/10 transition-all" aria-label="Remove item">
+                      <span class="icon-[tabler--trash] size-5" />
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -108,9 +102,10 @@
       </div>
 
       <!-- Order Summary -->
-      <div class="lg:col-span-4">
-        <div class="bg-base-100 p-8 rounded-[2rem] border border-base-200 shadow-xl shadow-primary/5 sticky top-24">
-          <h3 class="h4 mb-8">{{ t('cart.summary') }}</h3>
+      <div class="lg:col-span-4 mt-8 lg:mt-0">
+        <div class="card bg-base-100 shadow-xl border border-base-200 sticky top-24">
+          <div class="card-body p-8 md:p-10">
+            <h2 class="card-title text-2xl mb-8">{{ t('cart.orderSummary') }}</h2>
           
           <div class="space-y-4 mb-8">
             <div class="flex justify-between text-base-content/60">
@@ -153,6 +148,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>

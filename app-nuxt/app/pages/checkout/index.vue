@@ -29,7 +29,8 @@
       <!-- Forms Area -->
       <div class="lg:col-span-8 space-y-10">
         <!-- Shipping Address -->
-        <div class="bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-sm">
+        <div class="card bg-base-100 shadow-soft border border-base-200">
+          <div class="card-body p-8 md:p-10">
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">1</div>
             <h2 class="h4">{{ t('pages.checkout.step1') }}</h2>
@@ -73,10 +74,12 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
 
         <!-- Shipping Method -->
-        <div class="bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-sm">
+        <div class="card bg-base-100 shadow-soft border border-base-200">
+          <div class="card-body p-8 md:p-10">
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">2</div>
             <h2 class="h4">{{ t('pages.checkout.step2') }}</h2>
@@ -101,10 +104,12 @@
               <span v-if="selectedShippingMethod === method.id" class="absolute top-2 right-2 icon-[tabler--circle-check-filled] text-primary size-5"></span>
             </label>
           </div>
+          </div>
         </div>
 
         <!-- Payment Method -->
-        <div class="bg-base-100 p-8 md:p-10 rounded-[2.5rem] border border-base-200 shadow-sm">
+        <div class="card bg-base-100 shadow-soft border border-base-200">
+          <div class="card-body p-8 md:p-10">
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">3</div>
             <h2 class="h4">{{ t('pages.checkout.step3') }}</h2>
@@ -126,12 +131,14 @@
               <span v-if="selectedPaymentMethod === method.id" class="icon-[tabler--circle-check-filled] text-primary size-6"></span>
             </label>
           </div>
+          </div>
         </div>
       </div>
 
       <!-- Order Summary -->
-      <div class="lg:col-span-4">
-        <div class="bg-base-100 p-8 rounded-[2rem] border border-base-200 shadow-xl shadow-primary/5 sticky top-24">
+      <div class="lg:col-span-4 mt-8 lg:mt-0">
+        <div class="card bg-base-100 shadow-xl border border-base-200 sticky top-24">
+          <div class="card-body p-8">
           <h3 class="h4 mb-8">{{ t('pages.checkout.orderSummary') }}</h3>
           
           <!-- Items Mini-List -->
@@ -224,6 +231,7 @@
               <span class="icon-[tabler--shield-lock] size-4"></span>
               {{ t('pages.checkout.securePayment') }}
             </p>
+          </div>
           </div>
         </div>
       </div>

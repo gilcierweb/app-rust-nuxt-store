@@ -56,31 +56,37 @@
 
     <!-- Features Section -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
-      <div class="flex items-start gap-4 p-6 rounded-3xl bg-base-200/50">
-        <div class="size-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-          <span class="icon-[tabler--truck-delivery] size-6 text-primary"></span>
-        </div>
-        <div>
-          <h3 class="font-bold mb-1">{{ t('pages.home.features.shipping.title') }}</h3>
-          <p class="text-sm text-base-content/60">{{ t('pages.home.features.shipping.description') }}</p>
-        </div>
-      </div>
-      <div class="flex items-start gap-4 p-6 rounded-3xl bg-base-200/50">
-        <div class="size-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-          <span class="icon-[tabler--shield-check] size-6 text-primary"></span>
-        </div>
-        <div>
-          <h3 class="font-bold mb-1">{{ t('pages.home.features.payments.title') }}</h3>
-          <p class="text-sm text-base-content/60">{{ t('pages.home.features.payments.description') }}</p>
+      <div class="card bg-base-100 shadow-soft border border-base-200">
+        <div class="card-body flex-row items-start gap-4 p-6">
+          <div class="size-12 rounded-2xl bg-base-200 shadow-sm flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--truck-delivery] size-6 text-primary"></span>
+          </div>
+          <div>
+            <h3 class="font-bold mb-1">{{ t('pages.home.features.shipping.title') }}</h3>
+            <p class="text-sm text-base-content/60">{{ t('pages.home.features.shipping.description') }}</p>
+          </div>
         </div>
       </div>
-      <div class="flex items-start gap-4 p-6 rounded-3xl bg-base-200/50">
-        <div class="size-12 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0">
-          <span class="icon-[tabler--help-circle] size-6 text-primary"></span>
+      <div class="card bg-base-100 shadow-soft border border-base-200">
+        <div class="card-body flex-row items-start gap-4 p-6">
+          <div class="size-12 rounded-2xl bg-base-200 shadow-sm flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--shield-check] size-6 text-primary"></span>
+          </div>
+          <div>
+            <h3 class="font-bold mb-1">{{ t('pages.home.features.payments.title') }}</h3>
+            <p class="text-sm text-base-content/60">{{ t('pages.home.features.payments.description') }}</p>
+          </div>
         </div>
-        <div>
-          <h3 class="font-bold mb-1">{{ t('pages.home.features.support.title') }}</h3>
-          <p class="text-sm text-base-content/60">{{ t('pages.home.features.support.description') }}</p>
+      </div>
+      <div class="card bg-base-100 shadow-soft border border-base-200">
+        <div class="card-body flex-row items-start gap-4 p-6">
+          <div class="size-12 rounded-2xl bg-base-200 shadow-sm flex items-center justify-center shrink-0">
+            <span class="icon-[tabler--help-circle] size-6 text-primary"></span>
+          </div>
+          <div>
+            <h3 class="font-bold mb-1">{{ t('pages.home.features.support.title') }}</h3>
+            <p class="text-sm text-base-content/60">{{ t('pages.home.features.support.description') }}</p>
+          </div>
         </div>
       </div>
     </section>

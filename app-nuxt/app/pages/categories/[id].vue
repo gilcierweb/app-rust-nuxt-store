@@ -86,31 +86,24 @@
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center space-x-4">
               <span class="text-base-content/60">{{ (category?.productsCount || 0) }} products found</span>
-              <div class="dropdown dropdown-left">
-                <div tabindex="0" role="button" class="btn btn-ghost m-1">All Brands</div>
-                <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48 z-50">
-                  <li><a>All Brands</a></li>
-                  <li><a>Apple</a></li>
-                  <li><a>Samsung</a></li>
-                  <li><a>Dell</a></li>
-                  <li><a>HP</a></li>
-                </ul>
-              </div>
-              <div class="dropdown dropdown-left">
-                <div tabindex="0" role="button" class="btn btn-ghost m-1">Price</div>
-                <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48 z-50">
-                  <li><a>Low to High</a></li>
-                  <li><a>High to Low</a></li>
-                </ul>
-              </div>
-              <div class="dropdown dropdown-left">
-                <div tabindex="0" role="button" class="btn btn-ghost m-1">Rating</div>
-                <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48 z-50">
-                  <li><a>5 Stars</a></li>
-                  <li><a>4+ Stars</a></li>
-                  <li><a>3+ Stars</a></li>
-                </ul>
-              </div>
+              <select class="select select-bordered w-full max-w-xs m-1">
+                <option disabled selected>All Brands</option>
+                <option>Apple</option>
+                <option>Samsung</option>
+                <option>Dell</option>
+                <option>HP</option>
+              </select>
+              <select class="select select-bordered w-full max-w-xs m-1">
+                <option disabled selected>Price</option>
+                <option>Low to High</option>
+                <option>High to Low</option>
+              </select>
+              <select class="select select-bordered w-full max-w-xs m-1">
+                <option disabled selected>Rating</option>
+                <option>5 Stars</option>
+                <option>4+ Stars</option>
+                <option>3+ Stars</option>
+              </select>
             </div>
             <div class="flex items-center space-x-4">
               <span class="text-base-content/60">Filters:</span>
@@ -134,16 +127,7 @@
                   <span class="icon-[tabler--photo] size-16 text-base-content/20"></span>
                 </div>
                 <div class="absolute top-4 right-4">
-                  <div class="dropdown dropdown-end">
-                    <button tabindex="0" class="btn btn-ghost btn-sm btn-circle bg-white/90 backdrop-blur-sm">
-                      <span class="icon-[tabler--dots-vertical] size-4"></span>
-                    </button>
-                    <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48 z-50">
-                      <li><a>Add to Wishlist</a></li>
-                      <li><a>Quick View</a></li>
-                      <li><a>Compare</a></li>
-                    </ul>
-                  </div>
+                  <!-- Actions can be added here if needed -->
                 </div>
                 <div class="absolute top-4 left-4">
                   <button class="btn btn-ghost btn-sm btn-circle bg-white/90 backdrop-blur-sm hover:bg-white transition-colors">

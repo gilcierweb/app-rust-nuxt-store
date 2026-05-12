@@ -59,18 +59,9 @@
               <span class="icon-[tabler--navigation] size-4"></span>
               {{ t('pages.stores.directions') }}
             </button>
-            <div class="dropdown dropdown-end">
-              <button tabindex="0" class="btn btn-ghost rounded-xl bg-base-200/50 w-full" role="button">
-                {{ t('pages.stores.details') }}
-                <span class="icon-[tabler--chevron-down] size-4 ml-1"></span>
-              </button>
-              <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-48">
-                <li><a>View Details</a></li>
-                <li><a>Get Directions</a></li>
-                <li><a>Call Store</a></li>
-                <li><a>Share Location</a></li>
-              </ul>
-            </div>
+            <button class="btn btn-ghost rounded-xl bg-base-200/50 w-full hover:bg-base-300 transition-colors">
+              {{ t('pages.stores.details') }}
+            </button>
           </div>
         </div>
       </div>
