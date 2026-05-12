@@ -105,7 +105,7 @@
       <div class="lg:col-span-4 mt-8 lg:mt-0">
         <div class="card bg-base-100 shadow-xl border border-base-200 sticky top-24">
           <div class="card-body p-8 md:p-10">
-            <h2 class="card-title text-2xl mb-8">{{ t('cart.orderSummary') }}</h2>
+            <h5 class="card-title mb-4">{{ t('cart.orderSummary') }}</h5>
           
           <div class="space-y-4 mb-8">
             <div class="flex justify-between text-base-content/60">
@@ -134,8 +134,8 @@
             </div>
           </div>
           
-          <div class="space-y-4">
-            <NuxtLink to="/checkout" class="btn btn-primary btn-lg w-full h-16 rounded-2xl shadow-xl shadow-primary/20 text-lg transition-transform hover:scale-[1.02]">
+          <div class="card-actions mt-4 w-full">
+            <NuxtLink to="/checkout" class="btn btn-primary btn-lg w-full rounded-2xl shadow-xl shadow-primary/20 text-lg transition-transform hover:scale-[1.02]">
               {{ t('cart.checkout') }}
               <span class="icon-[tabler--arrow-right] size-5 ml-2" />
             </NuxtLink>

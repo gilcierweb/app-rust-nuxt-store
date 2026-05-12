@@ -36,41 +36,43 @@
             <h2 class="h4">{{ t('pages.checkout.step1') }}</h2>
           </div>
           
-          <div class="join join-vertical w-full">
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.firstName') }}</label>
-              <input v-model="address.firstName" type="text" class="input input-lg bg-base-200/50 border-none rounded-t-2xl h-14 join-item" :placeholder="t('shipping.firstName')" />
-            </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.lastName') }}</label>
-              <input v-model="address.lastName" type="text" class="input input-lg bg-base-200/50 border-none h-14 join-item" :placeholder="t('shipping.lastName')" />
-            </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.address1') }}</label>
-              <input v-model="address.address1" type="text" class="input input-lg bg-base-200/50 border-none h-14 join-item" :placeholder="t('shipping.address1')" />
-            </div>
-            <div class="form-control">
-              <label class="form-label">{{ t('shipping.address2') }} ({{ t('common.optional') || 'Opcional' }})</label>
-              <input v-model="address.address2" type="text" class="input input-lg bg-base-200/50 border-none h-14 join-item" :placeholder="t('shipping.address2')" />
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="form-control">
-                <label class="form-label">{{ t('shipping.city') }}</label>
-                <input v-model="address.city" type="text" class="input input-lg bg-base-200/50 border-none rounded-bl-2xl h-14 join-item" :placeholder="t('shipping.city')" />
+          <div class="space-y-4 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="w-full">
+                <label class="label-text" for="firstName">{{ t('shipping.firstName') }}</label>
+                <input v-model="address.firstName" type="text" class="input" id="firstName" :placeholder="t('shipping.firstName')" />
               </div>
-              <div class="form-control">
-                <label class="form-label">{{ t('shipping.state') }}</label>
-                <input v-model="address.state" type="text" class="input input-lg bg-base-200/50 border-none rounded-br-2xl h-14 join-item" :placeholder="t('shipping.state')" />
+              <div class="w-full">
+                <label class="label-text" for="lastName">{{ t('shipping.lastName') }}</label>
+                <input v-model="address.lastName" type="text" class="input" id="lastName" :placeholder="t('shipping.lastName')" />
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="form-control">
-                <label class="form-label">{{ t('shipping.zipCode') }}</label>
-                <input v-model="address.zipCode" type="text" class="input input-lg bg-base-200/50 border-none rounded-bl-2xl h-14 join-item" :placeholder="t('shipping.zipCode')" />
+            <div class="w-full">
+              <label class="label-text" for="address1">{{ t('shipping.address1') }}</label>
+              <input v-model="address.address1" type="text" class="input" id="address1" :placeholder="t('shipping.address1')" />
+            </div>
+            <div class="w-full">
+              <label class="label-text" for="address2">{{ t('shipping.address2') }} ({{ t('common.optional') || 'Opcional' }})</label>
+              <input v-model="address.address2" type="text" class="input" id="address2" :placeholder="t('shipping.address2')" />
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="w-full">
+                <label class="label-text" for="city">{{ t('shipping.city') }}</label>
+                <input v-model="address.city" type="text" class="input" id="city" :placeholder="t('shipping.city')" />
               </div>
-              <div class="form-control">
-                <label class="form-label">{{ t('shipping.phone') }}</label>
-                <input v-model="address.phone" type="text" class="input input-lg bg-base-200/50 border-none rounded-br-2xl h-14 join-item" placeholder="+55 00 00000-0000" />
+              <div class="w-full">
+                <label class="label-text" for="state">{{ t('shipping.state') }}</label>
+                <input v-model="address.state" type="text" class="input" id="state" :placeholder="t('shipping.state')" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="w-full">
+                <label class="label-text" for="zipCode">{{ t('shipping.zipCode') }}</label>
+                <input v-model="address.zipCode" type="text" class="input" id="zipCode" :placeholder="t('shipping.zipCode')" />
+              </div>
+              <div class="w-full">
+                <label class="label-text" for="phone">{{ t('shipping.phone') }}</label>
+                <input v-model="address.phone" type="text" class="input" id="phone" placeholder="+55 00 00000-0000" />
               </div>
             </div>
           </div>
@@ -90,19 +92,16 @@
             <span class="ml-3 text-base-content/60">Loading shipping methods...</span>
           </div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label v-for="method in shippingMethods" :key="method.id"
-              class="relative flex p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300"
-              :class="selectedShippingMethod === method.id ? 'border-primary bg-primary/5 ring-4 ring-primary/10' : 'border-base-200 hover:border-base-300'">
-              <input v-model="selectedShippingMethod" type="radio" name="shipping_method" :value="method.id" class="hidden" />
-              <div class="grow">
-                <p class="font-bold mb-1">{{ method.name || method.code }}</p>
-                <p class="text-xs text-base-content/50">Entrega em 3-5 dias úteis</p>
-              </div>
-              <div class="text-right">
-                <p class="font-black text-primary">{{ method.base_price ? formatNumberBR(method.base_price) : t('shipping.free') }}</p>
-              </div>
-              <span v-if="selectedShippingMethod === method.id" class="absolute top-2 right-2 icon-[tabler--circle-check-filled] text-primary size-5"></span>
-            </label>
+            <div v-for="method in shippingMethods" :key="method.id"
+              class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300"
+              :class="selectedShippingMethod === method.id ? 'border-primary bg-primary/5' : 'border-base-200'">
+              <input v-model="selectedShippingMethod" type="radio" name="shipping_method" :value="method.id" class="radio radio-primary" :id="`shipping-${method.id}`" />
+              <label class="label-text text-base grow cursor-pointer" :for="`shipping-${method.id}`">
+                <div class="font-bold">{{ method.name || method.code }}</div>
+                <div class="text-xs text-base-content/50">Entrega em 3-5 dias úteis</div>
+              </label>
+              <div class="font-black text-primary">{{ method.base_price ? formatNumberBR(method.base_price) : t('shipping.free') }}</div>
+            </div>
           </div>
           </div>
         </div>
@@ -120,16 +119,17 @@
             <span class="ml-3 text-base-content/60">Loading payment methods...</span>
           </div>
           <div v-else class="space-y-4">
-            <label v-for="method in paymentMethods" :key="method.id"
-              class="relative flex items-center p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300"
-              :class="selectedPaymentMethod === method.id ? 'border-primary bg-primary/5 ring-4 ring-primary/10' : 'border-base-200 hover:border-base-300'">
-              <input v-model="selectedPaymentMethod" type="radio" name="payment_method" :value="method.id" class="hidden" />
-              <div class="size-12 rounded-xl bg-white shadow-sm flex items-center justify-center mr-5 shrink-0 border border-base-200">
-                <span :class="[method.code.toLowerCase().includes('card') ? 'icon-[tabler--credit-card]' : method.code.toLowerCase().includes('pix') ? 'icon-[tabler--qrcode]' : 'icon-[tabler--wallet]', 'size-6 text-primary']"></span>
-              </div>
-              <div class="grow font-bold text-lg">{{ method.name || method.code }}</div>
-              <span v-if="selectedPaymentMethod === method.id" class="icon-[tabler--circle-check-filled] text-primary size-6"></span>
-            </label>
+            <div v-for="method in paymentMethods" :key="method.id"
+              class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300"
+              :class="selectedPaymentMethod === method.id ? 'border-primary bg-primary/5' : 'border-base-200'">
+              <input v-model="selectedPaymentMethod" type="radio" name="payment_method" :value="method.id" class="radio radio-primary" :id="`payment-${method.id}`" />
+              <label class="label-text text-base grow cursor-pointer flex items-center gap-4" :for="`payment-${method.id}`">
+                <div class="size-10 rounded-xl bg-white shadow-sm flex items-center justify-center border border-base-200">
+                  <span :class="[method.code.toLowerCase().includes('card') ? 'icon-[tabler--credit-card]' : method.code.toLowerCase().includes('pix') ? 'icon-[tabler--qrcode]' : 'icon-[tabler--wallet]', 'size-5 text-primary']"></span>
+                </div>
+                <div class="font-bold text-lg">{{ method.name || method.code }}</div>
+              </label>
+            </div>
           </div>
           </div>
         </div>
@@ -164,18 +164,21 @@
                 <span class="text-sm">Have a promo code? Apply it here for discounts!</span>
               </div>
             </div>
-            <div class="join w-full">
-              <input v-model="couponCode" type="text" :placeholder="t('pages.checkout.promoCode')" 
-                class="input bg-base-200/50 border-none rounded-l-2xl h-14 grow join-item uppercase font-bold tracking-widest placeholder:normal-case placeholder:font-normal placeholder:tracking-normal"
-                :disabled="couponApplied || couponChecking" @keyup.enter="applyCoupon" />
-              <button v-if="!couponApplied" @click="applyCoupon" :disabled="!couponCode.trim() || couponChecking"
-                class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
-                <span v-if="couponChecking" class="loading loading-spinner loading-xs"></span>
-                <span v-else>{{ t('pages.checkout.apply') }}</span>
-              </button>
-              <button v-else @click="removeCoupon" class="btn btn-error join-item rounded-r-2xl h-14 px-6">
-                <span class="icon-[tabler--x] size-5"></span>
-              </button>
+            <div class="w-full">
+              <label class="label-text" for="couponCode">{{ t('pages.checkout.promoCode') }}</label>
+              <div class="flex gap-2 mt-1">
+                <input v-model="couponCode" type="text" placeholder="PROMO20" id="couponCode"
+                  class="input grow uppercase font-bold tracking-widest placeholder:normal-case placeholder:font-normal placeholder:tracking-normal"
+                  :disabled="couponApplied || couponChecking" @keyup.enter="applyCoupon" />
+                <button v-if="!couponApplied" @click="applyCoupon" :disabled="!couponCode.trim() || couponChecking"
+                  class="btn btn-primary">
+                  <span v-if="couponChecking" class="loading loading-spinner loading-xs"></span>
+                  <span v-else>{{ t('pages.checkout.apply') }}</span>
+                </button>
+                <button v-else @click="removeCoupon" class="btn btn-error text-error-content">
+                  <span class="icon-[tabler--x] size-5"></span>
+                </button>
+              </div>
             </div>
             <p v-if="couponMessage" :class="['mt-2 text-xs font-medium px-2', couponApplied ? 'text-success' : 'text-error']">
               <span :class="[couponApplied ? 'icon-[tabler--circle-check]' : 'icon-[tabler--alert-circle]', 'size-3.5 inline-block align-middle mr-1']"></span>

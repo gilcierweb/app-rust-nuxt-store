@@ -73,26 +73,19 @@
             <div class="card-body p-8 md:p-12">
               <h2 class="card-title text-2xl mb-8">{{ t('pages.contact.form.submit') }}</h2>
               <form @submit.prevent class="space-y-6">
-                <div class="join join-vertical w-full">
-                  <div class="form-control">
-                    <label class="label">
-                      <span class="label-text">{{ t('pages.contact.form.name') }}</span>
-                    </label>
-                    <input type="text" :placeholder="t('pages.contact.form.placeholders.name')" class="input input-bordered w-full join-item" />
-                  </div>
-                  <div class="form-control">
-                    <label class="label">
-                      <span class="label-text">{{ t('pages.contact.form.email') }}</span>
-                    </label>
-                    <input type="email" :placeholder="t('pages.contact.form.placeholders.email')" class="input input-bordered w-full join-item" />
-                  </div>
+                <div class="w-full">
+                  <label class="label-text" for="contactName">{{ t('pages.contact.form.name') }}</label>
+                  <input type="text" :placeholder="t('pages.contact.form.placeholders.name')" class="input" id="contactName" />
+                </div>
+
+                <div class="w-full">
+                  <label class="label-text" for="contactEmail">{{ t('pages.contact.form.email') }}</label>
+                  <input type="email" :placeholder="t('pages.contact.form.placeholders.email')" class="input" id="contactEmail" />
                 </div>
                 
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text">{{ t('pages.contact.form.subject') }}</span>
-                  </label>
-                  <select class="select select-bordered w-full">
+                <div class="w-full">
+                  <label class="label-text" for="contactSubject">{{ t('pages.contact.form.subject') }}</label>
+                  <select class="select" id="contactSubject">
                     <option disabled selected>{{ t('pages.contact.form.placeholders.subject') }}</option>
                     <option>{{ t('pages.contact.form.placeholders.subjects.general') }}</option>
                     <option>{{ t('pages.contact.form.placeholders.subjects.support') }}</option>
@@ -101,17 +94,17 @@
                   </select>
                 </div>
 
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text">{{ t('pages.contact.form.message') }}</span>
-                  </label>
-                  <textarea class="textarea textarea-bordered min-h-32" :placeholder="t('pages.contact.form.placeholders.message')"></textarea>
+                <div class="w-full">
+                  <label class="label-text" for="contactMessage">{{ t('pages.contact.form.message') }}</label>
+                  <textarea class="textarea" :placeholder="t('pages.contact.form.placeholders.message')" id="contactMessage"></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-full mt-4">
-                  <span class="icon-[tabler--send] size-5 mr-2"></span>
-                  {{ t('pages.contact.form.submit') }}
-                </button>
+                <div class="card-actions mt-4">
+                  <button type="submit" class="btn btn-primary w-full">
+                    <span class="icon-[tabler--send] size-5 mr-2"></span>
+                    {{ t('pages.contact.form.submit') }}
+                  </button>
+                </div>
                 
                 <p class="text-center text-xs text-base-content/40 mt-6">
                   {{ t('pages.contact.form.success') }}
