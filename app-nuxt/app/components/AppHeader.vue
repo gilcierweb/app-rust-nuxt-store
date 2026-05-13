@@ -19,6 +19,21 @@
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
+                <!-- Language Switcher -->
+                <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
+                    <button id="lang-dropdown-header" type="button" class="dropdown-toggle btn btn-text btn-circle size-10" aria-haspopup="menu" aria-expanded="false">
+                        <span class="icon-[tabler--language] size-5.5"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-32 shadow-xl border border-base-content/10 mt-2" role="menu">
+                        <li v-for="lang in availableLocales" :key="lang.code">
+                            <button @click="setLocale(lang.code)" class="dropdown-item flex items-center gap-2" :class="{ 'active': locale === lang.code }">
+                                <span class="text-lg">{{ lang.flag }}</span>
+                                <span>{{ lang.name }}</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
                 <NuxtLink to="/wishlist" class="btn btn-text btn-square relative">
                     <span class="icon-[tabler--heart] size-5"></span>
                 </NuxtLink>
@@ -85,10 +100,16 @@
 </template>
 
 <script lang="ts" setup>
-const { t } = useI18n()
+const { t, locale, setLocale } = useI18n()
 const { isAuthenticated, user, logout } = useAuth()
 const { toggleCart } = useCartUI()
 const cartStore = useCartStore()
+
+const availableLocales = [
+    { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' }
+]
 
 function handleLogout() {
     logout()
