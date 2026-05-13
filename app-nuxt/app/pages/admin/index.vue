@@ -7,12 +7,12 @@
         <p class="text-gray-500">{{ t('admin.dashboard.welcome') }}</p>
       </div>
       <div class="flex gap-2">
-        <button class="btn btn-soft btn-sm">
-          <i class="icon-[tabler--calendar] size-4 mr-2"></i>
+        <button class="btn btn-soft btn-primary btn-sm">
+          <i class="icon-[tabler--calendar] size-4"></i>
           {{ t('admin.dashboard.last30Days') }}
         </button>
         <button class="btn btn-primary btn-sm">
-          <i class="icon-[tabler--download] size-4 mr-2"></i>
+          <i class="icon-[tabler--download] size-4"></i>
           {{ t('admin.dashboard.report') }}
         </button>
       </div>
@@ -46,8 +46,8 @@
           <div class="flex justify-between items-center mb-6">
             <h3 class="font-bold text-lg">{{ t('admin.dashboard.charts.salesEvolution') }}</h3>
             <div class="flex gap-1">
-              <button class="btn btn-xs btn-ghost text-primary">{{ t('admin.dashboard.charts.daily') }}</button>
-              <button class="btn btn-xs btn-ghost">{{ t('admin.dashboard.charts.monthly') }}</button>
+              <button class="btn btn-soft btn-primary btn-xs">{{ t('admin.dashboard.charts.daily') }}</button>
+              <button class="btn btn-ghost btn-xs">{{ t('admin.dashboard.charts.monthly') }}</button>
             </div>
           </div>
           <div class="h-80 w-full">
@@ -85,15 +85,15 @@
               />
             </ClientOnly>
             <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span class="text-3xl font-bold">1.2k</span>
+              <span class="text-3xl font-bold">{{ categoryData.reduce((acc, curr) => acc + curr.value, 0) }}</span>
               <span class="text-xs text-gray-400">{{ t('admin.dashboard.charts.totalSales') }}</span>
             </div>
           </div>
-          <div class="mt-4 space-y-2">
+          <div class="mt-6 space-y-2">
             <div v-for="(cat, index) in categoryData" :key="cat.name" class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <span class="size-2 rounded-full" :style="{ backgroundColor: ['#FF6F00', '#FF9F40', '#FFCD56', '#4BC0C0', '#9966FF'][index] }"></span>
-                <span class="text-xs text-gray-600">{{ cat.name }}</span>
+                <span class="size-2 rounded-full" :style="{ backgroundColor: ['#FF6F00', '#FF9F40', '#FFCD56', '#4BC0C0', '#9966FF'][index % 5] }"></span>
+                <span class="text-xs text-gray-600">{{ t(cat.name) }}</span>
               </div>
               <span class="text-xs font-bold">{{ cat.value }}</span>
             </div>
@@ -130,7 +130,7 @@
         <div class="card-body p-0">
           <div class="p-4 flex justify-between items-center border-b bg-base-200/30">
             <h3 class="font-bold text-lg">{{ t('admin.dashboard.charts.recentOrders') }}</h3>
-            <NuxtLinkLocale to="/admin/orders" class="btn btn-link btn-sm text-primary no-underline">{{ t('admin.dashboard.charts.viewAll') }}</NuxtLinkLocale>
+            <NuxtLinkLocale to="/admin/orders" class="btn btn-soft btn-primary btn-xs">{{ t('admin.dashboard.charts.viewAll') }}</NuxtLinkLocale>
           </div>
           <div class="overflow-x-auto">
             <table class="table table-sm">
@@ -152,11 +152,11 @@
                   <td class="font-bold">{{ formatNumberBR(order.total) }}</td>
                   <td>
                     <span :class="['badge badge-soft text-[10px] h-5', order.statusClass]">
-                      {{ order.statusLabel }}
+                      {{ t(order.statusLabel) }}
                     </span>
                   </td>
                   <td class="text-right">
-                    <button class="btn btn-circle btn-text btn-xs">
+                    <button class="btn btn-soft btn-info btn-xs btn-circle">
                       <i class="icon-[tabler--eye] size-4"></i>
                     </button>
                   </td>
@@ -172,113 +172,68 @@
 
 <script setup lang="ts">
 import { LegendPosition, CurveType } from 'vue-chrts'
+import type { DashboardStats } from '~/types/dashboard'
 
 definePageMeta({
   layout: 'admin'
 })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
+
+// Fetch Dashboard Stats
+const { pending, data: statsData } = await useFetch<DashboardStats>(`${config.public.baseURL}/api/dashboards/stats`)
 
 // KPI Data
-const kpiStats = [
-  { 
-    title: 'admin.dashboard.kpis.monthlyRevenue', 
-    value: formatNumberBR(45280), 
-    trend: '12%', 
-    trendUp: true, 
-    icon: 'icon-[tabler--cash]', 
-    colorClass: 'bg-success', 
-    textClass: 'text-success' 
-  },
-  { 
-    title: 'admin.dashboard.kpis.newOrders', 
-    value: '342', 
-    trend: '8%', 
-    trendUp: true, 
-    icon: 'icon-[tabler--package]', 
-    colorClass: 'bg-primary', 
-    textClass: 'text-primary' 
-  },
-  { 
-    title: 'admin.dashboard.kpis.newCustomers', 
-    value: '84', 
-    trend: '3%', 
-    trendUp: false, 
-    icon: 'icon-[tabler--users]', 
-    colorClass: 'bg-info', 
-    textClass: 'text-info' 
-  },
-  { 
-    title: 'admin.dashboard.kpis.conversionRate', 
-    value: '3.42%', 
-    trend: '0.5%', 
-    trendUp: true, 
-    icon: 'icon-[tabler--chart-pie]', 
-    colorClass: 'bg-warning', 
-    textClass: 'text-warning' 
-  }
-]
+const kpiStats = computed(() => {
+  return statsData.value?.kpiStats?.map(stat => ({
+    ...stat,
+    value: stat.title.includes('Revenue') ? formatNumberBR(Number(stat.value)) : 
+           stat.title.includes('Rate') ? `${stat.value}%` : stat.value
+  })) || []
+})
 
 // Charts Data
-const salesData = [
-  { date: '01/05', sales: 1200, orders: 15 },
-  { date: '02/05', sales: 1900, orders: 22 },
-  { date: '03/05', sales: 1500, orders: 18 },
-  { date: '04/05', sales: 2500, orders: 30 },
-  { date: '05/05', sales: 2100, orders: 25 },
-  { date: '06/05', sales: 3200, orders: 40 },
-  { date: '07/05', sales: 2800, orders: 35 },
-]
+const salesData = computed(() => statsData.value?.salesData || [])
 
-const salesCategories = {
+const salesCategories = computed(() => ({
   sales: { name: t('admin.dashboard.kpis.monthlyRevenue'), color: '#FF6F00' },
   orders: { name: t('admin.dashboard.kpis.newOrders'), color: '#3B82F6' }
-}
+}))
 
 const salesXFormatter = (tick: number) => {
-  return salesData[tick]?.date || ''
+  return salesData.value[tick]?.date || ''
 }
 
-const categoryData = [
-  { name: t('admin.dashboard.categories.electronics'), value: 400 },
-  { name: t('admin.dashboard.categories.clothing'), value: 300 },
-  { name: t('admin.dashboard.categories.home'), value: 200 },
-  { name: t('admin.dashboard.categories.beauty'), value: 150 },
-  { name: t('admin.dashboard.categories.others'), value: 100 },
-]
+const categoryData = computed(() => statsData.value?.categoryData || [])
 
-const donutCategories = {
-  [t('admin.dashboard.categories.electronics')]: { name: t('admin.dashboard.categories.electronics'), color: '#FF6F00' },
-  [t('admin.dashboard.categories.clothing')]: { name: t('admin.dashboard.categories.clothing'), color: '#FF9F40' },
-  [t('admin.dashboard.categories.home')]: { name: t('admin.dashboard.categories.home'), color: '#FFCD56' },
-  [t('admin.dashboard.categories.beauty')]: { name: t('admin.dashboard.categories.beauty'), color: '#4BC0C0' },
-  [t('admin.dashboard.categories.others')]: { name: t('admin.dashboard.categories.others'), color: '#9966FF' }
-}
+const donutCategories = computed(() => {
+  const categories: Record<string, { name: string, color: string }> = {}
+  const colors = ['#FF6F00', '#FF9F40', '#FFCD56', '#4BC0C0', '#9966FF']
+  
+  categoryData.value.forEach((cat, index) => {
+    categories[cat.name] = { name: cat.name, color: colors[index % colors.length] }
+  })
+  
+  return categories
+})
 
-const topProducts = [
-  { name: 'iPhone 15 Pro', sales: 45 },
-  { name: 'MacBook Air M3', sales: 32 },
-  { name: 'AirPods Pro 2', sales: 28 },
-  { name: 'Samsung S24', sales: 24 },
-  { name: 'iPad Air', sales: 18 },
-]
+const topProducts = computed(() => statsData.value?.topProducts || [])
 
-const productCategories = {
-  sales: { name: t('admin.products.table.actions'), color: '#3B82F6' } // Unidades Vendidas
-}
+const productCategories = computed(() => ({
+  sales: { name: t('admin.products.table.actions'), color: '#3B82F6' }
+}))
 
 const productXFormatter = (i: number) => {
-  return topProducts[i]?.name || ''
+  return topProducts.value[i]?.name || ''
 }
 
 // Recent Orders
-const recentOrders = [
-  { id: 1042, customer: 'Gilcier Junior', total: 1250.00, status: 'paid', statusLabel: t('admin.statusLabels.paid'), statusClass: 'badge-success' },
-  { id: 1041, customer: 'Maria Silva', total: 450.20, status: 'pending', statusLabel: t('admin.statusLabels.pending'), statusClass: 'badge-warning' },
-  { id: 1040, customer: 'João Oliveira', total: 1040, status: 'cancelled', statusLabel: t('admin.statusLabels.cancelled'), statusClass: 'badge-error' },
-  { id: 1039, customer: 'Ana Costa', total: 2100.00, status: 'paid', statusLabel: t('admin.statusLabels.paid'), statusClass: 'badge-success' },
-  { id: 1038, customer: 'Carlos Pereira', total: 120.00, status: 'paid', statusLabel: t('admin.statusLabels.paid'), statusClass: 'badge-success' },
-]
+const recentOrders = computed(() => statsData.value?.recentOrders || [])
+
+const formatNumberBR = (num: number | undefined) => {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num || 0)
+}
 </script>
 
 <style scoped>

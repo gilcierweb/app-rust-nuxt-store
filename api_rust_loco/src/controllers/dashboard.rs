@@ -68,12 +68,13 @@ pub struct RecentOrder {
 #[debug_handler]
 pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
     // 1. KPI Stats
-    let total_revenue: Option<Decimal> = orders::Entity::find()
+    let total_revenue = orders::Entity::find()
         .select_only()
         .column_as(orders::Column::TotalAmount.sum(), "total")
-        .into_tuple()
+        .into_tuple::<(Option<Decimal>,)>()
         .one(&ctx.db)
-        .await?;
+        .await?
+        .and_then(|(total,)| total);
 
     let total_orders = orders::Entity::find().count(&ctx.db).await?;
     let total_customers = users::Entity::find().count(&ctx.db).await?;
@@ -157,7 +158,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .column_as(order_items::Column::Id.count(), "count")
         .group_by(categories::Column::Name)
         .order_by_desc(Expr::cust("count"))
-        .into_tuple::<(String, Option<i64>)>()
+        .into_tuple::<(Option<String>, Option<i64>)>()
         .all(&ctx.db)
         .await?;
 
@@ -165,6 +166,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
     let mut others_count = 0;
 
     for (i, (name, count)) in all_category_results.into_iter().enumerate() {
+        let name = name.unwrap_or_else(|| "admin.statusLabels.unknown".to_string());
         let count = count.unwrap_or(0);
         if i < 5 {
             category_data.push(CategoryDataPoint { name, value: count });

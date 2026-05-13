@@ -1,11 +1,19 @@
 @import "tailwindcss";
+
+/* Tell Tailwind which source files to scan (Tailwind 4 syntax) */
+@source "../../../**/*.{vue,js,ts,jsx,tsx}";
+
+/* FlyonUI – already bundled as a Tailwind plugin */
 @plugin "flyonui";
 @import "flyonui/variants.css";
-
 @source "../../node_modules/flyonui/flyonui.js";
 
+/* Iconify – the plugin that generates the icon‑[…] utilities */
 @plugin "@iconify/tailwind4";
 
+@source inline("bg-info bg-warning text-info text-warning text-success text-primary");
+
+@source inline("icon-[tabler--cash] icon-[tabler--package] icon-[tabler--chart-pie]");
 
 .h1 {
     @apply text-base-content text-4xl;
