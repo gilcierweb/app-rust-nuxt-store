@@ -35,7 +35,7 @@ pub async fn checkout(
     Json(params): Json<CreateOrderParams>,
 ) -> Result<Response> {
     if params.items.is_empty() {
-        return Err(Error::BadRequest("Cart is empty".into()));
+        return Err(Error::BadRequest(t!("cart.empty").into()));
     }
 
     if let Some(ref code) = params.coupon_code {
@@ -43,27 +43,27 @@ pub async fn checkout(
             .filter(coupons::Column::Code.eq(Some(code.clone())))
             .one(&ctx.db)
             .await?
-            .ok_or_else(|| Error::BadRequest("Coupon not found".into()))?;
+            .ok_or_else(|| Error::BadRequest(t!("coupon.not_found").into()))?;
 
         if !coupon.active.unwrap_or(false) {
-            return Err(Error::BadRequest("Coupon is inactive".into()));
+            return Err(Error::BadRequest(t!("coupon.inactive").into()));
         }
 
         if let Some(expires_at) = coupon.expires_at {
             if expires_at < chrono::Utc::now().naive_utc() {
-                return Err(Error::BadRequest("Coupon has expired".into()));
+                return Err(Error::BadRequest(t!("coupon.expired").into()));
             }
         }
 
         if let Some(limit) = coupon.usage_limit {
             if limit > 0 && coupon.used_count.unwrap_or(0) >= limit {
-                return Err(Error::BadRequest("Coupon usage limit reached".into()));
+                return Err(Error::BadRequest(t!("coupon.limit_reached").into()));
             }
         }
 
         if let Some(min) = coupon.minimum_amount {
             if params.total_amount < min {
-                return Err(Error::BadRequest(format!("Minimum order amount is {}", min)));
+                return Err(Error::BadRequest(t!("coupon.min_amount", min = min).into()));
             }
         }
     }
@@ -118,7 +118,7 @@ pub async fn checkout(
             .filter(coupons::Column::Code.eq(params.coupon_code.clone()))
             .one(&ctx.db)
             .await?
-            .ok_or_else(|| Error::BadRequest("Coupon not found".into()))?;
+            .ok_or_else(|| Error::BadRequest(t!("coupon.not_found").into()))?;
 
         let usage = coupon_usages::ActiveModel {
             coupon_id: Set(coupon.id),
@@ -311,14 +311,11 @@ pub async fn update_status(
 
     let current_status = OrderStatus::from_i32(order.status.unwrap_or(1)).unwrap_or(OrderStatus::Pending);
     let new_status = OrderStatus::from_i32(params.status).ok_or_else(|| {
-        Error::BadRequest("Invalid status value".into())
+        Error::BadRequest(t!("order.invalid_status").into())
     })?;
 
     if !current_status.can_transition_to(new_status) {
-        return Err(Error::BadRequest(format!(
-            "Cannot transition from {:?} to {:?}",
-            current_status, new_status
-        )));
+        return Err(Error::BadRequest(t!("order.invalid_transition", from = format!("{:?}", current_status), to = format!("{:?}", new_status)).into()));
     }
 
     let mut active: crate::models::_entities::orders::ActiveModel = order.into();

@@ -25,7 +25,7 @@ pub struct RegisterParams {
 
 #[derive(Debug, Validate, Deserialize)]
 pub struct Validator {
-    #[validate(length(min = 2, message = "Name must be at least 2 characters long."))]
+    #[validate(length(min = 2, message = "validation.name_min_length"))]
     pub name: String,
     #[validate(custom(function = "validation::is_valid_email"))]
     pub email: String,

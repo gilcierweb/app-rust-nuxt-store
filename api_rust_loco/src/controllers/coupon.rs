@@ -86,7 +86,7 @@ pub async fn validate(
                 valid: false,
                 coupon: None,
                 discount: None,
-                message: "Coupon not found".to_string(),
+                message: t!("coupon.not_found").into(),
             })
         }
     };
@@ -96,7 +96,7 @@ pub async fn validate(
             valid: false,
             coupon: None,
             discount: None,
-            message: "Coupon is inactive".to_string(),
+            message: t!("coupon.inactive").into(),
         });
     }
 
@@ -106,7 +106,7 @@ pub async fn validate(
                 valid: false,
                 coupon: None,
                 discount: None,
-                message: "Coupon has expired".to_string(),
+                message: t!("coupon.expired").into(),
             });
         }
     }
@@ -117,7 +117,7 @@ pub async fn validate(
                 valid: false,
                 coupon: None,
                 discount: None,
-                message: "Coupon usage limit reached".to_string(),
+                message: t!("coupon.limit_reached").into(),
             });
         }
     }
@@ -128,7 +128,7 @@ pub async fn validate(
                 valid: false,
                 coupon: None,
                 discount: None,
-                message: format!("Minimum order amount is {}", min),
+                message: t!("coupon.min_amount", min = min).into(),
             });
         }
     }
@@ -139,7 +139,7 @@ pub async fn validate(
         valid: true,
         coupon: Some(coupon),
         discount,
-        message: "Coupon applied successfully".to_string(),
+        message: t!("coupon.applied").into(),
     })
 }
 

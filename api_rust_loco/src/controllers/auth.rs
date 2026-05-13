@@ -134,14 +134,14 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
     let valid = user.verify_password(&params.password);
 
     if !valid {
-        return unauthorized("unauthorized!");
+        return unauthorized(t!("auth.unauthorized"));
     }
 
     let jwt_secret = ctx.config.get_jwt_config()?;
 
     let token = user
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
-        .or_else(|_| unauthorized("unauthorized!"))?;
+        .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
     format::json(LoginResponse::new(&user, &token))
 }
@@ -176,7 +176,7 @@ async fn magic_link(
             email = params.email,
             "The provided email is invalid or does not match the allowed domains"
         );
-        return bad_request("invalid request");
+        return bad_request(t!("auth.invalid_request"));
     }
 
     let Ok(user) = users::Model::find_by_email(&ctx.db, &params.email).await else {
@@ -200,7 +200,7 @@ async fn magic_link_verify(
     let Ok(user) = users::Model::find_by_magic_token(&ctx.db, &token).await else {
         // we don't want to expose our users email. if the email is invalid we still
         // returning success to the caller
-        return unauthorized("unauthorized!");
+        return unauthorized(t!("auth.unauthorized"));
     };
 
     let user = user.into_active_model().clear_magic_link(&ctx.db).await?;
@@ -209,7 +209,7 @@ async fn magic_link_verify(
 
     let token = user
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
-        .or_else(|_| unauthorized("unauthorized!"))?;
+        .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
     format::json(LoginResponse::new(&user, &token))
 }

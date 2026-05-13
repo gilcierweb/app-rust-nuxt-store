@@ -1,6 +1,6 @@
 ---
 source: tests/models/users.rs
-assertion_line: 104
+assertion_line: 125
 expression: existing_user
 ---
 Ok(

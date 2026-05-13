@@ -46,7 +46,7 @@ pub async fn add(
         .await?;
 
     if existing.is_some() {
-        return Err(Error::BadRequest("Product already in wishlist".into()));
+        return Err(Error::BadRequest(t!("wishlist.already_exists").into()));
     }
 
     let now = chrono::Utc::now().into();

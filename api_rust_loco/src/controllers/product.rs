@@ -63,13 +63,13 @@ async fn save_image(
     let upload_dir = "uploads/products";
     tokio::fs::create_dir_all(upload_dir).await.map_err(|e| {
         tracing::error!(error = ?e, "could not create upload directory");
-        Error::BadRequest("could not create upload directory".into())
+        Error::BadRequest(t!("errors.upload_dir_creation").into())
     })?;
     
     let file_path = format!("{}/{}", upload_dir, unique_name);
     tokio::fs::write(&file_path, &content).await.map_err(|e| {
         tracing::error!(error = ?e, "could not write file");
-        Error::BadRequest("could not write file".into())
+        Error::BadRequest(t!("errors.file_write").into())
     })?;
     
     let now = chrono::Utc::now();
@@ -152,7 +152,7 @@ pub async fn add(State(ctx): State<AppContext>, mut multipart: axum::extract::Mu
     
     while let Some(field) = multipart.next_field().await.map_err(|e| {
         tracing::error!(error = ?e, "could not read multipart");
-        Error::BadRequest("could not read multipart".into())
+        Error::BadRequest(t!("errors.multipart_read").into())
     })? {
         let name = field.name().unwrap_or("").to_string();
         
@@ -161,7 +161,7 @@ pub async fn add(State(ctx): State<AppContext>, mut multipart: axum::extract::Mu
             let filename = field.file_name().unwrap_or("image.jpg").to_string();
             let content = field.bytes().await.map_err(|e| {
                 tracing::error!(error = ?e, "could not read file bytes");
-                Error::BadRequest("could not read file bytes".into())
+                Error::BadRequest(t!("errors.file_bytes_read").into())
             })?;
             
             if !content.is_empty() {
@@ -189,12 +189,12 @@ pub async fn add(State(ctx): State<AppContext>, mut multipart: axum::extract::Mu
         }
     }
     
-    let saved_product = product.insert(&ctx.db).await.map_err(|e| Error::Message(format!("Erro ao salvar produto: {}", e)))?;
+    let saved_product = product.insert(&ctx.db).await.map_err(|e| Error::Message(t!("errors.product_save", error = e.to_string()).into()))?;
     
     let images_count = images.len();
     for (content, filename, pos) in images {
         let image_model = save_image(content, filename, saved_product.id, pos, &ctx).await?;
-        image_model.insert(&ctx.db).await.map_err(|e| Error::Message(format!("Erro ao salvar imagem: {}", e)))?;
+        image_model.insert(&ctx.db).await.map_err(|e| Error::Message(t!("errors.image_save", error = e.to_string()).into()))?;
     }
     
     info!("Produto criado com {} imagens: {:?}", images_count, saved_product);

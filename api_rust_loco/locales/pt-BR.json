@@ -1,1 +1,50 @@
-{}
+{
+  "errors": {
+    "validation": "Erro de validação",
+    "upload_dir_creation": "Não foi possível criar o diretório de upload",
+    "file_write": "Não foi possível gravar o arquivo",
+    "multipart_read": "Não foi possível ler os dados multipart",
+    "file_bytes_read": "Não foi possível ler os bytes do arquivo",
+    "product_save": "Erro ao salvar produto: %{error}",
+    "image_save": "Erro ao salvar imagem: %{error}",
+    "internal_server_error": "Erro interno do servidor"
+  },
+  "auth": {
+    "unauthorized": "Não autorizado!",
+    "invalid_request": "Requisição inválida"
+  },
+  "validation": {
+    "field_required": "O campo %{field} é obrigatório",
+    "field_invalid": "O campo %{field} é inválido",
+    "name_min_length": "O nome deve ter pelo menos 2 caracteres.",
+    "fields": {
+      "legal_name": "Razão social",
+      "email": "E-mail",
+      "password": "Senha",
+      "name": "Nome",
+      "phone": "Telefone"
+    }
+  },
+  "category": {
+    "invalid_parent": "Parent_id inválido",
+    "self_parent": "Uma categoria não pode ser pai de si mesma"
+  },
+  "cart": {
+    "empty": "O carrinho está vazio"
+  },
+  "coupon": {
+    "not_found": "Cupom não encontrado",
+    "inactive": "Cupom está inativo",
+    "expired": "Cupom expirado",
+    "limit_reached": "Limite de uso do cupom atingido",
+    "min_amount": "O valor mínimo do pedido é %{min}",
+    "applied": "Cupom aplicado com sucesso"
+  },
+  "wishlist": {
+    "already_exists": "Produto já está na lista de desejos"
+  },
+  "order": {
+    "invalid_status": "Valor de status inválido",
+    "invalid_transition": "Não é possível transitar de %{from} para %{to}"
+  }
+}

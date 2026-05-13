@@ -34,13 +34,13 @@ impl Params {
               if let Some(parent_id) = self.parent_id {
                   // Não permite parent_id negativo
                   if parent_id < 0 {
-                      return Err(Error::BadRequest("Invalid parent_id".into()));
+                      return Err(Error::BadRequest(t!("category.invalid_parent").into()));
                   }
                   
                   // Não permite uma categoria ser pai de si mesma
                   if let Some(id) = current_id {
                       if parent_id == id {
-                          return Err(Error::BadRequest("Category cannot be its own parent".into()));
+                          return Err(Error::BadRequest(t!("category.self_parent").into()));
                       }
                   }
               }

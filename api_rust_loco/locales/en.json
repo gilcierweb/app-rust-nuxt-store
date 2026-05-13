@@ -1,1 +1,50 @@
-{}
+{
+  "errors": {
+    "validation": "Validation error",
+    "upload_dir_creation": "Could not create upload directory",
+    "file_write": "Could not write file",
+    "multipart_read": "Could not read multipart data",
+    "file_bytes_read": "Could not read file bytes",
+    "product_save": "Error saving product: %{error}",
+    "image_save": "Error saving image: %{error}",
+    "internal_server_error": "Internal server error"
+  },
+  "auth": {
+    "unauthorized": "Unauthorized!",
+    "invalid_request": "Invalid request"
+  },
+  "validation": {
+    "field_required": "The %{field} field is required",
+    "field_invalid": "The %{field} field is invalid",
+    "name_min_length": "Name must be at least 2 characters long.",
+    "fields": {
+      "legal_name": "Legal name",
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "phone": "Phone"
+    }
+  },
+  "category": {
+    "invalid_parent": "Invalid parent_id",
+    "self_parent": "A category cannot be its own parent"
+  },
+  "cart": {
+    "empty": "Cart is empty"
+  },
+  "coupon": {
+    "not_found": "Coupon not found",
+    "inactive": "Coupon is inactive",
+    "expired": "Coupon has expired",
+    "limit_reached": "Coupon usage limit reached",
+    "min_amount": "Minimum order amount is %{min}",
+    "applied": "Coupon applied successfully"
+  },
+  "wishlist": {
+    "already_exists": "Product already in wishlist"
+  },
+  "order": {
+    "invalid_status": "Invalid status value",
+    "invalid_transition": "Cannot transition from %{from} to %{to}"
+  }
+}
