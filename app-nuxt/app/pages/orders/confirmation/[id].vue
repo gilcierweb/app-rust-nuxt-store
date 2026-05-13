@@ -57,14 +57,18 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth'
+})
+
 const { t } = useI18n()
-const config = useRuntimeConfig()
 const route = useRoute()
 import type { Order } from '~/types'
+const { useApiFetch } = useApi()
 
 const id = route.params.id
-const { data: order, pending } = await useFetch<Order>(
-  `${config.public.baseURL}/api/orders/${id}`,
+const { data: order, pending } = await useApiFetch<Order>(
+  `/api/orders/${id}`,
   { key: `confirmation-${id}` }
 )
 

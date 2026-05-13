@@ -245,10 +245,15 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth'
+})
+
 const { t } = useI18n()
 const cartStore = useCartStore()
 const router = useRouter()
 const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 import type { PaymentMethod, ShippingMethod } from '~/types'
 
 const submitting = ref(false)
@@ -351,7 +356,7 @@ async function placeOrder() {
   const discount = couponDiscount.value || 0
 
   try {
-    const data = await $fetch<any>(`${config.public.baseURL}/api/orders/checkout`, {
+    const data = await apiFetch<any>('/api/orders/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: {

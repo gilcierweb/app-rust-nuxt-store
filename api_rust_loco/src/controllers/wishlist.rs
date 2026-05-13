@@ -8,6 +8,7 @@ use sea_orm::QueryOrder;
 use serde::Deserialize;
 
 use crate::models::_entities::wishlists::{ActiveModel, Entity};
+use crate::models::users;
 
 #[derive(Debug, Deserialize)]
 pub struct AddParams {
@@ -25,9 +26,10 @@ pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
 }
 
 #[debug_handler]
-pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let items = Entity::find()
-        .filter(crate::models::_entities::wishlists::Column::UserId.eq(1))
+        .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user.id))
         .order_by_desc(crate::models::_entities::wishlists::Column::CreatedAt)
         .all(&ctx.db)
         .await?;
@@ -36,11 +38,14 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 
 #[debug_handler]
 pub async fn add(
+    auth: auth::JWT,
     State(ctx): State<AppContext>,
     Query(params): Query<AddParams>,
 ) -> Result<Response> {
+    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+
     let existing = Entity::find()
-        .filter(crate::models::_entities::wishlists::Column::UserId.eq(1))
+        .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user.id))
         .filter(crate::models::_entities::wishlists::Column::ProductId.eq(params.product_id))
         .one(&ctx.db)
         .await?;
@@ -51,7 +56,7 @@ pub async fn add(
 
     let now = chrono::Utc::now().into();
     let item = ActiveModel {
-        user_id: Set(1),
+        user_id: Set(current_user.id),
         product_id: Set(params.product_id),
         created_at: Set(now),
         updated_at: Set(now),
@@ -66,13 +71,18 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn remove(
+    auth: auth::JWT,
     State(ctx): State<AppContext>,
     Query(params): Query<RemoveParams>,
 ) -> Result<Response> {
+    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let item = Entity::find_by_id(params.id)
         .one(&ctx.db)
         .await?;
     let item = item.ok_or_else(|| Error::NotFound)?;
+    if item.user_id != current_user.id {
+        return unauthorized(t!("auth.unauthorized"));
+    }
     item.delete(&ctx.db).await.map_err(|e| {
         tracing::error!(error = ?e, "failed to remove wishlist item");
         Error::InternalServerError

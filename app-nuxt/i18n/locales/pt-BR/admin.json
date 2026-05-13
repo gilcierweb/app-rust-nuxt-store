@@ -448,6 +448,11 @@
       "loading": "Carregando usuários...",
       "error": "Erro ao carregar usuários: {message}",
       "notFound": "Nenhum usuário encontrado.",
+      "detail": {
+        "emailVerified": "E-mail Verificado",
+        "createdAt": "Criado Em",
+        "updatedAt": "Atualizado Em"
+      },
       "table": {
         "email": "E-mail",
         "role": "Papel",

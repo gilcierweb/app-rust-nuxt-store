@@ -3,8 +3,14 @@ import type { LoginResponse, CurrentResponse } from '~/types/index'
 export const useAuth = () => {
   const config = useRuntimeConfig()
   const baseURL = config.public.baseURL
+  const { apiFetch } = useApi()
 
-  const tokenCookie = useCookie<string | null>('auth_token', { default: () => null })
+  const tokenCookie = useCookie<string | null>('auth_token', {
+    default: () => null,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 60 * 60 * 24 * 7
+  })
   const user = useState<CurrentResponse | null>('auth_user', () => null)
   const isAuthenticated = computed(() => !!tokenCookie.value)
   const loading = useState<boolean>('auth_loading', () => false)
@@ -62,11 +68,8 @@ export const useAuth = () => {
       return null
     }
     try {
-      const data = await $fetch<CurrentResponse>(`${baseURL}/api/auth/current`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${tokenCookie.value}`
-        }
+      const data = await apiFetch<CurrentResponse>('/api/auth/current', {
+        headers: { 'Content-Type': 'application/json' }
       })
       user.value = data
       return data

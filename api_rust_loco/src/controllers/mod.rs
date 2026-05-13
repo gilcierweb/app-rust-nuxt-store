@@ -1,5 +1,6 @@
 pub mod auth;
 
+pub mod user;
 pub mod shipment;
 pub mod post;
 pub mod profile;

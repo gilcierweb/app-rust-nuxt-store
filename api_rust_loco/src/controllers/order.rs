@@ -17,6 +17,7 @@ use crate::models::_entities::payments;
 use crate::models::_entities::shipments;
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::order_status::OrderStatus;
+use crate::models::users;
 
 fn generate_order_number() -> String {
     let ts = chrono::Utc::now().timestamp();
@@ -31,9 +32,12 @@ pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
 
 #[debug_handler]
 pub async fn checkout(
+    auth: auth::JWT,
     State(ctx): State<AppContext>,
     Json(params): Json<CreateOrderParams>,
 ) -> Result<Response> {
+    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+
     if params.items.is_empty() {
         return Err(Error::BadRequest(t!("cart.empty").into()));
     }
@@ -83,7 +87,7 @@ pub async fn checkout(
         payment_status: Set(Some(1)), // unpaid
         fulfillment_status: Set(Some(1)), // unfulfilled
         notes: Set(params.notes),
-        user_id: Set(1), // default user until auth middleware
+        user_id: Set(current_user.id),
         created_at: Set(now),
         updated_at: Set(now),
         ..Default::default()
@@ -122,7 +126,7 @@ pub async fn checkout(
 
         let usage = coupon_usages::ActiveModel {
             coupon_id: Set(coupon.id),
-            user_id: Set(1),
+            user_id: Set(current_user.id),
             order_id: Set(saved.id),
             used_at: Set(Some(chrono::Utc::now().naive_utc())),
             created_at: Set(now),
@@ -188,7 +192,7 @@ pub async fn checkout(
             zip_code: Set(params.address_zip_code.clone()),
             country: Set(params.address_country.clone()),
             phone: Set(params.address_phone.clone()),
-            user_id: Set(1),
+            user_id: Set(current_user.id),
             r#type: Set(Some("shipping".to_string())),
             created_at: Set(now),
             updated_at: Set(now),
@@ -232,9 +236,10 @@ pub async fn checkout(
 }
 
 #[debug_handler]
-pub async fn my_orders(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn my_orders(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let orders: Vec<crate::models::_entities::orders::Model> = Entity::find()
-        .filter(crate::models::_entities::orders::Column::UserId.eq(1))
+        .filter(crate::models::_entities::orders::Column::UserId.eq(current_user.id))
         .order_by_desc(crate::models::_entities::orders::Column::CreatedAt)
         .all(&ctx.db)
         .await?;

@@ -448,6 +448,11 @@
       "loading": "Cargando usuarios...",
       "error": "Error al cargar usuarios: {message}",
       "notFound": "No se encontraron usuarios.",
+      "detail": {
+        "emailVerified": "Correo Verificado",
+        "createdAt": "Creado En",
+        "updatedAt": "Actualizado En"
+      },
       "table": {
         "email": "E-mail",
         "role": "Rol",

@@ -127,16 +127,20 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth'
+})
+
 const { t } = useI18n()
 useSeoMeta({
   title: t('pages.orders.title'),
   ogTitle: t('pages.orders.title'),
 })
-const config = useRuntimeConfig()
 import type { Order } from '~/types'
+const { useApiFetch } = useApi()
 
-const { data: ordersData, pending } = await useFetch<Order[]>(
-  `${config.public.baseURL}/api/orders/my_orders`,
+const { data: ordersData, pending } = await useApiFetch<Order[]>(
+  '/api/orders/my_orders',
   { key: 'my-orders' }
 )
 const orders = computed(() => ordersData.value ?? [])
