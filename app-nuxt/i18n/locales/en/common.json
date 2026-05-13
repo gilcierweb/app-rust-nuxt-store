@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "App Rust Nuxt Store",
     "success": "Success",
     "error": "Error",
     "loading": "Loading...",
@@ -18,6 +19,7 @@
     "search": "Search",
     "confirm": "Confirm",
     "delete": "Delete",
+    "optional": "Optional",
     "edit": "Edit",
     "view": "View",
     "noDescription": "No description",

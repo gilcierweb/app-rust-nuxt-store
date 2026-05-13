@@ -23,8 +23,8 @@
         <div class="flex items-center gap-4">
           <div class="loading loading-spinner loading-md"></div>
           <div>
-            <p class="font-bold">Loading profiles</p>
-            <p class="text-sm opacity-80">Please wait while we fetch user profiles...</p>
+            <p class="font-bold">{{ t('pages.profiles.loading.title') }}</p>
+            <p class="text-sm opacity-80">{{ t('pages.profiles.loading.description') }}</p>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@
             <span class="icon-[tabler--users-group] size-8 text-warning"></span>
           </div>
           <div>
-            <h3 class="font-bold text-lg">{{ t('categories.notFound') }}</h3>
+            <h3 class="font-bold text-lg">{{ t('pages.profiles.notFound') }}</h3>
             <p class="text-sm opacity-80 mt-1">{{ t('pages.profiles.description') }}</p>
           </div>
         </div>

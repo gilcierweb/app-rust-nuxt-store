@@ -184,6 +184,13 @@
         "newOrders": "Novos Pedidos",
         "newCustomers": "Novos Clientes",
         "conversionRate": "Taxa de Conversão"
+      },
+      "categories": {
+        "electronics": "Eletrônicos",
+        "clothing": "Vestuário",
+        "home": "Casa",
+        "beauty": "Beleza",
+        "others": "Outros"
       }
     },
     "products": {
@@ -216,7 +223,13 @@
         "featured": "Destaque",
         "unknown": "Desconhecido",
         "prices": "Preços",
+        "salePrice": "Preço de Venda",
+        "costPrice": "Preço de Custo",
+        "comparePrice": "Preço Comparativo",
         "information": "Informações",
+        "sku": "SKU",
+        "categoryId": "Categoria ID",
+        "imageAlt": "Imagem do produto",
         "shortDescription": "Descrição Curta",
         "fullDescription": "Descrição Completa",
         "images": "Galeria de Imagens",
@@ -308,6 +321,31 @@
         "back": "Voltar para lista",
         "confirmDelete": "Tem certeza que deseja excluir o cupom \"{name}\"?",
         "errorDelete": "Erro ao excluir cupom"
+      },
+      "form": {
+        "titleEdit": "Editar Cupom",
+        "titleNew": "Novo Cupom",
+        "saving": "Salvando cupom...",
+        "code": "Código do Cupom",
+        "type": "Tipo de Desconto",
+        "value": "Valor do Desconto",
+        "minAmount": "Valor Mínimo",
+        "maxDiscount": "Desconto Máximo",
+        "usageLimit": "Limite de Uso",
+        "usageLimitPlaceholder": "0 = ilimitado",
+        "expiration": "Data de Expiração",
+        "active": "Cupom Ativo",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitCoupon": "Cupom",
+        "validation": {
+          "codeRequired": "O código do cupom é obrigatório"
+        },
+        "success": {
+          "created": "Cupom criado com sucesso!",
+          "updated": "Cupom atualizado com sucesso!"
+        },
+        "error": "Erro ao salvar cupom. Tente novamente."
       }
     },
     "orders": {
@@ -330,7 +368,11 @@
         "shipping": "Frete",
         "discount": "Desconto",
         "total": "Total",
-        "back": "Voltar para lista"
+        "back": "Voltar para lista",
+        "summary": "Resumo do Pedido",
+        "currency": "Moeda",
+        "addressNotFound": "Endereço padrão não encontrado.",
+        "noCustomerInfo": "Informações do cliente não disponíveis (User ID: {id})"
       }
     },
     "posts": {
@@ -479,6 +521,8 @@
       "title": "Métodos de Envio",
       "searchPlaceholder": "Buscar métodos de envio",
       "add": "Adicionar",
+      "searchLabel": "Buscar Método",
+      "clearSearch": "Limpar",
       "loading": "Carregando métodos de envio...",
       "error": "Erro ao carregar métodos de envio: {message}",
       "notFound": "Nenhum método de envio encontrado.",
@@ -497,8 +541,37 @@
         "active": "Ativo",
         "inactive": "Inativo"
       },
+      "form": {
+        "titleEdit": "Editar Método de Envio",
+        "titleNew": "Novo Método de Envio",
+        "saving": "Salvando método de envio...",
+        "name": "Nome",
+        "namePlaceholder": "Ex: Sedex, PAC, Transportadora",
+        "code": "Código",
+        "codePlaceholder": "Ex: sedex, pac, transportadora",
+        "basePrice": "Preço Base",
+        "freeThreshold": "Frete Grátis Acima de",
+        "freeThresholdPlaceholder": "0.00 = nunca",
+        "freeThresholdHint": "Deixe 0 para não oferecer frete grátis",
+        "active": "Método Ativo",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitMethod": "Método",
+        "validation": {
+          "nameRequired": "O nome é obrigatório",
+          "codeRequired": "O código é obrigatório",
+          "priceNegative": "O preço base não pode ser negativo"
+        },
+        "success": {
+          "created": "Método de envio criado com sucesso!",
+          "updated": "Método de envio atualizado com sucesso!"
+        },
+        "error": "Erro ao salvar método de envio. Tente novamente."
+      },
       "detail": {
         "title": "Detalhes do Método de Envio",
+        "loading": "Carregando detalhes do método...",
+        "settings": "Configurações",
         "back": "Voltar para lista",
         "confirmDelete": "Tem certeza que deseja excluir o método de envio \"{name}\"?",
         "errorDelete": "Erro ao excluir método de envio"

@@ -14,7 +14,7 @@
         <form @submit.prevent="handleSearch" class="flex flex-wrap gap-4 items-end">
           <div class="form-control flex-1 min-w-[240px]">
             <label class="label pt-0">
-              <span class="label-text-alt text-gray-500">Buscar Método</span>
+              <span class="label-text-alt text-gray-500">{{ t('admin.shippings.searchLabel') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors"></span>
@@ -27,7 +27,7 @@
             </div>
           </div>
           <button type="submit" class="btn btn-ghost">
-            Limpar
+            {{ t('admin.shippings.clearSearch') }}
           </button>
         </form>
       </div>
@@ -149,16 +149,16 @@ const filteredShippings = computed(() => {
 // Format currency
 const formatCurrency = (value: number | undefined) => {
   if (value === undefined || value === null) return '-'
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat(locale.value, {
     style: 'currency',
-    currency: 'BRL'
+    currency: locale.value === 'pt-BR' ? 'BRL' : (locale.value === 'es' ? 'EUR' : 'USD')
   }).format(value)
 }
 
 // Format date
 const formatDate = (dateString: string) => {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(locale.value, {
     day: '2-digit',
     month: 'short',
     year: 'numeric'

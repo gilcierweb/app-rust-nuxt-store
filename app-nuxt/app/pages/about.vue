@@ -27,11 +27,11 @@
           <p>{{ t('pages.about.story.p2') }}</p>
           <div class="pt-6 grid grid-cols-2 gap-6">
             <div>
-              <div class="text-3xl font-bold text-primary mb-1">10k+</div>
+              <div class="text-3xl font-bold text-primary mb-1">{{ t('pages.about.story.stats.customersVal') }}</div>
               <div class="text-sm font-medium opacity-60">{{ t('pages.about.story.stats.customers') }}</div>
             </div>
             <div>
-              <div class="text-3xl font-bold text-secondary mb-1">500+</div>
+              <div class="text-3xl font-bold text-secondary mb-1">{{ t('pages.about.story.stats.productsVal') }}</div>
               <div class="text-sm font-medium opacity-60">{{ t('pages.about.story.stats.products') }}</div>
             </div>
           </div>

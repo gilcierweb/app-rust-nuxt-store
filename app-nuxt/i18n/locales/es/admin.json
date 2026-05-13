@@ -184,6 +184,13 @@
         "newOrders": "Nuevos Pedidos",
         "newCustomers": "Nuevos Clientes",
         "conversionRate": "Tasa de Conversión"
+      },
+      "categories": {
+        "electronics": "Electrónica",
+        "clothing": "Ropa",
+        "home": "Hogar",
+        "beauty": "Belleza",
+        "others": "Otros"
       }
     },
     "products": {
@@ -216,7 +223,13 @@
         "featured": "Destacado",
         "unknown": "Desconocido",
         "prices": "Precios",
+        "salePrice": "Precio de Venta",
+        "costPrice": "Precio de Costo",
+        "comparePrice": "Precio Comparativo",
         "information": "Información",
+        "sku": "SKU",
+        "categoryId": "Categoría ID",
+        "imageAlt": "Imagen del producto",
         "shortDescription": "Descripción Corta",
         "fullDescription": "Descripción Completa",
         "images": "Galería de Imágenes",
@@ -308,6 +321,31 @@
         "back": "Volver a la lista",
         "confirmDelete": "¿Está seguro de que desea eliminar el cupón \"{name}\"?",
         "errorDelete": "Error al eliminar el cupón"
+      },
+      "form": {
+        "titleEdit": "Editar Cupón",
+        "titleNew": "Nuevo Cupón",
+        "saving": "Guardando cupón...",
+        "code": "Código del Cupón",
+        "type": "Tipo de Desconto",
+        "value": "Valor del Desconto",
+        "minAmount": "Valor Mínimo",
+        "maxDiscount": "Descuento Máximo",
+        "usageLimit": "Límite de Uso",
+        "usageLimitPlaceholder": "0 = ilimitado",
+        "expiration": "Fecha de Expiración",
+        "active": "Cupón Activo",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitCoupon": "Cupón",
+        "validation": {
+          "codeRequired": "El código del cupón es obligatorio"
+        },
+        "success": {
+          "created": "¡Cupón creado con éxito!",
+          "updated": "¡Cupón actualizado con éxito!"
+        },
+        "error": "Error al guardar el cupón. Inténtalo de nuevo."
       }
     },
     "orders": {
@@ -330,7 +368,11 @@
         "shipping": "Envío",
         "discount": "Descuento",
         "total": "Total",
-        "back": "Volver a la lista"
+        "back": "Volver a la lista",
+        "summary": "Resumen del Pedido",
+        "currency": "Moneda",
+        "addressNotFound": "No se encontró la dirección de envío predeterminada.",
+        "noCustomerInfo": "Información del cliente no disponible (User ID: {id})"
       }
     },
     "posts": {
@@ -493,12 +535,41 @@
         "actions": "Acciones"
       },
       "status": {
-        "above": "Encima de {threshold}",
+        "above": "Por encima de {threshold}",
         "active": "Activo",
         "inactive": "Inactivo"
       },
+      "form": {
+        "titleEdit": "Editar Método de Envío",
+        "titleNew": "Nuevo Método de Envío",
+        "saving": "Guardando método de envío...",
+        "name": "Nombre",
+        "namePlaceholder": "Ej: Sedex, PAC, Transportista",
+        "code": "Código",
+        "codePlaceholder": "Ej: sedex, pac, transportista",
+        "basePrice": "Precio Base",
+        "freeThreshold": "Envío Gratis por Encima de",
+        "freeThresholdPlaceholder": "0.00 = nunca",
+        "freeThresholdHint": "Deja 0 para no ofrecer envío gratis",
+        "active": "Método Activo",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitMethod": "Método",
+        "validation": {
+          "nameRequired": "El nombre es obligatorio",
+          "codeRequired": "El código es obligatorio",
+          "priceNegative": "El precio base no puede ser negativo"
+        },
+        "success": {
+          "created": "¡Método de envío creado con éxito!",
+          "updated": "¡Método de envío actualizado con éxito!"
+        },
+        "error": "Error al guardar el método de envío. Inténtalo de nuevo."
+      },
       "detail": {
         "title": "Detalles del Método de Envío",
+        "loading": "Cargando detalles del método...",
+        "settings": "Configuración",
         "back": "Volver a la lista",
         "confirmDelete": "¿Está seguro de que desea eliminar el método de envío \"{name}\"?",
         "errorDelete": "Error al eliminar el método de envío"

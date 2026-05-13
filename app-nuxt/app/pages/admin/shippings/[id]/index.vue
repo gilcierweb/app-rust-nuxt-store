@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <!-- Header with Back Button -->
@@ -7,7 +8,7 @@
           <i class="icon-[tabler--arrow-left] size-6"></i>
         </NuxtLink>
         <div>
-          <h1 class="h1">Detalhes do Método de Envio</h1>
+          <h1 class="h1">{{ t('admin.shippings.detail.title') }}</h1>
           <p class="text-sm text-gray-500" v-if="shipping">ID: {{ shipping.id }}</p>
         </div>
       </div>
@@ -15,11 +16,11 @@
       <div v-if="shipping" class="flex gap-2">
         <button @click="deleteShipping" class="btn btn-error btn-outline">
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
-          Excluir
+          {{ t('common.delete') }}
         </button>
         <NuxtLink :to="`/admin/shippings/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2"></i>
-          Editar
+          {{ t('common.edit') }}
         </NuxtLink>
       </div>
     </div>
@@ -27,14 +28,14 @@
     <!-- Loading State -->
     <div v-if="pending" class="flex flex-col items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="mt-4 text-gray-500">Carregando detalhes do método...</span>
+      <span class="mt-4 text-gray-500">{{ t('admin.shippings.detail.loading') }}</span>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Erro ao carregar método de envio: {{ error.message }}</span>
-      <button class="btn btn-sm btn-ghost" @click="() => refresh()">Tentar novamente</button>
+      <span>{{ t('admin.shippings.error', { message: error.message }) }}</span>
+      <button class="btn btn-sm btn-ghost" @click="() => refresh()">{{ t('common.actions.tryAgain') }}</button>
     </div>
 
     <!-- Content -->
@@ -51,28 +52,28 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
               <label class="label">
-                <span class="label-text text-gray-500">Nome</span>
+                <span class="label-text text-gray-500">{{ t('admin.shippings.table.name') }}</span>
               </label>
               <div class="font-medium text-lg">{{ shipping.name }}</div>
             </div>
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text text-gray-500">Código</span>
+                <span class="label-text text-gray-500">{{ t('admin.shippings.table.code') }}</span>
               </label>
               <div class="font-mono bg-base-200 px-3 py-2 rounded-md inline-block">{{ shipping.code }}</div>
             </div>
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text text-gray-500">Preço Base</span>
+                <span class="label-text text-gray-500">{{ t('admin.shippings.table.basePrice') }}</span>
               </label>
               <div class="font-medium text-xl text-primary">{{ formatCurrency(shipping.base_price) }}</div>
             </div>
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text text-gray-500">Frete Grátis Acima De</span>
+                <span class="label-text text-gray-500">{{ t('admin.shippings.table.freeThreshold') }}</span>
               </label>
               <div class="font-medium">
                 {{ shipping.free_shipping_threshold ? formatCurrency(shipping.free_shipping_threshold) : 'N/A' }}
@@ -85,16 +86,16 @@
       <!-- Status Card -->
       <div class="card bg-base-100 shadow-sm h-fit">
         <div class="card-body">
-          <h2 class="card-title mb-4">Configurações</h2>
+          <h2 class="card-title mb-4">{{ t('admin.shippings.detail.settings') }}</h2>
 
           <div class="flex flex-col gap-4">
             <div class="form-control">
               <label class="label">
-                <span class="label-text text-gray-500">Status</span>
+                <span class="label-text text-gray-500">{{ t('admin.shippings.table.status') }}</span>
               </label>
               <div>
                 <span :class="['badge badge-lg', shipping.active ? 'badge-success' : 'badge-error']">
-                  {{ shipping.active ? 'Ativo' : 'Inativo' }}
+                  {{ shipping.active ? t('admin.shippings.status.active') : t('admin.shippings.status.inactive') }}
                 </span>
               </div>
             </div>
@@ -103,11 +104,11 @@
 
             <div class="text-xs text-gray-500 space-y-2">
               <div class="flex justify-between">
-                <span>Criado em:</span>
+                <span>{{ t('pages.categories.item.createdAt') }}</span>
                 <span class="font-medium">{{ formatDate(shipping.created_at) }}</span>
               </div>
               <div class="flex justify-between">
-                <span>Atualizado em:</span>
+                <span>{{ t('pages.categories.item.updatedAt') }}</span>
                 <span class="font-medium">{{ formatDate(shipping.updated_at) }}</span>
               </div>
             </div>
@@ -119,13 +120,14 @@
     <!-- Not Found State -->
     <div v-else class="alert alert-warning">
       <i class="icon-[tabler--alert-triangle] size-6"></i>
-      <span>Método de envio não encontrado.</span>
-      <NuxtLink to="/admin/shippings" class="btn btn-sm">Voltar para lista</NuxtLink>
+      <span>{{ t('admin.shippings.notFound') }}</span>
+      <NuxtLink to="/admin/shippings" class="btn btn-sm">{{ t('admin.shippings.detail.back') }}</NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const { t, locale } = useI18n()
 import type { ShippingMethod } from '~/types'
 
 definePageMeta({
@@ -142,15 +144,15 @@ const { pending, data: shipping, error, refresh } = useFetch<ShippingMethod>(
 
 const formatCurrency = (value: number | undefined) => {
   if (value === undefined || value === null) return '-'
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat(locale.value, {
     style: 'currency',
-    currency: 'BRL'
+    currency: locale.value === 'pt-BR' ? 'BRL' : (locale.value === 'es' ? 'EUR' : 'USD')
   }).format(value)
 }
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(locale.value, {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -162,14 +164,14 @@ const formatDate = (dateString?: string) => {
 const deleteShipping = async () => {
   if (!shipping.value) return
 
-  if (confirm(`Tem certeza que deseja excluir o método de envio "${shipping.value.name}"?`)) {
+  if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.value.name }))) {
     try {
       await $fetch(`${config.public.baseURL}/api/shippings/${shipping.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/shippings')
     } catch (err) {
-      alert('Erro ao excluir método de envio')
+      alert(t('admin.shippings.detail.errorDelete'))
       console.error(err)
     }
   }

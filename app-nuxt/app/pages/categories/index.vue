@@ -18,7 +18,7 @@
             </div>
             
             <h1 class="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Explore por <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Categorias</span>
+              {{ t('pages.categories.hero.title', { span: '' }) }}<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">{{ t('pages.categories.hero.span') }}</span>
             </h1>
             <p class="text-xl text-white/60 max-w-lg mb-10 leading-relaxed">{{ t('pages.categories.description') }}</p>
             
@@ -40,14 +40,14 @@
                 <span class="icon-[tabler--category] size-8 text-primary"></span>
               </div>
               <div class="text-4xl font-bold text-white mb-2">{{ allCategories.length }}</div>
-              <div class="text-white/40 font-medium">Categorias Ativas</div>
+              <div class="text-white/40 font-medium">{{ t('pages.categories.stats.activeCategories') }}</div>
             </div>
             <div class="p-8 rounded-[2.5rem] bg-white/5 backdrop-blur-xl border border-white/10 mt-12 transform hover:-translate-y-2 transition-all duration-500">
               <div class="size-14 rounded-2xl bg-secondary/20 flex items-center justify-center mb-6">
                 <span class="icon-[tabler--box] size-8 text-secondary"></span>
               </div>
               <div class="text-4xl font-bold text-white mb-2">{{ totalProducts }}</div>
-              <div class="text-white/40 font-medium">Produtos Totais</div>
+              <div class="text-white/40 font-medium">{{ t('pages.categories.stats.totalProducts') }}</div>
             </div>
           </div>
         </div>
@@ -61,13 +61,13 @@
         <div class="card card-sm bg-base-100 shadow-soft border border-base-200">
           <div class="card-body">
             <div class="text-2xl font-bold text-base-content mb-1">{{ allCategories.length }}</div>
-            <div class="text-xs text-base-content/50 uppercase font-semibold">Categorias</div>
+            <div class="text-xs text-base-content/50 uppercase font-semibold">{{ t('pages.categories.stats.categories') }}</div>
           </div>
         </div>
         <div class="card card-sm bg-base-100 shadow-soft border border-base-200">
           <div class="card-body">
             <div class="text-2xl font-bold text-base-content mb-1">{{ totalProducts }}</div>
-            <div class="text-xs text-base-content/50 uppercase font-semibold">Produtos</div>
+            <div class="text-xs text-base-content/50 uppercase font-semibold">{{ t('pages.categories.stats.products') }}</div>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@
                 <span :class="[cat.icon || 'icon-[tabler--category]', 'size-6']"></span>
               </div>
               <h5 class="card-title">{{ cat.name }}</h5>
-              <span v-if="cat.featured" class="badge badge-warning badge-sm ml-auto">Destaque</span>
+              <span v-if="cat.featured" class="badge badge-warning badge-sm ml-auto">{{ t('pages.categories.badges.featured') }}</span>
             </div>
 
             <!-- Content -->
@@ -97,18 +97,18 @@
             <div class="grid grid-cols-2 gap-4 mb-6">
               <div class="text-center p-3 rounded-xl bg-base-200/50">
                 <div class="font-bold text-lg">{{ cat.productsCount }}</div>
-                <div class="text-xs text-base-content/50 uppercase">Produtos</div>
+                <div class="text-xs text-base-content/50 uppercase">{{ t('pages.categories.stats.products') }}</div>
               </div>
               <div class="text-center p-3 rounded-xl bg-base-200/50">
                 <div class="font-bold text-lg">{{ cat.subcategories }}</div>
-                <div class="text-xs text-base-content/50 uppercase">Subcategorias</div>
+                <div class="text-xs text-base-content/50 uppercase">{{ t('pages.categories.stats.subcategories') }}</div>
               </div>
             </div>
 
             <!-- Footer Action -->
             <div class="card-actions justify-between items-center mt-auto">
               <NuxtLink :to="`/categories/${cat.id}`" class="btn btn-primary btn-sm">
-                Explorar Agora
+                {{ t('pages.categories.actions.exploreNow') }}
               </NuxtLink>
               
               <button @click="toggleFavorite(cat.id)" class="btn btn-circle btn-ghost btn-sm">
@@ -124,9 +124,9 @@
         <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mx-auto mb-6">
           <span class="icon-[tabler--category-off] size-12 text-base-content/20"></span>
         </div>
-        <h3 class="text-2xl font-bold mb-2">Nenhuma categoria encontrada</h3>
-        <p class="text-base-content/50 mb-8">Tente ajustar sua busca ou explore todos os produtos.</p>
-        <NuxtLink to="/products" class="btn btn-primary px-8 rounded-2xl">Ver Todos os Produtos</NuxtLink>
+        <h3 class="text-2xl font-bold mb-2">{{ t('pages.categories.empty.title') }}</h3>
+        <p class="text-base-content/50 mb-8">{{ t('pages.categories.empty.description') }}</p>
+        <NuxtLink to="/products" class="btn btn-primary px-8 rounded-2xl">{{ t('pages.categories.actions.viewAllProducts') }}</NuxtLink>
       </div>
     </main>
   </div>

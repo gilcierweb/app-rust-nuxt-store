@@ -149,7 +149,7 @@
                   <td>
                     <div class="text-sm font-medium">{{ order.customer }}</div>
                   </td>
-                  <td class="font-bold">R$ {{ order.total.toFixed(2) }}</td>
+                  <td class="font-bold">{{ formatNumberBR(order.total) }}</td>
                   <td>
                     <span :class="['badge badge-soft text-[10px] h-5', order.statusClass]">
                       {{ order.statusLabel }}
@@ -183,7 +183,7 @@ const { t } = useI18n()
 const kpiStats = [
   { 
     title: 'admin.dashboard.kpis.monthlyRevenue', 
-    value: 'R$ 45.280,00', 
+    value: formatNumberBR(45280), 
     trend: '12%', 
     trendUp: true, 
     icon: 'icon-[tabler--cash]', 
@@ -240,19 +240,19 @@ const salesXFormatter = (tick: number) => {
 }
 
 const categoryData = [
-  { name: 'Eletrônicos', value: 400 },
-  { name: 'Vestuário', value: 300 },
-  { name: 'Casa', value: 200 },
-  { name: 'Beleza', value: 150 },
-  { name: 'Outros', value: 100 },
+  { name: t('admin.dashboard.categories.electronics'), value: 400 },
+  { name: t('admin.dashboard.categories.clothing'), value: 300 },
+  { name: t('admin.dashboard.categories.home'), value: 200 },
+  { name: t('admin.dashboard.categories.beauty'), value: 150 },
+  { name: t('admin.dashboard.categories.others'), value: 100 },
 ]
 
 const donutCategories = {
-  'Eletrônicos': { name: 'Eletrônicos', color: '#FF6F00' },
-  'Vestuário': { name: 'Vestuário', color: '#FF9F40' },
-  'Casa': { name: 'Casa', color: '#FFCD56' },
-  'Beleza': { name: 'Beleza', color: '#4BC0C0' },
-  'Outros': { name: 'Outros', color: '#9966FF' }
+  [t('admin.dashboard.categories.electronics')]: { name: t('admin.dashboard.categories.electronics'), color: '#FF6F00' },
+  [t('admin.dashboard.categories.clothing')]: { name: t('admin.dashboard.categories.clothing'), color: '#FF9F40' },
+  [t('admin.dashboard.categories.home')]: { name: t('admin.dashboard.categories.home'), color: '#FFCD56' },
+  [t('admin.dashboard.categories.beauty')]: { name: t('admin.dashboard.categories.beauty'), color: '#4BC0C0' },
+  [t('admin.dashboard.categories.others')]: { name: t('admin.dashboard.categories.others'), color: '#9966FF' }
 }
 
 const topProducts = [

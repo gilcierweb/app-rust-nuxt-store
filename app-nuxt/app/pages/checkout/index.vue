@@ -19,7 +19,7 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary mt-8">
+      <NuxtLink to="/products" class="btn btn-primary btn-lg mt-8 shadow-md">
         {{ t('cart.continueShopping') }}
       </NuxtLink>
     </div>
@@ -52,7 +52,7 @@
               <input v-model="address.address1" type="text" class="input" id="address1" :placeholder="t('shipping.address1')" />
             </div>
             <div class="w-full">
-              <label class="label-text" for="address2">{{ t('shipping.address2') }} ({{ t('common.optional') || 'Opcional' }})</label>
+              <label class="label-text" for="address2">{{ t('shipping.address2') }} ({{ t('common.optional') }})</label>
               <input v-model="address.address2" type="text" class="input" id="address2" :placeholder="t('shipping.address2')" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -72,7 +72,7 @@
               </div>
               <div class="w-full">
                 <label class="label-text" for="phone">{{ t('shipping.phone') }}</label>
-                <input v-model="address.phone" type="text" class="input" id="phone" placeholder="+55 00 00000-0000" />
+                <input v-model="address.phone" type="text" class="input" id="phone" :placeholder="t('shipping.phone')" />
               </div>
             </div>
           </div>
@@ -93,8 +93,9 @@
           </div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="method in shippingMethods" :key="method.id"
-              class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300"
-              :class="selectedShippingMethod === method.id ? 'border-primary bg-primary/5' : 'border-base-200'">
+              class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer hover:border-primary/50"
+              :class="selectedShippingMethod === method.id ? 'border-primary bg-primary/5 shadow-sm' : 'border-base-200'"
+              @click="selectedShippingMethod = method.id">
               <input v-model="selectedShippingMethod" type="radio" name="shipping_method" :value="method.id" class="radio radio-primary" :id="`shipping-${method.id}`" />
               <label class="label-text text-base grow cursor-pointer" :for="`shipping-${method.id}`">
                 <div class="font-bold">{{ method.name || method.code }}</div>
@@ -120,8 +121,9 @@
           </div>
           <div v-else class="space-y-4">
             <div v-for="method in paymentMethods" :key="method.id"
-              class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300"
-              :class="selectedPaymentMethod === method.id ? 'border-primary bg-primary/5' : 'border-base-200'">
+              class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer hover:border-primary/50"
+              :class="selectedPaymentMethod === method.id ? 'border-primary bg-primary/5 shadow-sm' : 'border-base-200'"
+              @click="selectedPaymentMethod = method.id">
               <input v-model="selectedPaymentMethod" type="radio" name="payment_method" :value="method.id" class="radio radio-primary" :id="`payment-${method.id}`" />
               <label class="label-text text-base grow cursor-pointer flex items-center gap-4" :for="`payment-${method.id}`">
                 <div class="size-10 rounded-xl bg-white shadow-sm flex items-center justify-center border border-base-200">
@@ -167,15 +169,15 @@
             <div class="w-full">
               <label class="label-text" for="couponCode">{{ t('pages.checkout.promoCode') }}</label>
               <div class="flex gap-2 mt-1">
-                <input v-model="couponCode" type="text" placeholder="PROMO20" id="couponCode"
+                <input v-model="couponCode" type="text" :placeholder="t('pages.checkout.promoCode')" id="couponCode"
                   class="input grow uppercase font-bold tracking-widest placeholder:normal-case placeholder:font-normal placeholder:tracking-normal"
                   :disabled="couponApplied || couponChecking" @keyup.enter="applyCoupon" />
                 <button v-if="!couponApplied" @click="applyCoupon" :disabled="!couponCode.trim() || couponChecking"
-                  class="btn btn-primary">
+                  class="btn btn-primary px-6">
                   <span v-if="couponChecking" class="loading loading-spinner loading-xs"></span>
                   <span v-else>{{ t('pages.checkout.apply') }}</span>
                 </button>
-                <button v-else @click="removeCoupon" class="btn btn-error text-error-content">
+                <button v-else @click="removeCoupon" class="btn btn-outline btn-error hover:bg-error hover:text-error-content">
                   <span class="icon-[tabler--x] size-5"></span>
                 </button>
               </div>
@@ -219,10 +221,10 @@
           </div>
           
           <div class="space-y-4">
-            <button class="btn btn-primary w-full"
+            <button class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300"
               :disabled="submitting || !selectedPaymentMethod" @click="placeOrder">
               <span v-if="submitting" class="loading loading-spinner mr-2" />
-              <span v-else class="icon-[tabler--lock] size-5 mr-2"></span>
+              <span v-else class="icon-[tabler--lock] size-6 mr-2"></span>
               {{ t('pages.checkout.placeOrder') }}
             </button>
             

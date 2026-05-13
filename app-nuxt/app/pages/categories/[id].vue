@@ -8,7 +8,7 @@
           <span class="loading loading-ring loading-lg text-primary"></span>
         </div>
       </div>
-      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">Loading category...</p>
+      <p class="mt-6 text-base-content/40 font-medium tracking-widest uppercase text-xs">{{ t('pages.categories.detail.loading') }}</p>
     </div>
 
     <!-- Category Not Found -->
@@ -16,9 +16,9 @@
       <div class="size-24 rounded-full bg-base-200 flex items-center justify-center mb-6">
         <span class="icon-[tabler--category-off] size-12 opacity-20" />
       </div>
-      <h2 class="h3 mb-2">Category Not Found</h2>
+      <h2 class="h3 mb-2">{{ t('pages.categories.detail.notFound') }}</h2>
       <NuxtLink to="/categories" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
-        Browse All Categories
+        {{ t('pages.categories.detail.browseAll') }}
       </NuxtLink>
     </div>
 
@@ -44,23 +44,23 @@
             </h1>
             
             <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              {{ category.description || 'Discover amazing products in this category' }}
+              {{ category.description || t('pages.categories.detail.fallbackDescription') }}
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
               <div class="flex items-center text-white/80">
                 <span class="icon-[tabler--box] size-5 mr-2"></span>
-                <span>{{ category.productsCount || 0 }} Products</span>
+                <span>{{ category.productsCount || 0 }} {{ t('pages.categories.detail.productsLabel') }}</span>
               </div>
               <div class="hidden sm:block w-1 h-1 bg-white/40 rounded-full"></div>
               <div class="flex items-center text-white/80">
                 <span class="icon-[tabler--star-filled] size-5 mr-2"></span>
-                <span>4.6/5 Average Rating</span>
+                <span>4.6/5 {{ t('pages.categories.detail.averageRating') }}</span>
               </div>
               <div class="hidden sm:block w-1 h-1 bg-white/40 rounded-full"></div>
               <div class="flex items-center text-white/80">
                 <span class="icon-[tabler--truck] size-5 mr-2"></span>
-                <span>Fast Delivery</span>
+                <span>{{ t('pages.categories.detail.fastDelivery') }}</span>
               </div>
             </div>
             
@@ -71,8 +71,8 @@
                   <span class="icon-[tabler--bolt] size-6 text-success"></span>
                 </div>
                 <div>
-                  <h3 class="font-bold">Special Offer</h3>
-                  <p class="text-sm opacity-80">Up to 70% OFF on selected products</p>
+                  <h3 class="font-bold">{{ t('pages.categories.detail.specialOffer') }}</h3>
+                  <p class="text-sm opacity-80">{{ t('pages.categories.detail.specialOfferDesc') }}</p>
                 </div>
               </div>
             </div>
@@ -85,31 +85,31 @@
         <div class="max-w-7xl mx-auto px-6 py-6">
           <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center space-x-4">
-              <span class="text-base-content/60">{{ (category?.productsCount || 0) }} products found</span>
+              <span class="text-base-content/60">{{ t('pages.categories.detail.productsFound', { count: category?.productsCount || 0 }) }}</span>
               <select class="select select-bordered w-full max-w-xs m-1">
-                <option disabled selected>All Brands</option>
+                <option disabled selected>{{ t('pages.categories.detail.allBrands') }}</option>
                 <option>Apple</option>
                 <option>Samsung</option>
                 <option>Dell</option>
                 <option>HP</option>
               </select>
               <select class="select select-bordered w-full max-w-xs m-1">
-                <option disabled selected>Price</option>
-                <option>Low to High</option>
-                <option>High to Low</option>
+                <option disabled selected>{{ t('pages.categories.detail.price') }}</option>
+                <option>{{ t('pages.categories.detail.lowToHigh') }}</option>
+                <option>{{ t('pages.categories.detail.highToLow') }}</option>
               </select>
               <select class="select select-bordered w-full max-w-xs m-1">
-                <option disabled selected>Rating</option>
-                <option>5 Stars</option>
-                <option>4+ Stars</option>
-                <option>3+ Stars</option>
+                <option disabled selected>{{ t('pages.categories.detail.rating') }}</option>
+                <option>{{ t('pages.categories.detail.stars', { n: 5 }) }}</option>
+                <option>{{ t('pages.categories.detail.starsPlus', { n: 4 }) }}</option>
+                <option>{{ t('pages.categories.detail.starsPlus', { n: 3 }) }}</option>
               </select>
             </div>
             <div class="flex items-center space-x-4">
-              <span class="text-base-content/60">Filters:</span>
+              <span class="text-base-content/60">{{ t('pages.categories.detail.filtersLabel') }}</span>
               <div class="btn-group">
-                <button class="btn btn-ghost">Grid</button>
-                <button class="btn btn-ghost">List</button>
+                <button class="btn btn-ghost">{{ t('pages.categories.detail.grid') }}</button>
+                <button class="btn btn-ghost">{{ t('pages.categories.detail.list') }}</button>
               </div>
             </div>
           </div>
@@ -142,14 +142,14 @@
                   <div class="flex text-warning">
                     <span v-for="n in 5" :key="n" class="icon-[tabler--star-filled] size-4"></span>
                   </div>
-                  <span class="text-base-content/60 text-sm ml-2">(0 reviews)</span>
+                  <span class="text-base-content/60 text-sm ml-2">({{ 0 }} {{ t('pages.categories.detail.reviews') }})</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <div>
-                    <span class="text-2xl font-bold text-base-content">R$ 0.00</span>
+                    <span class="text-2xl font-bold text-base-content">{{ formatNumberBR(0) }}</span>
                   </div>
-                  <button class="btn btn-primary btn-sm">
-                    <span class="icon-[tabler--shopping-cart] size-4"></span>
+                  <button class="btn btn-primary btn-sm btn-circle shadow-md">
+                    <span class="icon-[tabler--shopping-cart] size-5"></span>
                   </button>
                 </div>
               </div>
@@ -158,9 +158,9 @@
 
           <!-- Load More Button -->
           <div class="text-center mt-16">
-            <button class="btn btn-primary btn-lg rounded-2xl px-12 border-2 border-base-200 hover:border-primary/20 hover:bg-primary/5 transition-all">
+            <button class="btn btn-outline btn-primary btn-lg rounded-2xl px-12 border-2 hover:bg-primary/5 transition-all">
               <span class="flex items-center gap-2">
-                Load More Products
+                {{ t('pages.categories.detail.loadMore') }}
                 <span class="icon-[tabler--arrow-down] size-5"></span>
               </span>
             </button>
@@ -174,6 +174,7 @@
 <script setup lang="ts">
 import type { Category } from '~/types';
 
+const { t } = useI18n()
 const route = useRoute()
 const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();
@@ -184,16 +185,16 @@ const { pending, data: category } = await useLazyFetch<Category>(`${config.publi
 
 // SEO optimization for category page
 useSeoMeta({
-  title: category.value?.name || 'Category',
-  ogTitle: category.value?.name || 'Category',
-  description: (category.value?.description || 'Browse our collection of products in this category') as string,
-  ogDescription: (category.value?.description || 'Browse our collection of products in this category') as string,
+  title: category.value?.name || t('pages.categories.detail.fallbackTitle'),
+  ogTitle: category.value?.name || t('pages.categories.detail.fallbackTitle'),
+  description: (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
+  ogDescription: (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
   ogImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=630&fit=crop',
   ogUrl: `${config.public.baseURL}/categories/${id}`,
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  twitterTitle: category.value?.name || 'Category',
-  twitterDescription: (category.value?.description || 'Browse our collection of products in this category') as string,
+  twitterTitle: category.value?.name || t('pages.categories.detail.fallbackTitle'),
+  twitterDescription: (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
   twitterImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=630&fit=crop',
 })
 </script>

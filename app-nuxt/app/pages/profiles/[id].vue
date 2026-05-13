@@ -42,7 +42,7 @@
             </div>
             <div class="card bg-white/20 backdrop-blur-md text-primary-content shadow-none border-none">
               <div class="card-body p-4 text-center">
-                <div class="text-2xl font-black">R$ 25.680</div>
+                <div class="text-2xl font-black">{{ formatNumberBR(25680) }}</div>
                 <div class="text-sm opacity-80 uppercase tracking-wider font-bold">{{ t('pages.profiles.detail.stats.totalSpent') }}</div>
               </div>
             </div>

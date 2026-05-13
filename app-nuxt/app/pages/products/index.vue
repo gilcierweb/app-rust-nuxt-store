@@ -55,12 +55,12 @@
             <div class="space-y-4">
               <div class="join">
                 <input type="range" min="0" max="1000" class="range range-primary range-sm join-item" />
-                <input type="number" placeholder="Min" class="input input-sm input-bordered join-item w-20" />
-                <input type="number" placeholder="Max" class="input input-sm input-bordered join-item w-20" />
+                <input type="number" :placeholder="t('pages.products.filters.min')" class="input input-sm input-bordered join-item w-20" />
+                <input type="number" :placeholder="t('pages.products.filters.max')" class="input input-sm input-bordered join-item w-20" />
               </div>
               <div class="flex items-center justify-between text-xs font-medium">
-                <span>R$ 0</span>
-                <span>R$ 1.000+</span>
+                <span>{{ t('pages.products.filters.priceFrom', { amount: 0 }) }}</span>
+                <span>{{ t('pages.products.filters.priceTo', { amount: '1.000' }) }}</span>
               </div>
             </div>
           </div>

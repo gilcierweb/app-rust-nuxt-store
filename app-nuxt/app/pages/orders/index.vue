@@ -8,10 +8,10 @@
       </div>
       <div class="flex items-center gap-3">
         <select class="select select-bordered select-sm rounded-xl bg-base-200/50">
-          <option>All Orders</option>
-          <option>Pending</option>
-          <option>Completed</option>
-          <option>Cancelled</option>
+          <option>{{ t('order.filters.all') }}</option>
+          <option>{{ t('order.filters.pending') }}</option>
+          <option>{{ t('order.filters.completed') }}</option>
+          <option>{{ t('order.filters.cancelled') }}</option>
         </select>
         <button class="btn btn-ghost btn-square rounded-2xl bg-base-200/50">
           <span class="icon-[tabler--refresh] size-5"></span>
@@ -25,8 +25,8 @@
         <div class="flex items-center gap-4">
           <div class="loading loading-spinner loading-md"></div>
           <div>
-            <p class="font-bold">Loading your orders</p>
-            <p class="text-sm opacity-80">Please wait while we fetch your order history...</p>
+            <p class="font-bold">{{ t('pages.orders.loading.title') }}</p>
+            <p class="text-sm opacity-80">{{ t('pages.orders.loading.description') }}</p>
           </div>
         </div>
       </div>

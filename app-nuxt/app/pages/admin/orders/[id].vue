@@ -57,19 +57,19 @@
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="3" class="text-right text-base-content/60">Subtotal</td>
+                      <td colspan="3" class="text-right text-base-content/60">{{ $t('admin.orders.detail.subtotal') }}</td>
                       <td class="text-right">{{ formatNumberBR(order.subtotal) }}</td>
                     </tr>
                     <tr v-if="order.shipping_amount">
-                      <td colspan="3" class="text-right text-base-content/60">Frete</td>
+                      <td colspan="3" class="text-right text-base-content/60">{{ $t('admin.orders.detail.shipping') }}</td>
                       <td class="text-right">{{ formatNumberBR(order.shipping_amount) }}</td>
                     </tr>
                     <tr v-if="order.discount_amount">
-                      <td colspan="3" class="text-right text-base-content/60 text-error">Desconto</td>
+                      <td colspan="3" class="text-right text-base-content/60 text-error">{{ $t('admin.orders.detail.discount') }}</td>
                       <td class="text-right text-error">-{{ formatNumberBR(order.discount_amount) }}</td>
                     </tr>
                     <tr class="text-lg font-bold">
-                      <td colspan="3" class="text-right">Total</td>
+                      <td colspan="3" class="text-right">{{ $t('admin.orders.detail.total') }}</td>
                       <td class="text-right text-primary">{{ formatNumberBR(order.total_amount) }}</td>
                     </tr>
                   </tfoot>
@@ -85,7 +85,7 @@
               <div class="card-body">
                 <h3 class="font-semibold mb-4 flex items-center gap-2">
                   <i class="icon-[tabler--user] size-5"></i>
-                  Cliente
+                  {{ $t('admin.orders.detail.customer') }}
                 </h3>
                 <div v-if="pendingCustomer" class="flex justify-center py-4">
                   <span class="loading loading-spinner loading-sm"></span>
@@ -117,7 +117,7 @@
                   </NuxtLink>
                 </div>
                 <div v-else class="text-sm text-gray-500 italic">
-                  Informações do cliente não disponíveis (User ID: {{ order.user_id }})
+                  {{ $t('admin.orders.detail.noCustomerInfo', { id: order.user_id }) }}
                 </div>
               </div>
             </div>
@@ -127,7 +127,7 @@
               <div class="card-body">
                 <h3 class="font-semibold mb-4 flex items-center gap-2">
                   <i class="icon-[tabler--map-pin] size-5"></i>
-                  Endereço de Entrega
+                  {{ $t('admin.orders.detail.shippingAddress') }}
                 </h3>
                 <div v-if="pendingAddresses" class="flex justify-center py-4">
                   <span class="loading loading-spinner loading-sm"></span>
@@ -141,7 +141,7 @@
                   <div v-if="shippingAddress.phone" class="pt-1 text-gray-500">Tel: {{ shippingAddress.phone }}</div>
                 </div>
                 <div v-else class="text-sm text-gray-500 italic">
-                  Endereço padrão não encontrado.
+                  {{ $t('admin.orders.detail.addressNotFound') }}
                 </div>
               </div>
             </div>
@@ -168,14 +168,14 @@
 
           <div class="card bg-base-100 shadow-sm border">
             <div class="card-body">
-              <h3 class="font-semibold mb-4">Resumo do Pedido</h3>
+              <h3 class="font-semibold mb-4">{{ $t('admin.orders.detail.summary') }}</h3>
               <div class="space-y-3 text-sm">
                 <div class="flex justify-between">
-                  <span class="text-base-content/60">Data</span>
+                  <span class="text-base-content/60">{{ $t('common.table.date') }}</span>
                   <span>{{ formatDate(order.created_at) }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-base-content/60">Moeda</span>
+                  <span class="text-base-content/60">{{ $t('admin.orders.detail.currency') }}</span>
                   <span class="uppercase">{{ order.currency }}</span>
                 </div>
                 <div v-if="order.order_number" class="flex justify-between">
@@ -280,12 +280,12 @@ function paymentBadgeClass(status: unknown): string {
 
 function formatNumberBR(val: any) {
   const n = Number(val) || 0
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n)
+  return new Intl.NumberFormat(useI18n().locale.value, { style: 'currency', currency: 'BRL' }).format(n)
 }
 
 function formatDate(dateString: string) {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(dateString))
+  return new Intl.DateTimeFormat(useI18n().locale.value, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(dateString))
 }
 
 async function updateStatus() {

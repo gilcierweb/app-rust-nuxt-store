@@ -1,5 +1,11 @@
 {
   "order": {
+    "filters": {
+      "all": "Todos os Pedidos",
+      "pending": "Pendentes",
+      "completed": "Concluídos",
+      "cancelled": "Cancelados"
+    },
     "status": {
       "pending": "Pendente",
       "confirmed": "Confirmado",

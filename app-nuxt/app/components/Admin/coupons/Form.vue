@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Cupom' : 'Novo Cupom' }}
+          {{ isEditing ? t('admin.coupons.form.titleEdit') : t('admin.coupons.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando cupom...</span>
+          <span class="ml-3">{{ t('admin.coupons.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -34,7 +34,7 @@
           <!-- Code -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Código do Cupom *</span>
+              <span class="label-text font-semibold">{{ t('admin.coupons.form.code') }} *</span>
             </label>
             <input
               v-model="form.code"
@@ -54,19 +54,19 @@
             <!-- Discount Type -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Tipo de Desconto</span>
+                <span class="label-text font-semibold">{{ t('admin.coupons.form.type') }}</span>
               </label>
               <select v-model.number="form.discount_type" class="select select-bordered w-full" :disabled="pending">
-                <option :value="1">Porcentagem (%)</option>
-                <option :value="2">Valor Fixo (R$)</option>
-                <option :value="3">Frete Grátis</option>
+                <option :value="1">{{ t('admin.coupons.types.percentage') }} (%)</option>
+                <option :value="2">{{ t('admin.coupons.types.fixed') }} (R$)</option>
+                <option :value="3">{{ t('admin.coupons.types.freeShipping') }}</option>
               </select>
             </div>
 
             <!-- Discount Value -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Valor do Desconto</span>
+                <span class="label-text font-semibold">{{ t('admin.coupons.form.value') }}</span>
               </label>
               <input
                 v-model.number="form.discount_value"
@@ -84,7 +84,7 @@
             <!-- Minimum Amount -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Valor Mínimo</span>
+                <span class="label-text font-semibold">{{ t('admin.coupons.form.minAmount') }}</span>
               </label>
               <input
                 v-model.number="form.minimum_amount"
@@ -100,7 +100,7 @@
             <!-- Maximum Discount -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Desconto Máximo</span>
+                <span class="label-text font-semibold">{{ t('admin.coupons.form.maxDiscount') }}</span>
               </label>
               <input
                 v-model.number="form.maximum_discount"
@@ -118,13 +118,13 @@
             <!-- Usage Limit -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Limite de Uso</span>
+                <span class="label-text font-semibold">{{ t('admin.coupons.form.usageLimit') }}</span>
               </label>
               <input
                 v-model.number="form.usage_limit"
                 type="number"
                 min="0"
-                placeholder="0 = ilimitado"
+                :placeholder="t('admin.coupons.form.usageLimitPlaceholder')"
                 class="input input-bordered w-full"
                 :disabled="pending"
               />
@@ -133,7 +133,7 @@
             <!-- Expiration Date -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Data de Expiração</span>
+                <span class="label-text font-semibold">{{ t('admin.coupons.form.expiration') }}</span>
               </label>
               <input
                 v-model="form.expires_at"
@@ -147,7 +147,7 @@
           <!-- Active -->
           <div class="form-control">
             <label class="label cursor-pointer">
-              <span class="label-text font-semibold">Cupom Ativo</span>
+              <span class="label-text font-semibold">{{ t('admin.coupons.form.active') }}</span>
               <input
                 v-model="form.active"
                 type="checkbox"
@@ -165,11 +165,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('common.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Cupom
+              {{ isEditing ? t('admin.coupons.form.submitUpdate') : t('admin.coupons.form.submitSave') }} {{ t('admin.coupons.form.submitCoupon') }}
             </button>
           </div>
         </form>
@@ -179,6 +179,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 import type { Coupon } from '~/types'
 
 interface Props {
@@ -257,7 +258,7 @@ const validate = () => {
   errors.code = ''
 
   if (!form.code.trim()) {
-    errors.code = 'O código do cupom é obrigatório'
+    errors.code = t('admin.coupons.form.validation.codeRequired')
     isValid = false
   }
 
@@ -296,12 +297,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Cupom atualizado com sucesso!'
-      : 'Cupom criado com sucesso!'
+      ? t('admin.coupons.form.success.updated')
+      : t('admin.coupons.form.success.created')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar cupom. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.coupons.form.error')
   } finally {
     pending.value = false
   }

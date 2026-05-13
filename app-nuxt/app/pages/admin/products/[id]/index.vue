@@ -62,15 +62,15 @@
           <div class="space-y-3">
             <h3 class="font-semibold text-lg border-b pb-2">{{ $t('admin.products.detail.prices') }}</h3>
             <div class="flex justify-between">
-              <span class="text-gray-600">Preço de Venda:</span>
+              <span class="text-gray-600">{{ $t('admin.products.detail.salePrice') }}:</span>
               <span class="font-bold text-primary">{{ formatCurrency(product.price) }}</span>
             </div>
             <div v-if="product.costPrice" class="flex justify-between">
-              <span class="text-gray-600">Preço de Custo:</span>
+              <span class="text-gray-600">{{ $t('admin.products.detail.costPrice') }}:</span>
               <span>{{ formatCurrency(product.costPrice) }}</span>
             </div>
             <div v-if="product.comparePrice" class="flex justify-between">
-              <span class="text-gray-600">Preço Comparativo:</span>
+              <span class="text-gray-600">{{ $t('admin.products.detail.comparePrice') }}:</span>
               <span class="line-through text-gray-400">{{ formatCurrency(product.comparePrice) }}</span>
             </div>
           </div>
@@ -79,11 +79,11 @@
           <div class="space-y-3">
             <h3 class="font-semibold text-lg border-b pb-2">{{ $t('admin.products.detail.information') }}</h3>
             <div v-if="product.slug" class="flex justify-between">
-              <span class="text-gray-600">Slug:</span>
+              <span class="text-gray-600">{{ $t('common.table.slug') }}:</span>
               <span class="font-mono text-sm">{{ product.slug }}</span>
             </div>
             <div v-if="product.categoryId" class="flex justify-between">
-              <span class="text-gray-600">Categoria ID:</span>
+              <span class="text-gray-600">{{ $t('admin.products.detail.categoryId') }}:</span>
               <span>{{ product.categoryId }}</span>
             </div>
           </div>
@@ -111,7 +111,7 @@
             >
               <img
                 :src="`${config.public.baseURL}/uploads/products/${image.image}`"
-                :alt="image.alt_text || 'Imagem do produto'"
+                :alt="image.alt_text || $t('admin.products.detail.imageAlt')"
                 class="w-full h-32 object-cover rounded-lg"
               />
               <span v-if="image.cover" class="absolute top-1 left-1 badge badge-primary badge-sm">
@@ -182,8 +182,8 @@ const statusBadgeClass = computed(() => {
 
 // Format currency
 const formatCurrency = (value: number | undefined) => {
-  if (!value) return 'R$ 0,00'
-  return new Intl.NumberFormat('pt-BR', {
+  if (!value) return new Intl.NumberFormat(useI18n().locale.value, { style: 'currency', currency: 'BRL' }).format(0)
+  return new Intl.NumberFormat(useI18n().locale.value, {
     style: 'currency',
     currency: 'BRL'
   }).format(value)

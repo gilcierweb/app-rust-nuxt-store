@@ -18,7 +18,7 @@
       </span>
       
       <div class="flex-grow">
-        <span class="font-medium text-gray-900">{{ category.name || 'Sem nome' }}</span>
+        <span class="font-medium text-gray-900">{{ category.name || t('pages.categories.item.noName') }}</span>
         <span v-if="category.slug" class="ml-2 text-sm text-gray-500">({{ category.slug }})</span>
       </div>
       
@@ -26,7 +26,7 @@
         class="status-badge px-2 py-1 rounded-full text-xs font-medium"
         :class="category.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
       >
-        {{ category.active ? 'Ativa' : 'Inativa' }}
+        {{ category.active ? t('pages.categories.item.active') : t('pages.categories.item.inactive') }}
       </span>
     </div>
     
@@ -37,9 +37,9 @@
       
       <div class="meta-grid grid grid-cols-2 gap-2 text-sm text-gray-600">
         <div><span class="font-medium">ID:</span> {{ category.id }}</div>
-        <div><span class="font-medium">Posição:</span> {{ category.position || '-' }}</div>
-        <div><span class="font-medium">Criado em:</span> {{ formatDate(category.created_at) }}</div>
-        <div><span class="font-medium">Atualizado em:</span> {{ formatDate(category.updated_at) }}</div>
+        <div><span class="font-medium">{{ t('pages.categories.item.position') }}</span> {{ category.position || '-' }}</div>
+        <div><span class="font-medium">{{ t('pages.categories.item.createdAt') }}</span> {{ formatDate(category.created_at) }}</div>
+        <div><span class="font-medium">{{ t('pages.categories.item.updatedAt') }}</span> {{ formatDate(category.updated_at) }}</div>
       </div>
       
       <div v-if="hasChildren" class="mt-4">
@@ -58,8 +58,8 @@
     </div>
 </template>
 
-<script setup >
-
+<script setup>
+const { t, locale } = useI18n()
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -112,7 +112,7 @@ function formatDate(dateString) {
   
   try {
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', {
+    return date.toLocaleDateString(locale.value, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',

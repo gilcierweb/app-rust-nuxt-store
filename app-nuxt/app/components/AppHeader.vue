@@ -3,7 +3,7 @@
         <nav class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm">
             <div class="navbar-start max-md:w-1/4">
                 <NuxtLink to="/" class="link text-base-content link-neutral text-xl font-bold no-underline">
-                    App Rust Nuxt Store
+                    {{ t('common.appName') }}
                 </NuxtLink>
             </div>
             <div class="navbar-center max-md:hidden">

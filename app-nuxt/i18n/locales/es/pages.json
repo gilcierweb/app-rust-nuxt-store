@@ -7,7 +7,9 @@
       "products": "Productos",
       "autoImport": "Este es un componente importado automáticamente",
       "productsSubtitle": "Nuestra selección especial para ti",
+      "categoriesSubtitle": "Explora nossas coleções selecionadas",
       "shopAll": "Ver Todo",
+      "productsCount": "{count}+ Productos",
       "newsletter": {
         "title": "Mantente Adelante",
         "description": "Suscríbete a nuestro boletín y obtén acceso exclusivo a noticias, ofertas especiales y descuentos anticipados.",
@@ -43,7 +45,9 @@
         "p2": "Lo que comenzó como un pequeño proyecto creció hasta convertirse en una plataforma de escala completa que atiende a clientes en todo el mundo. Creemos en la calidad, la transparencia y la innovación.",
         "stats": {
           "customers": "Clientes Felices",
-          "products": "Productos Premium"
+          "customersVal": "10k+",
+          "products": "Productos Premium",
+          "productsVal": "500+"
         }
       },
       "mission": {
@@ -135,7 +139,87 @@
       "loading": "Cargando categorías...",
       "error": "Error al cargar categorías: {message}",
       "notFound": "No se encontraron categorías.",
-      "createFirst": "Crear primera categoría"
+      "createFirst": "Crear primera categoría",
+      "hero": {
+        "title": "Explora por {span}",
+        "span": "Categorías"
+      },
+      "stats": {
+        "activeCategories": "Categorías Activas",
+        "totalProducts": "Productos Totales",
+        "categories": "Categorías",
+        "products": "Productos",
+        "subcategories": "Subcategorías"
+      },
+      "badges": {
+        "featured": "Destacado"
+      },
+      "actions": {
+        "exploreNow": "Explorar Ahora",
+        "viewAllProducts": "Ver Todos los Productos"
+      },
+      "empty": {
+        "title": "No se encontraron categorías",
+        "description": "Intenta ajustar tu búsqueda o explora todos los productos."
+      },
+      "detail": {
+        "loading": "Cargando categoría...",
+        "notFound": "Categoría No Encontrada",
+        "browseAll": "Ver Todas las Categorías",
+        "fallbackDescription": "Descubre productos increíbles en esta categoría",
+        "productsLabel": "Productos",
+        "averageRating": "Calificación Media",
+        "fastDelivery": "Entrega Rápida",
+        "specialOffer": "Oferta Especial",
+        "specialOfferDesc": "Hasta 70% de descuento en productos seleccionados",
+        "productsFound": "{count} productos encontrados",
+        "allBrands": "Todas las Marcas",
+        "price": "Precio",
+        "lowToHigh": "Menor Precio",
+        "highToLow": "Mayor Precio",
+        "rating": "Calificación",
+        "stars": "{n} Estrellas",
+        "starsPlus": "{n}+ Estrelas",
+        "filtersLabel": "Filtros:",
+        "grid": "Cuadrícula",
+        "list": "Lista",
+        "reviews": "reseñas",
+        "loadMore": "Cargar Más Productos",
+        "fallbackTitle": "Categoría",
+        "detail": {
+          "loading": "Cargando detalles de la categoría...",
+          "notFound": "Categoría no encontrada",
+          "browseAll": "Ver todas las categorías",
+          "fallbackDescription": "Explore nuestra colección de productos en esta categoría.",
+          "productsLabel": "Productos",
+          "averageRating": "Calificación Promedio",
+          "fastDelivery": "Entrega Rápida",
+          "specialOffer": "Oferta Especial",
+          "specialOfferDesc": "¡Disfruta de descuentos exclusivos en esta categoría por tiempo limitado!",
+          "productsFound": "{count} productos encontrados",
+          "allBrands": "Todas las Marcas",
+          "price": "Precio",
+          "lowToHigh": "Precio: Menor a Mayor",
+          "highToLow": "Precio: Mayor a Menor",
+          "rating": "Calificación",
+          "stars": "{n} Estrellas",
+          "starsPlus": "{n}+ Estrelas",
+          "filtersLabel": "Filtros:",
+          "grid": "Cuadrícula",
+          "list": "Lista",
+          "reviews": "reseñas",
+          "loadMore": "Cargar Más Productos",
+          "fallbackTitle": "Categoría"
+        }
+      },
+      "item": {
+        "noName": "Sin nombre",
+        "active": "Activa",
+        "inactive": "Inactiva",
+        "position": "Posición:",
+        "createdAt": "Creado el:",
+        "updatedAt": "Actualizado el:"
+      }
     },
     "cart": {
       "title": "Carrito",
@@ -160,6 +244,10 @@
       "title": "Mis Pedidos",
       "description": "Sigue tus pedidos recientes e historial de compras.",
       "empty": "Aún no has realizado ningún pedido.",
+      "loading": {
+        "title": "Cargando tus pedidos",
+        "description": "Por favor, espera mientras buscamos tu historial de pedidos..."
+      },
       "number": "Pedido #",
       "date": "Fecha",
       "status": "Estado",
@@ -215,7 +303,11 @@
         "priceRange": "Rango de Precios",
         "rating": "Calificación",
         "apply": "Aplicar Filtros",
-        "andUp": "y superior"
+        "andUp": "y superior",
+        "min": "Mín",
+        "max": "Máx",
+        "priceFrom": "Desde: {amount}",
+        "priceTo": "Hasta: {amount}"
       },
       "promo": {
         "title": "¡Oferta de Verano!",
@@ -255,14 +347,21 @@
       "continueShopping": "Continuar Comprando",
       "viewProduct": "Ver Producto",
       "savedItems": "{count} Artículos Guardados",
-      "loading": "Cargando tu lista de deseos...",
       "savedAt": "Guardado el {date}",
-      "product": "Producto"
+      "product": "Producto",
+      "loading": {
+        "title": "Cargando tu lista de deseos",
+        "description": "Por favor, espera mientras buscamos tus artículos guardados..."
+      }
     },
     "profiles": {
       "title": "Comunidad",
       "description": "Conoce a los miembros de nuestra plataforma",
-      "loading": "Cargando perfiles...",
+      "loading": {
+        "title": "Cargando perfiles",
+        "description": "Por favor, espere mientras buscamos a los miembros de nuestra plataforma..."
+      },
+      "notFound": "No se encontraron perfiles",
       "readMore": "Ver Perfil",
       "search": "Buscar perfiles...",
       "explorer": "Explorador",

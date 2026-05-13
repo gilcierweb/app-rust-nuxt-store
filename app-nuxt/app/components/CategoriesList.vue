@@ -3,10 +3,10 @@
     <div class="flex items-center justify-between mb-8">
       <div>
         <h2 class="h3 gradient-text">{{ t('pages.home.categories') }}</h2>
-        <p class="text-base-content/60 mt-1">Explore our curated collections</p>
+        <p class="text-base-content/60 mt-1">{{ t('pages.home.categoriesSubtitle') }}</p>
       </div>
       <NuxtLink to="/categories" class="btn btn-ghost btn-sm gap-2">
-        View All <span class="icon-[tabler--arrow-right] size-4"></span>
+        {{ t('pages.home.shopAll') }} <span class="icon-[tabler--arrow-right] size-4"></span>
       </NuxtLink>
     </div>
 
@@ -21,7 +21,7 @@
         
         <div class="text-center">
           <h3 class="font-bold text-sm md:text-base group-hover:text-primary transition-colors">{{ cat.name }}</h3>
-          <span class="text-[10px] uppercase tracking-wider font-semibold text-base-content/40">12+ Products</span>
+          <span class="text-[10px] uppercase tracking-wider font-semibold text-base-content/40">{{ t('pages.home.productsCount', { count: 12 }) }}</span>
         </div>
       </NuxtLink>
     </div>

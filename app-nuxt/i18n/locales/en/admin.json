@@ -184,6 +184,13 @@
         "newOrders": "New Orders",
         "newCustomers": "New Customers",
         "conversionRate": "Conversion Rate"
+      },
+      "categories": {
+        "electronics": "Electronics",
+        "clothing": "Clothing",
+        "home": "Home",
+        "beauty": "Beauty",
+        "others": "Others"
       }
     },
     "products": {
@@ -216,7 +223,13 @@
         "featured": "Featured",
         "unknown": "Unknown",
         "prices": "Prices",
+        "salePrice": "Sale Price",
+        "costPrice": "Cost Price",
+        "comparePrice": "Compare Price",
         "information": "Information",
+        "sku": "SKU",
+        "categoryId": "Category ID",
+        "imageAlt": "Product Image",
         "shortDescription": "Short Description",
         "fullDescription": "Full Description",
         "images": "Images Gallery",
@@ -308,6 +321,31 @@
         "back": "Back to list",
         "confirmDelete": "Are you sure you want to delete coupon \"{name}\"?",
         "errorDelete": "Error deleting coupon"
+      },
+      "form": {
+        "titleEdit": "Edit Coupon",
+        "titleNew": "New Coupon",
+        "saving": "Saving coupon...",
+        "code": "Coupon Code",
+        "type": "Discount Type",
+        "value": "Discount Value",
+        "minAmount": "Minimum Amount",
+        "maxDiscount": "Maximum Discount",
+        "usageLimit": "Usage Limit",
+        "usageLimitPlaceholder": "0 = unlimited",
+        "expiration": "Expiration Date",
+        "active": "Coupon Active",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitCoupon": "Coupon",
+        "validation": {
+          "codeRequired": "Coupon code is required"
+        },
+        "success": {
+          "created": "Coupon created successfully!",
+          "updated": "Coupon updated successfully!"
+        },
+        "error": "Error saving coupon. Please try again."
       }
     },
     "orders": {
@@ -330,7 +368,11 @@
         "shipping": "Shipping",
         "discount": "Discount",
         "total": "Total",
-        "back": "Back to list"
+        "back": "Back to list",
+        "summary": "Order Summary",
+        "currency": "Currency",
+        "addressNotFound": "Default shipping address not found.",
+        "noCustomerInfo": "Customer information not available (User ID: {id})"
       }
     },
     "posts": {
@@ -479,6 +521,8 @@
       "title": "Shipping Methods",
       "searchPlaceholder": "Search shipping methods",
       "add": "Add",
+      "searchLabel": "Search Method",
+      "clearSearch": "Clear",
       "loading": "Loading shipping methods...",
       "error": "Error loading shipping methods: {message}",
       "notFound": "No shipping methods found.",
@@ -497,8 +541,37 @@
         "active": "Active",
         "inactive": "Inactive"
       },
+      "form": {
+        "titleEdit": "Edit Shipping Method",
+        "titleNew": "New Shipping Method",
+        "saving": "Saving shipping method...",
+        "name": "Name",
+        "namePlaceholder": "Ex: Sedex, PAC, Carrier",
+        "code": "Code",
+        "codePlaceholder": "Ex: sedex, pac, carrier",
+        "basePrice": "Base Price",
+        "freeThreshold": "Free Shipping Above",
+        "freeThresholdPlaceholder": "0.00 = never",
+        "freeThresholdHint": "Leave 0 to not offer free shipping",
+        "active": "Active Method",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitMethod": "Method",
+        "validation": {
+          "nameRequired": "Name is required",
+          "codeRequired": "Code is required",
+          "priceNegative": "Base price cannot be negative"
+        },
+        "success": {
+          "created": "Shipping method created successfully!",
+          "updated": "Shipping method updated successfully!"
+        },
+        "error": "Error saving shipping method. Please try again."
+      },
       "detail": {
         "title": "Shipping Method Details",
+        "loading": "Loading method details...",
+        "settings": "Settings",
         "back": "Back to list",
         "confirmDelete": "Are you sure you want to delete shipping method \"{name}\"?",
         "errorDelete": "Error deleting shipping method"

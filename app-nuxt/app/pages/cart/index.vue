@@ -59,24 +59,27 @@
                     </div>
                   </td>
                   <td class="py-4">
-                    <div class="inline-flex items-center p-1 border border-base-200 rounded-lg">
-                      <button class="btn btn-soft btn-secondary btn-square btn-sm" 
+                    <div class="join border border-primary/20 rounded-xl overflow-hidden shadow-md bg-base-100">
+                      <button class="btn btn-sm btn-primary join-item px-3 disabled:bg-primary/50 disabled:text-primary-content/50" 
                         @click="cartStore.updateQuantity(item.productId, item.quantity - 1)"
                         :disabled="item.quantity <= 1">
                         <span class="icon-[tabler--minus] size-4" />
                       </button>
-                      <span class="w-10 text-center font-bold">{{ item.quantity }}</span>
-                      <button class="btn btn-soft btn-secondary btn-square btn-sm" @click="cartStore.updateQuantity(item.productId, item.quantity + 1)">
+                      <div class="join-item flex items-center justify-center px-4 font-black text-sm border-x border-primary/20 min-w-[3rem]">
+                        {{ item.quantity }}
+                      </div>
+                      <button class="btn btn-sm btn-primary join-item px-3" 
+                        @click="cartStore.updateQuantity(item.productId, item.quantity + 1)">
                         <span class="icon-[tabler--plus] size-4" />
                       </button>
                     </div>
                   </td>
-                  <td class="py-4 text-right font-bold">
+                  <td class="py-4 text-right font-bold text-lg text-primary">
                     {{ formatNumberBR(item.price * item.quantity) }}
                   </td>
                   <td class="py-4 pr-6 text-right">
-                    <button @click="cartStore.removeItem(item.productId)" class="btn btn-circle btn-soft btn-error btn-sm" aria-label="Remove item">
-                      <span class="icon-[tabler--trash] size-4" />
+                    <button @click="cartStore.removeItem(item.productId)" class="btn btn-circle btn-error btn-sm shadow-sm hover:scale-110 transition-transform" :aria-label="t('cart.remove')">
+                      <span class="icon-[tabler--trash] size-5" />
                     </button>
                   </td>
                 </tr>
@@ -85,14 +88,14 @@
           </div>
         </div>
         
-        <div class="flex flex-wrap items-center justify-between gap-4 px-4">
+        <div class="flex flex-wrap items-center justify-between gap-4 px-4 pt-4">
           <div class="flex flex-wrap gap-4">
-            <NuxtLink to="/products" class="btn btn-soft btn-primary gap-2 rounded-xl">
-              <span class="icon-[tabler--arrow-left] size-4" />
+            <NuxtLink to="/products" class="btn btn-primary gap-2 rounded-xl px-8 shadow-md">
+              <span class="icon-[tabler--arrow-left] size-5" />
               {{ t('cart.continueShopping') }}
             </NuxtLink>
-            <button class="btn btn-soft btn-error gap-2 rounded-xl" @click="cartStore.clearCart()">
-              <span class="icon-[tabler--trash-x] size-4" />
+            <button class="btn btn-outline btn-error gap-2 rounded-xl px-8 hover:bg-error hover:text-error-content shadow-sm" @click="cartStore.clearCart()">
+              <span class="icon-[tabler--trash-x] size-5" />
               {{ t('cart.clearCart') }}
             </button>
           </div>
@@ -133,9 +136,9 @@
           </div>
           
           <div class="card-actions mt-4 w-full">
-            <NuxtLink to="/checkout" class="btn btn-primary w-full">
+            <NuxtLink to="/checkout" class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300">
               {{ t('cart.checkout') }}
-              <span class="icon-[tabler--arrow-right] size-5 ml-2" />
+              <span class="icon-[tabler--arrow-right] size-6 ml-2" />
             </NuxtLink>
             
             <div class="flex items-center justify-center gap-4 text-base-content/30 mt-6">

@@ -7,7 +7,9 @@
       "products": "Products",
       "autoImport": "This is an automatically imported component",
       "productsSubtitle": "Our special selection for you",
+      "categoriesSubtitle": "Explore our curated collections",
       "shopAll": "Shop All",
+      "productsCount": "{count}+ Products",
       "newsletter": {
         "title": "Stay Ahead",
         "description": "Subscribe to our newsletter and get exclusive access to news, special offers and early discounts.",
@@ -43,7 +45,9 @@
         "p2": "What started as a small project has grown into a full-scale platform serving customers worldwide. We believe in quality, transparency, and innovation.",
         "stats": {
           "customers": "Happy Customers",
-          "products": "Premium Products"
+          "customersVal": "10k+",
+          "products": "Premium Products",
+          "productsVal": "500+"
         }
       },
       "mission": {
@@ -135,7 +139,87 @@
       "loading": "Loading categories...",
       "error": "Error loading categories: {message}",
       "notFound": "No categories found.",
-      "createFirst": "Create first category"
+      "createFirst": "Create first category",
+      "hero": {
+        "title": "Explore by {span}",
+        "span": "Categories"
+      },
+      "stats": {
+        "activeCategories": "Active Categories",
+        "totalProducts": "Total Products",
+        "categories": "Categories",
+        "products": "Products",
+        "subcategories": "Subcategories"
+      },
+      "badges": {
+        "featured": "Featured"
+      },
+      "actions": {
+        "exploreNow": "Explore Now",
+        "viewAllProducts": "View All Products"
+      },
+      "empty": {
+        "title": "No categories found",
+        "description": "Try adjusting your search or explore all products."
+      },
+      "detail": {
+        "loading": "Loading category...",
+        "notFound": "Category Not Found",
+        "browseAll": "Browse All Categories",
+        "fallbackDescription": "Discover amazing products in this category",
+        "productsLabel": "Products",
+        "averageRating": "Average Rating",
+        "fastDelivery": "Fast Delivery",
+        "specialOffer": "Special Offer",
+        "specialOfferDesc": "Up to 70% OFF on selected products",
+        "productsFound": "{count} products found",
+        "allBrands": "All Brands",
+        "price": "Price",
+        "lowToHigh": "Low to High",
+        "highToLow": "High to Low",
+        "rating": "Rating",
+        "stars": "{n} Stars",
+        "starsPlus": "{n}+ Stars",
+        "filtersLabel": "Filters:",
+        "grid": "Grid",
+        "list": "List",
+        "reviews": "reviews",
+        "loadMore": "Load More Products",
+        "fallbackTitle": "Category",
+        "detail": {
+          "loading": "Loading category details...",
+          "notFound": "Category not found",
+          "browseAll": "Browse all categories",
+          "fallbackDescription": "Explore our collection of products in this category.",
+          "productsLabel": "Products",
+          "averageRating": "Average Rating",
+          "fastDelivery": "Fast Delivery",
+          "specialOffer": "Special Offer",
+          "specialOfferDesc": "Enjoy exclusive discounts in this category for a limited time!",
+          "productsFound": "{count} products found",
+          "allBrands": "All Brands",
+          "price": "Price",
+          "lowToHigh": "Price: Low to High",
+          "highToLow": "Price: High to Low",
+          "rating": "Rating",
+          "stars": "{n} Stars",
+          "starsPlus": "{n}+ Stars",
+          "filtersLabel": "Filters:",
+          "grid": "Grid",
+          "list": "List",
+          "reviews": "reviews",
+          "loadMore": "Load More Products",
+          "fallbackTitle": "Category"
+        }
+      },
+      "item": {
+        "noName": "No name",
+        "active": "Active",
+        "inactive": "Inactive",
+        "position": "Position:",
+        "createdAt": "Created at:",
+        "updatedAt": "Updated at:"
+      }
     },
     "cart": {
       "title": "Cart",
@@ -160,6 +244,10 @@
       "title": "My Orders",
       "description": "Track your recent orders and purchase history.",
       "empty": "You haven't placed any orders yet.",
+      "loading": {
+        "title": "Loading your orders",
+        "description": "Please wait while we fetch your order history..."
+      },
       "number": "Order #",
       "date": "Date",
       "status": "Status",
@@ -215,7 +303,11 @@
         "priceRange": "Price Range",
         "rating": "Rating",
         "apply": "Apply Filters",
-        "andUp": "and up"
+        "andUp": "and up",
+        "min": "Min",
+        "max": "Max",
+        "priceFrom": "From: {amount}",
+        "priceTo": "To: {amount}"
       },
       "promo": {
         "title": "Summer Offer!",
@@ -255,14 +347,21 @@
       "continueShopping": "Continue Shopping",
       "viewProduct": "View Product",
       "savedItems": "{count} Saved Items",
-      "loading": "Loading your wishlist...",
       "savedAt": "Saved at {date}",
-      "product": "Product"
+      "product": "Product",
+      "loading": {
+        "title": "Loading your wishlist",
+        "description": "Please wait while we fetch your saved items..."
+      }
     },
     "profiles": {
       "title": "Community",
       "description": "Meet the members of our platform",
-      "loading": "Loading profiles...",
+      "loading": {
+        "title": "Loading profiles",
+        "description": "Please wait while we fetch the members of our platform..."
+      },
+      "notFound": "No profiles found",
       "readMore": "View Profile",
       "search": "Search profiles...",
       "explorer": "Explorer",

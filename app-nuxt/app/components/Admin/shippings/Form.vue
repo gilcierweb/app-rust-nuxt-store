@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Método de Envio' : 'Novo Método de Envio' }}
+          {{ isEditing ? t('admin.shippings.form.titleEdit') : t('admin.shippings.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando método de envio...</span>
+          <span class="ml-3">{{ t('admin.shippings.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -34,12 +34,12 @@
           <!-- Name -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Nome *</span>
+              <span class="label-text font-semibold">{{ t('admin.shippings.form.name') }} *</span>
             </label>
             <input
               v-model="form.name"
               type="text"
-              placeholder="Ex: Sedex, PAC, Transportadora"
+              :placeholder="t('admin.shippings.form.namePlaceholder')"
               class="input input-bordered w-full"
               :class="{ 'input-error': errors.name }"
               required
@@ -53,12 +53,12 @@
           <!-- Code -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Código *</span>
+              <span class="label-text font-semibold">{{ t('admin.shippings.form.code') }} *</span>
             </label>
             <input
               v-model="form.code"
               type="text"
-              placeholder="Ex: sedex, pac, transportadora"
+              :placeholder="t('admin.shippings.form.codePlaceholder')"
               class="input input-bordered w-full"
               :class="{ 'input-error': errors.code }"
               required
@@ -73,7 +73,7 @@
             <!-- Base Price -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Preço Base *</span>
+                <span class="label-text font-semibold">{{ t('admin.shippings.form.basePrice') }} *</span>
               </label>
               <input
                 v-model.number="form.base_price"
@@ -94,19 +94,19 @@
             <!-- Free Shipping Threshold -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Frete Grátis Acima de</span>
+                <span class="label-text font-semibold">{{ t('admin.shippings.form.freeThreshold') }}</span>
               </label>
               <input
                 v-model.number="form.free_shipping_threshold"
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="0.00 = nunca"
+                :placeholder="t('admin.shippings.form.freeThresholdPlaceholder')"
                 class="input input-bordered w-full"
                 :disabled="pending"
               />
               <label class="label">
-                <span class="label-text-alt text-gray-500">Deixe 0 para não oferecer frete grátis</span>
+                <span class="label-text-alt text-gray-500">{{ t('admin.shippings.form.freeThresholdHint') }}</span>
               </label>
             </div>
           </div>
@@ -114,7 +114,7 @@
           <!-- Active -->
           <div class="form-control">
             <label class="label cursor-pointer">
-              <span class="label-text font-semibold">Método Ativo</span>
+              <span class="label-text font-semibold">{{ t('admin.shippings.form.active') }}</span>
               <input
                 v-model="form.active"
                 type="checkbox"
@@ -132,11 +132,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('common.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Método
+              {{ isEditing ? t('admin.shippings.form.submitUpdate') : t('admin.shippings.form.submitSave') }} {{ t('admin.shippings.form.submitMethod') }}
             </button>
           </div>
         </form>
@@ -146,6 +146,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 import type { ShippingMethod } from '~/types'
 
 interface Props {
@@ -213,17 +214,17 @@ const validate = () => {
   errors.base_price = ''
 
   if (!form.name.trim()) {
-    errors.name = 'O nome é obrigatório'
+    errors.name = t('admin.shippings.form.validation.nameRequired')
     isValid = false
   }
 
   if (!form.code.trim()) {
-    errors.code = 'O código é obrigatório'
+    errors.code = t('admin.shippings.form.validation.codeRequired')
     isValid = false
   }
 
   if (form.base_price < 0) {
-    errors.base_price = 'O preço base não pode ser negativo'
+    errors.base_price = t('admin.shippings.form.validation.priceNegative')
     isValid = false
   }
 
@@ -259,12 +260,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Método de envio atualizado com sucesso!'
-      : 'Método de envio criado com sucesso!'
+      ? t('admin.shippings.form.success.updated')
+      : t('admin.shippings.form.success.created')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar método de envio. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.shippings.form.error')
   } finally {
     pending.value = false
   }

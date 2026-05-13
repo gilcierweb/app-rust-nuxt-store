@@ -11,7 +11,7 @@
       <div class="bg-base-100 shadow-base-300/20 z-1 w-full space-y-6 rounded-xl p-6 shadow-md sm:min-w-md lg:p-8">
         <div class="flex items-center gap-3">
           <img src="https://cdn.flyonui.com/fy-assets/logo/logo.png" class="size-8" alt="brand-logo" />
-          <h2 class="text-base-content text-xl font-bold">App Rust Nuxt Store</h2>
+          <h2 class="text-base-content text-xl font-bold">{{ t('common.appName') }}</h2>
         </div>
         <div>
           <h3 class="text-base-content mb-1.5 text-2xl font-semibold">{{ t('auth.login.title') }}</h3>

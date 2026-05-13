@@ -20,8 +20,8 @@
         <div class="flex items-center gap-4">
           <div class="loading loading-spinner loading-md"></div>
           <div>
-            <p class="font-bold">Loading your wishlist</p>
-            <p class="text-sm opacity-80">Please wait while we fetch your saved items...</p>
+            <p class="font-bold">{{ t('pages.wishlist.loading.title') }}</p>
+            <p class="text-sm opacity-80">{{ t('pages.wishlist.loading.description') }}</p>
           </div>
         </div>
       </div>
