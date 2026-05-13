@@ -1,16 +1,14 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use loco_rs::prelude::*;
 use axum::debug_handler;
-use serde::{Deserialize, Serialize};
-use sea_orm::{entity::*, query::*, sea_query::Expr};
+use loco_rs::prelude::*;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
+use sea_orm::{entity::*, query::*, sea_query::Expr};
+use serde::{Deserialize, Serialize};
 
-use crate::models::_entities::{
-    orders, users, order_items, products, categories
-};
+use crate::models::_entities::{categories, order_items, orders, products, users};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -76,10 +74,10 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .into_tuple()
         .one(&ctx.db)
         .await?;
-    
+
     let total_orders = orders::Entity::find().count(&ctx.db).await?;
     let total_customers = users::Entity::find().count(&ctx.db).await?;
-    
+
     let revenue_f64 = total_revenue.unwrap_or_default().to_f64().unwrap_or(0.0);
 
     let conversion_rate = if total_customers > 0 {
@@ -96,7 +94,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             trend_up: true,
             icon: "icon-[tabler--cash]".to_string(),
             color_class: "bg-success".to_string(),
-            text_class: "text-success".to_string(),
+            text_class: "text-white".to_string(),
         },
         KpiStat {
             title: "admin.dashboard.kpis.newOrders".to_string(),
@@ -105,7 +103,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             trend_up: true,
             icon: "icon-[tabler--package]".to_string(),
             color_class: "bg-primary".to_string(),
-            text_class: "text-primary".to_string(),
+            text_class: "text-white".to_string(),
         },
         KpiStat {
             title: "admin.dashboard.kpis.newCustomers".to_string(),
@@ -114,7 +112,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             trend_up: false,
             icon: "icon-[tabler--users]".to_string(),
             color_class: "bg-info".to_string(),
-            text_class: "text-info".to_string(),
+            text_class: "text-white".to_string(),
         },
         KpiStat {
             title: "admin.dashboard.kpis.conversionRate".to_string(),
@@ -123,7 +121,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             trend_up: true,
             icon: "icon-[tabler--chart-pie]".to_string(),
             color_class: "bg-warning".to_string(),
-            text_class: "text-warning".to_string(),
+            text_class: "text-white".to_string(),
         },
     ];
 
@@ -141,13 +139,14 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .all(&ctx.db)
         .await?;
 
-    let sales_data = sales_results.into_iter().map(|(date, sales, orders)| {
-        SalesDataPoint {
+    let sales_data = sales_results
+        .into_iter()
+        .map(|(date, sales, orders)| SalesDataPoint {
             date: date.format("%d/%m").to_string(),
             sales: sales.unwrap_or_default().to_f64().unwrap_or(0.0),
             orders,
-        }
-    }).collect();
+        })
+        .collect();
 
     // 3. Category Data (Top 5 + Others)
     let all_category_results = categories::Entity::find()
@@ -164,7 +163,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
 
     let mut category_data = Vec::new();
     let mut others_count = 0;
-    
+
     for (i, (name, count)) in all_category_results.into_iter().enumerate() {
         let count = count.unwrap_or(0);
         if i < 5 {
@@ -173,16 +172,19 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             others_count += count;
         }
     }
-    
+
     if others_count > 0 {
-        category_data.push(CategoryDataPoint { 
-            name: "admin.dashboard.categories.others".to_string(), 
-            value: others_count 
+        category_data.push(CategoryDataPoint {
+            name: "admin.dashboard.categories.others".to_string(),
+            value: others_count,
         });
     }
 
     if category_data.is_empty() {
-        category_data.push(CategoryDataPoint { name: "admin.statusLabels.unknown".to_string(), value: 0 });
+        category_data.push(CategoryDataPoint {
+            name: "admin.statusLabels.unknown".to_string(),
+            value: 0,
+        });
     }
 
     // 4. Top Products
@@ -198,12 +200,13 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .all(&ctx.db)
         .await?;
 
-    let top_products = top_products_results.into_iter().map(|(name, sales)| {
-        TopProduct { 
-            name: name.unwrap_or_else(|| "admin.statusLabels.unknown".to_string()), 
-            sales: sales.unwrap_or_default().to_i64().unwrap_or(0) 
-        }
-    }).collect();
+    let top_products = top_products_results
+        .into_iter()
+        .map(|(name, sales)| TopProduct {
+            name: name.unwrap_or_else(|| "admin.statusLabels.unknown".to_string()),
+            sales: sales.unwrap_or_default().to_i64().unwrap_or(0),
+        })
+        .collect();
 
     // 5. Recent Orders
     let recent_orders_results = orders::Entity::find()
@@ -213,17 +216,26 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .all(&ctx.db)
         .await?;
 
-    let recent_orders = recent_orders_results.into_iter().map(|(order, user)| {
-        let customer_name = user.map(|u| u.name).unwrap_or_else(|| "admin.statusLabels.unknown".to_string());
-        RecentOrder {
-            id: order.id,
-            customer: customer_name,
-            total: order.total_amount.unwrap_or_default().to_f64().unwrap_or(0.0),
-            status: "paid".to_string(),
-            status_label: "admin.statusLabels.paid".to_string(),
-            status_class: "badge-success".to_string(),
-        }
-    }).collect();
+    let recent_orders = recent_orders_results
+        .into_iter()
+        .map(|(order, user)| {
+            let customer_name = user
+                .map(|u| u.name)
+                .unwrap_or_else(|| "admin.statusLabels.unknown".to_string());
+            RecentOrder {
+                id: order.id,
+                customer: customer_name,
+                total: order
+                    .total_amount
+                    .unwrap_or_default()
+                    .to_f64()
+                    .unwrap_or(0.0),
+                status: "paid".to_string(),
+                status_label: "admin.statusLabels.paid".to_string(),
+                status_class: "badge-success".to_string(),
+            }
+        })
+        .collect();
 
     format::json(DashboardResponse {
         kpi_stats,
