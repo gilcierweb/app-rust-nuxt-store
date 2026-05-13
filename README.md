@@ -42,6 +42,9 @@ A production-ready e-commerce application featuring a high-performance REST API 
 
 https://app-nuxt-store.pages.dev/
 
+## Admin App
+https://app-nuxt-store.pages.dev/admin/
+
 ## 📂 Project Structure
 
 ```
