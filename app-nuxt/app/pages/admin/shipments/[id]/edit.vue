@@ -8,7 +8,7 @@
     <div v-else-if="error" class="max-w-2xl mx-auto">
       <div class="alert alert-error">
         <span>{{ t('common.errorLoad', { resource: t('shipping.shipment') }) }}</span>
-        <NuxtLink to="/admin/shipments" class="btn btn-sm">{{ t('common.back') }}</NuxtLink>
+        <NuxtLinkLocale to="/admin/shipments" class="btn btn-sm">{{ t('common.back') }}</NuxtLinkLocale>
       </div>
     </div>
 

@@ -130,7 +130,7 @@
         <div class="card-body p-0">
           <div class="p-4 flex justify-between items-center border-b bg-base-200/30">
             <h3 class="font-bold text-lg">{{ t('admin.dashboard.charts.recentOrders') }}</h3>
-            <NuxtLink to="/admin/orders" class="btn btn-link btn-sm text-primary no-underline">{{ t('admin.dashboard.charts.viewAll') }}</NuxtLink>
+            <NuxtLinkLocale to="/admin/orders" class="btn btn-link btn-sm text-primary no-underline">{{ t('admin.dashboard.charts.viewAll') }}</NuxtLinkLocale>
           </div>
           <div class="overflow-x-auto">
             <table class="table table-sm">

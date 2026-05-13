@@ -39,7 +39,7 @@
           <span
             class="icon-[tabler--chevron-left] text-primary size-5 shrink-0 transition-transform group-hover:-translate-x-1 rtl:rotate-180"
           ></span>
-          <NuxtLink to="/users/sessions" class="link link-animated link-primary font-normal">{{ t('auth.forgotPassword.backToLogin') }}</NuxtLink>
+          <NuxtLinkLocale to="/users/sessions" class="link link-animated link-primary font-normal">{{ t('auth.forgotPassword.backToLogin') }}</NuxtLinkLocale>
         </div>
       </div>
     </div>

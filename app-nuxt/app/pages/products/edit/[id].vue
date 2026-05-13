@@ -2,9 +2,9 @@
   <div>
     <div class="container mx-auto px-4 py-8">
       <div class="mb-6">
-        <NuxtLink to="/products" class="btn btn-outline btn-sm">
+        <NuxtLinkLocale to="/products" class="btn btn-outline btn-sm">
           ← {{ t('pages.products.back') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
       
       <!-- Loading state while fetching product -->

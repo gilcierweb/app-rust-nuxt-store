@@ -17,7 +17,7 @@
         </div>
       </form>
 
-      <NuxtLink to="/admin/coupons/new" class="btn btn-success">{{ $t('admin.coupons.add') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/coupons/new" class="btn btn-success">{{ $t('admin.coupons.add') }}</NuxtLinkLocale>
     </div>
 
     <!-- Loading State -->
@@ -37,7 +37,7 @@
     <!-- Empty State -->
     <div v-else-if="filteredCoupons.length === 0" class="text-center py-12">
       <p class="text-gray-500 text-lg">{{ $t('admin.coupons.notFound') }}</p>
-      <NuxtLink to="/admin/coupons/new" class="btn btn-primary mt-4">{{ $t('admin.coupons.createFirst') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/coupons/new" class="btn btn-primary mt-4">{{ $t('admin.coupons.createFirst') }}</NuxtLinkLocale>
     </div>
 
     <!-- Coupons Table -->
@@ -83,20 +83,20 @@
                 </span>
               </td>
               <td>
-                <NuxtLink
+                <NuxtLinkLocale
                   :to="`/admin/coupons/${coupon.id}`"
                   class="btn btn-circle btn-text btn-sm"
                   :aria-label="$t('common.view')"
                 >
                   <i class="icon-[tabler--eye] size-5"></i>
-                </NuxtLink>
-                <NuxtLink
+                </NuxtLinkLocale>
+                <NuxtLinkLocale
                   :to="`/admin/coupons/${coupon.id}/edit`"
                   class="btn btn-circle btn-text btn-sm"
                   :aria-label="$t('common.edit')"
                 >
                   <i class="icon-[tabler--pencil] size-5"></i>
-                </NuxtLink>
+                </NuxtLinkLocale>
                 <button
                   type="button"
                   class="btn btn-circle btn-text btn-sm"

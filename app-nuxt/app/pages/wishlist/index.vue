@@ -42,9 +42,9 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
+      <NuxtLinkLocale to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
         {{ t('pages.wishlist.continueShopping') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Wishlist Grid -->
@@ -74,9 +74,9 @@
           <h3 class="h4 mb-6 group-hover:text-primary transition-colors">{{ t('pages.wishlist.product') }} #{{ item.product_id }}</h3>
           
           <div class="flex gap-3">
-            <NuxtLink :to="`/products/${item.product_id}`" class="btn btn-primary grow rounded-xl shadow-lg shadow-primary/10">
+            <NuxtLinkLocale :to="`/products/${item.product_id}`" class="btn btn-primary grow rounded-xl shadow-lg shadow-primary/10">
               {{ t('pages.wishlist.viewProduct') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
             <button class="btn btn-square btn-outline btn-primary rounded-xl" aria-label="Add to cart">
               <span class="icon-[tabler--shopping-cart-plus] size-5"></span>
             </button>

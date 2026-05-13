@@ -3,9 +3,9 @@
     <!-- Header with Back Button -->
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <NuxtLink to="/admin/customers" class="btn btn-ghost btn-circle">
+        <NuxtLinkLocale to="/admin/customers" class="btn btn-ghost btn-circle">
           <i class="icon-[tabler--arrow-left] size-6"></i>
-        </NuxtLink>
+        </NuxtLinkLocale>
         <div>
           <h1 class="h1">Detalhes do Cliente</h1>
           <p class="text-sm text-gray-500" v-if="profile">ID: {{ profile.id }} (User ID: {{ profile.user_id }})</p>
@@ -17,10 +17,10 @@
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
           Excluir
         </button>
-        <NuxtLink :to="`/admin/customers/${route.params.id}/edit`" class="btn btn-primary">
+        <NuxtLinkLocale :to="`/admin/customers/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2"></i>
           Editar
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
 
@@ -142,13 +142,13 @@
           <div class="card-body">
             <div class="flex justify-between items-center mb-4">
               <h2 class="card-title">Endereços</h2>
-              <NuxtLink 
+              <NuxtLinkLocale 
                 :to="{ path: '/admin/addresses/new', query: { user_id: profile.user_id, return_to: route.path } }" 
                 class="btn btn-sm btn-ghost"
               >
                 <i class="icon-[tabler--plus] size-4 mr-1"></i>
                 Adicionar
-              </NuxtLink>
+              </NuxtLinkLocale>
             </div>
 
             <div v-if="customerAddresses.length === 0" class="text-center py-6 text-gray-500">
@@ -158,12 +158,12 @@
             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div v-for="address in customerAddresses" :key="address.id" class="border rounded-lg p-4 relative group">
                 <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <NuxtLink 
+                   <NuxtLinkLocale 
                      :to="{ path: `/admin/addresses/${address.id}/edit`, query: { return_to: route.path } }" 
                      class="btn btn-xs btn-circle btn-ghost"
                    >
                      <i class="icon-[tabler--pencil] size-3"></i>
-                   </NuxtLink>
+                   </NuxtLinkLocale>
                 </div>
                 <div class="flex items-center gap-2 mb-2">
                   <span class="badge badge-sm badge-soft" :class="address.default ? 'badge-primary' : ''">
@@ -187,7 +187,7 @@
     <div v-else class="alert alert-warning">
       <i class="icon-[tabler--alert-triangle] size-6"></i>
       <span>Cliente não encontrado.</span>
-      <NuxtLink to="/admin/customers" class="btn btn-sm">Voltar para lista</NuxtLink>
+      <NuxtLinkLocale to="/admin/customers" class="btn btn-sm">Voltar para lista</NuxtLinkLocale>
     </div>
   </div>
 </template>

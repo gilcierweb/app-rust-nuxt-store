@@ -5,13 +5,13 @@
         <h2 class="h3 gradient-text">{{ t('pages.home.categories') }}</h2>
         <p class="text-base-content/60 mt-1">{{ t('pages.home.categoriesSubtitle') }}</p>
       </div>
-      <NuxtLink to="/categories" class="btn btn-ghost btn-sm gap-2">
+      <NuxtLinkLocale to="/categories" class="btn btn-ghost btn-sm gap-2">
         {{ t('pages.home.shopAll') }} <span class="icon-[tabler--arrow-right] size-4"></span>
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-      <NuxtLink v-for="cat in staticCategories" :key="cat.name" 
+      <NuxtLinkLocale v-for="cat in staticCategories" :key="cat.name" 
         :to="`/categories`"
         class="group flex flex-col items-center gap-4 p-6 rounded-3xl bg-base-200/50 hover:bg-primary/10 transition-all duration-500 hover-lift border border-transparent hover:border-primary/20">
         
@@ -23,7 +23,7 @@
           <h3 class="font-bold text-sm md:text-base group-hover:text-primary transition-colors">{{ cat.name }}</h3>
           <span class="text-[10px] uppercase tracking-wider font-semibold text-base-content/40">{{ t('pages.home.productsCount', { count: 12 }) }}</span>
         </div>
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
   </div>
 </template>

@@ -18,9 +18,9 @@
           <h2 class="h3 gradient-text">{{ t('pages.home.products') }}</h2>
           <p class="text-base-content/60 mt-1">{{ t('pages.home.productsSubtitle') }}</p>
         </div>
-        <NuxtLink to="/products" class="btn btn-primary btn-sm">
+        <NuxtLinkLocale to="/products" class="btn btn-primary btn-sm">
           {{ t('pages.home.shopAll') }} <span class="icon-[tabler--arrow-right] size-4"></span>
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
       <ProductList />
     </section>

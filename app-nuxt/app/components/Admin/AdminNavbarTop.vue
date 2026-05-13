@@ -38,9 +38,9 @@
               <span class="icon-[tabler--language] size-5.5"></span>
             </button>
             <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-32 shadow-xl border border-base-content/10 mt-2" role="menu">
-              <li v-for="lang in availableLocales" :key="lang.code">
+              <li v-for="lang in locales" :key="lang.code">
                 <button @click="setLocale(lang.code)" class="dropdown-item flex items-center gap-2" :class="{ 'active': locale === lang.code }">
-                  <span class="text-lg">{{ lang.flag }}</span>
+                  <span class="text-lg">{{ (lang as any).flag }}</span>
                   <span>{{ lang.name }}</span>
                 </button>
               </li>
@@ -74,17 +74,17 @@
                   <p class="text-base-content/60 text-xs font-medium truncate">{{ user?.email || 'admin@store.com' }}</p>
                 </div>
               </li>
-              <li>
-                <NuxtLink to="/admin/account" class="dropdown-item px-4">
+               <li>
+                <NuxtLinkLocale to="/admin/account" class="dropdown-item px-4">
                   <span class="icon-[tabler--user] size-5"></span>
                   {{ $t('admin.navbar.profile.myAccount') }}
-                </NuxtLink>
+                </NuxtLinkLocale>
               </li>
               <li>
-                <NuxtLink to="/admin/settings" class="dropdown-item px-4">
+                <NuxtLinkLocale to="/admin/settings" class="dropdown-item px-4">
                   <span class="icon-[tabler--settings] size-5"></span>
                   {{ $t('admin.navbar.profile.settings') }}
-                </NuxtLink>
+                </NuxtLinkLocale>
               </li>
               <li>
                 <hr class="border-base-content/10 -mx-2 my-1" />
@@ -139,13 +139,7 @@
 <script lang="ts" setup>
 const { user, logout } = useAuth()
 const route = useRoute()
-const { t, locale, setLocale } = useI18n()
-
-const availableLocales = [
-  { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' }
-]
+const { t, locale, locales, setLocale } = useI18n()
 
 const localizedRouteName = computed(() => {
   const name = route.name?.toString() || ''

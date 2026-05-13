@@ -13,7 +13,7 @@
     </template>
     
     <template v-else>
-      <NuxtLink :to="`/categories/${category.id}`">{{ category.name }}</NuxtLink>
+      <NuxtLinkLocale :to="`/categories/${category.id}`">{{ category.name }}</NuxtLinkLocale>
     </template>
   </li>
 </template>

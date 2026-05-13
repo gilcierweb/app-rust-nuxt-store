@@ -79,7 +79,7 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg">{{ t('pages.stores.cta.button') }}</NuxtLink>
+      <NuxtLinkLocale to="/products" class="btn btn-primary btn-lg">{{ t('pages.stores.cta.button') }}</NuxtLinkLocale>
     </div>
   </div>
 </template>

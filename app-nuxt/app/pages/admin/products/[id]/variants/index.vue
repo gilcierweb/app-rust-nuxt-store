@@ -3,13 +3,13 @@
     <div class="mb-6 flex items-center justify-between">
       <div>
         <h1 class="h1">{{ t('variant.list') }}</h1>
-        <NuxtLink :to="`/admin/products/${route.params.id}`" class="text-sm link link-primary">
+        <NuxtLinkLocale :to="`/admin/products/${route.params.id}`" class="text-sm link link-primary">
           ← {{ t('common.back') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
-      <NuxtLink :to="`/admin/products/${route.params.id}/variants/new`" class="btn btn-success">
+      <NuxtLinkLocale :to="`/admin/products/${route.params.id}/variants/new`" class="btn btn-success">
         {{ t('variant.add') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <div v-if="pending" class="flex items-center justify-center py-12">
@@ -40,9 +40,9 @@
               </span>
             </td>
             <td>
-              <NuxtLink :to="`/admin/products/${route.params.id}/variants/${v.id}/edit`" class="btn btn-circle btn-text btn-sm">
+              <NuxtLinkLocale :to="`/admin/products/${route.params.id}/variants/${v.id}/edit`" class="btn btn-circle btn-text btn-sm">
                 <span class="icon-[tabler--pencil] size-5"></span>
-              </NuxtLink>
+              </NuxtLinkLocale>
               <button class="btn btn-circle btn-text btn-sm" @click="handleDelete(v.id)">
                 <span class="icon-[tabler--trash] size-5"></span>
               </button>

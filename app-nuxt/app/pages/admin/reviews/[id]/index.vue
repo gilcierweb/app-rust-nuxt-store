@@ -3,9 +3,9 @@
     <!-- Header with Back Button -->
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <NuxtLink to="/admin/reviews" class="btn btn-ghost btn-circle">
+        <NuxtLinkLocale to="/admin/reviews" class="btn btn-ghost btn-circle">
           <i class="icon-[tabler--arrow-left] size-6"></i>
-        </NuxtLink>
+        </NuxtLinkLocale>
         <div>
           <h1 class="h1">Detalhes da Avaliação</h1>
           <p class="text-sm text-gray-500" v-if="review">ID: {{ review.id }}</p>
@@ -17,10 +17,10 @@
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
           Excluir
         </button>
-        <NuxtLink :to="`/admin/reviews/${route.params.id}/edit`" class="btn btn-primary">
+        <NuxtLinkLocale :to="`/admin/reviews/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2"></i>
           Editar
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
 
@@ -140,7 +140,7 @@
     <div v-else class="alert alert-warning">
       <i class="icon-[tabler--alert-triangle] size-6"></i>
       <span>Avaliação não encontrada.</span>
-      <NuxtLink to="/admin/reviews" class="btn btn-sm">Voltar para lista</NuxtLink>
+      <NuxtLinkLocale to="/admin/reviews" class="btn btn-sm">Voltar para lista</NuxtLinkLocale>
     </div>
   </div>
 </template>

@@ -109,6 +109,7 @@ export default defineNuxtConfig({
           "en/header.json", "en/footer.json"
         ],
         name: "English",
+        flag: "🇺🇸"
       },
       {
         code: "es",
@@ -121,6 +122,7 @@ export default defineNuxtConfig({
           "es/header.json", "es/footer.json"
         ],
         name: "Español",
+        flag: "🇪🇸"
       },
       {
         code: "pt-BR",
@@ -133,6 +135,7 @@ export default defineNuxtConfig({
           "pt-BR/header.json", "pt-BR/footer.json"
         ],
         name: "Português Brasil",
+        flag: "🇧🇷"
       },
     ],
     langDir: "locales",
@@ -141,7 +144,8 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: "i18n_redirected",
-      redirectOn: "root",
+      alwaysRedirect: false,
+      fallbackLocale: "pt-BR"
     },
   },
 

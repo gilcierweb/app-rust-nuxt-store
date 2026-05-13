@@ -6,17 +6,17 @@
 
     <div v-else-if="!order" class="flex flex-col items-center justify-center py-20">
       <p class="text-lg text-base-content/60">{{ $t('common.status.unknown') }}</p>
-      <NuxtLink to="/admin/orders" class="btn btn-primary mt-4">
+      <NuxtLinkLocale to="/admin/orders" class="btn btn-primary mt-4">
         {{ $t('admin.orders.detail.back') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <div v-else>
       <div class="mb-6 flex items-center justify-between">
         <div>
-          <NuxtLink to="/admin/orders" class="link link-hover text-sm text-base-content/60">
+          <NuxtLinkLocale to="/admin/orders" class="link link-hover text-sm text-base-content/60">
             &larr; {{ $t('admin.orders.detail.back') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
           <h1 class="h1 mt-1">{{ $t('admin.orders.detail.title') }} - {{ order.order_number || '#' + order.id }}</h1>
         </div>
         <div class="flex gap-2 items-center">
@@ -112,9 +112,9 @@
                       <span>{{ customerProfile.phone }}</span>
                     </div>
                   </div>
-                  <NuxtLink :to="`/admin/customers/${customerProfile.id}`" class="btn btn-xs btn-outline btn-block mt-2">
+                  <NuxtLinkLocale :to="`/admin/customers/${customerProfile.id}`" class="btn btn-xs btn-outline btn-block mt-2">
                     Ver Perfil Completo
-                  </NuxtLink>
+                  </NuxtLinkLocale>
                 </div>
                 <div v-else class="text-sm text-gray-500 italic">
                   {{ $t('admin.orders.detail.noCustomerInfo', { id: order.user_id }) }}

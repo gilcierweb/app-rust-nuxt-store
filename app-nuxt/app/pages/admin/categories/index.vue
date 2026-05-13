@@ -17,7 +17,7 @@
         </div>
       </form>
 
-      <NuxtLink to="/admin/categories/new" class="btn btn-success">{{ $t('admin.categories.add') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/categories/new" class="btn btn-success">{{ $t('admin.categories.add') }}</NuxtLinkLocale>
     </div>
 
     <!-- Loading State -->
@@ -37,7 +37,7 @@
     <!-- Empty State -->
     <div v-else-if="filteredCategories.length === 0" class="text-center py-12">
       <p class="text-gray-500 text-lg">{{ $t('admin.categories.notFound') }}</p>
-      <NuxtLink to="/admin/categories/new" class="btn btn-primary mt-4">{{ $t('admin.categories.createFirst') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/categories/new" class="btn btn-primary mt-4">{{ $t('admin.categories.createFirst') }}</NuxtLinkLocale>
     </div>
 
     <!-- Categories Table -->
@@ -68,20 +68,20 @@
               <td>{{ category.position ?? '-' }}</td>
               <td>{{ formatDate(category.created_at) }}</td>
               <td>
-                <NuxtLink
+                <NuxtLinkLocale
                   :to="`/admin/categories/${category.id}`"
                   class="btn btn-circle btn-text btn-sm"
                   :aria-label="$t('common.view')"
                 >
                   <i class="icon-[tabler--eye] size-5"></i>
-                </NuxtLink>
-                <NuxtLink
+                </NuxtLinkLocale>
+                <NuxtLinkLocale
                   :to="`/admin/categories/${category.id}/edit`"
                   class="btn btn-circle btn-text btn-sm"
                   :aria-label="$t('common.edit')"
                 >
                   <i class="icon-[tabler--pencil] size-5"></i>
-                </NuxtLink>
+                </NuxtLinkLocale>
                 <button
                   type="button"
                   class="btn btn-circle btn-text btn-sm"

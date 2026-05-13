@@ -2,10 +2,10 @@
   <div>
     <div class="mb-6 flex items-center justify-between">
       <h1 class="h1">{{ $t('admin.shipments.title') }}</h1>
-      <NuxtLink to="/admin/shipments/new" class="btn btn-primary">
+      <NuxtLinkLocale to="/admin/shipments/new" class="btn btn-primary">
         <i class="icon-[tabler--plus] size-5 mr-2"></i>
         {{ $t('admin.shipments.add') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Loading State -->
@@ -39,9 +39,9 @@
             <tr v-for="shipment in shipments" :key="shipment.id" class="row-hover">
               <td><span class="font-mono text-sm">#{{ shipment.id }}</span></td>
               <td>
-                <NuxtLink :to="`/admin/orders/${shipment.order_id}`" class="link link-hover font-bold text-primary font-mono text-sm">
+                <NuxtLinkLocale :to="`/admin/orders/${shipment.order_id}`" class="link link-hover font-bold text-primary font-mono text-sm">
                   #{{ shipment.order_id }}
-                </NuxtLink>
+                </NuxtLinkLocale>
               </td>
               <td><span class="text-xs font-mono bg-base-200 px-2 py-1 rounded">{{ shipment.tracking_number || '-' }}</span></td>
               <td>{{ shipment.carrier || '-' }}</td>
@@ -53,12 +53,12 @@
               <td><div class="text-sm">{{ formatDate(shipment.created_at) }}</div></td>
               <td class="text-right">
                 <div class="flex justify-end gap-1">
-                  <NuxtLink :to="`/admin/shipments/${shipment.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
+                  <NuxtLinkLocale :to="`/admin/shipments/${shipment.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                     <i class="icon-[tabler--eye] size-5" />
-                  </NuxtLink>
-                  <NuxtLink :to="`/admin/shipments/${shipment.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.edit')">
+                  </NuxtLinkLocale>
+                  <NuxtLinkLocale :to="`/admin/shipments/${shipment.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.edit')">
                     <i class="icon-[tabler--pencil] size-5" />
-                  </NuxtLink>
+                  </NuxtLinkLocale>
                   <button type="button" class="btn btn-circle btn-text btn-sm text-error" :aria-label="$t('common.delete')" @click="confirmDelete(shipment)">
                     <i class="icon-[tabler--trash] size-5" />
                   </button>

@@ -6,10 +6,10 @@
 
                     <div class="flex flex-col">
                         <div class="logo mb-4">
-                            <a href="/">
-                            <i class="icon-[tabler--building-store] text-2xl text-primary mr-2"></i>
+                            <NuxtLinkLocale to="/" class="flex items-center">
+                                <i class="icon-[tabler--building-store] text-2xl text-primary mr-2"></i>
                                 Rust Loco Nuxt Store
-                            </a>
+                            </NuxtLinkLocale>
                         </div>
                         <p class="mb-4">{{ t('footer.brandDescription') }}</p>
                         <h4 class="social-title text-2xl mb-2 text-white">{{ t('footer.socialTitle') }}</h4>
@@ -26,23 +26,23 @@
                     <nav>
                         <h3 class="text-2xl mb-2 text-white">{{ t('footer.links.title') }}</h3>
                         <ul>
-                            <li><NuxtLink to="/about" class="link link-primary link-animated">{{ t('footer.links.about') }}</NuxtLink></li>
-                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.links.faq') }}</NuxtLink></li>
-                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.links.howItWorks') }}</NuxtLink></li>
-                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.links.plans') }}</NuxtLink></li>
-                            <li><NuxtLink to="/privacy" class="link link-primary link-animated">{{ t('footer.links.privacy') }}</NuxtLink></li>
-                            <li><NuxtLink to="/terms" class="link link-primary link-animated">{{ t('footer.links.terms') }}</NuxtLink></li>
-                            <li><NuxtLink to="/contact" class="link link-primary link-animated">{{ t('footer.links.contact') }}</NuxtLink></li>
+                             <li><NuxtLinkLocale to="/about" class="link link-primary link-animated">{{ t('footer.links.about') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="#" class="link link-primary link-animated">{{ t('footer.links.faq') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="#" class="link link-primary link-animated">{{ t('footer.links.howItWorks') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="#" class="link link-primary link-animated">{{ t('footer.links.plans') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="/privacy" class="link link-primary link-animated">{{ t('footer.links.privacy') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="/terms" class="link link-primary link-animated">{{ t('footer.links.terms') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="/contact" class="link link-primary link-animated">{{ t('footer.links.contact') }}</NuxtLinkLocale></li>
                         </ul>
                     </nav>
 
                     <nav>
                         <h3 class="text-2xl mb-2 text-white">{{ t('footer.menu.title') }}</h3>
                         <ul>
-                            <li><NuxtLink to="/" class="link link-primary link-animated">{{ t('footer.menu.home') }}</NuxtLink></li>
-                            <li><NuxtLink to="/products" class="link link-primary link-animated">{{ t('footer.menu.products') }}</NuxtLink></li>
-                            <li><NuxtLink to="/stores" class="link link-primary link-animated">{{ t('footer.menu.stores') }}</NuxtLink></li>
-                            <li><NuxtLink to="#" class="link link-primary link-animated">{{ t('footer.menu.advertise') }}</NuxtLink></li>
+                             <li><NuxtLinkLocale to="/" class="link link-primary link-animated">{{ t('footer.menu.home') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="/products" class="link link-primary link-animated">{{ t('footer.menu.products') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="/stores" class="link link-primary link-animated">{{ t('footer.menu.stores') }}</NuxtLinkLocale></li>
+                             <li><NuxtLinkLocale to="#" class="link link-primary link-animated">{{ t('footer.menu.advertise') }}</NuxtLinkLocale></li>
                         </ul>
                     </nav>
 

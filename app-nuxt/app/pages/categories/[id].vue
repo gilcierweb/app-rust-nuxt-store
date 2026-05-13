@@ -17,9 +17,9 @@
         <span class="icon-[tabler--category-off] size-12 opacity-20" />
       </div>
       <h2 class="h3 mb-2">{{ t('pages.categories.detail.notFound') }}</h2>
-      <NuxtLink to="/categories" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+      <NuxtLinkLocale to="/categories" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
         {{ t('pages.categories.detail.browseAll') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Category Detail -->

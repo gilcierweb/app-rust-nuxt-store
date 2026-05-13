@@ -17,7 +17,7 @@
         </div>
       </form>
 
-      <NuxtLink to="/admin/customers/new" class="btn btn-success">{{ $t('admin.customers.add') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/customers/new" class="btn btn-success">{{ $t('admin.customers.add') }}</NuxtLinkLocale>
     </div>
 
     <!-- Loading State -->
@@ -37,7 +37,7 @@
     <!-- Empty State -->
     <div v-else-if="filteredProfiles.length === 0" class="text-center py-12">
       <p class="text-gray-500 text-lg">{{ $t('admin.customers.notFound') }}</p>
-      <NuxtLink to="/admin/customers/new" class="btn btn-primary mt-4">{{ $t('admin.customers.createFirst') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/customers/new" class="btn btn-primary mt-4">{{ $t('admin.customers.createFirst') }}</NuxtLinkLocale>
     </div>
 
     <!-- Profiles Table -->
@@ -76,20 +76,20 @@
               <td>{{ profile.user_id }}</td>
               <td>{{ formatDate(profile.created_at) }}</td>
               <td>
-                <NuxtLink
+                <NuxtLinkLocale
                   :to="`/admin/customers/${profile.id}`"
                   class="btn btn-circle btn-text btn-sm"
                   :aria-label="$t('common.view')"
                 >
                   <i class="icon-[tabler--eye] size-5"></i>
-                </NuxtLink>
-                <NuxtLink
+                </NuxtLinkLocale>
+                <NuxtLinkLocale
                   :to="`/admin/customers/${profile.id}/edit`"
                   class="btn btn-circle btn-text btn-sm"
                   :aria-label="$t('common.edit')"
                 >
                   <i class="icon-[tabler--pencil] size-5"></i>
-                </NuxtLink>
+                </NuxtLinkLocale>
                 <button
                   type="button"
                   class="btn btn-circle btn-text btn-sm"

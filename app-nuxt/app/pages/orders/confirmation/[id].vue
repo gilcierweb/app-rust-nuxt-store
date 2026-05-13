@@ -7,9 +7,9 @@
     <div v-else-if="!order" class="flex flex-col items-center justify-center py-20">
       <span class="icon-[tabler--alert-circle] mb-4 size-20 text-error opacity-60" />
       <p class="text-lg">{{ t('admin.statusLabels.unknown') }}</p>
-      <NuxtLink to="/orders" class="btn btn-primary mt-4">
+      <NuxtLinkLocale to="/orders" class="btn btn-primary mt-4">
         {{ t('pages.orders.title') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <div v-else class="mx-auto max-w-2xl py-10 text-center">
@@ -45,12 +45,12 @@
       <p class="mt-6 text-sm text-base-content/40">{{ t('pages.confirmation.emailSent') }}</p>
 
       <div class="mt-8 flex justify-center gap-4">
-        <NuxtLink to="/orders" class="btn btn-primary">
+        <NuxtLinkLocale to="/orders" class="btn btn-primary">
           {{ t('pages.orders.title') }}
-        </NuxtLink>
-        <NuxtLink to="/products" class="btn btn-ghost">
+        </NuxtLinkLocale>
+        <NuxtLinkLocale to="/products" class="btn btn-ghost">
           {{ t('cart.continueShopping') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
   </div>

@@ -87,7 +87,7 @@
           </form>
           <p class="text-base-content/80 mb-4 text-center">
             {{ t('auth.register.hasAccount') }}
-            <NuxtLink to="/users/sessions" class="link link-animated link-primary font-normal">{{ t('auth.register.loginLink') }}</NuxtLink>
+            <NuxtLinkLocale to="/users/sessions" class="link link-animated link-primary font-normal">{{ t('auth.register.loginLink') }}</NuxtLinkLocale>
           </p>
         </div>
       </div>

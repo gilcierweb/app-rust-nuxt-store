@@ -45,9 +45,9 @@
               <span class="font-semibold">{{ t('cart.subtotal') }}</span>
               <span class="text-xl font-bold text-primary">{{ formatNumberBR(cartStore.totalPrice) }}</span>
             </div>
-            <NuxtLink to="/cart" class="btn btn-primary w-full" @click="closeCart">
+            <NuxtLinkLocale to="/cart" class="btn btn-primary w-full" @click="closeCart">
               {{ t('cart.viewCart') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </div>
       </div>

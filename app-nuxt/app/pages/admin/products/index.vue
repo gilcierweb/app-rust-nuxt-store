@@ -2,10 +2,10 @@
   <div>
     <div class="mb-6 flex justify-between items-center">
       <h1 class="h1">{{ $t('admin.products.title') }}</h1>
-      <NuxtLink to="/admin/products/new" class="btn btn-primary">
+      <NuxtLinkLocale to="/admin/products/new" class="btn btn-primary">
         <i class="icon-[tabler--plus] size-5 mr-2"></i>
         {{ $t('admin.products.add') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Filters & Search -->
@@ -110,12 +110,12 @@
               </td>
               <td class="text-right">
                 <div class="flex justify-end gap-1">
-                  <NuxtLink :to="`/admin/products/${product.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
+                  <NuxtLinkLocale :to="`/admin/products/${product.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                     <i class="icon-[tabler--eye] size-5"></i>
-                  </NuxtLink>
-                  <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.edit')">
+                  </NuxtLinkLocale>
+                  <NuxtLinkLocale :to="`/admin/products/${product.id}/edit`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.edit')">
                     <i class="icon-[tabler--pencil] size-5"></i>
-                  </NuxtLink>
+                  </NuxtLinkLocale>
                   <button class="btn btn-circle btn-text btn-sm text-error" @click="confirmDelete(product)">
                     <i class="icon-[tabler--trash] size-5"></i>
                   </button>

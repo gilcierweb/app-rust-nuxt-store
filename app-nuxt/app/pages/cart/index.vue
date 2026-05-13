@@ -19,9 +19,9 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg mt-8">
+      <NuxtLinkLocale to="/products" class="btn btn-primary btn-lg mt-8">
         {{ t('cart.continueShopping') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Cart Content -->
@@ -50,9 +50,9 @@
                         </div>
                       </div>
                       <div>
-                        <NuxtLink v-if="item.slug" :to="`/products/${item.slug || item.productId}`" class="font-bold hover:text-primary transition-colors line-clamp-1">
+                        <NuxtLinkLocale v-if="item.slug" :to="`/products/${item.slug || item.productId}`" class="font-bold hover:text-primary transition-colors line-clamp-1">
                           {{ item.name }}
-                        </NuxtLink>
+                        </NuxtLinkLocale>
                         <p v-else class="font-bold line-clamp-1">{{ item.name }}</p>
                         <p class="text-primary font-semibold text-sm">{{ formatNumberBR(item.price) }}</p>
                       </div>
@@ -90,10 +90,10 @@
         
         <div class="flex flex-wrap items-center justify-between gap-4 px-4 pt-4">
           <div class="flex flex-wrap gap-4">
-            <NuxtLink to="/products" class="btn btn-primary gap-2 rounded-xl px-8 shadow-md">
+            <NuxtLinkLocale to="/products" class="btn btn-primary gap-2 rounded-xl px-8 shadow-md">
               <span class="icon-[tabler--arrow-left] size-5" />
               {{ t('cart.continueShopping') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
             <button class="btn btn-outline btn-error gap-2 rounded-xl px-8 hover:bg-error hover:text-error-content shadow-sm" @click="cartStore.clearCart()">
               <span class="icon-[tabler--trash-x] size-5" />
               {{ t('cart.clearCart') }}
@@ -136,10 +136,10 @@
           </div>
           
           <div class="card-actions mt-4 w-full">
-            <NuxtLink to="/checkout" class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300">
+            <NuxtLinkLocale to="/checkout" class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300">
               {{ t('cart.checkout') }}
               <span class="icon-[tabler--arrow-right] size-6 ml-2" />
-            </NuxtLink>
+            </NuxtLinkLocale>
             
             <div class="flex items-center justify-center gap-4 text-base-content/30 mt-6">
               <span class="icon-[tabler--brand-visa] size-8"></span>

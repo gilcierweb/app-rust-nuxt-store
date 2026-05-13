@@ -44,7 +44,7 @@
           <p class="text-sm text-base-content/50">
             <i18n-t keypath="privacy.questions" tag="span">
               <template #contact>
-                <NuxtLink to="/contact" class="link link-primary">{{ t('pages.about.cta.contact') }}</NuxtLink>
+                <NuxtLinkLocale to="/contact" class="link link-primary">{{ t('pages.about.cta.contact') }}</NuxtLinkLocale>
               </template>
             </i18n-t>
           </p>

@@ -3,9 +3,9 @@
     <!-- Header with Back Button -->
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <NuxtLink to="/admin/coupons" class="btn btn-ghost btn-circle">
+        <NuxtLinkLocale to="/admin/coupons" class="btn btn-ghost btn-circle">
           <i class="icon-[tabler--arrow-left] size-6"></i>
-        </NuxtLink>
+        </NuxtLinkLocale>
         <div>
           <h1 class="h1">{{ $t('admin.coupons.detail.title') }}</h1>
           <p class="text-sm text-gray-500" v-if="coupon">ID: {{ coupon.id }}</p>
@@ -17,10 +17,10 @@
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
           {{ $t('common.delete') }}
         </button>
-        <NuxtLink :to="`/admin/coupons/${route.params.id}/edit`" class="btn btn-primary">
+        <NuxtLinkLocale :to="`/admin/coupons/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2"></i>
           {{ $t('common.edit') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
 
@@ -139,7 +139,7 @@
     <div v-else class="alert alert-warning">
       <i class="icon-[tabler--alert-triangle] size-6"></i>
       <span>{{ $t('admin.coupons.notFound') }}</span>
-      <NuxtLink to="/admin/coupons" class="btn btn-sm">{{ $t('admin.coupons.detail.back') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/coupons" class="btn btn-sm">{{ $t('admin.coupons.detail.back') }}</NuxtLinkLocale>
     </div>
   </div>
 </template>

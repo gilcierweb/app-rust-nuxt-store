@@ -99,10 +99,10 @@
               </div>
               <span class="text-xs font-bold">Admin</span>
             </div>
-            <NuxtLink :to="`/posts/${post.id}`" class="btn btn-ghost btn-sm gap-1">
+            <NuxtLinkLocale :to="`/posts/${post.id}`" class="btn btn-ghost btn-sm gap-1">
               {{ t('pages.posts.readMore') }}
               <span class="icon-[tabler--arrow-right] size-4"></span>
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </div>
       </article>

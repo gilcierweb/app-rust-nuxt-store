@@ -17,9 +17,9 @@
         <span class="icon-[tabler--package-off] size-12 opacity-20" />
       </div>
       <h2 class="h3 mb-2">{{ t('product.notFound') }}</h2>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
+      <NuxtLinkLocale to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105">
         {{ t('cart.continueShopping') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Product Detail -->

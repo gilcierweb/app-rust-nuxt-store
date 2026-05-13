@@ -19,9 +19,9 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg mt-8 shadow-md">
+      <NuxtLinkLocale to="/products" class="btn btn-primary btn-lg mt-8 shadow-md">
         {{ t('cart.continueShopping') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Checkout Content -->

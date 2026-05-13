@@ -2,9 +2,9 @@
   <div>
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <NuxtLink to="/admin/shipments" class="btn btn-ghost btn-circle">
+        <NuxtLinkLocale to="/admin/shipments" class="btn btn-ghost btn-circle">
           <i class="icon-[tabler--arrow-left] size-6" />
-        </NuxtLink>
+        </NuxtLinkLocale>
         <div>
           <h1 class="h1">{{ t('shipping.shipmentDetails') }}</h1>
           <p class="text-sm text-base-content/60" v-if="shipment">#{{ shipment.id }}</p>
@@ -14,9 +14,9 @@
         <button @click="deleteShipment" class="btn btn-error btn-outline">
           <i class="icon-[tabler--trash] size-5 mr-2" /> {{ t('common.delete') }}
         </button>
-        <NuxtLink :to="`/admin/shipments/${route.params.id}/edit`" class="btn btn-primary">
+        <NuxtLinkLocale :to="`/admin/shipments/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2" /> {{ t('common.edit') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </div>
 
@@ -37,9 +37,9 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
               <label class="label"><span class="label-text text-base-content/60">{{ t('shipping.order') }}</span></label>
-              <NuxtLink :to="`/admin/orders/${shipment.order_id}`" class="link link-hover font-mono text-lg">
+              <NuxtLinkLocale :to="`/admin/orders/${shipment.order_id}`" class="link link-hover font-mono text-lg">
                 #{{ shipment.order_id }}
-              </NuxtLink>
+              </NuxtLinkLocale>
             </div>
             <div class="form-control">
               <label class="label"><span class="label-text text-base-content/60">{{ t('shipping.carrier') }}</span></label>
@@ -72,7 +72,7 @@
 
     <div v-else class="alert alert-warning">
       <span>{{ t('admin.statusLabels.unknown') }}</span>
-      <NuxtLink to="/admin/shipments" class="btn btn-sm">{{ t('common.back') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/shipments" class="btn btn-sm">{{ t('common.back') }}</NuxtLinkLocale>
     </div>
   </div>
 </template>

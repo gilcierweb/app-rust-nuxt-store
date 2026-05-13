@@ -84,8 +84,8 @@
       <h2 class="h3 mb-6">{{ t('pages.about.cta.title') }}</h2>
       <p class="mb-8 text-base-content/60">{{ t('pages.about.cta.description') }}</p>
       <div class="flex flex-wrap justify-center gap-4">
-        <NuxtLink to="/contact" class="btn btn-primary">{{ t('pages.about.cta.contact') }}</NuxtLink>
-        <NuxtLink to="/products" class="btn btn-ghost">{{ t('pages.about.cta.browse') }}</NuxtLink>
+        <NuxtLinkLocale to="/contact" class="btn btn-primary">{{ t('pages.about.cta.contact') }}</NuxtLinkLocale>
+        <NuxtLinkLocale to="/products" class="btn btn-ghost">{{ t('pages.about.cta.browse') }}</NuxtLinkLocale>
       </div>
     </section>
   </div>

@@ -48,7 +48,7 @@
                 <input type="checkbox" class="checkbox checkbox-primary" id="rememberMe" />
                 <label class="label-text text-base-content/80 p-0 text-base" for="rememberMe">{{ t('auth.login.rememberMe') }}</label>
               </div>
-              <NuxtLink to="/users/passwords" class="link link-animated link-primary font-normal">{{ t('auth.login.forgotPassword') }}</NuxtLink>
+              <NuxtLinkLocale to="/users/passwords" class="link link-animated link-primary font-normal">{{ t('auth.login.forgotPassword') }}</NuxtLinkLocale>
             </div>
             <button type="submit" class="btn btn-lg btn-primary btn-gradient btn-block" :disabled="loading">
               <span v-if="loading" class="loading loading-spinner"></span>
@@ -57,7 +57,7 @@
           </form>
           <p class="text-base-content/80 mb-4 text-center">
             {{ t('auth.login.noAccount') }}
-            <NuxtLink to="/users/registrations" class="link link-animated link-primary font-normal">{{ t('auth.login.createAccount') }}</NuxtLink>
+            <NuxtLinkLocale to="/users/registrations" class="link link-animated link-primary font-normal">{{ t('auth.login.createAccount') }}</NuxtLinkLocale>
           </p>
         </div>
       </div>

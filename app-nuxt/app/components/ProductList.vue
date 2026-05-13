@@ -19,7 +19,7 @@
         
         <!-- Image Area -->
         <figure class="relative aspect-square overflow-hidden bg-base-200">
-          <NuxtLink :to="`/products/${product.id}`" class="w-full h-full">
+          <NuxtLinkLocale :to="`/products/${product.id}`" class="w-full h-full">
             <OptimizedImage
               v-if="product.image"
               :src="product.image"
@@ -29,7 +29,7 @@
             <div v-else class="flex items-center justify-center h-full text-base-content/20">
               <span class="icon-[tabler--photo] size-12"></span>
             </div>
-          </NuxtLink>
+          </NuxtLinkLocale>
           
           <!-- Badges & Actions -->
           <div class="absolute top-3 left-3 flex flex-col gap-2">
@@ -45,11 +45,11 @@
 
         <!-- Product Info -->
         <div class="card-body p-5 gap-1">
-          <NuxtLink :to="`/products/${product.id}`" class="group/title">
+          <NuxtLinkLocale :to="`/products/${product.id}`" class="group/title">
             <h3 class="card-title text-base font-bold line-clamp-1 group-hover/title:text-primary transition-colors">
               {{ product.name }}
             </h3>
-          </NuxtLink>
+          </NuxtLinkLocale>
           
           <div class="flex items-center justify-between mt-1">
             <p class="text-primary font-bold text-lg">{{ formatNumberBR(product.price) }}</p>
@@ -68,9 +68,9 @@
               <span class="icon-[tabler--shopping-cart] size-4"></span>
               {{ t('product.addToCart') }}
             </button>
-            <NuxtLink :to="`/products/${product.id}`" class="btn btn-ghost btn-sm btn-square" aria-label="View Details">
+            <NuxtLinkLocale :to="`/products/${product.id}`" class="btn btn-ghost btn-sm btn-square" aria-label="View Details">
               <span class="icon-[tabler--eye] size-4"></span>
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </div>
       </div>

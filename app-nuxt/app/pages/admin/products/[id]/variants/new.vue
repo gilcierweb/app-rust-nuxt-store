@@ -2,9 +2,9 @@
   <div class="max-w-2xl mx-auto">
     <div class="mb-6">
       <h1 class="h1">{{ t('variant.add') }}</h1>
-      <NuxtLink :to="`/admin/products/${route.params.id}/variants`" class="text-sm link link-primary">
+      <NuxtLinkLocale :to="`/admin/products/${route.params.id}/variants`" class="text-sm link link-primary">
         ← {{ t('common.back') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <form @submit.prevent="handleSave" class="space-y-4">
@@ -57,9 +57,9 @@
           <span v-if="saving" class="loading loading-spinner" />
           {{ t('common.save') }}
         </button>
-        <NuxtLink :to="`/admin/products/${route.params.id}/variants`" class="btn btn-outline">
+        <NuxtLinkLocale :to="`/admin/products/${route.params.id}/variants`" class="btn btn-outline">
           {{ t('common.cancel') }}
-        </NuxtLink>
+        </NuxtLinkLocale>
       </div>
     </form>
   </div>

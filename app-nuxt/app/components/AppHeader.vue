@@ -2,20 +2,20 @@
     <div>
         <nav class="navbar rounded-box flex w-full items-center justify-between gap-2 shadow-base-300/20 shadow-sm">
             <div class="navbar-start max-md:w-1/4">
-                <NuxtLink to="/" class="link text-base-content link-neutral text-xl font-bold no-underline">
+                <NuxtLinkLocale to="/" class="link text-base-content link-neutral text-xl font-bold no-underline">
                     {{ t('common.appName') }}
-                </NuxtLink>
+                </NuxtLinkLocale>
             </div>
             <div class="navbar-center max-md:hidden">
                 <ul class="menu menu-horizontal p-0 font-medium">
-                    <li><NuxtLink to="/">{{ t('header.home') }}</NuxtLink></li>
-                    <li><NuxtLink to="/categories">{{ t('header.categories') }}</NuxtLink></li>
-                    <li><NuxtLink to="/products">{{ t('header.products') }}</NuxtLink></li>
-                    <li><NuxtLink to="/stores">{{ t('header.stores') }}</NuxtLink></li>
-                    <li><NuxtLink to="/posts">{{ t('header.posts') }}</NuxtLink></li>
-                    <li><NuxtLink to="/profiles">{{ t('header.profiles') }}</NuxtLink></li>
-                    <li><NuxtLink to="/contact">{{ t('header.contact') }}</NuxtLink></li>
-                    <li><NuxtLink to="/about">{{ t('header.about') }}</NuxtLink></li>
+                    <li><NuxtLinkLocale to="/">{{ t('header.home') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/categories">{{ t('header.categories') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/products">{{ t('header.products') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/stores">{{ t('header.stores') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/posts">{{ t('header.posts') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/profiles">{{ t('header.profiles') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/contact">{{ t('header.contact') }}</NuxtLinkLocale></li>
+                    <li><NuxtLinkLocale to="/about">{{ t('header.about') }}</NuxtLinkLocale></li>
                 </ul>
             </div>
             <div class="navbar-end items-center gap-4">
@@ -25,18 +25,18 @@
                         <span class="icon-[tabler--language] size-5.5"></span>
                     </button>
                     <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-32 shadow-xl border border-base-content/10 mt-2" role="menu">
-                        <li v-for="lang in availableLocales" :key="lang.code">
+                        <li v-for="lang in locales" :key="lang.code">
                             <button @click="setLocale(lang.code)" class="dropdown-item flex items-center gap-2" :class="{ 'active': locale === lang.code }">
-                                <span class="text-lg">{{ lang.flag }}</span>
+                                <span class="text-lg">{{ (lang as any).flag }}</span>
                                 <span>{{ lang.name }}</span>
                             </button>
                         </li>
                     </ul>
                 </div>
 
-                <NuxtLink to="/wishlist" class="btn btn-text btn-square relative">
+                <NuxtLinkLocale to="/wishlist" class="btn btn-text btn-square relative">
                     <span class="icon-[tabler--heart] size-5"></span>
-                </NuxtLink>
+                </NuxtLinkLocale>
                 <button class="btn btn-text btn-square relative" @click="toggleCart">
                     <span class="icon-[tabler--shopping-cart] size-5"></span>
                     <span v-if="cartStore.totalItems > 0" class="badge badge-primary badge-xs absolute -top-1 -right-1">
@@ -52,47 +52,47 @@
                     </button>
                     <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-60" role="menu"
                         aria-orientation="vertical" aria-labelledby="dropdown-default">
-                        <li><NuxtLink to="/" class="dropdown-item">{{ t('header.home') }}</NuxtLink></li>
-                        <li><NuxtLink to="/categories" class="dropdown-item">{{ t('header.categories') }}</NuxtLink></li>
-                        <li><NuxtLink to="/products" class="dropdown-item">{{ t('header.products') }}</NuxtLink></li>
-                        <li><NuxtLink to="/cart" class="dropdown-item">{{ t('header.cart') }}</NuxtLink></li>
-                        <li><NuxtLink to="/stores" class="dropdown-item">{{ t('header.stores') }}</NuxtLink></li>
-                        <li><NuxtLink to="/posts" class="dropdown-item">{{ t('header.posts') }}</NuxtLink></li>
-                        <li><NuxtLink to="/profiles" class="dropdown-item">{{ t('header.profiles') }}</NuxtLink></li>
-                        <li><NuxtLink to="/contact" class="dropdown-item">{{ t('header.contact') }}</NuxtLink></li>
-                        <li><NuxtLink to="/about" class="dropdown-item">{{ t('header.about') }}</NuxtLink></li>
+                        <li><NuxtLinkLocale to="/" class="dropdown-item">{{ t('header.home') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/categories" class="dropdown-item">{{ t('header.categories') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/products" class="dropdown-item">{{ t('header.products') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/cart" class="dropdown-item">{{ t('header.cart') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/stores" class="dropdown-item">{{ t('header.stores') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/posts" class="dropdown-item">{{ t('header.posts') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/profiles" class="dropdown-item">{{ t('header.profiles') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/contact" class="dropdown-item">{{ t('header.contact') }}</NuxtLinkLocale></li>
+                        <li><NuxtLinkLocale to="/about" class="dropdown-item">{{ t('header.about') }}</NuxtLinkLocale></li>
                         <li v-if="isAuthenticated"><hr class="my-1" /></li>
                         <li v-if="isAuthenticated">
-                            <NuxtLink to="/admin" class="dropdown-item">{{ t('header.admin') }}</NuxtLink>
+                            <NuxtLinkLocale to="/admin" class="dropdown-item">{{ t('header.admin') }}</NuxtLinkLocale>
                         </li>
                     </ul>
                 </div>
 
                 <template v-if="isAuthenticated">
-                    <NuxtLink to="/admin" class="btn btn-text btn-sm max-md:hidden">
+                    <NuxtLinkLocale to="/admin" class="btn btn-text btn-sm max-md:hidden">
                         <span class="icon-[tabler--layout-dashboard] size-4"></span>
                         {{ t('header.admin') }}
-                    </NuxtLink>
+                    </NuxtLinkLocale>
                     <div class="dropdown relative inline-flex [--auto-close:inside] [--offset:8] [--placement:bottom-end]">
                         <button type="button" class="dropdown-toggle btn btn-text flex items-center gap-2" aria-haspopup="menu" aria-expanded="false">
                             <span class="icon-[tabler--user] size-4"></span>
                             <span class="max-md:hidden">{{ user?.name || t('header.profile') }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu">
-                            <li><NuxtLink to="/profiles" class="dropdown-item">{{ t('header.profile') }}</NuxtLink></li>
+                            <li><NuxtLinkLocale to="/profiles" class="dropdown-item">{{ t('header.profile') }}</NuxtLinkLocale></li>
                             <li><button class="dropdown-item" @click="handleLogout">{{ t('header.signOut') }}</button></li>
                         </ul>
                     </div>
                 </template>
                 <template v-else>
-                    <NuxtLink to="/users/sessions" class="btn max-md:btn-square btn-text">
+                    <NuxtLinkLocale to="/users/sessions" class="btn max-md:btn-square btn-text">
                         <span class="max-md:hidden">{{ t('header.logIn') }}</span>
                         <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
-                    </NuxtLink>
-                    <NuxtLink to="/users/registrations" class="btn max-md:btn-square btn-primary">
+                    </NuxtLinkLocale>
+                    <NuxtLinkLocale to="/users/registrations" class="btn max-md:btn-square btn-primary">
                         <span class="max-md:hidden">{{ t('header.getStarted') }}</span>
                         <span class="icon-[tabler--arrow-right] rtl:rotate-180"></span>
-                    </NuxtLink>
+                    </NuxtLinkLocale>
                 </template>
             </div>
         </nav>
@@ -100,16 +100,10 @@
 </template>
 
 <script lang="ts" setup>
-const { t, locale, setLocale } = useI18n()
+const { t, locale, locales, setLocale } = useI18n()
 const { isAuthenticated, user, logout } = useAuth()
 const { toggleCart } = useCartUI()
 const cartStore = useCartStore()
-
-const availableLocales = [
-    { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' }
-]
 
 function handleLogout() {
     logout()

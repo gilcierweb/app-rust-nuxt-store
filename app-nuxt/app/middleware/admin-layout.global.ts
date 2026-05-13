@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware((to) => {
-  if (to.path.startsWith('/admin')) {
+  if (to.path.includes('/admin')) {
     to.meta.layout = 'admin'
   }
 })

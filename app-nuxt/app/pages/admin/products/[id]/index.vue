@@ -12,7 +12,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <span>{{ $t('admin.products.detail.error', { message: error.message }) }}</span>
-      <NuxtLink to="/admin/products" class="btn btn-sm">{{ $t('common.back') }}</NuxtLink>
+      <NuxtLinkLocale to="/admin/products" class="btn btn-sm">{{ $t('common.back') }}</NuxtLinkLocale>
     </div>
 
     <!-- Product Details -->
@@ -25,9 +25,9 @@
             <p class="text-gray-500">SKU: {{ product.sku }}</p>
           </div>
           <div class="flex gap-2">
-            <NuxtLink :to="`/admin/products/${product.id}/edit`" class="btn btn-primary btn-sm">
+            <NuxtLinkLocale :to="`/admin/products/${product.id}/edit`" class="btn btn-primary btn-sm">
               {{ $t('common.edit') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
             <button type="button" class="btn btn-error btn-sm" @click="confirmDelete">
               {{ $t('common.delete') }}
             </button>
@@ -123,17 +123,17 @@
 
         <!-- Variants Link -->
         <div class="mt-6 pt-4 border-t">
-          <NuxtLink :to="`/admin/products/${product.id}/variants`" class="btn btn-outline btn-primary">
+          <NuxtLinkLocale :to="`/admin/products/${product.id}/variants`" class="btn btn-outline btn-primary">
             <span class="icon-[tabler--box] size-5"></span>
             {{ $t('admin.products.detail.manageVariants') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
         </div>
 
         <!-- Back Button -->
         <div class="mt-4">
-          <NuxtLink to="/admin/products" class="btn btn-outline">
+          <NuxtLinkLocale to="/admin/products" class="btn btn-outline">
             {{ $t('admin.products.detail.backList') }}
-          </NuxtLink>
+          </NuxtLinkLocale>
         </div>
       </div>
     </div>

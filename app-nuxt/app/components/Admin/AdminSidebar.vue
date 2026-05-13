@@ -18,7 +18,7 @@
         <div class="flex gap-3 mt-2">
            <a href="#" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--brand-github] size-4"></i></a>
            <a href="#" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--brand-twitter] size-4"></i></a>
-           <NuxtLink to="/admin/settings" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--settings] size-4"></i></NuxtLink>
+           <NuxtLinkLocale to="/admin/settings" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--settings] size-4"></i></NuxtLinkLocale>
         </div>
       </div>
 
@@ -26,80 +26,80 @@
       <div class="h-full overflow-y-auto px-4 py-4">
         <ul class="menu p-0 gap-1">
           <li>
-            <NuxtLink to="/admin" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--home] size-5"></i>
               {{ $t('admin.sidebar.dashboard') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
           
           <li class="menu-title mt-4 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
             {{ $t('admin.sidebar.category_ecommerce') || 'E-commerce' }}
           </li>
           <li>
-            <NuxtLink to="/admin/orders" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/orders" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--shopping-cart] size-5"></i>
               {{ $t('admin.orders.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/admin/products" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/products" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--package] size-5"></i>
               {{ $t('admin.products.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/admin/categories" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/categories" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--category] size-5"></i>
               {{ $t('admin.categories.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
             {{ $t('admin.sidebar.category_logistics') || 'Logistics' }}
           </li>
           <li>
-            <NuxtLink to="/admin/shipments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/shipments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--truck-delivery] size-5"></i>
               {{ $t('admin.shipments.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/admin/shippings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/shippings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--map-pin] size-5"></i>
               {{ $t('admin.shippings.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
             {{ $t('admin.sidebar.category_content') || 'Content' }}
           </li>
           <li>
-            <NuxtLink to="/admin/posts" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/posts" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--article] size-5"></i>
               {{ $t('admin.posts.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
             {{ $t('admin.sidebar.category_admin') || 'Administration' }}
           </li>
           <li>
-            <NuxtLink to="/admin/customers" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/customers" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--users] size-5"></i>
               {{ $t('admin.customers.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/admin/users" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/users" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--user-shield] size-5"></i>
               {{ $t('admin.users.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
           <li>
-            <NuxtLink to="/admin/settings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+            <NuxtLinkLocale to="/admin/settings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--settings] size-5"></i>
               {{ $t('admin.settings.title') }}
-            </NuxtLink>
+            </NuxtLinkLocale>
           </li>
         </ul>
       </div>

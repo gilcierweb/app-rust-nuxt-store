@@ -62,10 +62,10 @@
             </div>
           </div>
           
-          <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary w-full">
+          <NuxtLinkLocale :to="`/profiles/${profile.id}`" class="btn btn-primary w-full">
             {{ t('pages.profiles.readMore') }}
             <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
-          </NuxtLink>
+          </NuxtLinkLocale>
         </div>
       </div>
     </div>

@@ -102,9 +102,9 @@
                 {{ formatNumberBR(order.total_amount) }}
               </td>
               <td class="text-right">
-                <NuxtLink :to="`/admin/orders/${order.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
+                <NuxtLinkLocale :to="`/admin/orders/${order.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="$t('common.view')">
                   <i class="icon-[tabler--eye] size-5" />
-                </NuxtLink>
+                </NuxtLinkLocale>
               </td>
             </tr>
             <tr v-if="filteredOrders.length === 0">

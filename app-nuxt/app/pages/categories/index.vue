@@ -107,9 +107,9 @@
 
             <!-- Footer Action -->
             <div class="card-actions justify-between items-center mt-auto">
-              <NuxtLink :to="`/categories/${cat.id}`" class="btn btn-primary btn-sm">
+              <NuxtLinkLocale :to="`/categories/${cat.id}`" class="btn btn-primary btn-sm">
                 {{ t('pages.categories.actions.exploreNow') }}
-              </NuxtLink>
+              </NuxtLinkLocale>
               
               <button @click="toggleFavorite(cat.id)" class="btn btn-circle btn-ghost btn-sm">
                 <span :class="[cat.isFavorite ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart] text-base-content/40 hover:text-error', 'size-5 transition-colors']"></span>
@@ -126,7 +126,7 @@
         </div>
         <h3 class="text-2xl font-bold mb-2">{{ t('pages.categories.empty.title') }}</h3>
         <p class="text-base-content/50 mb-8">{{ t('pages.categories.empty.description') }}</p>
-        <NuxtLink to="/products" class="btn btn-primary px-8 rounded-2xl">{{ t('pages.categories.actions.viewAllProducts') }}</NuxtLink>
+        <NuxtLinkLocale to="/products" class="btn btn-primary px-8 rounded-2xl">{{ t('pages.categories.actions.viewAllProducts') }}</NuxtLinkLocale>
       </div>
     </main>
   </div>

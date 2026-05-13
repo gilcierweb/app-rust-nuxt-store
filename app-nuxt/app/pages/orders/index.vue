@@ -47,9 +47,9 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
+      <NuxtLinkLocale to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
         {{ t('cart.continueShopping') }}
-      </NuxtLink>
+      </NuxtLinkLocale>
     </div>
 
     <!-- Orders List -->
@@ -105,10 +105,10 @@
               <span class="block text-[10px] uppercase tracking-widest text-base-content/30 font-bold">{{ t('pages.orders.amount') }}</span>
               <span class="text-3xl font-black text-primary">{{ formatNumberBR(order.total_amount) }}</span>
             </div>
-            <NuxtLink :to="`/orders/confirmation/${order.id}`" class="btn btn-outline btn-sm rounded-xl px-6 group-hover:bg-primary group-hover:text-primary-content transition-all">
+            <NuxtLinkLocale :to="`/orders/confirmation/${order.id}`" class="btn btn-outline btn-sm rounded-xl px-6 group-hover:bg-primary group-hover:text-primary-content transition-all">
               {{ t('pages.orders.detail') }}
               <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
-            </NuxtLink>
+            </NuxtLinkLocale>
           </div>
         </div>
         
