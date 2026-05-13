@@ -15,7 +15,7 @@
           </div>
           <div>
             <h2 class="font-bold text-lg">{{ t('cart.empty') }}</h2>
-            <p class="text-sm opacity-80 mt-1">Your cart is empty. Add some products to proceed with checkout.</p>
+            <p class="text-sm opacity-80 mt-1">{{ t('pages.checkout.emptyDescription') }}</p>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@
           
           <div v-if="shippingMethods.length === 0" class="flex items-center justify-center py-10">
             <div class="loading loading-spinner loading-md"></div>
-            <span class="ml-3 text-base-content/60">Loading shipping methods...</span>
+            <span class="ml-3 text-base-content/60">{{ t('pages.checkout.loadingShipping') }}</span>
           </div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="method in shippingMethods" :key="method.id"
@@ -98,7 +98,7 @@
               <input v-model="selectedShippingMethod" type="radio" name="shipping_method" :value="method.id" class="radio radio-primary" :id="`shipping-${method.id}`" />
               <label class="label-text text-base grow cursor-pointer" :for="`shipping-${method.id}`">
                 <div class="font-bold">{{ method.name || method.code }}</div>
-                <div class="text-xs text-base-content/50">Entrega em 3-5 dias úteis</div>
+                <div class="text-xs text-base-content/50">{{ t('shipping.deliveryTime') }}</div>
               </label>
               <div class="font-black text-primary">{{ method.base_price ? formatNumberBR(method.base_price) : t('shipping.free') }}</div>
             </div>
@@ -116,7 +116,7 @@
           
           <div v-if="paymentMethods.length === 0" class="flex items-center justify-center py-10">
             <div class="loading loading-spinner loading-md"></div>
-            <span class="ml-3 text-base-content/60">Loading payment methods...</span>
+            <span class="ml-3 text-base-content/60">{{ t('pages.checkout.loadingPayment') }}</span>
           </div>
           <div v-else class="space-y-4">
             <div v-for="method in paymentMethods" :key="method.id"
@@ -161,7 +161,7 @@
             <div class="alert alert-info mb-4">
               <div class="flex items-center gap-2">
                 <span class="icon-[tabler--discount-2] size-5"></span>
-                <span class="text-sm">Have a promo code? Apply it here for discounts!</span>
+                <span class="text-sm">{{ t('pages.checkout.promoInfo') }}</span>
               </div>
             </div>
             <div class="w-full">
@@ -206,7 +206,7 @@
             <div class="alert alert-success mb-4">
               <div class="flex items-center gap-2">
                 <span class="icon-[tabler--shield-check] size-5"></span>
-                <span class="text-sm">Secure checkout with encrypted payment</span>
+                <span class="text-sm">{{ t('pages.checkout.secureInfo') }}</span>
               </div>
             </div>
             <div class="flex justify-between items-end">

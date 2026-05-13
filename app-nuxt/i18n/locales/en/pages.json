@@ -139,7 +139,9 @@
     },
     "cart": {
       "title": "Cart",
+      "description": "Manage your selected items and proceed to checkout.",
       "empty": "Your cart is empty",
+      "emptyDescription": "Looks like you haven't added anything to your cart yet. Explore our products and find something you love!",
       "subtotal": "Subtotal",
       "checkout": "Checkout",
       "continueShopping": "Continue Shopping",
@@ -173,6 +175,11 @@
     "checkout": {
       "title": "Checkout",
       "description": "Complete your purchase by providing delivery and payment details.",
+      "emptyDescription": "Your cart is empty. Add some products to proceed with checkout.",
+      "loadingShipping": "Loading shipping methods...",
+      "loadingPayment": "Loading payment methods...",
+      "promoInfo": "Have a promo code? Apply it here for discounts!",
+      "secureInfo": "Secure checkout with encrypted payment",
       "placeOrder": "Confirm Order",
       "orderSummary": "Order Summary",
       "confirming": "Confirming your order...",
@@ -259,7 +266,67 @@
       "readMore": "View Profile",
       "search": "Search profiles...",
       "explorer": "Explorer",
-      "member": "Member"
+      "member": "Member",
+      "detail": {
+        "title": "{name} - Profile",
+        "loading": "Loading profile data...",
+        "photoAlt": "Profile photo",
+        "premiumSince": "Premium Member since 2023",
+        "personalInfo": "Personal Information",
+        "edit": "Edit Profile",
+        "lastOrders": "Recent Orders",
+        "viewAllOrders": "View All Orders",
+        "savedAddresses": "Saved Addresses",
+        "coupons": "My Coupons",
+        "stats": {
+          "orders": "Orders",
+          "totalSpent": "Total Spent",
+          "rating": "Rating"
+        },
+        "fields": {
+          "fullName": "Full Name",
+          "email": "Email",
+          "phone": "Phone",
+          "birthDate": "Birth Date"
+        },
+        "addresses": {
+          "home": "Home",
+          "work": "Work",
+          "main": "Default",
+          "add": "Add Address"
+        },
+        "orders": {
+          "status": {
+            "delivered": "Delivered",
+            "inTransit": "In Transit",
+            "preparing": "Preparing"
+          }
+        },
+        "mocks": {
+          "user": "John Doe",
+          "email": "john{'@'}example.com",
+          "phone": "+1 555-0199",
+          "date": "1990-05-15",
+          "order1": "Order #12345",
+          "order2": "Order #12344",
+          "date1": "July 05, 2025",
+          "date2": "July 03, 2025",
+          "price1": "$299.90",
+          "price2": "$159.90",
+          "addressHome": "123 Main St - New York - NY, 10001",
+          "addressWork": "456 Wall St - New York - NY, 10005",
+          "coupon1": {
+            "code": "DISCOUNT20",
+            "desc": "20% OFF on electronics",
+            "validity": "Valid until 07/31/2025"
+          },
+          "coupon2": {
+            "code": "FREESHIP10",
+            "desc": "Free shipping over $99",
+            "validity": "Valid until 08/15/2025"
+          }
+        }
+      }
     },
     "stores": {
       "title": "Our Stores",

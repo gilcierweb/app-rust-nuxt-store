@@ -26,6 +26,7 @@
       "shipped": "Shipped",
       "delivered": "Delivered",
       "cancelled": "Cancelled"
-    }
+    },
+    "deliveryTime": "Delivery in 3-5 business days"
   }
 }

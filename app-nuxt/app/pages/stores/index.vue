@@ -6,10 +6,9 @@
       <p class="text-xl text-base-content/60 max-w-2xl mx-auto">{{ t('pages.stores.description') }}</p>
       
       <div class="max-w-xl mx-auto mt-10">
-        <div class="join w-full">
-          <input type="text" :placeholder="t('pages.stores.search')" 
-            class="input input-lg bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-14" />
-          <button class="btn btn-primary join-item">
+        <div class="flex items-center gap-2 w-full">
+          <input type="text" :placeholder="t('pages.stores.search')" class="input grow" id="storeSearch" />
+          <button class="btn btn-primary">
             <span class="icon-[tabler--search] size-5"></span>
           </button>
         </div>

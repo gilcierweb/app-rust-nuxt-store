@@ -139,7 +139,9 @@
     },
     "cart": {
       "title": "Carrinho",
+      "description": "Gerencie seus itens selecionados e prossiga para a finalização da compra.",
       "empty": "Seu carrinho está vazio",
+      "emptyDescription": "Parece que você ainda não adicionou nada ao carrinho. Explore nossos produtos e encontre algo que você ame!",
       "subtotal": "Subtotal",
       "checkout": "Finalizar Compra",
       "continueShopping": "Continuar Comprando",
@@ -173,6 +175,11 @@
     "checkout": {
       "title": "Finalizar Compra",
       "description": "Complete sua compra fornecendo os detalhes de entrega e pagamento.",
+      "emptyDescription": "Seu carrinho está vazio. Adicione alguns produtos para prosseguir com a compra.",
+      "loadingShipping": "Carregando métodos de envio...",
+      "loadingPayment": "Carregando métodos de pagamento...",
+      "promoInfo": "Tem um código promocional? Aplique aqui para descontos!",
+      "secureInfo": "Pagamento seguro com criptografia ponta a ponta",
       "placeOrder": "Confirmar Pedido",
       "orderSummary": "Resumo do Pedido",
       "confirming": "Confirmando seu pedido...",
@@ -259,7 +266,67 @@
       "readMore": "Ver Perfil",
       "search": "Buscar perfis...",
       "explorer": "Explorador",
-      "member": "Membro"
+      "member": "Membro",
+      "detail": {
+        "title": "{name} - Perfil",
+        "loading": "Carregando dados do perfil...",
+        "photoAlt": "Foto de perfil",
+        "premiumSince": "Membro Premium desde 2023",
+        "personalInfo": "Informações Pessoais",
+        "edit": "Editar Perfil",
+        "lastOrders": "Últimos Pedidos",
+        "viewAllOrders": "Ver Todos os Pedidos",
+        "savedAddresses": "Endereços Salvos",
+        "coupons": "Meus Cupons",
+        "stats": {
+          "orders": "Pedidos",
+          "totalSpent": "Gasto Total",
+          "rating": "Avaliação"
+        },
+        "fields": {
+          "fullName": "Nome Completo",
+          "email": "E-mail",
+          "phone": "Telefone",
+          "birthDate": "Data de Nascimento"
+        },
+        "addresses": {
+          "home": "Casa",
+          "work": "Trabalho",
+          "main": "Principal",
+          "add": "Adicionar Endereço"
+        },
+        "orders": {
+          "status": {
+            "delivered": "Entregue",
+            "inTransit": "Em Trânsito",
+            "preparing": "Preparando"
+          }
+        },
+        "mocks": {
+          "user": "João Silva",
+          "email": "joao{'@'}exemplo.com",
+          "phone": "(11) 99999-9999",
+          "date": "1990-05-15",
+          "order1": "Pedido #12345",
+          "order2": "Pedido #12344",
+          "date1": "05 de Julho, 2025",
+          "date2": "03 de Julho, 2025",
+          "price1": "R$ 299,90",
+          "price2": "R$ 159,90",
+          "addressHome": "Rua das Flores, 123 - São Paulo - SP, 01234-567",
+          "addressWork": "Av. Paulista, 1000 - São Paulo - SP, 01310-100",
+          "coupon1": {
+            "code": "DESCONTO20",
+            "desc": "20% OFF em eletrônicos",
+            "validity": "Válido até 31/07/2025"
+          },
+          "coupon2": {
+            "code": "FRETE10",
+            "desc": "Frete grátis acima de R$ 99",
+            "validity": "Válido até 15/08/2025"
+          }
+        }
+      }
     },
     "stores": {
       "title": "Nossas Lojas",

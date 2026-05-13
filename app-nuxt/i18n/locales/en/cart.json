@@ -13,6 +13,9 @@
     "viewCart": "View Cart",
     "clearCart": "Clear Cart",
     "itemsCount": "{count} items",
-    "yourCart": "Your Cart"
+    "yourCart": "Your Cart",
+    "orderSummary": "Order Summary",
+    "shipping": "Shipping",
+    "taxesIncluded": "Taxes included in total price"
   }
 }

@@ -8,10 +8,9 @@
       </div>
       
       <div class="max-w-xl mx-auto w-full md:w-80">
-        <div class="join w-full">
-          <input type="text" :placeholder="t('pages.profiles.search')" 
-            class="input input-lg bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-14" />
-          <button class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
+        <div class="flex items-center gap-2 w-full">
+          <input type="text" :placeholder="t('pages.profiles.search')" class="input grow" id="profileSearch" />
+          <button class="btn btn-primary">
             <span class="icon-[tabler--search] size-5"></span>
           </button>
         </div>
@@ -63,7 +62,7 @@
             </div>
           </div>
           
-          <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary btn-md w-full rounded-xl shadow-lg shadow-primary/10">
+          <NuxtLink :to="`/profiles/${profile.id}`" class="btn btn-primary w-full">
             {{ t('pages.profiles.readMore') }}
             <span class="icon-[tabler--arrow-right] size-4 ml-1"></span>
           </NuxtLink>

@@ -13,6 +13,9 @@
     "viewCart": "Ver Carrinho",
     "clearCart": "Limpar Carrinho",
     "itemsCount": "{count} itens",
-    "yourCart": "Seu Carrinho"
+    "yourCart": "Seu Carrinho",
+    "orderSummary": "Resumo do Pedido",
+    "shipping": "Frete",
+    "taxesIncluded": "Impostos inclusos no preço total"
   }
 }

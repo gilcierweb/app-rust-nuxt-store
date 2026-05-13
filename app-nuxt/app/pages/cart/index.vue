@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="mb-10 pt-10">
       <h1 class="h2 gradient-text">{{ t('pages.cart.title') }}</h1>
-      <p class="text-base-content/60 mt-1">Manage your selected items and proceed to checkout.</p>
+      <p class="text-base-content/60 mt-1">{{ t('pages.cart.description') }}</p>
     </div>
 
     <!-- Empty State -->
@@ -15,9 +15,7 @@
           </div>
           <div>
             <h2 class="font-bold text-lg">{{ t('cart.empty') }}</h2>
-            <p class="text-sm opacity-80 mt-1">
-              Looks like you haven't added anything to your cart yet. Explore our products and find something you love!
-            </p>
+              {{ t('pages.cart.emptyDescription') }}
           </div>
         </div>
       </div>
@@ -62,13 +60,13 @@
                   </td>
                   <td class="py-4">
                     <div class="inline-flex items-center p-1 border border-base-200 rounded-lg">
-                      <button class="btn btn-ghost btn-square btn-sm text-base-content/70" 
+                      <button class="btn btn-soft btn-secondary btn-square btn-sm" 
                         @click="cartStore.updateQuantity(item.productId, item.quantity - 1)"
                         :disabled="item.quantity <= 1">
                         <span class="icon-[tabler--minus] size-4" />
                       </button>
                       <span class="w-10 text-center font-bold">{{ item.quantity }}</span>
-                      <button class="btn btn-ghost btn-square btn-sm text-base-content/70" @click="cartStore.updateQuantity(item.productId, item.quantity + 1)">
+                      <button class="btn btn-soft btn-secondary btn-square btn-sm" @click="cartStore.updateQuantity(item.productId, item.quantity + 1)">
                         <span class="icon-[tabler--plus] size-4" />
                       </button>
                     </div>
@@ -77,8 +75,8 @@
                     {{ formatNumberBR(item.price * item.quantity) }}
                   </td>
                   <td class="py-4 pr-6 text-right">
-                    <button @click="cartStore.removeItem(item.productId)" class="btn btn-circle btn-ghost btn-sm text-error/60 hover:text-error hover:bg-error/10" aria-label="Remove item">
-                      <span class="icon-[tabler--trash] size-5" />
+                    <button @click="cartStore.removeItem(item.productId)" class="btn btn-circle btn-soft btn-error btn-sm" aria-label="Remove item">
+                      <span class="icon-[tabler--trash] size-4" />
                     </button>
                   </td>
                 </tr>
@@ -88,12 +86,12 @@
         </div>
         
         <div class="flex flex-wrap items-center justify-between gap-4 px-4">
-          <div class="join">
-            <NuxtLink to="/products" class="btn btn-ghost gap-2 rounded-xl join-item">
+          <div class="flex flex-wrap gap-4">
+            <NuxtLink to="/products" class="btn btn-soft btn-primary gap-2 rounded-xl">
               <span class="icon-[tabler--arrow-left] size-4" />
               {{ t('cart.continueShopping') }}
             </NuxtLink>
-            <button class="btn btn-ghost text-error/60 gap-2 rounded-xl join-item" @click="cartStore.clearCart()">
+            <button class="btn btn-soft btn-error gap-2 rounded-xl" @click="cartStore.clearCart()">
               <span class="icon-[tabler--trash-x] size-4" />
               {{ t('cart.clearCart') }}
             </button>
@@ -109,13 +107,13 @@
           
           <div class="space-y-4 mb-8">
             <div class="flex justify-between text-base-content/60">
-              <span>Subtotal</span>
-              <span class="badge badge-ghost">{{ cartStore.totalItems }} items</span>
+              <span>{{ t('cart.subtotal') }}</span>
+              <span class="badge badge-ghost">{{ t('cart.itemsCount', { count: cartStore.totalItems }) }}</span>
               <span>{{ formatNumberBR(cartStore.totalPrice) }}</span>
             </div>
             <div class="flex justify-between items-center gap-2">
-              <span>Shipping</span>
-              <span class="badge badge-success badge-sm">Free</span>
+              <span>{{ t('cart.shipping') }}</span>
+              <span class="badge badge-success badge-sm">{{ t('shipping.free') }}</span>
             </div>
           </div>
           
@@ -123,11 +121,11 @@
             <div class="alert alert-info mb-4">
               <div class="flex items-center gap-2">
                 <span class="icon-[tabler--info-circle] size-5"></span>
-                <span class="text-sm">Taxes included in total price</span>
+                <span class="text-sm">{{ t('cart.taxesIncluded') }}</span>
               </div>
             </div>
             <div class="flex justify-between items-end">
-              <span class="font-bold text-lg text-base-content/60">Total</span>
+              <span class="font-bold text-lg text-base-content/60">{{ t('cart.total') }}</span>
               <div class="text-right">
                 <span class="block text-3xl font-black text-primary">{{ formatNumberBR(cartStore.totalPrice) }}</span>
               </div>

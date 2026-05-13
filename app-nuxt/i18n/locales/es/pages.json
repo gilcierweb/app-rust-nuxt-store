@@ -139,7 +139,9 @@
     },
     "cart": {
       "title": "Carrito",
+      "description": "Gestiona tus artículos seleccionados y procede a la compra.",
       "empty": "Tu carrito está vacío",
+      "emptyDescription": "Parece que aún no has añadido nada a tu carrito. ¡Explora nuestros productos y encuentra algo que te encante!",
       "subtotal": "Subtotal",
       "checkout": "Finalizar Compra",
       "continueShopping": "Continuar Comprando",
@@ -173,6 +175,11 @@
     "checkout": {
       "title": "Finalizar Compra",
       "description": "Completa tu compra proporcionando los detalles de entrega y pago.",
+      "emptyDescription": "Tu carrito está vacío. Añade algunos productos para continuar con la compra.",
+      "loadingShipping": "Cargando métodos de envío...",
+      "loadingPayment": "Cargando métodos de pago...",
+      "promoInfo": "¿Tienes un código promocional? ¡Aplícalo aquí para obtener descuentos!",
+      "secureInfo": "Pago seguro con cifrado de extremo a extremo",
       "placeOrder": "Confirmar Pedido",
       "orderSummary": "Resumen del Pedido",
       "confirming": "Confirmando tu pedido...",
@@ -259,7 +266,67 @@
       "readMore": "Ver Perfil",
       "search": "Buscar perfiles...",
       "explorer": "Explorador",
-      "member": "Miembro"
+      "member": "Miembro",
+      "detail": {
+        "title": "{name} - Perfil",
+        "loading": "Cargando datos del perfil...",
+        "photoAlt": "Foto de perfil",
+        "premiumSince": "Miembro Premium desde 2023",
+        "personalInfo": "Información Personal",
+        "edit": "Editar Perfil",
+        "lastOrders": "Últimos Pedidos",
+        "viewAllOrders": "Ver Todos los Pedidos",
+        "savedAddresses": "Direcciones Guardadas",
+        "coupons": "Mis Cupones",
+        "stats": {
+          "orders": "Pedidos",
+          "totalSpent": "Gasto Total",
+          "rating": "Calificación"
+        },
+        "fields": {
+          "fullName": "Nombre Completo",
+          "email": "Correo Electrónico",
+          "phone": "Teléfono",
+          "birthDate": "Fecha de Nacimiento"
+        },
+        "addresses": {
+          "home": "Casa",
+          "work": "Trabajo",
+          "main": "Principal",
+          "add": "Agregar Dirección"
+        },
+        "orders": {
+          "status": {
+            "delivered": "Entregado",
+            "inTransit": "En Tránsito",
+            "preparing": "Preparando"
+          }
+        },
+        "mocks": {
+          "user": "Juan Pérez",
+          "email": "juan{'@'}ejemplo.com",
+          "phone": "+34 900 123 456",
+          "date": "1990-05-15",
+          "order1": "Pedido #12345",
+          "order2": "Pedido #12344",
+          "date1": "05 de Julio, 2025",
+          "date2": "03 de Julio, 2025",
+          "price1": "299,90 €",
+          "price2": "159,90 €",
+          "addressHome": "Calle Mayor, 123 - Madrid - 28001",
+          "addressWork": "Paseo de la Castellana, 100 - Madrid - 28046",
+          "coupon1": {
+            "code": "DESCUENTO20",
+            "desc": "20% Dto. en electrónica",
+            "validity": "Válido hasta el 31/07/2025"
+          },
+          "coupon2": {
+            "code": "ENVIO10",
+            "desc": "Envío gratis a partir de 99 €",
+            "validity": "Válido hasta el 15/08/2025"
+          }
+        }
+      }
     },
     "stores": {
       "title": "Nuestras Tiendas",
