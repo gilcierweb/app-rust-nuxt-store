@@ -9,7 +9,7 @@
         <div class="join w-full">
           <input type="text" :placeholder="t('pages.stores.search')" 
             class="input input-lg bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-14" />
-          <button class="btn btn-primary join-item rounded-r-2xl h-14 px-6">
+          <button class="btn btn-primary join-item">
             <span class="icon-[tabler--search] size-5"></span>
           </button>
         </div>
@@ -55,11 +55,11 @@
           </div>
           
           <div class="grid grid-cols-2 gap-4">
-            <button class="btn btn-primary rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2">
+            <button class="btn btn-primary gap-2">
               <span class="icon-[tabler--navigation] size-4"></span>
               {{ t('pages.stores.directions') }}
             </button>
-            <button class="btn btn-ghost rounded-xl bg-base-200/50 w-full hover:bg-base-300 transition-colors">
+            <button class="btn btn-soft w-full">
               {{ t('pages.stores.details') }}
             </button>
           </div>
@@ -80,7 +80,7 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-12 rounded-2xl">{{ t('pages.stores.cta.button') }}</NuxtLink>
+      <NuxtLink to="/products" class="btn btn-primary btn-lg">{{ t('pages.stores.cta.button') }}</NuxtLink>
     </div>
   </div>
 </template>

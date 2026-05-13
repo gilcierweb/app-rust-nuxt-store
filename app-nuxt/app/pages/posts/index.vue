@@ -20,7 +20,7 @@
                 <p class="text-xs text-base-content/40">{{ t('pages.posts.authorRole') }} • {{ t('pages.posts.readTime', { n: 5 }) }}</p>
               </div>
             </div>
-            <button class="btn btn-primary btn-lg rounded-2xl px-10 shadow-xl shadow-primary/20">{{ t('pages.posts.readMore') }}</button>
+            <button class="btn btn-primary btn-lg">{{ t('pages.posts.readMore') }}</button>
           </div>
           <div class="hidden lg:block relative">
             <div class="aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white/50 bg-base-300">
@@ -37,7 +37,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
       <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full md:w-auto">
         <button v-for="cat in blogCategories" :key="cat.key" 
-          class="btn btn-soft btn-sm rounded-xl px-6 whitespace-nowrap"
+          class="btn btn-soft btn-sm whitespace-nowrap"
           :class="cat.key === 'all' ? 'btn-primary' : ''">
           {{ t(cat.label) }}
         </button>
@@ -47,7 +47,7 @@
         <div class="join w-full">
           <input type="text" :placeholder="t('pages.posts.hero.cta')" 
             class="input bg-base-200/50 border-none rounded-l-2xl pl-12 grow join-item h-12" />
-          <button class="btn btn-primary join-item rounded-r-2xl h-12 px-6">
+          <button class="btn btn-primary join-item">
             <span class="icon-[tabler--search] size-5"></span>
           </button>
         </div>
@@ -99,7 +99,7 @@
               </div>
               <span class="text-xs font-bold">Admin</span>
             </div>
-            <NuxtLink :to="`/posts/${post.id}`" class="btn btn-ghost btn-sm rounded-lg hover:bg-primary/10 hover:text-primary gap-1">
+            <NuxtLink :to="`/posts/${post.id}`" class="btn btn-ghost btn-sm gap-1">
               {{ t('pages.posts.readMore') }}
               <span class="icon-[tabler--arrow-right] size-4"></span>
             </NuxtLink>
@@ -125,7 +125,7 @@
 
     <!-- Load More -->
     <div v-if="!pending && posts && posts.length > 0" class="text-center mt-16">
-      <button class="btn btn-ghost btn-lg rounded-2xl px-12 border-2 border-base-200 hover:border-primary/20 hover:bg-primary/5 transition-all">
+      <button class="btn btn-outline btn-lg">
         <span class="flex items-center gap-2">
           {{ t('pages.posts.loadMore') }}
           <span class="icon-[tabler--arrow-down] size-5"></span>

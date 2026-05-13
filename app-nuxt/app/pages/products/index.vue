@@ -12,12 +12,12 @@
           <input type="text" :placeholder="t('pages.products.search.placeholder')" 
             class="input input-lg bg-base-200/50 border-none rounded-2xl pl-12 pr-14 w-full h-14" />
           <div class="absolute right-2 top-1/2 -translate-y-1/2">
-            <button class="btn btn-ghost btn-square btn-sm rounded-lg">
+            <button class="btn btn-ghost btn-square btn-sm">
               <span class="icon-[tabler--adjustments-horizontal] size-5"></span>
             </button>
           </div>
         </div>
-        <button class="btn btn-square btn-lg bg-base-200/50 border-none rounded-2xl h-14 w-14 lg:hidden" 
+        <button class="btn btn-square btn-ghost lg:hidden" 
           onclick="document.getElementById('filter-drawer').classList.toggle('overlay-open')"
           aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-drawer">
           <span class="icon-[tabler--filter] size-6"></span>
@@ -94,7 +94,7 @@
             <div>
               <h4 class="font-bold text-lg mb-1">{{ t('pages.products.promo.title') }}</h4>
               <p class="text-sm opacity-80 mb-3">{{ t('pages.products.promo.description') }}</p>
-              <button class="btn btn-success btn-sm w-full rounded-xl">{{ t('pages.products.promo.button') }}</button>
+              <button class="btn btn-success btn-sm w-full">{{ t('pages.products.promo.button') }}</button>
             </div>
           </div>
         </div>
@@ -125,7 +125,7 @@
               </label>
             </div>
           </div>
-          <button class="btn btn-primary w-full mt-8 rounded-2xl h-14" data-overlay="#filter-drawer">{{ t('pages.products.filters.apply') }}</button>
+          <button class="btn btn-primary w-full mt-8" data-overlay="#filter-drawer">{{ t('pages.products.filters.apply') }}</button>
         </div>
       </div>
     </div>

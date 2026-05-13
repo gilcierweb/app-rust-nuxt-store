@@ -58,67 +58,61 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Section Header for Mobile/Small Screens -->
       <div class="lg:hidden grid grid-cols-2 gap-4 mb-12">
-        <div class="p-6 rounded-3xl bg-base-100 border border-base-200 shadow-sm">
-          <div class="text-2xl font-bold text-base-content mb-1">{{ allCategories.length }}</div>
-          <div class="text-xs text-base-content/50 uppercase font-semibold">Categorias</div>
+        <div class="card card-sm bg-base-100 shadow-soft border border-base-200">
+          <div class="card-body">
+            <div class="text-2xl font-bold text-base-content mb-1">{{ allCategories.length }}</div>
+            <div class="text-xs text-base-content/50 uppercase font-semibold">Categorias</div>
+          </div>
         </div>
-        <div class="p-6 rounded-3xl bg-base-100 border border-base-200 shadow-sm">
-          <div class="text-2xl font-bold text-base-content mb-1">{{ totalProducts }}</div>
-          <div class="text-xs text-base-content/50 uppercase font-semibold">Produtos</div>
+        <div class="card card-sm bg-base-100 shadow-soft border border-base-200">
+          <div class="card-body">
+            <div class="text-2xl font-bold text-base-content mb-1">{{ totalProducts }}</div>
+            <div class="text-xs text-base-content/50 uppercase font-semibold">Produtos</div>
+          </div>
         </div>
       </div>
 
       <!-- Categories Grid -->
       <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="i in 6" :key="i" class="h-[400px] rounded-[3rem] bg-base-200/50 animate-pulse"></div>
+        <div v-for="i in 6" :key="i" class="card bg-base-200/50 animate-pulse h-64 border border-base-200"></div>
       </div>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div v-for="cat in allCategories" :key="cat.id" 
-          class="group relative h-[420px] rounded-[3rem] overflow-hidden bg-base-100 border border-base-200 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10">
+          class="card bg-base-100 shadow-soft border border-base-200 hover-lift group">
           
-          <!-- Background Pattern -->
-          <div class="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
-            <span :class="[cat.icon || 'icon-[tabler--category]', 'size-48']"></span>
-          </div>
-
-          <div class="h-full flex flex-col p-10">
+          <div class="card-body">
             <!-- Header -->
-            <div class="flex justify-between items-start mb-8">
-              <div class="size-16 rounded-3xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors duration-500">
-                <span :class="[cat.icon || 'icon-[tabler--category]', 'size-8 text-primary group-hover:text-white transition-colors duration-500']"></span>
+            <div class="flex items-center gap-4 mb-4">
+              <div class="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                <span :class="[cat.icon || 'icon-[tabler--category]', 'size-6']"></span>
               </div>
+              <h5 class="card-title">{{ cat.name }}</h5>
+              <span v-if="cat.featured" class="badge badge-warning badge-sm ml-auto">Destaque</span>
             </div>
 
             <!-- Content -->
-            <div class="flex-grow">
-              <div class="flex items-center gap-3 mb-3">
-                <h3 class="text-2xl font-bold text-base-content">{{ cat.name }}</h3>
-                <span v-if="cat.featured" class="badge badge-warning badge-sm rounded-full">Destaque</span>
+            <p class="text-base-content/70 mb-6 line-clamp-2 min-h-[3rem]">{{ cat.description }}</p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div class="text-center p-3 rounded-xl bg-base-200/50">
+                <div class="font-bold text-lg">{{ cat.productsCount }}</div>
+                <div class="text-xs text-base-content/50 uppercase">Produtos</div>
               </div>
-              <p class="text-base-content/50 leading-relaxed mb-8 line-clamp-2">{{ cat.description }}</p>
-              
-              <div class="grid grid-cols-2 gap-6 p-6 rounded-3xl bg-base-50/50 border border-base-200/50">
-                <div>
-                  <div class="text-2xl font-bold text-base-content">{{ cat.productsCount }}</div>
-                  <div class="text-xs font-medium text-base-content/40 uppercase">Produtos</div>
-                </div>
-                <div>
-                  <div class="text-2xl font-bold text-base-content">{{ cat.subcategories }}</div>
-                  <div class="text-xs font-medium text-base-content/40 uppercase">Subcategorias</div>
-                </div>
+              <div class="text-center p-3 rounded-xl bg-base-200/50">
+                <div class="font-bold text-lg">{{ cat.subcategories }}</div>
+                <div class="text-xs text-base-content/50 uppercase">Subcategorias</div>
               </div>
             </div>
 
             <!-- Footer Action -->
-            <div class="mt-8 flex items-center justify-between">
-              <NuxtLink :to="`/categories/${cat.id}`" class="flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all">
+            <div class="card-actions justify-between items-center mt-auto">
+              <NuxtLink :to="`/categories/${cat.id}`" class="btn btn-primary btn-sm">
                 Explorar Agora
-                <span class="icon-[tabler--arrow-right] size-5"></span>
               </NuxtLink>
               
-              <button @click="toggleFavorite(cat.id)" class="btn btn-ghost btn-sm btn-circle hover:bg-error/10 transition-colors">
-                <span :class="[cat.isFavorite ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart] text-base-content/20', 'size-5']"></span>
+              <button @click="toggleFavorite(cat.id)" class="btn btn-circle btn-ghost btn-sm">
+                <span :class="[cat.isFavorite ? 'icon-[tabler--heart-filled] text-error' : 'icon-[tabler--heart] text-base-content/40 hover:text-error', 'size-5 transition-colors']"></span>
               </button>
             </div>
           </div>

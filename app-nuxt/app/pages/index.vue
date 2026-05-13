@@ -18,7 +18,7 @@
           <h2 class="h3 gradient-text">{{ t('pages.home.products') }}</h2>
           <p class="text-base-content/60 mt-1">{{ t('pages.home.productsSubtitle') }}</p>
         </div>
-        <NuxtLink to="/products" class="btn btn-primary btn-sm gap-2">
+        <NuxtLink to="/products" class="btn btn-primary btn-sm">
           {{ t('pages.home.shopAll') }} <span class="icon-[tabler--arrow-right] size-4"></span>
         </NuxtLink>
       </div>
@@ -39,7 +39,7 @@
         <form class="flex flex-col sm:flex-row gap-4">
           <input type="email" :placeholder="t('pages.home.newsletter.placeholder')" 
             class="input input-lg bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:bg-white/20 grow rounded-2xl h-14" />
-          <button type="submit" class="btn btn-secondary btn-lg h-14 px-10 rounded-2xl shadow-xl shadow-secondary/20 transition-transform hover:scale-105">
+          <button type="submit" class="btn btn-secondary btn-lg">
             {{ t('pages.home.newsletter.button') }}
           </button>
         </form>

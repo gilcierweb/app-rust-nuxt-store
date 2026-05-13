@@ -19,7 +19,7 @@
           </div>
         </div>
       </div>
-      <NuxtLink to="/products" class="btn btn-primary btn-lg px-10 rounded-2xl shadow-xl shadow-primary/20 transition-transform hover:scale-105 mt-8">
+      <NuxtLink to="/products" class="btn btn-primary mt-8">
         {{ t('cart.continueShopping') }}
       </NuxtLink>
     </div>
@@ -219,7 +219,7 @@
           </div>
           
           <div class="space-y-4">
-            <button class="btn btn-primary btn-lg w-full h-16 rounded-2xl shadow-xl shadow-primary/20 text-lg transition-all hover:scale-[1.02] hover:shadow-primary/30"
+            <button class="btn btn-primary w-full"
               :disabled="submitting || !selectedPaymentMethod" @click="placeOrder">
               <span v-if="submitting" class="loading loading-spinner mr-2" />
               <span v-else class="icon-[tabler--lock] size-5 mr-2"></span>
