@@ -11,6 +11,7 @@
     "addToCart": "Add to Cart",
     "loadMore": "Load more products",
     "found": "{count} products found",
+    "notFound": "Product not found",
     "filters": {
       "title": "Filters:",
       "allBrands": "All brands",
@@ -43,6 +44,14 @@
       "fastDelivery": "Fast delivery",
       "discount": "-{percent}%",
       "reviews": "({count} reviews)"
-    }
+    },
+    "verifiedPurchase": "Verified purchase",
+    "noReviews": "No reviews yet. Be the first!",
+    "rating": "Rating",
+    "reviewTitle": "Review title",
+    "reviewComment": "Comment",
+    "submitReview": "Submit Review",
+    "reviewSuccess": "Review submitted successfully!",
+    "reviewError": "Error submitting review"
   }
 }
