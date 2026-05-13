@@ -26,7 +26,13 @@ export const useAuth = () => {
         body: { email, password }
       })
       tokenCookie.value = data.token
-      user.value = { pid: data.pid, name: data.name, email }
+      user.value = {
+        pid: data.pid,
+        name: data.name,
+        email,
+        roles: data.roles,
+        can_manage_admin: data.can_manage_admin
+      }
       return data
     } catch (err: any) {
       const message = err?.data?.message || err?.message || 'Erro ao fazer login'

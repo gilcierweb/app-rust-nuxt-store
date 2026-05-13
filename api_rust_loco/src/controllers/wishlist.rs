@@ -76,9 +76,7 @@ pub async fn remove(
     Query(params): Query<RemoveParams>,
 ) -> Result<Response> {
     let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    let item = Entity::find_by_id(params.id)
-        .one(&ctx.db)
-        .await?;
+    let item = Entity::find_by_id(params.id).one(&ctx.db).await?;
     let item = item.ok_or_else(|| Error::NotFound)?;
     if item.user_id != current_user.id {
         return unauthorized(t!("auth.unauthorized"));

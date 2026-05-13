@@ -1,5 +1,5 @@
+pub use super::_entities::coupons::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::coupons::{ActiveModel, Model, Entity};
 pub type Coupons = Entity;
 
 #[async_trait::async_trait]

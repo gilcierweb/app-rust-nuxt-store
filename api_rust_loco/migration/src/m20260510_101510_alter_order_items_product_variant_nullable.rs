@@ -46,4 +46,3 @@ enum OrderItems {
     Table,
     ProductVariantId,
 }
-

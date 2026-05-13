@@ -1,17 +1,17 @@
 mod auth;
 mod prepare_data;
 
-pub mod post;
-pub mod profile;
-pub mod category;
-pub mod product;
-pub mod cart;
-pub mod order;
-pub mod review;
-pub mod wishlist;
 pub mod address;
+pub mod cart;
+pub mod category;
 pub mod coupon;
+pub mod dashboard;
+pub mod order;
 pub mod payment;
+pub mod post;
+pub mod product;
+pub mod profile;
+pub mod review;
 pub mod shipping;
 pub mod variant;
-pub mod dashboard;
+pub mod wishlist;

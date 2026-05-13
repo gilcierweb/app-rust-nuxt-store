@@ -1,5 +1,5 @@
+pub use super::_entities::product_variants::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::product_variants::{ActiveModel, Model, Entity};
 pub type ProductVariants = Entity;
 
 #[async_trait::async_trait]

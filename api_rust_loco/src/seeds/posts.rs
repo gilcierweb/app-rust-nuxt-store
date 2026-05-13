@@ -1,11 +1,11 @@
-use chrono::Utc;
-use loco_rs::Result;
-use fakeit::words;
-use rand::Rng;
-use sea_orm::{ActiveModelTrait, Set, EntityTrait, PaginatorTrait};
 use crate::models::_entities::posts::{ActiveModel as Post, Entity as Posts};
 use crate::models::_entities::users::Entity as UserEntity;
 use crate::models::post_status::PostStatus;
+use chrono::Utc;
+use fakeit::words;
+use loco_rs::Result;
+use rand::Rng;
+use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let count = Posts::find().count(db).await?;

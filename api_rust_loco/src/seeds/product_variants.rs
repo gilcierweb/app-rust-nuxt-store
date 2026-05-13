@@ -26,7 +26,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for product in &products {
         let num_variants = rand::rng().random_range(1..=4);
-        
+
         for (i, variant_name) in variant_names.iter().take(num_variants).enumerate() {
             let base_price = product.price.unwrap_or(Decimal::new(1000, 2));
             let price_adjustment = Decimal::new(rand::rng().random_range(-500..500) as i64, 2);
@@ -34,7 +34,8 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
             let cost_price = price - Decimal::new(rand::rng().random_range(100..300) as i64, 2);
             let compare_price = price + Decimal::new(rand::rng().random_range(100..500) as i64, 2);
 
-            let sku = format!("{}-{}", 
+            let sku = format!(
+                "{}-{}",
                 product.sku.clone().unwrap_or_else(|| "SKU".to_string()),
                 unique::uuid_v4().split('-').next().unwrap_or("VAR")
             );
@@ -46,7 +47,10 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
                 cost_price: Set(Some(cost_price)),
                 compare_price: Set(Some(compare_price)),
                 inventory_quantity: Set(Some(rand::rng().random_range(10..500))),
-                weight: Set(Some(Decimal::new(rand::rng().random_range(100..2000) as i64, 2))),
+                weight: Set(Some(Decimal::new(
+                    rand::rng().random_range(100..2000) as i64,
+                    2,
+                ))),
                 barcode: Set(Some(unique::uuid_v4())),
                 position: Set(Some(i as i32)),
                 active: Set(Some(bool_rand::bool())),

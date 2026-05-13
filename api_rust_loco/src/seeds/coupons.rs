@@ -1,4 +1,4 @@
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
 use fakeit::bool_rand;
 use loco_rs::Result;
 use rust_decimal::Decimal;
@@ -18,14 +18,15 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let coupon_data = vec![
         ("WELCOME10", 1, 1000, Some(5000), Some(1000), 100), // 10% off, max $10 discount
         ("SAVE20", 1, 2000, Some(10000), Some(2000), 50),    // 20% off, max $20 discount
-        ("FLAT50", 2, 5000, Some(10000), None, 30),        // $50 flat off
-        ("FREESHIP", 2, 0, Some(5000), None, 200),          // Free shipping
+        ("FLAT50", 2, 5000, Some(10000), None, 30),          // $50 flat off
+        ("FREESHIP", 2, 0, Some(5000), None, 200),           // Free shipping
         ("HOLIDAY25", 1, 2500, Some(7500), Some(2500), 25),
         ("FLASH15", 1, 1500, Some(3000), Some(1500), 10),
         ("BULK10", 2, 1000, Some(2000), None, 1000),
     ];
 
-    for (code, discount_type, discount_value, min_amount, max_discount, usage_limit) in coupon_data {
+    for (code, discount_type, discount_value, min_amount, max_discount, usage_limit) in coupon_data
+    {
         let expires_at = if bool_rand::bool() {
             Some((now + Duration::days(30)).naive_utc())
         } else {

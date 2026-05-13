@@ -6,7 +6,6 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-     
         #[derive(Iden)]
         enum Categories {
             Table,
@@ -22,7 +21,7 @@ impl MigrationTrait for Migration {
                     .to_owned(),
             )
             .await?;
-      
+
         manager
             .create_foreign_key(
                 ForeignKey::create()
@@ -37,13 +36,12 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-     
         #[derive(Iden)]
         enum Categories {
             Table,
             ParentId,
         }
-       
+
         manager
             .drop_foreign_key(
                 ForeignKey::drop()
@@ -52,7 +50,7 @@ impl MigrationTrait for Migration {
                     .to_owned(),
             )
             .await?;
-    
+
         manager
             .alter_table(
                 Table::alter()

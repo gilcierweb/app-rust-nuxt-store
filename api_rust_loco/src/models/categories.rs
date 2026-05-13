@@ -1,6 +1,6 @@
+pub use super::_entities::categories::{ActiveModel, Column, Entity, Model};
 use loco_rs::{model::ModelError, Result};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::categories::{ActiveModel, Model, Entity, Column };
 pub type Categories = Entity;
 
 #[async_trait::async_trait]
@@ -22,27 +22,27 @@ impl ActiveModelBehavior for ActiveModel {
 // implement your read-oriented logic here
 impl Model {
     pub async fn find_with_relations(
-           db: &DatabaseConnection,
-           id: i32,
-       ) -> Result<(Self, Option<Self>, Vec<Self>)> {
-           let category = Entity::find_by_id(id)
-               .one(db)
-               .await?
-               .ok_or_else(|| ModelError::EntityNotFound)?;
-   
-           let parent = if let Some(parent_id) = category.parent_id {
-               Entity::find_by_id(parent_id).one(db).await?
-           } else {
-               None
-           };
-   
-           let children = Entity::find()
-               .filter(Column::ParentId.eq(id))
-               .all(db)
-               .await?;
-   
-           Ok((category, parent, children))
-       }
+        db: &DatabaseConnection,
+        id: i32,
+    ) -> Result<(Self, Option<Self>, Vec<Self>)> {
+        let category = Entity::find_by_id(id)
+            .one(db)
+            .await?
+            .ok_or_else(|| ModelError::EntityNotFound)?;
+
+        let parent = if let Some(parent_id) = category.parent_id {
+            Entity::find_by_id(parent_id).one(db).await?
+        } else {
+            None
+        };
+
+        let children = Entity::find()
+            .filter(Column::ParentId.eq(id))
+            .all(db)
+            .await?;
+
+        Ok((category, parent, children))
+    }
 }
 
 // implement your write-oriented logic here

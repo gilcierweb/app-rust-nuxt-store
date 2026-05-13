@@ -24,14 +24,18 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for product in &products {
         let num_images = rand::rng().random_range(1..=5);
-        
+
         for position in 0..num_images {
             let image_url = image::url(800, 600);
             let is_cover = position == 0;
 
             let product_image = ActiveModel {
                 image: Set(Some(image_url)),
-                alt_text: Set(Some(format!("Product {} image {}", product.id, position + 1))),
+                alt_text: Set(Some(format!(
+                    "Product {} image {}",
+                    product.id,
+                    position + 1
+                ))),
                 active: Set(Some(true)),
                 cover: Set(Some(is_cover)),
                 position: Set(Some(position)),

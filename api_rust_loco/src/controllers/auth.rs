@@ -143,13 +143,15 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
         .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
-    format::json(LoginResponse::new(&user, &token))
+    let roles = user.roles(&ctx.db).await?;
+    format::json(LoginResponse::new(&user, &token, roles))
 }
 
 #[debug_handler]
 async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
     let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    format::json(CurrentResponse::new(&user))
+    let roles = user.roles(&ctx.db).await?;
+    format::json(CurrentResponse::new(&user, roles))
 }
 
 /// Magic link authentication provides a secure and passwordless way to log in to the application.
@@ -211,7 +213,8 @@ async fn magic_link_verify(
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
         .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
-    format::json(LoginResponse::new(&user, &token))
+    let roles = user.roles(&ctx.db).await?;
+    format::json(LoginResponse::new(&user, &token, roles))
 }
 
 pub fn routes() -> Routes {

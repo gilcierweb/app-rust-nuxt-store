@@ -8,8 +8,8 @@ use rust_decimal::Decimal;
 use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 
-use crate::models::_entities::product_variants::{ActiveModel, Entity, Model};
 use crate::models::_entities::product_variant_options::Entity as PivotEntity;
+use crate::models::_entities::product_variants::{ActiveModel, Entity, Model};
 use crate::models::_entities::variant_options::Entity as OptionTypeEntity;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -72,10 +72,7 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     item.ok_or_else(|| Error::NotFound)
 }
 
-async fn load_variant_options(
-    ctx: &AppContext,
-    variant_id: i32,
-) -> Result<Vec<VariantOptionJson>> {
+async fn load_variant_options(ctx: &AppContext, variant_id: i32) -> Result<Vec<VariantOptionJson>> {
     let pivots = PivotEntity::find()
         .filter(
             crate::models::_entities::product_variant_options::Column::ProductVariantId
@@ -137,7 +134,8 @@ pub async fn list(
         .find(|(k, _)| k == "product_id")
         .and_then(|(_, v)| v.parse().ok());
 
-    let mut query = Entity::find().order_by_asc(crate::models::_entities::product_variants::Column::Position);
+    let mut query =
+        Entity::find().order_by_asc(crate::models::_entities::product_variants::Column::Position);
     if let Some(pid) = product_id {
         query = query.filter(crate::models::_entities::product_variants::Column::ProductId.eq(pid));
     }
@@ -166,10 +164,7 @@ pub async fn list(
 }
 
 #[debug_handler]
-pub async fn get_one(
-    Path(id): Path<i32>,
-    State(ctx): State<AppContext>,
-) -> Result<Response> {
+pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     let v = load_item(&ctx, id).await?;
     let options = load_variant_options(&ctx, v.id).await?;
     format::json(VariantWithOptions {
@@ -190,11 +185,10 @@ pub async fn get_one(
 }
 
 #[debug_handler]
-pub async fn add(
-    State(ctx): State<AppContext>,
-    Json(params): Json<Params>,
-) -> Result<Response> {
-    let mut item = ActiveModel { ..Default::default() };
+pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
+    let mut item = ActiveModel {
+        ..Default::default()
+    };
     params.update(&mut item);
     let now = chrono::Utc::now().into();
     item.created_at = Set(now);
@@ -217,10 +211,7 @@ pub async fn update(
 }
 
 #[debug_handler]
-pub async fn remove(
-    Path(id): Path<i32>,
-    State(ctx): State<AppContext>,
-) -> Result<Response> {
+pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }

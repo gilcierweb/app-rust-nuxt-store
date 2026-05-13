@@ -34,4 +34,3 @@ async fn can_get_get_one() {
     })
     .await;
 }
-

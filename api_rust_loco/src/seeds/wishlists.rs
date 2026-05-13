@@ -3,9 +3,9 @@ use loco_rs::Result;
 use rand::Rng;
 use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
-use crate::models::_entities::wishlists::{ActiveModel, Entity};
 use crate::models::_entities::products::Entity as ProductEntity;
 use crate::models::_entities::users::Entity as UserEntity;
+use crate::models::_entities::wishlists::{ActiveModel, Entity};
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let count = Entity::find().count(db).await?;
@@ -26,7 +26,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for user in &users {
         let num_items = rand::rng().random_range(0..=8);
-        
+
         for _ in 0..num_items {
             let product = &products[rand::rng().random_range(0..products.len())];
 

@@ -1,17 +1,19 @@
 use chrono::Utc;
-use fakeit::{bool_rand,company, unique, words};
+use fakeit::{bool_rand, company, unique, words};
 use loco_rs::Result;
 use rand::Rng;
 use rust_decimal::Decimal;
-use sea_orm::{ActiveModelTrait,  EntityTrait, Set};
 use sea_orm::prelude::*;
+use sea_orm::{ActiveModelTrait, EntityTrait, Set};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::models::_entities::products::{ActiveModel as Product, Entity as ProductEntity};
 use crate::models::_entities::categories::Entity as CategoryEntity;
+use crate::models::_entities::products::{ActiveModel as Product, Entity as ProductEntity};
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
-    let count = <ProductEntity as sea_orm::EntityTrait>::find().count(db).await?;
+    let count = <ProductEntity as sea_orm::EntityTrait>::find()
+        .count(db)
+        .await?;
     if count > 0 {
         tracing::info!("Products already exist, skipping.");
         return Ok(());
@@ -32,7 +34,6 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let now = Utc::now();
 
     for i in 0..30 {
-
         let number_one = rand::rng().random_range(1000..100_000);
         let number_two = rand::rng().random_range(100..5000);
         let number_three = rand::rng().random_range(1000..9999);
@@ -42,9 +43,6 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
         let sku_val = format!("SKU-{}", number_three);
         let short_desc = words::sentence(rand::rng().random_range(5..10));
         let desc = words::paragraph(3, 4, 10, "\n".to_string());
-
-      
-
 
         let price = Decimal::new(number_one as i64, 2);
         let cost_price = price - Decimal::new(number_two as i64, 2);

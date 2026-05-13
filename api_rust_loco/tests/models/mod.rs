@@ -1,25 +1,23 @@
 mod users;
 
-
-
-mod posts;
-mod profiles;
-mod categories;
-mod products;
-mod product_images;
-mod product_variants;
-mod variant_options;
-mod product_variant_options;
-mod carts;
+mod addresses;
 mod cart_items;
-mod orders;
+mod carts;
+mod categories;
+mod coupon_usages;
+mod coupons;
 mod order_items;
+mod orders;
 mod payment_methods;
 mod payments;
-mod addresses;
-mod shipping_methods;
-mod shipments;
-mod coupons;
-mod coupon_usages;
+mod posts;
+mod product_images;
+mod product_variant_options;
+mod product_variants;
+mod products;
+mod profiles;
 mod reviews;
+mod shipments;
+mod shipping_methods;
+mod variant_options;
 mod wishlists;

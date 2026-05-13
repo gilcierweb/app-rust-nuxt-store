@@ -6,8 +6,8 @@ use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
 use crate::models::_entities::order_items::{ActiveModel, Entity};
 use crate::models::_entities::orders::Entity as OrderEntity;
-use crate::models::_entities::products::Entity as ProductEntity;
 use crate::models::_entities::product_variants::Entity as VariantEntity;
+use crate::models::_entities::products::Entity as ProductEntity;
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let count = Entity::find().count(db).await?;
@@ -29,11 +29,14 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for order in &orders {
         let num_items = rand::rng().random_range(1..=4);
-        
+
         for _ in 0..num_items {
             let product = &products[rand::rng().random_range(0..products.len())];
-            let product_variants: Vec<_> = variants.iter().filter(|v| v.product_id == product.id).collect();
-            
+            let product_variants: Vec<_> = variants
+                .iter()
+                .filter(|v| v.product_id == product.id)
+                .collect();
+
             let variant_id = if !product_variants.is_empty() && rand::rng().random_bool(0.6) {
                 Some(product_variants[rand::rng().random_range(0..product_variants.len())].id)
             } else {

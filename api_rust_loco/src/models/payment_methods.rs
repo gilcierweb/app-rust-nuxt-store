@@ -1,5 +1,5 @@
+pub use super::_entities::payment_methods::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::payment_methods::{ActiveModel, Model, Entity};
 pub type PaymentMethods = Entity;
 
 #[async_trait::async_trait]

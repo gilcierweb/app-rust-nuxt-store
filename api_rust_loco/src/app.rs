@@ -72,10 +72,10 @@ impl Hooks for App {
     async fn after_routes(router: axum::Router, _ctx: &AppContext) -> Result<axum::Router> {
         use utoipa::OpenApi;
         use utoipa_swagger_ui::SwaggerUi;
-        
+
         let swagger = SwaggerUi::new("/api/docs")
             .url("/api-docs/openapi.json", crate::openapi::ApiDoc::openapi());
-            
+
         Ok(router.merge(swagger))
     }
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {

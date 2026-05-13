@@ -6,6 +6,7 @@ pub mod coupon_usages;
 pub mod coupons;
 pub mod order_items;
 pub mod orders;
+pub mod payment_methods;
 pub mod payments;
 pub mod posts;
 pub mod product_images;
@@ -19,10 +20,9 @@ pub mod shipping_methods;
 pub mod users;
 pub mod variant_options;
 pub mod wishlists;
-pub mod payment_methods;
 
-use sea_orm::DatabaseConnection;
 use loco_rs::Result;
+use sea_orm::DatabaseConnection;
 
 /// Seeds all database tables in the correct dependency order.
 /// This function is called during application boot when running seeds.

@@ -64,4 +64,3 @@ async fn can_get_clear() {
     })
     .await;
 }
-

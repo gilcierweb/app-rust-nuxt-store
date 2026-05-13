@@ -4,8 +4,8 @@ use loco_rs::Result;
 use rand::Rng;
 use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
-use crate::models::_entities::reviews::{ActiveModel, Entity};
 use crate::models::_entities::products::Entity as ProductEntity;
+use crate::models::_entities::reviews::{ActiveModel, Entity};
 use crate::models::_entities::users::Entity as UserEntity;
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
@@ -27,7 +27,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for product in &products {
         let num_reviews = rand::rng().random_range(0..=5);
-        
+
         for _ in 0..num_reviews {
             let user = &users[rand::rng().random_range(0..users.len())];
             let rating = rand::rng().random_range(1..=5);

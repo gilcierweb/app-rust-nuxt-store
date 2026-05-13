@@ -1,6 +1,6 @@
+pub use super::_entities::orders::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
-pub use super::_entities::orders::{ActiveModel, Model, Entity};
 pub type Orders = Entity;
 
 #[derive(Debug, Deserialize)]

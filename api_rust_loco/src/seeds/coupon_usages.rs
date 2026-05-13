@@ -1,4 +1,4 @@
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
 use loco_rs::Result;
 use rand::Rng;
 use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
@@ -30,7 +30,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
         if rand::rng().random_bool(0.3) {
             let coupon = &coupons[rand::rng().random_range(0..coupons.len())];
             let user = &users[rand::rng().random_range(0..users.len())];
-            
+
             let used_at = (now - Duration::days(rand::rng().random_range(1..30))).naive_utc();
 
             let coupon_usage = ActiveModel {

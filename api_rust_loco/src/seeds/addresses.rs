@@ -25,7 +25,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for user in &users {
         let num_addresses = rand::rng().random_range(1..=3);
-        
+
         for i in 0..num_addresses {
             let address_type = address_types[i % address_types.len()];
             let is_default = i == 0;

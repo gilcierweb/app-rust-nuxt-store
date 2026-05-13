@@ -1,11 +1,11 @@
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
 use fakeit::unique;
 use loco_rs::Result;
 use rand::Rng;
 use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
-use crate::models::_entities::shipments::{ActiveModel, Entity};
 use crate::models::_entities::orders::Entity as OrderEntity;
+use crate::models::_entities::shipments::{ActiveModel, Entity};
 use crate::models::_entities::shipping_methods::Entity as ShippingMethodEntity;
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
@@ -28,9 +28,10 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for order in &orders {
         let num_shipments = rand::rng().random_range(0..=2);
-        
+
         for _ in 0..num_shipments {
-            let shipping_method = &shipping_methods[rand::rng().random_range(0..shipping_methods.len())];
+            let shipping_method =
+                &shipping_methods[rand::rng().random_range(0..shipping_methods.len())];
             let status = rand::rng().random_range(1..=5);
 
             let shipped_at = if status >= 2 {
@@ -46,8 +47,17 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
             };
 
             let shipment = ActiveModel {
-                tracking_number: Set(Some(unique::uuid_v4().to_uppercase().replace("-", "").split_at(16).0.to_string())),
-                carrier: Set(Some(carriers[rand::rng().random_range(0..carriers.len())].to_string())),
+                tracking_number: Set(Some(
+                    unique::uuid_v4()
+                        .to_uppercase()
+                        .replace("-", "")
+                        .split_at(16)
+                        .0
+                        .to_string(),
+                )),
+                carrier: Set(Some(
+                    carriers[rand::rng().random_range(0..carriers.len())].to_string(),
+                )),
                 status: Set(Some(status)),
                 shipped_at: Set(shipped_at),
                 delivered_at: Set(delivered_at),

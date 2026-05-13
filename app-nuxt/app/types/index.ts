@@ -125,6 +125,8 @@ export interface LoginResponse {
   token: string
   pid: string
   name: string
+  roles: string[]
+  can_manage_admin: boolean
   is_verified: boolean
 }
 
@@ -132,6 +134,8 @@ export interface CurrentResponse {
   pid: string
   name: string
   email: string
+  roles: string[]
+  can_manage_admin: boolean
 }
 
 export interface RegisterParams {

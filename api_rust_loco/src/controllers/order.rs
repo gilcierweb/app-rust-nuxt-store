@@ -15,8 +15,8 @@ use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
 use crate::models::_entities::payments;
 use crate::models::_entities::shipments;
-use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::order_status::OrderStatus;
+use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::users;
 
 fn generate_order_number() -> String {
@@ -84,7 +84,7 @@ pub async fn checkout(
         shipping_amount: Set(params.shipping_amount),
         discount_amount: Set(params.discount_amount),
         currency: Set(Some("BRL".to_string())),
-        payment_status: Set(Some(1)), // unpaid
+        payment_status: Set(Some(1)),     // unpaid
         fulfillment_status: Set(Some(1)), // unfulfilled
         notes: Set(params.notes),
         user_id: Set(current_user.id),
@@ -258,10 +258,7 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 }
 
 #[debug_handler]
-pub async fn get_one(
-    Path(id): Path<i32>,
-    State(ctx): State<AppContext>,
-) -> Result<Response> {
+pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     let order = Entity::find_by_id(id).one(&ctx.db).await?;
     let order = order.ok_or(Error::NotFound)?;
 
@@ -314,13 +311,20 @@ pub async fn update_status(
     let order = Entity::find_by_id(id).one(&ctx.db).await?;
     let order = order.ok_or(Error::NotFound)?;
 
-    let current_status = OrderStatus::from_i32(order.status.unwrap_or(1)).unwrap_or(OrderStatus::Pending);
-    let new_status = OrderStatus::from_i32(params.status).ok_or_else(|| {
-        Error::BadRequest(t!("order.invalid_status").into())
-    })?;
+    let current_status =
+        OrderStatus::from_i32(order.status.unwrap_or(1)).unwrap_or(OrderStatus::Pending);
+    let new_status = OrderStatus::from_i32(params.status)
+        .ok_or_else(|| Error::BadRequest(t!("order.invalid_status").into()))?;
 
     if !current_status.can_transition_to(new_status) {
-        return Err(Error::BadRequest(t!("order.invalid_transition", from = format!("{:?}", current_status), to = format!("{:?}", new_status)).into()));
+        return Err(Error::BadRequest(
+            t!(
+                "order.invalid_transition",
+                from = format!("{:?}", current_status),
+                to = format!("{:?}", new_status)
+            )
+            .into(),
+        ));
     }
 
     let mut active: crate::models::_entities::orders::ActiveModel = order.into();

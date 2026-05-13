@@ -1,11 +1,13 @@
 use async_trait::async_trait;
 use chrono::{offset::Local, Duration};
 use loco_rs::{auth::jwt, hash, prelude::*};
+use sea_orm::{ColumnTrait, EntityTrait, JoinType, QueryFilter, QuerySelect, RelationTrait};
 use serde::{Deserialize, Serialize};
 use serde_json::Map;
 use uuid::Uuid;
 
 pub use super::_entities::users::{self, ActiveModel, Entity, Model};
+use super::_entities::{roles, users_roles};
 
 pub const MAGIC_LINK_LENGTH: i8 = 32;
 pub const MAGIC_LINK_EXPIRATION_MIN: i8 = 5;
@@ -249,6 +251,35 @@ impl Model {
         .insert(&txn)
         .await?;
 
+        let default_role = roles::Entity::find()
+            .filter(roles::Column::Name.eq("user"))
+            .filter(roles::Column::ResourceType.is_null())
+            .filter(roles::Column::ResourceId.is_null())
+            .one(&txn)
+            .await?;
+        let default_role = match default_role {
+            Some(role) => role,
+            None => {
+                roles::ActiveModel {
+                    name: ActiveValue::set("user".to_string()),
+                    resource_type: ActiveValue::set(None),
+                    resource_id: ActiveValue::set(None),
+                    created_at: ActiveValue::set(Local::now().into()),
+                    updated_at: ActiveValue::set(Local::now().into()),
+                    ..Default::default()
+                }
+                .insert(&txn)
+                .await?
+            }
+        };
+
+        users_roles::ActiveModel {
+            user_id: ActiveValue::set(user.id),
+            role_id: ActiveValue::set(default_role.id),
+        }
+        .insert(&txn)
+        .await?;
+
         txn.commit().await?;
 
         Ok(user)
@@ -261,6 +292,27 @@ impl Model {
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: u64) -> ModelResult<String> {
         Ok(jwt::JWT::new(secret).generate_token(expiration, self.pid.to_string(), Map::new())?)
+    }
+
+    pub async fn roles(&self, db: &DatabaseConnection) -> ModelResult<Vec<String>> {
+        let roles = roles::Entity::find()
+            .join(JoinType::InnerJoin, roles::Relation::UsersRoles.def())
+            .filter(users_roles::Column::UserId.eq(self.id))
+            .all(db)
+            .await?;
+
+        Ok(roles.into_iter().map(|role| role.name).collect())
+    }
+
+    pub async fn has_role(&self, db: &DatabaseConnection, name: &str) -> ModelResult<bool> {
+        let role = roles::Entity::find()
+            .join(JoinType::InnerJoin, roles::Relation::UsersRoles.def())
+            .filter(users_roles::Column::UserId.eq(self.id))
+            .filter(roles::Column::Name.eq(name))
+            .one(db)
+            .await?;
+
+        Ok(role.is_some())
     }
 }
 

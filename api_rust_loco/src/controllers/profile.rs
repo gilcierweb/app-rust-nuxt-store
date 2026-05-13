@@ -1,9 +1,9 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use axum::debug_handler;
 
 use crate::models::_entities::profiles::{ActiveModel, Entity, Model};
 
@@ -19,21 +19,21 @@ pub struct Params {
     pub avatar: Option<String>,
     pub bio: Option<String>,
     pub whatsapp: Option<i64>,
-    }
+}
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-      item.first_name = Set(self.first_name.clone());
-      item.last_name = Set(self.last_name.clone());
-      item.full_name = Set(self.full_name.clone());
-      item.username = Set(self.username.clone());
-      item.nickname = Set(self.nickname.clone());
-      item.phone = Set(self.phone.clone());
-      item.birth_date = Set(self.birth_date.clone());
-      item.avatar = Set(self.avatar.clone());
-      item.bio = Set(self.bio.clone());
-      item.whatsapp = Set(self.whatsapp.clone());
-      }
+        item.first_name = Set(self.first_name.clone());
+        item.last_name = Set(self.last_name.clone());
+        item.full_name = Set(self.full_name.clone());
+        item.username = Set(self.username.clone());
+        item.nickname = Set(self.nickname.clone());
+        item.phone = Set(self.phone.clone());
+        item.birth_date = Set(self.birth_date.clone());
+        item.avatar = Set(self.avatar.clone());
+        item.bio = Set(self.bio.clone());
+        item.whatsapp = Set(self.whatsapp.clone());
+    }
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {

@@ -7,7 +7,7 @@ use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::users::{Entity, Model};
-use crate::models::users;
+use crate::models::ability::{Ability, Action, Resource, Subject};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -34,45 +34,39 @@ pub struct UserDetail {
     pub updated_at: DateTimeWithTimeZone,
 }
 
-fn to_list_item(user: Model) -> UserListItem {
-    let role = if user.id == 1 || user.email.starts_with("admin@") {
+fn display_role(roles: &[String]) -> String {
+    if roles.iter().any(|role| role == "admin") {
         "Admin".to_string()
+    } else if let Some(role) = roles.first() {
+        role.to_string()
     } else {
         "User".to_string()
-    };
+    }
+}
 
+fn to_list_item(user: Model, roles: Vec<String>) -> UserListItem {
     UserListItem {
         id: user.id,
         email: user.email,
         name: user.name,
-        role,
+        role: display_role(&roles),
         active: user.email_verified_at.is_some(),
         created_at: user.created_at,
     }
 }
 
-fn to_detail(user: Model) -> UserDetail {
-    let role = if user.id == 1 || user.email.starts_with("admin@") {
-        "Admin".to_string()
-    } else {
-        "User".to_string()
-    };
-
+fn to_detail(user: Model, roles: Vec<String>) -> UserDetail {
     UserDetail {
         id: user.id,
         pid: user.pid.to_string(),
         email: user.email,
         name: user.name,
-        role,
+        role: display_role(&roles),
         active: user.email_verified_at.is_some(),
         email_verified_at: user.email_verified_at,
         created_at: user.created_at,
         updated_at: user.updated_at,
     }
-}
-
-fn is_admin(user: &Model) -> bool {
-    user.id == 1 || user.email.starts_with("admin@")
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
@@ -82,17 +76,20 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 
 #[debug_handler]
 pub async fn list(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    if !is_admin(&current_user) {
-        return unauthorized(t!("auth.unauthorized"));
-    }
+    let (current_user, ability) = Ability::for_user_pid(&ctx.db, &auth.claims.pid).await?;
+    ability.authorize(Action::Read, Subject::Admin)?;
 
-    let items = Entity::find()
+    let items = ability
+        .accessible_users_query(Action::Read, current_user.id)
         .order_by_desc(crate::models::_entities::users::Column::CreatedAt)
         .all(&ctx.db)
         .await?;
 
-    let response: Vec<UserListItem> = items.into_iter().map(to_list_item).collect();
+    let mut response = Vec::with_capacity(items.len());
+    for item in items {
+        let roles = item.roles(&ctx.db).await?;
+        response.push(to_list_item(item, roles));
+    }
     format::json(response)
 }
 
@@ -102,12 +99,14 @@ pub async fn get_one(
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    if !is_admin(&current_user) {
-        return unauthorized(t!("auth.unauthorized"));
-    }
+    let (_, ability) = Ability::for_user_pid(&ctx.db, &auth.claims.pid).await?;
+    ability.authorize(Action::Read, Subject::Admin)?;
 
-    format::json(to_detail(load_item(&ctx, id).await?))
+    let item = load_item(&ctx, id).await?;
+    ability.authorize_resource(Action::Read, Resource::User { id: item.id })?;
+
+    let roles = item.roles(&ctx.db).await?;
+    format::json(to_detail(item, roles))
 }
 
 #[debug_handler]
@@ -116,12 +115,13 @@ pub async fn remove(
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    if !is_admin(&current_user) {
-        return unauthorized(t!("auth.unauthorized"));
-    }
+    let (_, ability) = Ability::for_user_pid(&ctx.db, &auth.claims.pid).await?;
+    ability.authorize(Action::Read, Subject::Admin)?;
 
-    load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    let item = load_item(&ctx, id).await?;
+    ability.authorize_resource(Action::Destroy, Resource::User { id: item.id })?;
+
+    item.delete(&ctx.db).await?;
     format::empty()
 }
 

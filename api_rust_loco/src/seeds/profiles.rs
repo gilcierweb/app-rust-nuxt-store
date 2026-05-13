@@ -1,7 +1,7 @@
-use loco_rs::Result;
 use chrono::{DateTime, TimeZone, Utc};
-use sea_orm::{ActiveModelTrait, Set, EntityTrait, PaginatorTrait};
-use fakeit::{internet, name, contact, image, words, datetime};
+use fakeit::{contact, datetime, image, internet, name, words};
+use loco_rs::Result;
+use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
 use crate::models::_entities::profiles::{ActiveModel as Profile, Entity as Profiles};
 use crate::models::_entities::users::Entity as UserEntity;

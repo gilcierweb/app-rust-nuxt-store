@@ -25,10 +25,10 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for user in &users {
         let num_orders = rand::rng().random_range(0..=5);
-        
+
         for i in 0..num_orders {
             let order_number = format!("ORD-{}-{:06}", now.format("%Y%m%d"), i + 1);
-            
+
             let subtotal = Decimal::new(rand::rng().random_range(1000..50000) as i64, 2);
             let tax_rate = Decimal::new(rand::rng().random_range(5..20) as i64, 2);
             let tax_amount = subtotal * tax_rate / Decimal::new(100, 0);
@@ -48,7 +48,9 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
                 tax_amount: Set(Some(tax_amount)),
                 shipping_amount: Set(Some(shipping_amount)),
                 discount_amount: Set(Some(discount_amount)),
-                currency: Set(Some(currencies[rand::rng().random_range(0..currencies.len())].to_string())),
+                currency: Set(Some(
+                    currencies[rand::rng().random_range(0..currencies.len())].to_string(),
+                )),
                 payment_status: Set(Some(payment_status_val)),
                 fulfillment_status: Set(Some(fulfillment_status_val)),
                 notes: Set(Some(format!("Order notes for customer {}", user.id))),

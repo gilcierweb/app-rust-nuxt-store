@@ -13,7 +13,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
         return Ok(());
     }
 
-    let now = Utc::now();  
+    let now = Utc::now();
 
     let mut root_ids = Vec::new();
     for i in 0..5 {

@@ -1,5 +1,5 @@
+pub use super::_entities::products::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::products::{ActiveModel, Model, Entity};
 pub type Products = Entity;
 
 use super::_entities::categories::Model as CategoryModel;
@@ -47,7 +47,7 @@ impl From<(Model, Option<CategoryModel>)> for ProductWithCategory {
         Self {
             id: product.id,
             name: product.name,
-            slug: product.slug,          
+            slug: product.slug,
             sku: product.sku,
             short_description: product.short_description,
             description: product.description,
@@ -91,4 +91,3 @@ impl ActiveModel {}
 
 // implement your custom finders, selectors oriented logic here
 impl Entity {}
-

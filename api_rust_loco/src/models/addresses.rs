@@ -1,5 +1,5 @@
+pub use super::_entities::addresses::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::addresses::{ActiveModel, Model, Entity};
 pub type Addresses = Entity;
 
 #[async_trait::async_trait]

@@ -1,5 +1,5 @@
+pub use super::_entities::profiles::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::profiles::{ActiveModel, Model, Entity};
 pub type Profiles = Entity;
 
 #[async_trait::async_trait]

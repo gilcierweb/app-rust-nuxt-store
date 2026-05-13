@@ -1,5 +1,5 @@
+pub use super::_entities::wishlists::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::wishlists::{ActiveModel, Model, Entity};
 pub type Wishlists = Entity;
 
 #[async_trait::async_trait]

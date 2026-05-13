@@ -1,13 +1,13 @@
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
 use fakeit::unique;
 use loco_rs::Result;
 use rand::Rng;
 use rust_decimal::Decimal;
 use sea_orm::{ActiveModelTrait, EntityTrait, PaginatorTrait, Set};
 
-use crate::models::_entities::payments::{ActiveModel, Entity};
 use crate::models::_entities::orders::Entity as OrderEntity;
 use crate::models::_entities::payment_methods::Entity as PaymentMethodEntity;
+use crate::models::_entities::payments::{ActiveModel, Entity};
 
 pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
     let count = Entity::find().count(db).await?;
@@ -29,9 +29,10 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for order in &orders {
         let num_payments = rand::rng().random_range(0..=2);
-        
+
         for _ in 0..num_payments {
-            let payment_method = &payment_methods[rand::rng().random_range(0..payment_methods.len())];
+            let payment_method =
+                &payment_methods[rand::rng().random_range(0..payment_methods.len())];
             let amount = order.total_amount.unwrap_or(Decimal::new(1000, 2));
             let status = rand::rng().random_range(1..=4);
 
@@ -43,7 +44,9 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
             let payment = ActiveModel {
                 amount: Set(Some(amount)),
-                currency: Set(Some(currencies[rand::rng().random_range(0..currencies.len())].to_string())),
+                currency: Set(Some(
+                    currencies[rand::rng().random_range(0..currencies.len())].to_string(),
+                )),
                 status: Set(Some(status)),
                 transaction_id: Set(Some(unique::uuid_v4())),
                 gateway_response: Set(Some(r#"{"status": "success", "code": "200"}"#.to_string())),

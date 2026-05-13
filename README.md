@@ -97,6 +97,7 @@ cd api_rust_loco/
 cargo loco db create
 cargo loco db migrate
 cargo loco db seed    # Seed with sample data
+cargo loco db reset
 
 # Start the API server
 cargo loco start

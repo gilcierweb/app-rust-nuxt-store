@@ -44,4 +44,3 @@ async fn can_get_remove() {
     })
     .await;
 }
-

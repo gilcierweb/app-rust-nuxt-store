@@ -1,4 +1,4 @@
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
 use fakeit::unique;
 use loco_rs::Result;
 use rand::Rng;
@@ -24,7 +24,7 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
 
     for user in &users {
         let num_carts = rand::rng().random_range(0..=2);
-        
+
         for _ in 0..num_carts {
             let has_session = rand::rng().random_bool(0.3);
             let session_id = if has_session {

@@ -1,5 +1,5 @@
+pub use super::_entities::order_items::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::order_items::{ActiveModel, Model, Entity};
 pub type OrderItems = Entity;
 
 #[async_trait::async_trait]

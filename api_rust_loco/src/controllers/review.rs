@@ -1,10 +1,10 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
-use loco_rs::prelude::*;
-use serde::{Deserialize, Serialize};
 use axum::debug_handler;
 use axum::extract::Query;
+use loco_rs::prelude::*;
+use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::reviews::{ActiveModel, Entity, Model};
 
@@ -52,7 +52,8 @@ pub async fn list(
 ) -> Result<Response> {
     let mut query_builder = Entity::find();
     if let Some(product_id) = query.product_id {
-        query_builder = query_builder.filter(crate::models::_entities::reviews::Column::ProductId.eq(product_id));
+        query_builder = query_builder
+            .filter(crate::models::_entities::reviews::Column::ProductId.eq(product_id));
     }
     format::json(query_builder.all(&ctx.db).await?)
 }

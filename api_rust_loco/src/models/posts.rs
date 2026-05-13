@@ -1,5 +1,5 @@
+pub use super::_entities::posts::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::posts::{ActiveModel, Model, Entity};
 pub type Posts = Entity;
 use super::post_status::PostStatus;
 

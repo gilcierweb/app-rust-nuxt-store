@@ -47,6 +47,9 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
         }
     }
 
-    tracing::info!("Product variant options generated for {} variants", variants.len());
+    tracing::info!(
+        "Product variant options generated for {} variants",
+        variants.len()
+    );
     Ok(())
 }

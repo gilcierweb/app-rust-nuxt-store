@@ -1,11 +1,11 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
-use axum::debug_handler;
 
-use crate::models::_entities::categories::{ ActiveModel, Entity, Model};
+use crate::models::_entities::categories::{ActiveModel, Entity, Model};
 use crate::models::_entities::products::Entity as ProductEntity;
 use serde_json::json;
 use std::collections::HashMap;
@@ -18,34 +18,34 @@ pub struct Params {
     pub active: Option<bool>,
     pub position: Option<i32>,
     pub parent_id: Option<i32>,
-    }
+}
 
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
-      item.name = Set(self.name.clone());
-      item.slug = Set(self.slug.clone());
-      item.description = Set(self.description.clone());
-      item.active = Set(self.active.clone());
-      item.position = Set(self.position.clone());
-      item.parent_id = Set(self.parent_id.clone());
-      }
-      
-      pub fn validate(&self, current_id: Option<i32>) -> Result<()> {
-              if let Some(parent_id) = self.parent_id {
-                  // Não permite parent_id negativo
-                  if parent_id < 0 {
-                      return Err(Error::BadRequest(t!("category.invalid_parent").into()));
-                  }
-                  
-                  // Não permite uma categoria ser pai de si mesma
-                  if let Some(id) = current_id {
-                      if parent_id == id {
-                          return Err(Error::BadRequest(t!("category.self_parent").into()));
-                      }
-                  }
-              }
-              Ok(())
-          }
+        item.name = Set(self.name.clone());
+        item.slug = Set(self.slug.clone());
+        item.description = Set(self.description.clone());
+        item.active = Set(self.active.clone());
+        item.position = Set(self.position.clone());
+        item.parent_id = Set(self.parent_id.clone());
+    }
+
+    pub fn validate(&self, current_id: Option<i32>) -> Result<()> {
+        if let Some(parent_id) = self.parent_id {
+            // Não permite parent_id negativo
+            if parent_id < 0 {
+                return Err(Error::BadRequest(t!("category.invalid_parent").into()));
+            }
+
+            // Não permite uma categoria ser pai de si mesma
+            if let Some(id) = current_id {
+                if parent_id == id {
+                    return Err(Error::BadRequest(t!("category.self_parent").into()));
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Clone)]
@@ -78,14 +78,14 @@ pub async fn list_with_relations(State(ctx): State<AppContext>) -> Result<Respon
         .find_with_related(ProductEntity)
         .all(&ctx.db)
         .await?;
-  
+
     format::json(categories)
 }
 
 #[debug_handler]
 pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
     params.validate(None)?;
-    
+
     let mut item = ActiveModel {
         ..Default::default()
     };
@@ -101,7 +101,7 @@ pub async fn update(
     Json(params): Json<Params>,
 ) -> Result<Response> {
     params.validate(Some(id))?;
-     
+
     let item = load_item(&ctx, id).await?;
     let mut item = item.into_active_model();
     params.update(&mut item);
@@ -118,37 +118,40 @@ pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resul
 #[debug_handler]
 pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     let item = Entity::find_by_id(id)
-            .one(&ctx.db)
-            .await?
-            .ok_or_else(|| Error::NotFound)?;
-        
+        .one(&ctx.db)
+        .await?
+        .ok_or_else(|| Error::NotFound)?;
+
     format::json(item)
 }
 
 #[debug_handler]
-pub async fn get_one_with_relations(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn get_one_with_relations(
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     let (category, parent, children) = Model::find_with_relations(&ctx.db, id)
         .await
         .map_err(|_| Error::NotFound)?;
-    
+
     let response = json!({
         "category": category,
         "parent": parent,
         "children": children
     });
-    
+
     format::json(response)
 }
 
 fn sort_children_recursive(category: &mut CategoryResponse) {
-    category.children.sort_by(|a, b| {
-        match (a.position, b.position) {
+    category
+        .children
+        .sort_by(|a, b| match (a.position, b.position) {
             (Some(pa), Some(pb)) => pa.cmp(&pb),
             (Some(_), None) => std::cmp::Ordering::Less,
             (None, Some(_)) => std::cmp::Ordering::Greater,
             (None, None) => std::cmp::Ordering::Equal,
-        }
-    });
+        });
 
     for child in &mut category.children {
         sort_children_recursive(child);
@@ -157,7 +160,7 @@ fn sort_children_recursive(category: &mut CategoryResponse) {
 
 fn build_hierarchy_from_flat(categories: Vec<Model>) -> Vec<CategoryResponse> {
     let mut items: HashMap<i32, CategoryResponse> = HashMap::new();
-   
+
     for category in categories {
         let item = CategoryResponse {
             id: category.id,
@@ -185,7 +188,8 @@ fn build_hierarchy_from_flat(categories: Vec<Model>) -> Vec<CategoryResponse> {
         }
     }
 
-    let mut tree: Vec<CategoryResponse> = items.into_values()
+    let mut tree: Vec<CategoryResponse> = items
+        .into_values()
         .filter(|item| item.parent_id.is_none())
         .collect();
 
@@ -210,8 +214,8 @@ pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
 // }
 // #[debug_handler]
 // pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
-//     let categories = Entity::find().all(&ctx.db).await?;        
-      
+//     let categories = Entity::find().all(&ctx.db).await?;
+
 //     format::json(categories)
 // }
 

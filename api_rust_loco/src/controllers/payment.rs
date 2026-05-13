@@ -8,8 +8,8 @@ use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::models::_entities::payments::{ActiveModel, Entity};
 use crate::models::_entities::payment_methods;
+use crate::models::_entities::payments::{ActiveModel, Entity};
 
 #[derive(Debug, Deserialize)]
 pub struct ProcessPaymentParams {
