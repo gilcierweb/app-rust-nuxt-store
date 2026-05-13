@@ -5,8 +5,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "order_items")]
-pub struct Model { 
-    #[sea_orm(primary_key, auto_increment = true)]
+pub struct Model {
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
+    #[sea_orm(primary_key)]
     pub id: i32,
     pub quantity: Option<i32>,
     pub price: Option<Decimal>,
@@ -14,8 +16,6 @@ pub struct Model {
     pub order_id: i32,
     pub product_id: i32,
     pub product_variant_id: Option<i32>,
-    pub created_at: DateTimeWithTimeZone,
-    pub updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

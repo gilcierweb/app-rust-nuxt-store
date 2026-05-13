@@ -46,5 +46,19 @@
   "order": {
     "invalid_status": "Valor de estado inválido",
     "invalid_transition": "No se puede transitar de %{from} a %{to}"
+  },
+  "admin": {
+    "statusLabels": {
+      "paid": "Pagado",
+      "unknown": "Desconocido"
+    },
+    "dashboard": {
+      "kpis": {
+        "monthlyRevenue": "Ingresos Mensuales",
+        "newOrders": "Nuevos Pedidos",
+        "newCustomers": "Nuevos Clientes",
+        "conversionRate": "Tasa de Conversión"
+      }
+    }
   }
 }

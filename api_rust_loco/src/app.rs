@@ -50,6 +50,7 @@ impl Hooks for App {
 
     fn routes(_ctx: &AppContext) -> AppRoutes {
         AppRoutes::with_default_routes() // controller routes below
+            .add_route(controllers::dashboard::routes())
             .add_route(controllers::variant::routes())
             .add_route(controllers::shipping::routes())
             .add_route(controllers::payment::routes())
