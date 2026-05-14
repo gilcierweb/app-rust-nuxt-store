@@ -34,7 +34,7 @@
                     </ul>
                 </div>
 
-                <NuxtLinkLocale to="/wishlist" class="btn btn-text btn-square relative">
+                <NuxtLinkLocale :to="isAuthenticated ? '/account/wishlist' : '/wishlist'" class="btn btn-text btn-square relative">
                     <span class="icon-[tabler--heart] size-5"></span>
                 </NuxtLinkLocale>
                 <button class="btn btn-text btn-square relative" @click="toggleCart">
@@ -63,13 +63,19 @@
                         <li><NuxtLinkLocale to="/about" class="dropdown-item">{{ t('header.about') }}</NuxtLinkLocale></li>
                         <li v-if="isAuthenticated"><hr class="my-1" /></li>
                         <li v-if="isAuthenticated">
+                            <NuxtLinkLocale to="/account" class="dropdown-item">Minha conta</NuxtLinkLocale>
+                        </li>
+                        <li v-if="isAuthenticated">
+                            <NuxtLinkLocale to="/account/orders" class="dropdown-item">Pedidos</NuxtLinkLocale>
+                        </li>
+                        <li v-if="isAuthenticated && user?.can_manage_admin">
                             <NuxtLinkLocale to="/admin" class="dropdown-item">{{ t('header.admin') }}</NuxtLinkLocale>
                         </li>
                     </ul>
                 </div>
 
                 <template v-if="isAuthenticated">
-                    <NuxtLinkLocale to="/admin" class="btn btn-text btn-sm max-md:hidden">
+                    <NuxtLinkLocale v-if="user?.can_manage_admin" to="/admin" class="btn btn-text btn-sm max-md:hidden">
                         <span class="icon-[tabler--layout-dashboard] size-4"></span>
                         {{ t('header.admin') }}
                     </NuxtLinkLocale>
@@ -80,6 +86,8 @@
                         </button>
                         <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu">
                             <li><NuxtLinkLocale to="/account" class="dropdown-item">{{ t('header.profile') }}</NuxtLinkLocale></li>
+                            <li><NuxtLinkLocale to="/account/orders" class="dropdown-item">Pedidos</NuxtLinkLocale></li>
+                            <li><NuxtLinkLocale to="/account/wishlist" class="dropdown-item">Wishlist</NuxtLinkLocale></li>
                             <li><button class="dropdown-item" @click="handleLogout">{{ t('header.signOut') }}</button></li>
                         </ul>
                     </div>

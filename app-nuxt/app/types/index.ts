@@ -134,6 +134,7 @@ export interface CurrentResponse {
   pid: string
   name: string
   email: string
+  avatar?: string
   roles: string[]
   can_manage_admin: boolean
 }
