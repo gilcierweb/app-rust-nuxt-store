@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: category, pending, error } = useLazyFetch<Category>(
-  `${config.public.baseURL}/api/categories/${route.params.id}`
+  `${config.public.baseURL}/api/admin/categories/${route.params.id}`
 )
 
 const handleSaved = (savedCategory: Category) => {

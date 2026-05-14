@@ -79,7 +79,7 @@
                             <span class="max-md:hidden">{{ user?.name || t('header.profile') }}</span>
                         </button>
                         <ul class="dropdown-menu dropdown-open:opacity-100 hidden min-w-40" role="menu">
-                            <li><NuxtLinkLocale to="/profiles" class="dropdown-item">{{ t('header.profile') }}</NuxtLinkLocale></li>
+                            <li><NuxtLinkLocale to="/account" class="dropdown-item">{{ t('header.profile') }}</NuxtLinkLocale></li>
                             <li><button class="dropdown-item" @click="handleLogout">{{ t('header.signOut') }}</button></li>
                         </ul>
                     </div>

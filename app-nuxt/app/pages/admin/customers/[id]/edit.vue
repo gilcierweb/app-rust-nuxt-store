@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: profile, pending, error } = useLazyFetch<Profile>(
-  `${config.public.baseURL}/api/profiles/${route.params.id}`
+  `${config.public.baseURL}/api/admin/profiles/${route.params.id}`
 )
 
 const handleSaved = (savedProfile: Profile) => {

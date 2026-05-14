@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: post, pending, error } = useLazyFetch<Post>(
-  `${config.public.baseURL}/api/posts/${route.params.id}`
+  `${config.public.baseURL}/api/admin/posts/${route.params.id}`
 )
 
 const handleSaved = (savedPost: Post) => {

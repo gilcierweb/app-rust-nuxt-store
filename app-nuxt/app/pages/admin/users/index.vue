@@ -121,7 +121,7 @@ const { apiFetch, useApiLazyFetch } = useApi()
 
 const searchQuery = ref('')
 
-const { pending, data: users, error, refresh } = useApiLazyFetch<AdminUser[]>('/api/users')
+const { pending, data: users, error, refresh } = useApiLazyFetch<AdminUser[]>('/api/admin/users')
 
 const filteredUsers = computed(() => {
   if (!users.value) return []
@@ -151,7 +151,7 @@ const handleSearch = () => {
 const confirmDelete = async (user: AdminUser) => {
   if (confirm(t('common.confirmDelete', { name: user.email }))) {
     try {
-      await apiFetch(`/api/users/${user.id}`, {
+      await apiFetch(`/api/admin/users/${user.id}`, {
         method: 'DELETE'
       })
       await refresh()

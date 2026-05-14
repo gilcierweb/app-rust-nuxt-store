@@ -249,7 +249,13 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
 }
 
 pub fn routes() -> Routes {
-    Routes::new()
-        .prefix("api/dashboards")
-        .add("/stats", get(stats))
+    routes_with_prefix("api/dashboards")
+}
+
+pub fn admin_routes() -> Routes {
+    routes_with_prefix("api/admin/dashboards")
+}
+
+fn routes_with_prefix(prefix: &str) -> Routes {
+    Routes::new().prefix(prefix).add("/stats", get(stats))
 }

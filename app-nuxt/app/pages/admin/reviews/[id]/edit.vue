@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: review, pending, error } = useLazyFetch<Review>(
-  `${config.public.baseURL}/api/reviews/${route.params.id}`
+  `${config.public.baseURL}/api/admin/reviews/${route.params.id}`
 )
 
 const handleSaved = (savedReview: Review) => {

@@ -91,7 +91,7 @@ const form = reactive({
 async function handleSave() {
   saving.value = true
   try {
-    await $fetch(`${config.public.baseURL}/api/variants/`, {
+    await $fetch(`${config.public.baseURL}/api/admin/variants/`, {
       method: 'POST',
       body: form,
     })

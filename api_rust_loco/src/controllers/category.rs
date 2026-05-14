@@ -220,8 +220,16 @@ pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
 // }
 
 pub fn routes() -> Routes {
+    routes_with_prefix("api/categories/")
+}
+
+pub fn admin_routes() -> Routes {
+    routes_with_prefix("api/admin/categories/")
+}
+
+fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix("api/categories/")
+        .prefix(prefix)
         .add("/", get(list))
         .add("/relations", get(list_with_relations))
         .add("/", post(add))

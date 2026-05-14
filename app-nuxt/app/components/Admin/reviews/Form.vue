@@ -285,8 +285,8 @@ const onSubmit = async () => {
     }
 
     const url = props.isEditing
-      ? `${config.public.baseURL}/api/reviews/${props.review?.id}`
-      : `${config.public.baseURL}/api/reviews`
+      ? `${config.public.baseURL}/api/admin/reviews/${props.review?.id}`
+      : `${config.public.baseURL}/api/admin/reviews`
 
     const method = props.isEditing ? 'PUT' : 'POST'
 

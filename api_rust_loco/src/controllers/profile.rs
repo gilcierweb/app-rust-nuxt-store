@@ -81,8 +81,16 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 }
 
 pub fn routes() -> Routes {
+    routes_with_prefix("api/profiles/")
+}
+
+pub fn admin_routes() -> Routes {
+    routes_with_prefix("api/admin/profiles/")
+}
+
+fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix("api/profiles/")
+        .prefix(prefix)
         .add("/", get(list))
         .add("/", post(add))
         .add("{id}", get(get_one))

@@ -140,7 +140,7 @@ import type { Order } from '~/types'
 const { useApiFetch } = useApi()
 
 const { data: ordersData, pending } = await useApiFetch<Order[]>(
-  '/api/orders/my_orders',
+  '/api/account/orders',
   { key: 'my-orders' }
 )
 const orders = computed(() => ordersData.value ?? [])

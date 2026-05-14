@@ -261,7 +261,30 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     let order = Entity::find_by_id(id).one(&ctx.db).await?;
     let order = order.ok_or(Error::NotFound)?;
+    respond_with_order_items(&ctx, order).await
+}
 
+#[debug_handler]
+pub async fn account_get_one(
+    auth: auth::JWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let order = Entity::find_by_id(id).one(&ctx.db).await?;
+    let order = order.ok_or(Error::NotFound)?;
+    if order.user_id != current_user.id {
+        return unauthorized(t!("auth.unauthorized"));
+    }
+
+    respond_with_order_items(&ctx, order).await
+}
+
+async fn respond_with_order_items(
+    ctx: &AppContext,
+    order: crate::models::_entities::orders::Model,
+) -> Result<Response> {
+    let id = order.id;
     let items = order_items::Entity::find()
         .filter(crate::models::_entities::order_items::Column::OrderId.eq(id))
         .find_also_related(crate::models::_entities::products::Entity)
@@ -336,8 +359,29 @@ pub async fn update_status(
 }
 
 pub fn routes() -> Routes {
+    routes_with_prefix("api/orders/")
+}
+
+pub fn admin_routes() -> Routes {
     Routes::new()
-        .prefix("api/orders/")
+        .prefix("api/admin/orders/")
+        .add("/", get(index))
+        .add("list", get(list))
+        .add("{id}", get(get_one))
+        .add("{id}/status", put(update_status))
+}
+
+pub fn account_routes() -> Routes {
+    Routes::new()
+        .prefix("api/account/orders/")
+        .add("/", get(my_orders))
+        .add("checkout", post(checkout))
+        .add("{id}", get(account_get_one))
+}
+
+fn routes_with_prefix(prefix: &str) -> Routes {
+    Routes::new()
+        .prefix(prefix)
         .add("/", get(index))
         .add("checkout", post(checkout))
         .add("my_orders", get(my_orders))

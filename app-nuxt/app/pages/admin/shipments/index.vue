@@ -85,7 +85,7 @@ definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const config = useRuntimeConfig()
 
-const { pending, data: shipments, error, refresh } = useLazyFetch<Shipment[]>(`${config.public.baseURL}/api/shipments`)
+const { pending, data: shipments, error, refresh } = useLazyFetch<Shipment[]>(`${config.public.baseURL}/api/admin/shipments`)
 
 const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('shipping.status.pending'), badge: 'badge-warning' },
@@ -112,7 +112,7 @@ const formatDate = (dateString: string) => {
 const confirmDelete = async (shipment: Shipment) => {
   if (confirm(t('admin.shipments.detail.confirmDelete', { id: shipment.id }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/shipments/${shipment.id}`, { method: 'DELETE' })
+      await $fetch(`${config.public.baseURL}/api/admin/shipments/${shipment.id}`, { method: 'DELETE' })
       await refresh()
     } catch {
       alert(t('admin.shipments.detail.errorDelete'))

@@ -150,7 +150,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
 
-const { pending, data: user, error, refresh } = useApiFetch<AdminUserDetail>(`/api/users/${route.params.id}`)
+const { pending, data: user, error, refresh } = useApiFetch<AdminUserDetail>(`/api/admin/users/${route.params.id}`)
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return '-'
@@ -168,7 +168,7 @@ const deleteUser = async () => {
 
   if (confirm(t('common.confirmDelete', { name: user.value.email }))) {
     try {
-      await apiFetch(`/api/users/${user.value.id}`, {
+      await apiFetch(`/api/admin/users/${user.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/users')

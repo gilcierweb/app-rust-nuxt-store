@@ -182,7 +182,7 @@ const { t } = useI18n()
 const config = useRuntimeConfig()
 
 // Fetch Dashboard Stats
-const { pending, data: statsData } = await useFetch<DashboardStats>(`${config.public.baseURL}/api/dashboards/stats`)
+const { pending, data: statsData } = await useFetch<DashboardStats>(`${config.public.baseURL}/api/admin/dashboards/stats`)
 
 // KPI Data
 const kpiStats = computed(() => {

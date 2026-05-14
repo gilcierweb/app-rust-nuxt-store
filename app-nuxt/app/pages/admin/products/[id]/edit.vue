@@ -41,7 +41,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: product, pending, error } = useLazyFetch<ProductApi>(
-  `${config.public.baseURL}/api/products/${route.params.id}`
+  `${config.public.baseURL}/api/admin/products/${route.params.id}`
 )
 
 const handleSaved = (savedProduct: ProductApi) => {

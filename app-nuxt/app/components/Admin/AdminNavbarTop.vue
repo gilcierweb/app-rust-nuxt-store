@@ -75,7 +75,7 @@
                 </div>
               </li>
                <li>
-                <NuxtLinkLocale to="/admin/account" class="dropdown-item px-4">
+                <NuxtLinkLocale to="/account" class="dropdown-item px-4">
                   <span class="icon-[tabler--user] size-5"></span>
                   {{ $t('admin.navbar.profile.myAccount') }}
                 </NuxtLinkLocale>
@@ -145,7 +145,8 @@ const localizedRouteName = computed(() => {
   const name = route.name?.toString() || ''
   const baseName = name.split('___')[0]
   if (!baseName || baseName === 'admin') return t('admin.sidebar.dashboard')
-  const module = baseName.replace('admin-', '')
+  const module = baseName.replace('admin-', '').split('-')[0] || ''
+  if (!module) return t('admin.sidebar.dashboard')
   const translationKey = `admin.${module}.title`
   const translated = t(translationKey)
   if (translated && translated !== translationKey) return translated

@@ -134,7 +134,7 @@ const { t } = useI18n()
 const searchQuery = ref('')
 
 const { pending, data: posts, error, refresh } = useLazyFetch<Post[]>(
-  `${config.public.baseURL}/api/posts`
+  `${config.public.baseURL}/api/admin/posts`
 )
 
 // Filtered posts based on search
@@ -198,7 +198,7 @@ const handleSearch = () => {
 const confirmDelete = async (post: Post) => {
   if (confirm(t('admin.posts.detail.confirmDelete', { name: post.title || t('admin.posts.noTitle') }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/posts/${post.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/posts/${post.id}`, {
         method: 'DELETE'
       })
       await refresh()

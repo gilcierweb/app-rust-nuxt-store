@@ -103,7 +103,7 @@ const form = reactive({
 
 onMounted(async () => {
   try {
-    shippingMethods.value = await $fetch(`${config.public.baseURL}/api/shippings`)
+    shippingMethods.value = await $fetch(`${config.public.baseURL}/api/admin/shippings`)
   } catch {
     shippingMethods.value = []
   }
@@ -125,13 +125,13 @@ async function handleSubmit() {
 
     let result: Shipment
     if (props.isEditing && props.shipment?.id) {
-      result = await $fetch(`${config.public.baseURL}/api/shipments/${props.shipment.id}`, {
+      result = await $fetch(`${config.public.baseURL}/api/admin/shipments/${props.shipment.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body,
       })
     } else {
-      result = await $fetch(`${config.public.baseURL}/api/shipments`, {
+      result = await $fetch(`${config.public.baseURL}/api/admin/shipments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,

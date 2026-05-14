@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: shipping, pending, error } = useLazyFetch<ShippingMethod>(
-  `${config.public.baseURL}/api/shippings/${route.params.id}`
+  `${config.public.baseURL}/api/admin/shippings/${route.params.id}`
 )
 
 const handleSaved = (savedShipping: ShippingMethod) => {

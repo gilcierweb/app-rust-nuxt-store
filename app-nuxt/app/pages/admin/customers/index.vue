@@ -120,7 +120,7 @@ const { t } = useI18n()
 const searchQuery = ref('')
 
 const { pending, data: profiles, error, refresh } = useLazyFetch<Profile[]>(
-  `${config.public.baseURL}/api/profiles`
+  `${config.public.baseURL}/api/admin/profiles`
 )
 
 // Filtered profiles based on search
@@ -163,7 +163,7 @@ const confirmDelete = async (profile: Profile) => {
   const name = profile.full_name || `${profile.first_name} ${profile.last_name}`
   if (confirm(t('admin.customers.detail.confirmDelete', { name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/profiles/${profile.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/profiles/${profile.id}`, {
         method: 'DELETE'
       })
       await refresh()

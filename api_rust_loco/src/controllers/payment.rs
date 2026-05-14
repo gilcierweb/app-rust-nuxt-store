@@ -137,8 +137,16 @@ pub async fn get_by_order(
 }
 
 pub fn routes() -> Routes {
+    routes_with_prefix("api/payments/")
+}
+
+pub fn admin_routes() -> Routes {
+    routes_with_prefix("api/admin/payments/")
+}
+
+fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix("api/payments/")
+        .prefix(prefix)
         .add("process", post(process))
         .add("order/{order_id}", get(get_by_order))
         .add("methods", get(list_methods))

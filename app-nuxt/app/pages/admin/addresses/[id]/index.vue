@@ -158,7 +158,7 @@ const config = useRuntimeConfig()
 const router = useRouter()
 
 const { pending, data: address, error, refresh } = useFetch<Address>(
-  `${config.public.baseURL}/api/addresses/${route.params.id}`
+  `${config.public.baseURL}/api/admin/addresses/${route.params.id}`
 )
 
 const typeLabel = (type?: string) => {
@@ -187,7 +187,7 @@ const deleteAddress = async () => {
   const name = `${address.value.first_name} ${address.value.last_name}`
   if (confirm(`Tem certeza que deseja excluir o endereço de "${name}"?`)) {
     try {
-      await $fetch(`${config.public.baseURL}/api/addresses/${address.value.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/addresses/${address.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/addresses')

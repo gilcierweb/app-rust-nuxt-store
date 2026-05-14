@@ -126,8 +126,16 @@ pub async fn remove(
 }
 
 pub fn routes() -> Routes {
+    routes_with_prefix("api/users/")
+}
+
+pub fn admin_routes() -> Routes {
+    routes_with_prefix("api/admin/users/")
+}
+
+fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix("api/users/")
+        .prefix(prefix)
         .add("/", get(list))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))

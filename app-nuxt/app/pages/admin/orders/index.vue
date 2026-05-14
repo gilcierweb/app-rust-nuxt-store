@@ -131,7 +131,7 @@ const searchQuery = ref('')
 const selectedStatus = ref('')
 
 const { data: ordersData, pending } = await useFetch<Order[]>(
-  `${config.public.baseURL}/api/orders/list`,
+  `${config.public.baseURL}/api/admin/orders/list`,
   { key: 'admin-orders' }
 )
 

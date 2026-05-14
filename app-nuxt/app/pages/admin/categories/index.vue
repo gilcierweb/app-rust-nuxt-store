@@ -113,7 +113,7 @@ const { t } = useI18n()
 const searchQuery = ref('')
 
 const { pending, data: categories, error, refresh } = useLazyFetch<Category[]>(
-  `${config.public.baseURL}/api/categories`
+  `${config.public.baseURL}/api/admin/categories`
 )
 
 // Filtered categories based on search
@@ -148,7 +148,7 @@ const handleSearch = () => {
 const confirmDelete = async (category: Category) => {
   if (confirm(t('admin.categories.detail.confirmDelete', { name: category.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/categories/${category.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/categories/${category.id}`, {
         method: 'DELETE'
       })
       await refresh()

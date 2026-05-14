@@ -356,7 +356,7 @@ async function placeOrder() {
   const discount = couponDiscount.value || 0
 
   try {
-    const data = await apiFetch<any>('/api/orders/checkout', {
+    const data = await apiFetch<any>('/api/account/orders/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: {

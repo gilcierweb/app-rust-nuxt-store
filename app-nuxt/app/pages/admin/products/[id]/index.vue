@@ -152,7 +152,7 @@ const config = useRuntimeConfig()
 const { t } = useI18n()
 
 const { data: product, pending, error } = useLazyFetch<ProductApi>(
-  `${config.public.baseURL}/api/products/${route.params.id}`
+  `${config.public.baseURL}/api/admin/products/${route.params.id}`
 )
 
 // Computed para imagem de capa
@@ -195,7 +195,7 @@ const confirmDelete = async () => {
   
   if (confirm(t('admin.products.confirmDelete', { name: product.value.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/products/${product.value.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/products/${product.value.id}`, {
         method: 'DELETE'
       })
       navigateTo('/admin/products')

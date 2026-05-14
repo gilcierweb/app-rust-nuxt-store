@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: address, pending, error } = useLazyFetch<Address>(
-  `${config.public.baseURL}/api/addresses/${route.params.id}`
+  `${config.public.baseURL}/api/admin/addresses/${route.params.id}`
 )
 
 const handleSaved = (savedAddress: Address) => {

@@ -298,7 +298,7 @@ const imageFields = ref<Array<{
 }>>([])
 
 /* categories */
-const { data: categoriesData } = useLazyFetch<Category[]>(`${config.public.baseURL}/api/categories`)
+const { data: categoriesData } = useLazyFetch<Category[]>(`${config.public.baseURL}/api/admin/categories`)
 const categories = computed(() => categoriesData.value || [])
 
 /* image handlers (unchanged) */
@@ -430,7 +430,7 @@ const onSubmit = handleSubmit(async (vals: FormValues) => {
   successMessage.value = ''
 
   try {
-    const url = props.isEditing ? `${config.public.baseURL}/api/products/${props.product?.id}` : `${config.public.baseURL}/api/products`
+    const url = props.isEditing ? `${config.public.baseURL}/api/admin/products/${props.product?.id}` : `${config.public.baseURL}/api/admin/products`
     const method = props.isEditing ? 'PUT' : 'POST'
 
     if (method === 'POST' && imageFields.value.some(f => f.file)) {

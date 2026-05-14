@@ -68,14 +68,14 @@ const config = useRuntimeConfig()
 const productId = route.params.id
 
 const { data: variants, pending, refresh } = await useFetch<ProductVariant[]>(
-  `${config.public.baseURL}/api/variants/list?product_id=${productId}`,
+  `${config.public.baseURL}/api/admin/variants/list?product_id=${productId}`,
   { key: `variants-${productId}` }
 )
 
 async function handleDelete(variantId: number) {
   if (!confirm(t('variant.deleteConfirm'))) return
   try {
-    await $fetch(`${config.public.baseURL}/api/variants/${variantId}`, { method: 'DELETE' })
+    await $fetch(`${config.public.baseURL}/api/admin/variants/${variantId}`, { method: 'DELETE' })
     refresh()
   } catch (e) {
     console.error(e)

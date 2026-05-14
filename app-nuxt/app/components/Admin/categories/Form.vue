@@ -188,7 +188,7 @@ const errorMessage = ref('')
 
 // Fetch parent categories
 const { data: parentCategories } = useLazyFetch<Category[]>(
-  `${config.public.baseURL}/api/categories`
+  `${config.public.baseURL}/api/admin/categories`
 )
 
 // Filter out current category from parent options (can't be parent of itself)
@@ -272,8 +272,8 @@ const onSubmit = async () => {
     }
 
     const url = props.isEditing
-      ? `${config.public.baseURL}/api/categories/${props.category?.id}`
-      : `${config.public.baseURL}/api/categories`
+      ? `${config.public.baseURL}/api/admin/categories/${props.category?.id}`
+      : `${config.public.baseURL}/api/admin/categories`
 
     const method = props.isEditing ? 'PUT' : 'POST'
 

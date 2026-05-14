@@ -83,7 +83,7 @@ const variantId = route.params.variantId
 const saving = ref(false)
 
 const { data: variant, pending } = await useFetch<ProductVariant>(
-  `${config.public.baseURL}/api/variants/${variantId}`,
+  `${config.public.baseURL}/api/admin/variants/${variantId}`,
   { key: `variant-${variantId}` }
 )
 
@@ -119,7 +119,7 @@ watch(variant, (v) => {
 async function handleSave() {
   saving.value = true
   try {
-    await $fetch(`${config.public.baseURL}/api/variants/${variantId}`, {
+    await $fetch(`${config.public.baseURL}/api/admin/variants/${variantId}`, {
       method: 'PUT',
       body: form,
     })

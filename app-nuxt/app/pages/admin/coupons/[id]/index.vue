@@ -157,7 +157,7 @@ const router = useRouter()
 const { t } = useI18n()
 
 const { pending, data: coupon, error, refresh } = useFetch<Coupon>(
-  `${config.public.baseURL}/api/coupons/${route.params.id}`
+  `${config.public.baseURL}/api/admin/coupons/${route.params.id}`
 )
 
 const discountTypeLabel = (type?: number) => {
@@ -205,7 +205,7 @@ const deleteCoupon = async () => {
 
   if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.value.code }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/coupons/${coupon.value.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/coupons/${coupon.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/coupons')

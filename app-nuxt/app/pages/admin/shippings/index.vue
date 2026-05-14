@@ -132,7 +132,7 @@ const { apiFetch, useApiLazyFetch } = useApi()
 const searchQuery = ref('')
 
 const { pending, data: shippings, error, refresh } = useApiLazyFetch<ShippingMethod[]>(
-  `${config.public.baseURL}/api/shippings`
+  `${config.public.baseURL}/api/admin/shippings`
 )
 
 // Filtered shippings based on search
@@ -175,7 +175,7 @@ const handleSearch = () => {
 const confirmDelete = async (shipping: ShippingMethod) => {
   if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.name }))) {
     try {
-      await apiFetch(`${config.public.baseURL}/api/shippings/${shipping.id}`, {
+      await apiFetch(`${config.public.baseURL}/api/admin/shippings/${shipping.id}`, {
         method: 'DELETE'
       })
       await refresh()

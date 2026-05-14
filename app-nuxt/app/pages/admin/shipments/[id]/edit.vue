@@ -27,10 +27,11 @@ import type { Shipment } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 
+const { t } = useI18n()
 const route = useRoute()
 const config = useRuntimeConfig()
 
-const { data: shipment, pending, error } = useLazyFetch<Shipment>(`${config.public.baseURL}/api/shipments/${route.params.id}`)
+const { data: shipment, pending, error } = useLazyFetch<Shipment>(`${config.public.baseURL}/api/admin/shipments/${route.params.id}`)
 
 const handleSaved = (_shipment: Shipment) => {
   navigateTo('/admin/shipments')

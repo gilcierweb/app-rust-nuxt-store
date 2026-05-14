@@ -150,8 +150,8 @@ const selectedCategory = ref('')
 const selectedStatus = ref('')
 
 // Fetch Products and Categories
-const { pending, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/products`)
-const { data: categories } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories`)
+const { pending, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/admin/products`)
+const { data: categories } = await useFetch<Category[]>(`${config.public.baseURL}/api/admin/categories`)
 
 const products = computed(() => productsData.value || [])
 
@@ -180,7 +180,7 @@ const formatNumberBR = (num: number | undefined) => {
 const confirmDelete = async (product: ProductApi) => {
   if (confirm(t('admin.products.confirmDelete', { name: product.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/products/${product.id}`, { method: 'DELETE' })
+      await $fetch(`${config.public.baseURL}/api/admin/products/${product.id}`, { method: 'DELETE' })
       // Refresh logic would go here
       window.location.reload()
     } catch (err) {

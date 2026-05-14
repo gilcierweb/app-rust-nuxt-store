@@ -68,7 +68,7 @@ const { useApiFetch } = useApi()
 
 const id = route.params.id
 const { data: order, pending } = await useApiFetch<Order>(
-  `/api/orders/${id}`,
+  `/api/account/orders/${id}`,
   { key: `confirmation-${id}` }
 )
 

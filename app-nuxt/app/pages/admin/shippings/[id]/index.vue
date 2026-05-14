@@ -139,7 +139,7 @@ const config = useRuntimeConfig()
 const router = useRouter()
 
 const { pending, data: shipping, error, refresh } = useFetch<ShippingMethod>(
-  `${config.public.baseURL}/api/shippings/${route.params.id}`
+  `${config.public.baseURL}/api/admin/shippings/${route.params.id}`
 )
 
 const formatCurrency = (value: number | undefined) => {
@@ -166,7 +166,7 @@ const deleteShipping = async () => {
 
   if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.value.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/shippings/${shipping.value.id}`, {
+      await $fetch(`${config.public.baseURL}/api/admin/shippings/${shipping.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/shippings')

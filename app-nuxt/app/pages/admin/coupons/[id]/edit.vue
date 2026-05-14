@@ -39,7 +39,7 @@ const route = useRoute()
 const config = useRuntimeConfig()
 
 const { data: coupon, pending, error } = useLazyFetch<Coupon>(
-  `${config.public.baseURL}/api/coupons/${route.params.id}`
+  `${config.public.baseURL}/api/admin/coupons/${route.params.id}`
 )
 
 const handleSaved = (savedCoupon: Coupon) => {
