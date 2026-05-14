@@ -126,11 +126,12 @@ definePageMeta({
 })
 
 const config = useRuntimeConfig()
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const { apiFetch, useApiLazyFetch } = useApi()
 
 const searchQuery = ref('')
 
-const { pending, data: shippings, error, refresh } = useLazyFetch<ShippingMethod[]>(
+const { pending, data: shippings, error, refresh } = useApiLazyFetch<ShippingMethod[]>(
   `${config.public.baseURL}/api/shippings`
 )
 
@@ -174,7 +175,7 @@ const handleSearch = () => {
 const confirmDelete = async (shipping: ShippingMethod) => {
   if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/shippings/${shipping.id}`, {
+      await apiFetch(`${config.public.baseURL}/api/shippings/${shipping.id}`, {
         method: 'DELETE'
       })
       await refresh()
