@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use axum::{
     extract::{Request, State},
+    http::Method,
     http::StatusCode,
     middleware::{self, Next},
     response::{IntoResponse, Response},
@@ -140,6 +141,12 @@ async fn admin_namespace_guard(
     next: Next,
 ) -> Response {
     if !req.uri().path().starts_with("/api/admin/") {
+        return next.run(req).await;
+    }
+
+    // CORS preflight requests do not include Authorization and must not be
+    // blocked by admin auth middleware.
+    if req.method() == Method::OPTIONS {
         return next.run(req).await;
     }
 

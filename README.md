@@ -8,6 +8,7 @@ A production-ready e-commerce application featuring a high-performance REST API 
 
 ![App Nuxt Admin](app-nuxt/app/assets/images/app-rust-nuxt-store-admin.webp)
 
+
 ---
 
 ## ✨ Key Features
@@ -44,6 +45,20 @@ https://app-nuxt-store.pages.dev/
 
 ## Admin App
 https://app-nuxt-store.pages.dev/admin/
+
+admin: admin@example.com
+
+manager: manager@example.com
+
+editor: editor@example.com
+
+support: support@example.com
+
+customer: customer@example.com
+
+viewer: viewer@example.com
+
+Everyone's password: Password123!
 
 ## 📂 Project Structure
 
