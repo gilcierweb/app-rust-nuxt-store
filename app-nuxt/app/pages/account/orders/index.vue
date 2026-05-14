@@ -3,33 +3,33 @@
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <p class="text-primary text-sm font-semibold uppercase tracking-wide">Account</p>
-        <h1 class="text-base-content text-2xl font-bold md:text-3xl">Meus pedidos</h1>
-        <p class="text-base-content/60 mt-1">Historico de compras da sua conta.</p>
+        <h1 class="text-base-content text-2xl font-bold md:text-3xl">{{ $t('account.myOrders') }}</h1>
+        <p class="text-base-content/60 mt-1">{{ $t('account.ordersHistory') }}</p>
       </div>
       <button class="btn btn-soft" :disabled="pending" @click="refresh()">
         <span class="icon-[tabler--refresh] size-5" :class="{ 'animate-spin': pending }"></span>
-        Atualizar
+        {{ $t('account.refresh') }}
       </button>
     </div>
 
     <div v-if="pending" class="rounded-box border border-base-content/10 bg-base-100 p-8">
       <div class="flex items-center gap-3 text-base-content/60">
         <span class="loading loading-spinner loading-sm"></span>
-        Carregando pedidos...
+        {{ $t('account.loadingOrders') }}
       </div>
     </div>
 
     <div v-else-if="error" class="alert alert-error">
       <span class="icon-[tabler--alert-circle] size-6"></span>
-      <span>Erro ao carregar pedidos: {{ error.message }}</span>
+      <span>{{ $t('account.errorLoadingOrders') }} {{ error.message }}</span>
     </div>
 
     <div v-else-if="orders.length === 0" class="rounded-box border border-dashed border-base-content/20 bg-base-100 p-10 text-center">
       <span class="icon-[tabler--package-off] text-base-content/30 mx-auto mb-4 size-12"></span>
-      <h2 class="text-lg font-semibold">Nenhum pedido encontrado</h2>
-      <p class="text-base-content/60 mt-1">Quando voce comprar, seus pedidos aparecem nesta tela.</p>
+      <h2 class="text-lg font-semibold">{{ $t('account.noOrdersFound') }}</h2>
+      <p class="text-base-content/60 mt-1">{{ $t('account.noOrdersMessage') }}</p>
       <NuxtLinkLocale to="/products" class="btn btn-primary mt-6">
-        Continuar comprando
+        {{ $t('account.continueShopping') }}
       </NuxtLinkLocale>
     </div>
 
@@ -38,11 +38,11 @@
         <table class="table">
           <thead>
             <tr>
-              <th>Pedido</th>
-              <th>Data</th>
-              <th>Status</th>
-              <th>Pagamento</th>
-              <th class="text-right">Total</th>
+              <th>{{ $t('account.order') }}</th>
+              <th>{{ $t('account.date') }}</th>
+              <th>{{ $t('account.status') }}</th>
+              <th>{{ $t('account.paymentStatus') }}</th>
+              <th class="text-right">{{ $t('account.total') }}</th>
               <th class="w-16"></th>
             </tr>
           </thead>
@@ -50,14 +50,14 @@
             <tr v-for="order in orders" :key="order.id">
               <td>
                 <div class="font-semibold">{{ order.order_number || `#${order.id}` }}</div>
-                <div class="text-base-content/50 text-xs">{{ order.items?.length || 0 }} itens</div>
+                <div class="text-base-content/50 text-xs">{{ order.items?.length || 0 }} {{ $t('account.items') }}</div>
               </td>
               <td>{{ formatDate(order.created_at) }}</td>
               <td><span :class="['badge', statusBadgeClass(order.status)]">{{ statusLabel(order.status) }}</span></td>
               <td><span :class="['badge', paymentBadgeClass(order.payment_status)]">{{ paymentLabel(order.payment_status) }}</span></td>
               <td class="text-right font-bold text-primary">{{ formatCurrency(order.total_amount, order.currency) }}</td>
               <td>
-                <NuxtLinkLocale :to="`/account/orders/${order.id}`" class="btn btn-square btn-soft btn-sm" aria-label="Ver pedido">
+                <NuxtLinkLocale :to="`/account/orders/${order.id}`" class="btn btn-square btn-soft btn-sm" :aria-label="$t('account.viewOrder')">
                   <span class="icon-[tabler--eye] size-4"></span>
                 </NuxtLinkLocale>
               </td>
@@ -77,12 +77,12 @@ definePageMeta({
   middleware: 'auth'
 })
 
-useSeoMeta({
-  title: 'Meus pedidos'
-})
-
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const { useApiFetch } = useApi()
+
+useSeoMeta({
+  title: t('account.myOrders')
+})
 
 const { data: ordersData, pending, error, refresh } = await useApiFetch<Order[]>(
   '/api/account/orders',
@@ -92,23 +92,23 @@ const { data: ordersData, pending, error, refresh } = await useApiFetch<Order[]>
 const orders = computed(() => ordersData.value ?? [])
 
 const statusMap: Record<number, { label: string; badge: string }> = {
-  1: { label: 'Pendente', badge: 'badge-soft badge-warning' },
-  2: { label: 'Confirmado', badge: 'badge-soft badge-info' },
-  3: { label: 'Processando', badge: 'badge-soft badge-info' },
-  4: { label: 'Enviado', badge: 'badge-soft badge-primary' },
-  5: { label: 'Entregue', badge: 'badge-soft badge-success' },
-  6: { label: 'Cancelado', badge: 'badge-soft badge-error' }
+  1: { label: t('account.status.pending'), badge: 'badge-soft badge-warning' },
+  2: { label: t('account.status.confirmed'), badge: 'badge-soft badge-info' },
+  3: { label: t('account.status.processing'), badge: 'badge-soft badge-info' },
+  4: { label: t('account.status.shipped'), badge: 'badge-soft badge-primary' },
+  5: { label: t('account.status.delivered'), badge: 'badge-soft badge-success' },
+  6: { label: t('account.status.cancelled'), badge: 'badge-soft badge-error' }
 }
 
 const paymentMap: Record<number, { label: string; badge: string }> = {
-  1: { label: 'Nao pago', badge: 'badge-soft badge-error' },
-  2: { label: 'Pago', badge: 'badge-soft badge-success' },
-  3: { label: 'Reembolsado', badge: 'badge-soft badge-info' },
-  4: { label: 'Parcial', badge: 'badge-soft badge-warning' }
+  1: { label: t('account.payment.unpaid'), badge: 'badge-soft badge-error' },
+  2: { label: t('account.payment.paid'), badge: 'badge-soft badge-success' },
+  3: { label: t('account.payment.refunded'), badge: 'badge-soft badge-info' },
+  4: { label: t('account.payment.partial'), badge: 'badge-soft badge-warning' }
 }
 
 function statusLabel(status: unknown): string {
-  return statusMap[Number(status)]?.label ?? 'Desconhecido'
+  return statusMap[Number(status)]?.label ?? t('account.status.unknown')
 }
 
 function statusBadgeClass(status: unknown): string {
@@ -116,7 +116,7 @@ function statusBadgeClass(status: unknown): string {
 }
 
 function paymentLabel(status: unknown): string {
-  return paymentMap[Number(status)]?.label ?? 'Desconhecido'
+  return paymentMap[Number(status)]?.label ?? t('account.payment.unknown')
 }
 
 function paymentBadgeClass(status: unknown): string {
