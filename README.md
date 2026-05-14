@@ -234,7 +234,7 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 
 ---
 
-## ✅ ToDo — Completed
+## ✅ ToDo - Completed
 
 * [X] Users (registration, JWT auth, email verification, password reset, magic link)
 * [X] Profiles (CRUD, avatar, bio, phone, whatsapp)
@@ -270,7 +270,7 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 * [X] E2E tests (Playwright)
 * [X] Docker + Docker Compose
 
-## 📌 ToDo — Pending
+## 📌 ToDo - Pending
 
 ### Core Commerce
 * [ ] Payment gateway integration (Stripe, PayPal, Mercado Pago)
