@@ -273,7 +273,7 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 ## 📌 ToDo - Pending
 
 ### Core Commerce
-* [ ] Payment gateway integration (Stripe, PayPal, Mercado Pago)
+* [ ] Payment gateway integration (Stripe, PayPal, Braintree, Mercado Pago, Pagar.me, Iugu, AbacatePay, Cielo, Getnet)
 * [ ] Inventory management (stock tracking per product/variant)
 * [ ] Low-stock alerts and automatic out-of-stock handling
 * [ ] Order invoice generation (PDF)
@@ -285,6 +285,16 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 * [ ] Gift cards and store credit
 * [ ] Loyalty points / rewards program
 * [ ] Product bundles and kits
+* [ ] Research and select APIs for USA (e.g., UPS, FedEx, or USPS).
+* [ ] Research and select APIs for Brazil (e.g., Correios, Melhor Envio, or Jadlog).
+* [ ] Implement a conditional checkout logic based on the user's country.
+* [ ] Map weight and dimension units (Metric vs. Imperial).
+* [ ] Add currency support for shipping costs (USD, BRL and more).
+* [ ] Set up error handling for unsupported zip codes.
+
+
+
+
 
 ### Search & Discovery
 * [ ] Full-text product search (PostgreSQL tsvector or Meilisearch)
