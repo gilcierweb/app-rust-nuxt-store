@@ -28,6 +28,7 @@ mod m20260510_083315_reviews;
 mod m20260510_083524_wishlists;
 mod m20260510_101510_alter_order_items_product_variant_nullable;
 mod m20260513_223617_create_roles_and_users_roles;
+mod m20260516_000001_add_performance_indexes;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -59,6 +60,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260510_083524_wishlists::Migration),
             Box::new(m20260510_101510_alter_order_items_product_variant_nullable::Migration),
             Box::new(m20260513_223617_create_roles_and_users_roles::Migration),
+            Box::new(m20260516_000001_add_performance_indexes::Migration),
             // inject-above (do not remove this comment)
         ]
     }

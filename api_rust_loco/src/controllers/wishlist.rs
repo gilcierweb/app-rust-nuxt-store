@@ -1,12 +1,12 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use crate::middleware::auth::CookieJWT;
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
 use sea_orm::QueryOrder;
 use serde::Deserialize;
-use crate::middleware::auth::CookieJWT;
 
 use crate::models::_entities::wishlists::{ActiveModel, Entity};
 use crate::models::users;

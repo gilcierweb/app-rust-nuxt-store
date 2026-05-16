@@ -1,6 +1,8 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use std::collections::HashMap;
+
 use axum::body::Bytes;
 use axum::debug_handler;
 use loco_rs::prelude::*;
@@ -17,6 +19,7 @@ use crate::models::_entities::product_images::{
 };
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
 use crate::models::products::{ProductWithCategory, Products};
+use crate::utils::slug::parameterize;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -121,23 +124,28 @@ pub async fn get_products_with_categories(
         .all(&ctx.db)
         .await?;
 
-    // Map images to their respective products in memory
-    for product_with_category in &mut data {
-        let product_images: Vec<_> = all_images
-            .iter()
-            .filter(|img| img.product_id == product_with_category.id)
-            .map(|img| crate::models::products::ProductImageJson {
+    let mut images_by_product: HashMap<i32, Vec<crate::models::products::ProductImageJson>> =
+        HashMap::new();
+    for img in all_images {
+        images_by_product.entry(img.product_id).or_default().push(
+            crate::models::products::ProductImageJson {
                 id: img.id,
-                image: img.image.clone(),
-                alt_text: img.alt_text.clone(),
+                image: img.image,
+                alt_text: img.alt_text,
                 active: img.active,
                 cover: img.cover,
                 position: img.position,
                 product_id: img.product_id,
-            })
-            .collect();
-        
-        product_with_category.images = Some(product_images);
+            },
+        );
+    }
+
+    for product_with_category in &mut data {
+        product_with_category.images = Some(
+            images_by_product
+                .remove(&product_with_category.id)
+                .unwrap_or_default(),
+        );
     }
 
     format::json(data)

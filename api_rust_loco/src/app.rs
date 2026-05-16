@@ -21,6 +21,7 @@ use loco_rs::{
     Result,
 };
 
+use crate::middleware::auth::AdminSession;
 use crate::seeds;
 use crate::{models::ability::Ability, models::users::Model as UserModel};
 
@@ -138,7 +139,7 @@ impl Hooks for App {
 
 async fn admin_namespace_guard(
     State(ctx): State<AppContext>,
-    req: Request,
+    mut req: Request,
     next: Next,
 ) -> Response {
     if !req.uri().path().starts_with("/api/admin/") {
@@ -152,15 +153,12 @@ async fn admin_namespace_guard(
     }
 
     let jar = CookieJar::from_headers(req.headers());
-    let token = jar
-        .get("auth_token")
-        .map(|c| c.value())
-        .or_else(|| {
-            req.headers()
-                .get(axum::http::header::AUTHORIZATION)
-                .and_then(|header| header.to_str().ok())
-                .and_then(|header| header.strip_prefix("Bearer "))
-        });
+    let token = jar.get("auth_token").map(|c| c.value()).or_else(|| {
+        req.headers()
+            .get(axum::http::header::AUTHORIZATION)
+            .and_then(|header| header.to_str().ok())
+            .and_then(|header| header.strip_prefix("Bearer "))
+    });
 
     let Some(token) = token else {
         return admin_unauthorized().into_response();
@@ -182,6 +180,8 @@ async fn admin_namespace_guard(
     if !ability.can_manage_admin() {
         return admin_forbidden().into_response();
     }
+
+    req.extensions_mut().insert(AdminSession { user, ability });
 
     next.run(req).await
 }

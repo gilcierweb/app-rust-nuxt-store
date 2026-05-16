@@ -69,9 +69,9 @@ useSeoMeta({
   title: t('account.settingsTitle')
 })
 
-const { user, fetchCurrentUser, logout } = useAuth()
+const { user, init, logout } = useAuth()
 
 if (!user.value) {
-  await fetchCurrentUser()
+  await init()
 }
 </script>

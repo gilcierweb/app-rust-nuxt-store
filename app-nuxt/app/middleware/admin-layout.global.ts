@@ -2,10 +2,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (to.path.includes('/admin')) {
     const localePath = useLocalePath()
     const auth = useAuth()
-    
-    if (!auth.user.value) {
-      await auth.fetchCurrentUser()
-    }
+
+    await auth.init()
 
     if (!auth.isAuthenticated.value) {
       return navigateTo(localePath('/users/sessions'))

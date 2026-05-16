@@ -1,16 +1,16 @@
 use crate::{
     mailers::auth::AuthMailer,
+    middleware::auth::CookieJWT,
     models::{
         _entities::users,
         users::{LoginParams, RegisterParams},
     },
     views::auth::{CurrentResponse, LoginResponse},
-    middleware::auth::CookieJWT,
 };
-use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use axum::debug_handler;
-use loco_rs::prelude::*;
+use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use loco_rs::environment::Environment;
+use loco_rs::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::sync::OnceLock;

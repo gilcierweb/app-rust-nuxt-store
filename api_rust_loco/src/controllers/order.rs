@@ -1,13 +1,13 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use crate::middleware::auth::CookieJWT;
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use sea_orm::QueryOrder;
 use uuid::Uuid;
-use crate::middleware::auth::CookieJWT;
 
 use crate::models::_entities::addresses;
 use crate::models::_entities::coupon_usages;

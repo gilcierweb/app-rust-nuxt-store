@@ -134,7 +134,8 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         all_category_results_fut,
         top_products_results_fut,
         recent_orders_results_fut,
-    ).map_err(|e| {
+    )
+    .map_err(|e| {
         tracing::error!(error = ?e, "Failed to execute dashboard queries in parallel");
         Error::InternalServerError
     })?;

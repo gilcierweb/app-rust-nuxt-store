@@ -127,7 +127,7 @@ export const useAuth = () => {
 
   async function init() {
     if (user.value) return
-    await fetchCurrentUser()
+    await callOnce('auth:current', () => fetchCurrentUser(), { mode: 'navigation' })
   }
 
   return {

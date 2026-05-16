@@ -141,7 +141,7 @@ definePageMeta({
 })
 
 const { locale, t } = useI18n()
-const { user, fetchCurrentUser } = useAuth()
+const { user, init } = useAuth()
 const { useApiLazyFetch } = useApi()
 
 useSeoMeta({
@@ -149,7 +149,7 @@ useSeoMeta({
 })
 
 if (!user.value) {
-  await fetchCurrentUser()
+  await init()
 }
 
 const { data: ordersData, pending: ordersPending } = useApiLazyFetch<Order[]>(

@@ -1,12 +1,15 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
+use std::collections::HashMap;
+
 use axum::debug_handler;
+use axum::extract::Extension;
 use loco_rs::prelude::*;
 use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 
-use crate::middleware::auth::CookieJWT;
+use crate::middleware::auth::{AdminSession, CookieJWT};
 use crate::models::_entities::users::{Entity, Model};
 use crate::models::ability::{Ability, Action, Resource, Subject};
 
@@ -75,9 +78,26 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     item.ok_or_else(|| Error::NotFound)
 }
 
+async fn resolve_user_and_ability(
+    ctx: &AppContext,
+    pid: &str,
+    admin_session: Option<Extension<AdminSession>>,
+) -> Result<(Model, Ability)> {
+    if let Some(Extension(admin_session)) = admin_session {
+        return Ok((admin_session.user, admin_session.ability));
+    }
+
+    Ok(Ability::for_user_pid(&ctx.db, pid).await?)
+}
+
 #[debug_handler]
-pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let (current_user, ability) = Ability::for_user_pid(&ctx.db, &auth.claims.pid).await?;
+pub async fn list(
+    auth: CookieJWT,
+    admin_session: Option<Extension<AdminSession>>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let (current_user, ability) =
+        resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
     ability.authorize(Action::Read, Subject::Admin)?;
 
     let items = ability
@@ -92,7 +112,7 @@ pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Resp
 
     // Optimization: Fetch all roles for all displayed users in one go
     let user_ids: Vec<i32> = items.iter().map(|u| u.id).collect();
-    
+
     use crate::models::_entities::roles::Entity as RoleEntity;
     use crate::models::_entities::users_roles::Entity as UserRoleEntity;
 
@@ -102,15 +122,19 @@ pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Resp
         .all(&ctx.db)
         .await?;
 
+    let mut roles_by_user: HashMap<i32, Vec<String>> = HashMap::new();
+    for (user_role, role) in all_users_roles {
+        if let Some(role) = role {
+            roles_by_user
+                .entry(user_role.user_id)
+                .or_default()
+                .push(role.name);
+        }
+    }
+
     let mut response = Vec::with_capacity(items.len());
     for item in items {
-        let user_id = item.id;
-        let roles: Vec<String> = all_users_roles
-            .iter()
-            .filter(|(ur, _)| ur.user_id == user_id)
-            .filter_map(|(_, r)| r.as_ref().map(|role| role.name.clone()))
-            .collect();
-        
+        let roles = roles_by_user.remove(&item.id).unwrap_or_default();
         response.push(to_list_item(item, roles));
     }
     format::json(response)
@@ -119,10 +143,11 @@ pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Resp
 #[debug_handler]
 pub async fn get_one(
     auth: CookieJWT,
+    admin_session: Option<Extension<AdminSession>>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let (_, ability) = Ability::for_user_pid(&ctx.db, &auth.claims.pid).await?;
+    let (_, ability) = resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
     ability.authorize(Action::Read, Subject::Admin)?;
 
     let item = load_item(&ctx, id).await?;
@@ -135,10 +160,11 @@ pub async fn get_one(
 #[debug_handler]
 pub async fn remove(
     auth: CookieJWT,
+    admin_session: Option<Extension<AdminSession>>,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let (_, ability) = Ability::for_user_pid(&ctx.db, &auth.claims.pid).await?;
+    let (_, ability) = resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
     ability.authorize(Action::Read, Subject::Admin)?;
 
     let item = load_item(&ctx, id).await?;
