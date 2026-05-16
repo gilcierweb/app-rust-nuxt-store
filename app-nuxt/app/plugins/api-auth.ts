@@ -11,7 +11,7 @@ export default defineNuxtPlugin(() => {
   const tokenCookie = useCookie<string | null>('auth_token', { default: () => null })
   const baseURL = config.public.baseURL
 
-  const wrappedFetch = ofetch.create({
+  const wrappedFetch = $fetch.create({
     onRequest({ request, options }) {
       const requestUrl = typeof request === 'string' ? request : request.toString()
       const token = tokenCookie.value
@@ -25,5 +25,9 @@ export default defineNuxtPlugin(() => {
     }
   })
 
-  globalThis.$fetch = wrappedFetch as typeof globalThis.$fetch
+  return {
+    provide: {
+      api: wrappedFetch
+    }
+  }
 })

@@ -11,8 +11,9 @@ export function useApi() {
   const config = useRuntimeConfig()
 
   const apiFetch = <T>(path: MaybeRefOrGetter<string>, options: any = {}) => {
+    const { $api } = useNuxtApp()
     const url = normalizePath(config.public.baseURL, toValue(path))
-    return $fetch<T>(url, options)
+    return ($api as typeof $fetch)<T>(url, options)
   }
 
   const useApiFetch = <T>(path: MaybeRefOrGetter<string>, options: any = {}) => {
@@ -20,6 +21,7 @@ export function useApi() {
     const nuxtApp = useNuxtApp()
     return useFetch<T>(resolvedPath, {
       ...options,
+      $fetch: nuxtApp.$api as typeof $fetch,
       getCachedData(key) {
         if (options.getCachedData) return options.getCachedData(key)
         return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
@@ -32,6 +34,7 @@ export function useApi() {
     const nuxtApp = useNuxtApp()
     return useLazyFetch<T>(resolvedPath, {
       ...options,
+      $fetch: nuxtApp.$api as typeof $fetch,
       getCachedData(key) {
         if (options.getCachedData) return options.getCachedData(key)
         return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
