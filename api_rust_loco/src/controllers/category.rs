@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::categories::{ActiveModel, Entity, Model};
 use crate::models::_entities::products::Entity as ProductEntity;
+use crate::utils::slug::parameterize;
 use serde_json::json;
 use std::collections::HashMap;
 
@@ -23,7 +24,7 @@ pub struct Params {
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
         item.name = Set(self.name.clone());
-        item.slug = Set(self.slug.clone());
+        item.slug = Set(self.slug.as_deref().map(parameterize));
         item.description = Set(self.description.clone());
         item.active = Set(self.active.clone());
         item.position = Set(self.position.clone());

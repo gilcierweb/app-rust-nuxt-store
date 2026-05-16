@@ -40,7 +40,7 @@ pub struct Params {
 impl Params {
     fn update(&self, item: &mut ActiveModel) {
         item.name = Set(self.name.clone());
-        item.slug = Set(self.slug.clone());
+        item.slug = Set(self.slug.as_deref().map(parameterize));
         item.sku = Set(self.sku.clone());
         item.short_description = Set(self.short_description.clone());
         item.description = Set(self.description.clone());
@@ -202,7 +202,7 @@ pub async fn add(
             if let Ok(text) = field.text().await {
                 match name.as_str() {
                     "name" => product.name = Set(Some(text)),
-                    "slug" => product.slug = Set(Some(text)),
+                    "slug" => product.slug = Set(Some(parameterize(&text))),
                     "sku" => product.sku = Set(Some(text)),
                     "short_description" => product.short_description = Set(Some(text)),
                     "description" => product.description = Set(Some(text)),
