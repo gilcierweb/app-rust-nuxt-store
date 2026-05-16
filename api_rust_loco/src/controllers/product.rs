@@ -109,31 +109,35 @@ pub async fn get_products_with_categories(
 
     let mut data: Vec<ProductWithCategory> = products.into_iter().map(Into::into).collect();
 
-    // Load images for each product
-    for product_with_category in &mut data {
-        let images = ProductImageEntity::find()
-            .filter(
-                crate::models::_entities::product_images::Column::ProductId
-                    .eq(product_with_category.id),
-            )
-            .order_by_asc(crate::models::_entities::product_images::Column::Position)
-            .all(&ctx.db)
-            .await?;
+    if data.is_empty() {
+        return format::json(data);
+    }
 
-        product_with_category.images = Some(
-            images
-                .into_iter()
-                .map(|img| crate::models::products::ProductImageJson {
-                    id: img.id,
-                    image: img.image,
-                    alt_text: img.alt_text,
-                    active: img.active,
-                    cover: img.cover,
-                    position: img.position,
-                    product_id: img.product_id,
-                })
-                .collect(),
-        );
+    // Optimization: Fetch all images for all products in a single query (Fix N+1)
+    let product_ids: Vec<i32> = data.iter().map(|p| p.id).collect();
+    let all_images = ProductImageEntity::find()
+        .filter(crate::models::_entities::product_images::Column::ProductId.is_in(product_ids))
+        .order_by_asc(crate::models::_entities::product_images::Column::Position)
+        .all(&ctx.db)
+        .await?;
+
+    // Map images to their respective products in memory
+    for product_with_category in &mut data {
+        let product_images: Vec<_> = all_images
+            .iter()
+            .filter(|img| img.product_id == product_with_category.id)
+            .map(|img| crate::models::products::ProductImageJson {
+                id: img.id,
+                image: img.image.clone(),
+                alt_text: img.alt_text.clone(),
+                active: img.active,
+                cover: img.cover,
+                position: img.position,
+                product_id: img.product_id,
+            })
+            .collect();
+        
+        product_with_category.images = Some(product_images);
     }
 
     format::json(data)

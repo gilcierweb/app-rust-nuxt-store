@@ -86,9 +86,31 @@ pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Resp
         .all(&ctx.db)
         .await?;
 
+    if items.is_empty() {
+        return format::json(Vec::<UserListItem>::new());
+    }
+
+    // Optimization: Fetch all roles for all displayed users in one go
+    let user_ids: Vec<i32> = items.iter().map(|u| u.id).collect();
+    
+    use crate::models::_entities::roles::Entity as RoleEntity;
+    use crate::models::_entities::users_roles::Entity as UserRoleEntity;
+
+    let all_users_roles = UserRoleEntity::find()
+        .filter(crate::models::_entities::users_roles::Column::UserId.is_in(user_ids))
+        .find_also_related(RoleEntity)
+        .all(&ctx.db)
+        .await?;
+
     let mut response = Vec::with_capacity(items.len());
     for item in items {
-        let roles = item.roles(&ctx.db).await?;
+        let user_id = item.id;
+        let roles: Vec<String> = all_users_roles
+            .iter()
+            .filter(|(ur, _)| ur.user_id == user_id)
+            .filter_map(|(_, r)| r.as_ref().map(|role| role.name.clone()))
+            .collect();
+        
         response.push(to_list_item(item, roles));
     }
     format::json(response)
