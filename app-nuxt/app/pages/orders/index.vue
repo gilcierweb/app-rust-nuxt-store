@@ -137,9 +137,9 @@ useSeoMeta({
   ogTitle: t('pages.orders.title'),
 })
 import type { Order } from '~/types'
-const { useApiFetch } = useApi()
+const { useApiLazyFetch } = useApi()
 
-const { data: ordersData, pending } = await useApiFetch<Order[]>(
+const { data: ordersData, pending } = useApiLazyFetch<Order[]>(
   '/api/account/orders',
   { key: 'my-orders' }
 )

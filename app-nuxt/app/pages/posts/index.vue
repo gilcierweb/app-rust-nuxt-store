@@ -138,7 +138,6 @@
 <script setup lang="ts">
 import type { Post } from '~/types';
 const { t, locale } = useI18n()
-const config = useRuntimeConfig();
 const { $truncate } = useNuxtApp();
 
 useSeoMeta({
@@ -149,7 +148,7 @@ useSeoMeta({
 })
 
 const { useApiLazyFetch } = useApi()
-const { pending, data: posts } = await useApiLazyFetch<Post[]>('/api/posts')
+const { pending, data: posts } = useApiLazyFetch<Post[]>('/api/posts')
 
 const blogCategories = [
   { key: 'all', label: 'pages.posts.categories.all' },

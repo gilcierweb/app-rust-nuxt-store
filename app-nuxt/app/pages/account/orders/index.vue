@@ -78,13 +78,13 @@ definePageMeta({
 })
 
 const { locale, t } = useI18n()
-const { useApiFetch } = useApi()
+const { useApiLazyFetch } = useApi()
 
 useSeoMeta({
   title: t('account.myOrders')
 })
 
-const { data: ordersData, pending, error, refresh } = await useApiFetch<Order[]>(
+const { data: ordersData, pending, error, refresh } = useApiLazyFetch<Order[]>(
   '/api/account/orders',
   { key: 'account-orders' }
 )

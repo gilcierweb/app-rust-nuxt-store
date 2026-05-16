@@ -64,10 +64,10 @@ import type { ProductVariant } from '~/types'
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const route = useRoute()
-const { apiFetch, useApiFetch } = useApi()
+const { apiFetch, useApiLazyFetch } = useApi()
 const productId = route.params.id
 
-const { data: variants, pending, refresh } = await useApiFetch<ProductVariant[]>(
+const { data: variants, pending, refresh } = useApiLazyFetch<ProductVariant[]>(
   `/api/admin/variants/list?product_id=${productId}`,
   { key: `variants-${productId}` }
 )

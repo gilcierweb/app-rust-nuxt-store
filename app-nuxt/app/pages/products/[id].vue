@@ -193,7 +193,7 @@
 <script setup lang="ts">
 import type { ProductApi, ProductVariant, Review } from '~/types'
 const { t } = useI18n()
-const { apiFetch, useApiFetch } = useApi()
+const { apiFetch, useApiLazyFetch } = useApi()
 const config = useRuntimeConfig()
 const route = useRoute()
 const cartStore = useCartStore()
@@ -201,8 +201,8 @@ const { openCart } = useCartUI()
 
 const productId = computed(() => route.params.id as string)
 
-// Fetching Product
-const { data: productApi, pending: pendingApi } = await useApiFetch<ProductApi>(
+// Fetching Product (non-blocking: renders immediately with loading state)
+const { data: productApi, pending: pendingApi } = useApiLazyFetch<ProductApi>(
   () => `/api/products/${productId.value}`,
   { key: `product-${productId.value}` }
 )
@@ -222,8 +222,8 @@ useSeoMeta({
   ogImage: computed(() => productApi.value?.images?.[0]?.image || ''),
 })
 
-// Fetching Variants
-const { data: variants } = await useApiFetch<ProductVariant[]>(
+// Fetching Variants (non-blocking)
+const { data: variants } = useApiLazyFetch<ProductVariant[]>(
   () => `/api/variants/list?product_id=${productId.value}`,
   { key: `variants-${productId.value}` }
 )
@@ -265,8 +265,8 @@ function addToCartApi(product: ProductApi) {
 const { fetchWishlist, toggleWishlist, isInWishlist } = useWishlist()
 onMounted(() => { fetchWishlist() })
 
-// Reviews
-const { data: reviews, refresh: refreshReviews } = await useApiFetch<Review[]>(
+// Reviews (non-blocking)
+const { data: reviews, refresh: refreshReviews } = useApiLazyFetch<Review[]>(
   () => `/api/reviews?product_id=${productId.value}`,
   { key: `reviews-${productId.value}` }
 )

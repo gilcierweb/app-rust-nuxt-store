@@ -1,0 +1,13 @@
+import { proxyRequest } from 'h3'
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig()
+  
+  const backendUrl = config.public.ApiRustBaseUrl || 'http://localhost:5150'
+  
+  // Extrai o caminho após o /uploads/
+  const path = event.context.params?.path || ''
+  const target = `${backendUrl}/uploads/${path}`
+  
+  return proxyRequest(event, target)
+})

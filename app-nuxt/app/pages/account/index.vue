@@ -142,7 +142,7 @@ definePageMeta({
 
 const { locale, t } = useI18n()
 const { user, fetchCurrentUser } = useAuth()
-const { useApiFetch } = useApi()
+const { useApiLazyFetch } = useApi()
 
 useSeoMeta({
   title: t('account.title')
@@ -152,11 +152,11 @@ if (!user.value) {
   await fetchCurrentUser()
 }
 
-const { data: ordersData, pending: ordersPending } = await useApiFetch<Order[]>(
+const { data: ordersData, pending: ordersPending } = useApiLazyFetch<Order[]>(
   '/api/account/orders',
   { key: 'account-overview-orders' }
 )
-const { data: wishlistData, pending: wishlistPending } = await useApiFetch<WishlistItem[]>(
+const { data: wishlistData, pending: wishlistPending } = useApiLazyFetch<WishlistItem[]>(
   '/api/account/wishlist',
   { key: 'account-overview-wishlist' }
 )

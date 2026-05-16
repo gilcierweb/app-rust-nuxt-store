@@ -37,13 +37,12 @@
 import type { ProductApi } from '~/types';
 const { t } = useI18n()
 
-const route = useRoute();
-const config = useRuntimeConfig();
+const { useApiLazyFetch } = useApi()
 
 const id = route.params.id;
 
-// Fetch product data for editing
-const { pending, data: product, error } = await useLazyFetch<ProductApi>(`${config.public.baseURL}/api/products/${id}`);
+// Fetch product data for editing (non-blocking)
+const { pending, data: product, error } = useApiLazyFetch<ProductApi>(() => `/api/products/${id}`);
 
 // Handle successful product update
 const handleProductUpdated = (updatedProduct: ProductApi) => {

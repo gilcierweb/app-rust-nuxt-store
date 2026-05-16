@@ -64,10 +64,10 @@ definePageMeta({
 const { t } = useI18n()
 const route = useRoute()
 import type { Order } from '~/types'
-const { useApiFetch } = useApi()
+const { useApiLazyFetch } = useApi()
 
 const id = route.params.id
-const { data: order, pending } = await useApiFetch<Order>(
+const { data: order, pending } = useApiLazyFetch<Order>(
   `/api/account/orders/${id}`,
   { key: `confirmation-${id}` }
 )

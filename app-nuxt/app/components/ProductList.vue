@@ -90,7 +90,6 @@
 import OptimizedImage from './OptimizedImage.vue'
 import type { ProductApi } from '~/types'
 
-const config = useRuntimeConfig()
 const { t } = useI18n()
 const { openCart } = useCartUI()
 const cartStore = useCartStore()
@@ -108,10 +107,10 @@ interface UnifiedProduct {
   source: 'api' | 'dummy'
 }
 
-// Data Fetching
-const { useApiFetch } = useApi()
-const { pending: pendingApi, data: productsData } = await useApiFetch<ProductApi[]>('/api/products')
-const { pending: pendingDummy, data: dummyData } = await useFetch<{ products: any[] }>(`https://dummyjson.com/products`)
+// Data Fetching (non-blocking: page renders instantly with skeleton loaders)
+const { useApiLazyFetch } = useApi()
+const { pending: pendingApi, data: productsData } = useApiLazyFetch<ProductApi[]>('/api/products')
+const { pending: pendingDummy, data: dummyData } = useLazyFetch<{ products: any[] }>(`https://dummyjson.com/products`)
 
 const isLoading = computed(() => pendingApi.value || pendingDummy.value)
 

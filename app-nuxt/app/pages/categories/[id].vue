@@ -176,25 +176,25 @@ import type { Category } from '~/types';
 
 const { t } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig();
+const { useApiLazyFetch } = useApi()
 const { $truncate } = useNuxtApp();
 
 const id = route.params.id;
 
-const { pending, data: category } = await useLazyFetch<Category>(`${config.public.baseURL}/api/categories/${id}`);
+const { pending, data: category } = useApiLazyFetch<Category>(() => `/api/categories/${id}`);
 
 // SEO optimization for category page
 useSeoMeta({
-  title: category.value?.name || t('pages.categories.detail.fallbackTitle'),
-  ogTitle: category.value?.name || t('pages.categories.detail.fallbackTitle'),
-  description: (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
-  ogDescription: (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
+  title: () => category.value?.name || t('pages.categories.detail.fallbackTitle'),
+  ogTitle: () => category.value?.name || t('pages.categories.detail.fallbackTitle'),
+  description: () => (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
+  ogDescription: () => (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
   ogImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=630&fit=crop',
-  ogUrl: `${config.public.baseURL}/categories/${id}`,
+  ogUrl: () => `${config.public.baseURL}/categories/${id}`,
   ogType: 'website',
   twitterCard: 'summary_large_image',
-  twitterTitle: category.value?.name || t('pages.categories.detail.fallbackTitle'),
-  twitterDescription: (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
+  twitterTitle: () => category.value?.name || t('pages.categories.detail.fallbackTitle'),
+  twitterDescription: () => (category.value?.description || t('pages.categories.detail.fallbackDescription')) as string,
   twitterImage: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=1200&h=630&fit=crop',
 })
 </script>

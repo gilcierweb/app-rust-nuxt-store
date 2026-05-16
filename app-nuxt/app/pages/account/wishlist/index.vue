@@ -70,10 +70,10 @@ const { locale, t } = useI18n()
 useSeoMeta({
   title: t('account.wishlistTitle')
 })
-const { apiFetch, useApiFetch } = useApi()
+const { apiFetch, useApiLazyFetch } = useApi()
 
 const removingId = ref<number | null>(null)
-const { data, pending, error, refresh } = await useApiFetch<WishlistItem[]>(
+const { data, pending, error, refresh } = useApiLazyFetch<WishlistItem[]>(
   '/api/account/wishlist',
   { key: 'account-wishlist' }
 )

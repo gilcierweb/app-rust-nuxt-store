@@ -99,5 +99,7 @@ useSeoMeta({
   ogDescription: t('pages.profiles.description'),
 })
 
-const { pending, data: profiles } = await useLazyFetch<Profile[]>(`${config.public.baseURL}/api/profiles`)
+const { useApiLazyFetch } = useApi()
+
+const { pending, data: profiles } = useApiLazyFetch<Profile[]>('/api/profiles')
 </script>

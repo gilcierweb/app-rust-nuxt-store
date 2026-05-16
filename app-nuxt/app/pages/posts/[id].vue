@@ -531,12 +531,13 @@ import type { Post } from "~/types";
 const { t } = useI18n()
 
 const route = useRoute();
+const config = useRuntimeConfig();
 const { useApiLazyFetch } = useApi()
 // When accessing /posts/1, route.params.id will be 1
 console.log(route.params.id);
 const id = route.params.id;
 
-const { status, data: post } = await useApiLazyFetch<Post>(
+const { status, data: post } = useApiLazyFetch<Post>(
     `/api/posts/${id}`,
 );
 

@@ -257,7 +257,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>();
 
-const config = useRuntimeConfig();
+const { apiFetch, useApiLazyFetch } = useApi();
 const { $truncate } = useNuxtApp();
 
 // Form state
@@ -286,7 +286,7 @@ const successMessage = ref('');
 const errorMessage = ref('');
 
 // Fetch categories for dropdown
-const { data: categoriesData } = await useLazyFetch<Category[]>(`${config.public.baseURL}/api/categories`);
+const { data: categoriesData } = useApiLazyFetch<Category[]>('/api/categories');
 const categories = computed(() => categoriesData.value || []);
 
 // Auto-generate slug from name
@@ -329,18 +329,16 @@ const handleSubmit = async () => {
   successMessage.value = '';
   
   try {
-    const url = props.isEditing 
-      ? `${config.public.baseURL}/api/products/${props.product?.id}`
-      : `${config.public.baseURL}/api/products`;
+    const path = props.isEditing 
+      ? `/api/products/${props.product?.id}`
+      : '/api/products';
     
     const method = props.isEditing ? 'PUT' : 'POST';
     
-    const { data, error } = await $fetch(url, {
+    const data = await apiFetch(path, {
       method,
       body: form.value,
     });
-    
-    if (error) throw new Error(error);
     
     successMessage.value = props.isEditing 
       ? 'Produto atualizado com sucesso!' 

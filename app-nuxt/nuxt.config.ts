@@ -4,6 +4,9 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+  future: {
+    compatibilityVersion: 4,
+  },
   modules: ['@nuxt/eslint', '@nuxt/image', 'shadcn-nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vite-pwa/nuxt', 'nuxt-toast', '@nuxtjs/i18n','nuxt-security', '@nuxtjs/sitemap', 'nuxt-charts'],
   css: ["~/assets/css/main.css"],
 
@@ -44,12 +47,10 @@ export default defineNuxtConfig({
   },
   
   runtimeConfig: {
-    // private
-    // NUXT_BASE_URL: ''
     public: {
       ApiBaseUrl: '',
-      ApiRustBaseUrl: '',
-      baseURL: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5150' // Exposed to the frontend as well.
+      ApiRustBaseUrl: process.env.NUXT_API_RUST_BASE_URL || process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5150',
+      baseURL: '' // Deixar vazio para forçar requisições relativas no front-end
     }
   },
   
@@ -192,12 +193,11 @@ export default defineNuxtConfig({
     },
   },
 
-  // Experimental features disabled - causing payload errors in dev
-  // experimental: {
-  //   payloadExtraction: true,
-  //   renderJsonPayloads: true,
-  //   clientFallback: true,
-  // },
+  // Experimental performance features
+  experimental: {
+    // Disable payloadExtraction in dev to prevent EISDIR errors
+    payloadExtraction: false
+  },
 
   // Nitro build optimization
   nitro: {
@@ -205,13 +205,17 @@ export default defineNuxtConfig({
     compressPublicAssets: true,
     minify: true,
     routeRules: {
-      '/api/**': { cors: true, headers: { 'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE' } },
-      '/products/**': { isr: 60, prerender: false },
-      // Prerender disabled for dev - enable for production
-      // '/': { prerender: true },
-      // '/products': { prerender: true },
-      // '/about': { prerender: true },
-      // '/contact': { prerender: true },
+      // Proxying is now handled by server/api/[...].ts and server/routes/uploads/[...].ts
+      
+      // Storefront pages: ISR with 60s revalidation (cached at edge, refreshed in background)
+      '/': { isr: 60 },
+      '/products': { isr: 60 },
+      '/products/**': { isr: 60 },
+      '/posts': { isr: 60 },
+      '/posts/**': { isr: 60 },
+      '/categories': { isr: 60 },
+      // Admin pages: no caching (always fresh, auth-protected)
+      '/admin/**': { ssr: true },
     },
   },
 
@@ -243,10 +247,10 @@ export default defineNuxtConfig({
         'default-src': ["'self'"],
         'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         'script-src-attr': ["'self'", "'unsafe-inline'"],
-        'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com', 'https://picsum.photos'],
+        'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com', 'https://picsum.photos', 'https://fastly.picsum.photos', 'https://images.unsplash.com'],
         'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
         'font-src': ["'self'", "https://cdnjs.cloudflare.com"],
-        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com", "https://romantic-freedom-production-386f.up.railway.app", "https://picsum.photos/800/600"],
+        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com", "https://romantic-freedom-production-386f.up.railway.app", "https://picsum.photos", "https://fastly.picsum.photos"],
       }
     }
   },

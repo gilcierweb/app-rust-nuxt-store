@@ -122,7 +122,7 @@ definePageMeta({
 
 const route = useRoute()
 const { locale, t } = useI18n()
-const { useApiFetch } = useApi()
+const { useApiLazyFetch } = useApi()
 
 const orderId = computed(() => {
   const id = route.params.id
@@ -133,7 +133,7 @@ useSeoMeta({
   title: () => `${t('account.orderNumber')}${orderId.value}`
 })
 
-const { data: order, pending, error } = await useApiFetch<Order>(
+const { data: order, pending, error } = useApiLazyFetch<Order>(
   `/api/account/orders/${orderId.value}`,
   { key: `account-order-${orderId.value}` }
 )

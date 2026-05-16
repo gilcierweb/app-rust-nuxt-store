@@ -202,12 +202,12 @@ import type { Profile } from '~/types';
 const { t } = useI18n()
 
 const route = useRoute();
-const config = useRuntimeConfig();
+const { useApiLazyFetch } = useApi()
 const id = route.params.id;
 
 useSeoMeta({
   title: t('pages.profiles.detail.title', { name: 'Profile' }),
 })
 
-const { pending, data: profile } = await useLazyFetch<Profile>(`${config.public.baseURL}/api/profiles/${id}`);
+const { pending, data: profile } = useApiLazyFetch<Profile>(() => `/api/profiles/${id}`);
 </script>

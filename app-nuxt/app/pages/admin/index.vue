@@ -58,9 +58,10 @@
               <button class="btn btn-ghost btn-xs">{{ t('admin.dashboard.charts.monthly') }}</button>
             </div>
           </div>
-          <div class="h-80 w-full">
+          <div class="h-80 w-full relative">
             <ClientOnly>
               <AreaChart 
+                v-if="salesData.length > 1"
                 :data="salesData"
                 :categories="salesCategories"
                 :y-axis="['sales', 'orders']"
@@ -71,6 +72,9 @@
                 :legend-position="LegendPosition.TopRight"
                 :curve-type="CurveType.MonotoneX"
               />
+              <div v-else class="absolute inset-0 flex items-center justify-center bg-base-100/50">
+                <span class="loading loading-spinner text-primary"></span>
+              </div>
             </ClientOnly>
           </div>
         </div>
@@ -82,28 +86,33 @@
           <h3 class="font-bold text-lg mb-6 text-left">{{ t('admin.dashboard.charts.salesByCategory') }}</h3>
           <div class="h-64 w-full relative flex items-center justify-center">
             <ClientOnly>
-              <DonutChart 
-                :data="categoryData.map(d => d.value)"
-                :categories="donutCategories"
-                :height="260"
-                :radius="4"
-                :arc-width="20"
-                :pad-angle="0.1"
-                :show-tooltip="true"
-              />
+              <template v-if="categoryData.length > 0">
+                <DonutChart 
+                  :data="categoryData.map(d => d.value)"
+                  :categories="donutCategories"
+                  :height="260"
+                  :radius="4"
+                  :arc-width="20"
+                  :pad-angle="0.1"
+                  :show-tooltip="true"
+                />
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span class="text-3xl font-bold">{{ categoryData.reduce((acc, curr) => acc + curr.value, 0) }}</span>
+                  <span class="text-xs text-gray-400">{{ t('admin.dashboard.charts.totalSales') }}</span>
+                </div>
+              </template>
+              <div v-else class="flex items-center justify-center h-full w-full">
+                <span class="loading loading-spinner text-primary"></span>
+              </div>
             </ClientOnly>
-            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <span class="text-3xl font-bold">{{ categoryData.reduce((acc, curr) => acc + curr.value, 0) }}</span>
-              <span class="text-xs text-gray-400">{{ t('admin.dashboard.charts.totalSales') }}</span>
-            </div>
           </div>
           <div class="mt-6 space-y-2">
-            <div v-for="(cat, index) in categoryData" :key="cat.name" class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="size-2 rounded-full" :style="{ backgroundColor: ['#FF6F00', '#FF9F40', '#FFCD56', '#4BC0C0', '#9966FF'][index % 5] }"></span>
-                <span class="text-xs text-gray-600">{{ t(cat.name) }}</span>
-              </div>
-              <span class="text-xs font-bold">{{ cat.value }}</span>
+            <div v-for="cat in categoryData" :key="cat.name" class="flex justify-between items-center text-sm">
+              <span class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full" :style="{ backgroundColor: donutCategories[cat.name]?.color }"></span>
+                {{ cat.name }}
+              </span>
+              <span class="font-bold">{{ formatNumberBR(cat.value) }}</span>
             </div>
           </div>
         </div>
@@ -113,21 +122,22 @@
     <!-- Charts Row 2: Top Products & Recent Orders -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
        <!-- Top Products Bar Chart -->
-       <div class="card bg-base-100 shadow-sm border">
+      <div class="card bg-base-100 shadow-sm border">
         <div class="card-body p-4">
           <h3 class="font-bold text-lg mb-6">{{ t('admin.dashboard.charts.topProducts') }}</h3>
-          <div class="h-80 w-full">
+          <div class="h-64 w-full relative">
             <ClientOnly>
               <BarChart 
+                v-if="topProducts.length > 0"
                 :data="topProducts"
                 :categories="productCategories"
-                :y-axis="['sales']"
-                :height="300"
+                :height="260"
                 :x-formatter="productXFormatter"
-                :y-grid-line="true"
                 :show-tooltip="true"
-                :radius="4"
               />
+              <div v-else class="absolute inset-0 flex items-center justify-center bg-base-100/50">
+                <span class="loading loading-spinner text-primary"></span>
+              </div>
             </ClientOnly>
           </div>
         </div>
