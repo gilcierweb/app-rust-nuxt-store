@@ -45,7 +45,7 @@ services:
     tty: true
     restart: always
     environment:
-      NUXT_PUBLIC_API_RUST_BASE_URL: http://app:8080
+      NUXT_API_RUST_BASE_URL: http://app:8080
     ports: 
       - '3000:3000'
     volumes:

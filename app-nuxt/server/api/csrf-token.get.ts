@@ -1,5 +1,5 @@
 export default defineEventHandler((event) => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig(event)
   const token = event.context.csrfToken
   const headerName = config.public.csurf?.headerName
 

@@ -1,6 +1,17 @@
+import { resolveBackendBaseUrl } from '../utils/backend-url'
+
 const BACKEND_CSRF_HEADER = 'x-backend-csrf-token'
 const BACKEND_CSRF_ENDPOINT = '/api/auth/csrf'
 const BACKEND_CSRF_COOKIE = 'backend_csrf'
+const SKIPPED_RESPONSE_HEADERS = new Set([
+  'content-length',
+  'content-encoding',
+  'transfer-encoding',
+  'access-control-allow-origin',
+  'access-control-allow-credentials',
+  'access-control-allow-headers',
+  'access-control-allow-methods'
+])
 
 function isProtectedMethod(method: string): boolean {
   return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())
@@ -82,20 +93,61 @@ async function ensureBackendCsrfToken(event: any, backendUrl: string, incomingCo
   return { token, cookieHeader }
 }
 
+function forwardResponseHeaders(event: any, responseHeaders: Headers) {
+  for (const [key, value] of responseHeaders.entries()) {
+    const headerName = key.toLowerCase()
+
+    if (headerName === 'set-cookie') {
+      const cookies = splitSetCookieHeader(String(value))
+      for (const cookie of cookies) {
+        appendResponseHeader(event, 'set-cookie', cookie)
+      }
+      continue
+    }
+
+    if (!SKIPPED_RESPONSE_HEADERS.has(headerName)) {
+      setResponseHeader(event, key, value)
+    }
+  }
+}
+
+function backendErrorPayload(error: any, phase: string, statusText?: string) {
+  const data = error?.data ?? error?.response?._data
+  if (data && typeof data === 'object') return data
+
+  return {
+    error: 'backend_request_failed',
+    phase,
+    description: typeof data === 'string' ? data : statusText || error?.message || 'Backend request failed'
+  }
+}
+
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  
-  // A URL base do Rust. Pega da config de runtime que é populada pelo .env
-  const backendUrl = config.apiRustBaseUrl || 'http://localhost:5150'
+  const backend = resolveBackendBaseUrl(event)
+
+  if (!backend.ok) {
+    setResponseHeader(event, 'x-api-proxy-error-source', 'nuxt-runtime-config')
+    setResponseStatus(event, backend.statusCode, 'Backend URL not configured')
+
+    return {
+      error: 'backend_url_not_configured',
+      description: backend.message,
+      current: backend.current,
+      source: backend.source
+    }
+  }
+
+  const backendUrl = backend.url
   
   const path = event.context.params?.path || ''
   const requestUrl = getRequestURL(event)
   const targetUrl = `${backendUrl}/api/${path}${requestUrl.search}`
+  let phase = 'backend-request'
   
   // Forward essential headers
   const incomingHeaders = getRequestHeaders(event)
   const headers = new Headers()
-  const allowedHeaders = ['authorization', 'accept', 'content-type', 'cookie', 'user-agent', 'origin']
+  const allowedHeaders = ['authorization', 'accept', 'content-type', 'cookie', 'user-agent']
   
   for (const headerName of allowedHeaders) {
     const value = incomingHeaders[headerName]
@@ -107,15 +159,17 @@ export default defineEventHandler(async (event) => {
   const method = event.method || 'GET'
   const body = ['GET', 'HEAD'].includes(method) ? undefined : await readRawBody(event, false)
 
-  if (isProtectedMethod(method) && requestUrl.pathname !== BACKEND_CSRF_ENDPOINT) {
-    const { token, cookieHeader } = await ensureBackendCsrfToken(event, backendUrl, headers.get('cookie') || undefined)
-    headers.set(BACKEND_CSRF_HEADER, token)
-    if (cookieHeader) {
-      headers.set('cookie', cookieHeader)
-    }
-  }
-
   try {
+    if (isProtectedMethod(method) && requestUrl.pathname !== BACKEND_CSRF_ENDPOINT) {
+      phase = 'backend-csrf-bootstrap'
+      const { token, cookieHeader } = await ensureBackendCsrfToken(event, backendUrl, headers.get('cookie') || undefined)
+      headers.set(BACKEND_CSRF_HEADER, token)
+      if (cookieHeader) {
+        headers.set('cookie', cookieHeader)
+      }
+    }
+
+    phase = 'backend-request'
     const response = await $fetch.raw(targetUrl, {
       method,
       headers,
@@ -125,27 +179,25 @@ export default defineEventHandler(async (event) => {
 
     // Forward status and content-type
     setResponseStatus(event, response.status, response.statusText)
-    
-    // Forward headers
-    for (const [key, value] of response.headers.entries()) {
-      if (key.toLowerCase() === 'set-cookie') {
-        // split cookies properly
-        const cookies = String(value).split(/,(?=\s*[^;,\s]+=)/).map(c => c.trim()).filter(Boolean)
-        for (const cookie of cookies) {
-          appendResponseHeader(event, 'set-cookie', cookie)
-        }
-      } else if (!['content-length', 'content-encoding', 'transfer-encoding'].includes(key.toLowerCase())) {
-        setResponseHeader(event, key, value)
-      }
-    }
+    forwardResponseHeaders(event, response.headers)
 
     return response._data
   } catch (error: any) {
     const response = error?.response
     if (!response) {
-      throw createError({ statusCode: 502, statusMessage: 'Bad Gateway' })
+      setResponseHeader(event, 'x-api-proxy-error-source', phase)
+      setResponseStatus(event, 502, 'Bad Gateway')
+
+      return {
+        error: 'backend_unreachable',
+        phase,
+        description: error?.message || 'Backend request failed'
+      }
     }
+
+    forwardResponseHeaders(event, response.headers)
+    setResponseHeader(event, 'x-api-proxy-error-source', phase)
     setResponseStatus(event, response.status, response.statusText)
-    return response._data || { error: { message: response.statusText } }
+    return backendErrorPayload(error, phase, response.statusText)
   }
 })
