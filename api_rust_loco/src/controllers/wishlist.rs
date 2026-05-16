@@ -91,18 +91,18 @@ pub async fn remove(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/wishlists/")
+        .prefix("api/wishlists")
         .add("/", get(index))
-        .add("list", get(list))
-        .add("add", get(add))
-        .add("remove", get(remove))
+        .add("/list", get(list))
+        .add("/add", get(add))
+        .add("/remove", get(remove))
 }
 
 pub fn account_routes() -> Routes {
     Routes::new()
-        .prefix("api/account/wishlist/")
+        .prefix("api/account/wishlist")
         .add("/", get(list))
-        .add("list", get(list))
-        .add("add", get(add))
-        .add("remove", get(remove))
+        .add("/list", get(list))
+        .add("/add", get(add))
+        .add("/remove", get(remove))
 }

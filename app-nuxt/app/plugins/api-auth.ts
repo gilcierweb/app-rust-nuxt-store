@@ -19,9 +19,16 @@ export default defineNuxtPlugin(() => {
 
       // Forward cookies from client to API during SSR
       if (import.meta.server && isApiRequest(requestUrl, baseURL)) {
-        options.headers = {
-          ...options.headers,
-          ...useRequestHeaders(['cookie'])
+        const cookieHeader = useRequestHeaders(['cookie'])
+        if (cookieHeader.cookie) {
+          options.headers = options.headers || {}
+          if (Array.isArray(options.headers)) {
+            options.headers.push(['cookie', cookieHeader.cookie])
+          } else if (options.headers instanceof Headers) {
+            options.headers.set('cookie', cookieHeader.cookie)
+          } else {
+            options.headers.cookie = cookieHeader.cookie
+          }
         }
       }
     }

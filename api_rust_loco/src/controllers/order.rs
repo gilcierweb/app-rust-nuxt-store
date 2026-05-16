@@ -360,33 +360,33 @@ pub async fn update_status(
 }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/orders/")
+    routes_with_prefix("api/orders")
 }
 
 pub fn admin_routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/orders/")
+        .prefix("api/admin/orders")
         .add("/", get(index))
-        .add("list", get(list))
-        .add("{id}", get(get_one))
-        .add("{id}/status", put(update_status))
+        .add("/list", get(list))
+        .add("/{id}", get(get_one))
+        .add("/{id}/status", put(update_status))
 }
 
 pub fn account_routes() -> Routes {
     Routes::new()
-        .prefix("api/account/orders/")
+        .prefix("api/account/orders")
         .add("/", get(my_orders))
-        .add("checkout", post(checkout))
-        .add("{id}", get(account_get_one))
+        .add("/checkout", post(checkout))
+        .add("/{id}", get(account_get_one))
 }
 
 fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
         .prefix(prefix)
         .add("/", get(index))
-        .add("checkout", post(checkout))
-        .add("my_orders", get(my_orders))
-        .add("list", get(list))
-        .add("{id}", get(get_one))
-        .add("{id}/status", put(update_status))
+        .add("/checkout", post(checkout))
+        .add("/my_orders", get(my_orders))
+        .add("/list", get(list))
+        .add("/{id}", get(get_one))
+        .add("/{id}/status", put(update_status))
 }

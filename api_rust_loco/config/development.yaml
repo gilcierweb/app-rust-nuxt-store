@@ -31,7 +31,20 @@ server:
         - http://localhost:3001
         - http://localhost:3002
       allow_headers: 
-        - "*"
+        - "Content-Type"
+        - "Authorization"
+        - "Accept"
+        - "Origin"
+        - "X-Requested-With"
+        - "Cookie"
+      allow_methods: 
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "PATCH"
+        - "OPTIONS"
+      allow_credentials: true
     compression:
       enable: true
 
