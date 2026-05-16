@@ -72,6 +72,9 @@ export const useAuth = () => {
   }
 
   async function fetchCurrentUser() {
+    if (loading.value) return user.value
+    
+    loading.value = true
     try {
       const data = await apiFetch<CurrentResponse>('/api/auth/current', {
         headers: { 'Content-Type': 'application/json' }
@@ -81,6 +84,8 @@ export const useAuth = () => {
     } catch {
       user.value = null
       return null
+    } finally {
+      loading.value = false
     }
   }
 
@@ -121,6 +126,7 @@ export const useAuth = () => {
   }
 
   async function init() {
+    if (user.value) return
     await fetchCurrentUser()
   }
 

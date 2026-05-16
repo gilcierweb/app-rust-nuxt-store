@@ -67,20 +67,81 @@ pub struct RecentOrder {
 
 #[debug_handler]
 pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
-    // 1. KPI Stats
-    let total_revenue = orders::Entity::find()
+    // Define all futures for parallel execution
+    let total_revenue_fut = orders::Entity::find()
         .select_only()
         .column_as(orders::Column::TotalAmount.sum(), "total")
         .into_tuple::<(Option<Decimal>,)>()
-        .one(&ctx.db)
-        .await?
-        .and_then(|(total,)| total);
+        .one(&ctx.db);
 
-    let total_orders = orders::Entity::find().count(&ctx.db).await?;
-    let total_customers = users::Entity::find().count(&ctx.db).await?;
+    let total_orders_fut = orders::Entity::find().count(&ctx.db);
+    let total_customers_fut = users::Entity::find().count(&ctx.db);
 
+    let seven_days_ago = chrono::Utc::now() - chrono::Duration::days(7);
+    let sales_results_fut = orders::Entity::find()
+        .select_only()
+        .column_as(Expr::cust("CAST(created_at AS DATE)"), "date")
+        .column_as(orders::Column::TotalAmount.sum(), "sales")
+        .column_as(orders::Column::Id.count(), "orders")
+        .filter(orders::Column::CreatedAt.gte(seven_days_ago))
+        .group_by(Expr::cust("CAST(created_at AS DATE)"))
+        .order_by_asc(Expr::cust("CAST(created_at AS DATE)"))
+        .into_tuple::<(chrono::NaiveDate, Option<Decimal>, i64)>()
+        .all(&ctx.db);
+
+    let all_category_results_fut = categories::Entity::find()
+        .join(JoinType::LeftJoin, categories::Relation::Products.def())
+        .join(JoinType::LeftJoin, products::Relation::OrderItems.def())
+        .select_only()
+        .column(categories::Column::Name)
+        .column_as(order_items::Column::Id.count(), "count")
+        .group_by(categories::Column::Name)
+        .order_by_desc(Expr::cust("count"))
+        .into_tuple::<(Option<String>, Option<i64>)>()
+        .all(&ctx.db);
+
+    let top_products_results_fut = products::Entity::find()
+        .join(JoinType::LeftJoin, products::Relation::OrderItems.def())
+        .select_only()
+        .column(products::Column::Name)
+        .column_as(order_items::Column::Quantity.sum(), "sales_sum")
+        .group_by(products::Column::Name)
+        .order_by_desc(Expr::cust("sales_sum"))
+        .limit(5)
+        .into_tuple::<(Option<String>, Option<i64>)>()
+        .all(&ctx.db);
+
+    let recent_orders_results_fut = orders::Entity::find()
+        .find_also_related(users::Entity)
+        .order_by_desc(orders::Column::CreatedAt)
+        .limit(5)
+        .all(&ctx.db);
+
+    // Execute all queries in parallel
+    let (
+        total_revenue_res,
+        total_orders,
+        total_customers,
+        sales_results,
+        all_category_results,
+        top_products_results,
+        recent_orders_results,
+    ) = tokio::try_join!(
+        total_revenue_fut,
+        total_orders_fut,
+        total_customers_fut,
+        sales_results_fut,
+        all_category_results_fut,
+        top_products_results_fut,
+        recent_orders_results_fut,
+    ).map_err(|e| {
+        tracing::error!(error = ?e, "Failed to execute dashboard queries in parallel");
+        Error::InternalServerError
+    })?;
+
+    // 1. Process KPI Stats
+    let total_revenue = total_revenue_res.and_then(|(total,)| total);
     let revenue_f64 = total_revenue.unwrap_or_default().to_f64().unwrap_or(0.0);
-
     let conversion_rate = if total_customers > 0 {
         (total_orders as f64 / total_customers as f64) * 100.0
     } else {
@@ -126,20 +187,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         },
     ];
 
-    // 2. Sales Data (Last 7 days)
-    let seven_days_ago = chrono::Utc::now() - chrono::Duration::days(7);
-    let sales_results = orders::Entity::find()
-        .select_only()
-        .column_as(Expr::cust("CAST(created_at AS DATE)"), "date")
-        .column_as(orders::Column::TotalAmount.sum(), "sales")
-        .column_as(orders::Column::Id.count(), "orders")
-        .filter(orders::Column::CreatedAt.gte(seven_days_ago))
-        .group_by(Expr::cust("CAST(created_at AS DATE)"))
-        .order_by_asc(Expr::cust("CAST(created_at AS DATE)"))
-        .into_tuple::<(chrono::NaiveDate, Option<Decimal>, i64)>()
-        .all(&ctx.db)
-        .await?;
-
+    // 2. Process Sales Data
     let sales_data = sales_results
         .into_iter()
         .map(|(date, sales, orders)| SalesDataPoint {
@@ -149,22 +197,9 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         })
         .collect();
 
-    // 3. Category Data (Top 5 + Others)
-    let all_category_results = categories::Entity::find()
-        .join(JoinType::LeftJoin, categories::Relation::Products.def())
-        .join(JoinType::LeftJoin, products::Relation::OrderItems.def())
-        .select_only()
-        .column(categories::Column::Name)
-        .column_as(order_items::Column::Id.count(), "count")
-        .group_by(categories::Column::Name)
-        .order_by_desc(Expr::cust("count"))
-        .into_tuple::<(Option<String>, Option<i64>)>()
-        .all(&ctx.db)
-        .await?;
-
+    // 3. Process Category Data
     let mut category_data = Vec::new();
     let mut others_count = 0;
-
     for (i, (name, count)) in all_category_results.into_iter().enumerate() {
         let name = name.unwrap_or_else(|| "admin.statusLabels.unknown".to_string());
         let count = count.unwrap_or(0);
@@ -174,14 +209,12 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             others_count += count;
         }
     }
-
     if others_count > 0 {
         category_data.push(CategoryDataPoint {
             name: "admin.dashboard.categories.others".to_string(),
             value: others_count,
         });
     }
-
     if category_data.is_empty() {
         category_data.push(CategoryDataPoint {
             name: "admin.statusLabels.unknown".to_string(),
@@ -189,19 +222,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         });
     }
 
-    // 4. Top Products
-    let top_products_results = products::Entity::find()
-        .join(JoinType::LeftJoin, products::Relation::OrderItems.def())
-        .select_only()
-        .column(products::Column::Name)
-        .column_as(order_items::Column::Quantity.sum(), "sales_sum")
-        .group_by(products::Column::Name)
-        .order_by_desc(Expr::cust("sales_sum"))
-        .limit(5)
-        .into_tuple::<(Option<String>, Option<i64>)>()
-        .all(&ctx.db)
-        .await?;
-
+    // 4. Process Top Products
     let top_products = top_products_results
         .into_iter()
         .map(|(name, sales)| TopProduct {
@@ -210,14 +231,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         })
         .collect();
 
-    // 5. Recent Orders
-    let recent_orders_results = orders::Entity::find()
-        .find_also_related(users::Entity)
-        .order_by_desc(orders::Column::CreatedAt)
-        .limit(5)
-        .all(&ctx.db)
-        .await?;
-
+    // 5. Process Recent Orders
     let recent_orders = recent_orders_results
         .into_iter()
         .map(|(order, user)| {
