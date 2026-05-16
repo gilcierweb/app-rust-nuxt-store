@@ -243,10 +243,10 @@ export default defineNuxtConfig({
         'default-src': ["'self'"],
         'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         'script-src-attr': ["'self'", "'unsafe-inline'"],
-        'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com'],
+        'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com', 'https://picsum.photos'],
         'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
         'font-src': ["'self'", "https://cdnjs.cloudflare.com"],
-        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com", "https://romantic-freedom-production-386f.up.railway.app"],
+        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com", "https://romantic-freedom-production-386f.up.railway.app", "https://picsum.photos/800/600"],
       }
     }
   },
