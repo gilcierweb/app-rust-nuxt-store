@@ -6,6 +6,7 @@ use axum::extract::Query;
 use loco_rs::prelude::*;
 use sea_orm::QueryOrder;
 use serde::Deserialize;
+use crate::middleware::auth::CookieJWT;
 
 use crate::models::_entities::wishlists::{ActiveModel, Entity};
 use crate::models::users;
@@ -26,7 +27,7 @@ pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
 }
 
 #[debug_handler]
-pub async fn list(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
     let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let items = Entity::find()
         .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user.id))
@@ -38,7 +39,7 @@ pub async fn list(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Resp
 
 #[debug_handler]
 pub async fn add(
-    auth: auth::JWT,
+    auth: CookieJWT,
     State(ctx): State<AppContext>,
     Query(params): Query<AddParams>,
 ) -> Result<Response> {
@@ -71,7 +72,7 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn remove(
-    auth: auth::JWT,
+    auth: CookieJWT,
     State(ctx): State<AppContext>,
     Query(params): Query<RemoveParams>,
 ) -> Result<Response> {

@@ -5,9 +5,12 @@ use crate::{
         users::{LoginParams, RegisterParams},
     },
     views::auth::{CurrentResponse, LoginResponse},
+    middleware::auth::CookieJWT,
 };
+use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use axum::debug_handler;
 use loco_rs::prelude::*;
+use loco_rs::environment::Environment;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::sync::OnceLock;
@@ -128,7 +131,11 @@ async fn reset(State(ctx): State<AppContext>, Json(params): Json<ResetParams>) -
 
 /// Creates a user login and returns a token
 #[debug_handler]
-async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -> Result<Response> {
+async fn login(
+    State(ctx): State<AppContext>,
+    jar: CookieJar,
+    Json(params): Json<LoginParams>,
+) -> Result<(CookieJar, Response)> {
     let user = users::Model::find_by_email(&ctx.db, &params.email).await?;
 
     let valid = user.verify_password(&params.password);
@@ -143,15 +150,34 @@ async fn login(State(ctx): State<AppContext>, Json(params): Json<LoginParams>) -
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
         .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
+    let cookie = Cookie::build(("auth_token", token.clone()))
+        .path("/")
+        .http_only(true)
+        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .secure(ctx.environment == Environment::Production)
+        .build();
+
+    let jar = jar.add(cookie);
     let roles = user.roles(&ctx.db).await?;
-    format::json(LoginResponse::new(&user, &token, roles))
+    Ok((jar, format::json(LoginResponse::new(&user, &token, roles))?))
 }
 
 #[debug_handler]
-async fn current(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+async fn current(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
     let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let roles = user.roles(&ctx.db).await?;
     format::json(CurrentResponse::new(&user, roles))
+}
+
+#[debug_handler]
+async fn logout(jar: CookieJar) -> Result<(CookieJar, Response)> {
+    let cookie = Cookie::build(("auth_token", ""))
+        .path("/")
+        .http_only(true)
+        .max_age(time::Duration::ZERO)
+        .build();
+    let jar = jar.add(cookie);
+    Ok((jar, format::json(())?))
 }
 
 /// Magic link authentication provides a secure and passwordless way to log in to the application.
@@ -198,7 +224,8 @@ async fn magic_link(
 async fn magic_link_verify(
     Path(token): Path<String>,
     State(ctx): State<AppContext>,
-) -> Result<Response> {
+    jar: CookieJar,
+) -> Result<(CookieJar, Response)> {
     let Ok(user) = users::Model::find_by_magic_token(&ctx.db, &token).await else {
         // we don't want to expose our users email. if the email is invalid we still
         // returning success to the caller
@@ -213,8 +240,16 @@ async fn magic_link_verify(
         .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
         .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
+    let cookie = Cookie::build(("auth_token", token.clone()))
+        .path("/")
+        .http_only(true)
+        .same_site(SameSite::Lax)
+        .secure(ctx.environment == Environment::Production)
+        .build();
+
+    let jar = jar.add(cookie);
     let roles = user.roles(&ctx.db).await?;
-    format::json(LoginResponse::new(&user, &token, roles))
+    Ok((jar, format::json(LoginResponse::new(&user, &token, roles))?))
 }
 
 pub fn routes() -> Routes {
@@ -223,6 +258,7 @@ pub fn routes() -> Routes {
         .add("/register", post(register))
         .add("/verify/{token}", get(verify))
         .add("/login", post(login))
+        .add("/logout", post(logout))
         .add("/forgot", post(forgot))
         .add("/reset", post(reset))
         .add("/current", get(current))

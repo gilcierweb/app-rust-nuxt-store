@@ -5,14 +5,8 @@ export const useAuth = () => {
   const baseURL = config.public.baseURL
   const { apiFetch } = useApi()
 
-  const tokenCookie = useCookie<string | null>('auth_token', {
-    default: () => null,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7
-  })
   const user = useState<CurrentResponse | null>('auth_user', () => null)
-  const isAuthenticated = computed(() => !!tokenCookie.value)
+  const isAuthenticated = computed(() => !!user.value)
   const loading = useState<boolean>('auth_loading', () => false)
   const error = useState<string | null>('auth_error', () => null)
 
@@ -23,9 +17,10 @@ export const useAuth = () => {
       const data = await $fetch<LoginResponse>(`${baseURL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: { email, password }
+        body: { email, password },
+        credentials: 'include'
       })
-      tokenCookie.value = data.token
+      
       user.value = {
         pid: data.pid,
         name: data.name,
@@ -61,18 +56,22 @@ export const useAuth = () => {
     }
   }
 
-  function logout() {
-    tokenCookie.value = null
-    user.value = null
-    error.value = null
-    navigateTo('/users/sessions')
+  async function logout() {
+    try {
+      await $fetch(`${baseURL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      })
+    } catch (err) {
+      console.error('Erro ao fazer logout no servidor', err)
+    } finally {
+      user.value = null
+      error.value = null
+      navigateTo('/users/sessions')
+    }
   }
 
   async function fetchCurrentUser() {
-    if (!tokenCookie.value) {
-      user.value = null
-      return null
-    }
     try {
       const data = await apiFetch<CurrentResponse>('/api/auth/current', {
         headers: { 'Content-Type': 'application/json' }
@@ -80,7 +79,6 @@ export const useAuth = () => {
       user.value = data
       return data
     } catch {
-      tokenCookie.value = null
       user.value = null
       return null
     }
@@ -123,13 +121,10 @@ export const useAuth = () => {
   }
 
   async function init() {
-    if (tokenCookie.value) {
-      await fetchCurrentUser()
-    }
+    await fetchCurrentUser()
   }
 
   return {
-    token: tokenCookie,
     user,
     isAuthenticated,
     loading,

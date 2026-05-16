@@ -7,6 +7,7 @@ use axum::{
     response::{IntoResponse, Response},
     Json,
 };
+use axum_extra::extract::CookieJar;
 use loco_rs::{
     app::{AppContext, Hooks, Initializer},
     auth::jwt,
@@ -150,12 +151,18 @@ async fn admin_namespace_guard(
         return next.run(req).await;
     }
 
-    let Some(token) = req
-        .headers()
-        .get(axum::http::header::AUTHORIZATION)
-        .and_then(|header| header.to_str().ok())
-        .and_then(|header| header.strip_prefix("Bearer "))
-    else {
+    let jar = CookieJar::from_headers(req.headers());
+    let token = jar
+        .get("auth_token")
+        .map(|c| c.value())
+        .or_else(|| {
+            req.headers()
+                .get(axum::http::header::AUTHORIZATION)
+                .and_then(|header| header.to_str().ok())
+                .and_then(|header| header.strip_prefix("Bearer "))
+        });
+
+    let Some(token) = token else {
         return admin_unauthorized().into_response();
     };
 

@@ -7,6 +7,7 @@ use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use sea_orm::QueryOrder;
 use uuid::Uuid;
+use crate::middleware::auth::CookieJWT;
 
 use crate::models::_entities::addresses;
 use crate::models::_entities::coupon_usages;
@@ -32,7 +33,7 @@ pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
 
 #[debug_handler]
 pub async fn checkout(
-    auth: auth::JWT,
+    auth: CookieJWT,
     State(ctx): State<AppContext>,
     Json(params): Json<CreateOrderParams>,
 ) -> Result<Response> {
@@ -236,7 +237,7 @@ pub async fn checkout(
 }
 
 #[debug_handler]
-pub async fn my_orders(auth: auth::JWT, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn my_orders(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
     let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
     let orders: Vec<crate::models::_entities::orders::Model> = Entity::find()
         .filter(crate::models::_entities::orders::Column::UserId.eq(current_user.id))
@@ -266,7 +267,7 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 
 #[debug_handler]
 pub async fn account_get_one(
-    auth: auth::JWT,
+    auth: CookieJWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {

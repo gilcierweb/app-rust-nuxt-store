@@ -8,20 +8,22 @@ function isApiRequest(request: string, baseURL: string): boolean {
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
-  const tokenCookie = useCookie<string | null>('auth_token', { default: () => null })
   const baseURL = config.public.baseURL
 
   const wrappedFetch = $fetch.create({
     onRequest({ request, options }) {
       const requestUrl = typeof request === 'string' ? request : request.toString()
-      const token = tokenCookie.value
-      if (!token || !isApiRequest(requestUrl, baseURL)) return
+      
+      // Ensure credentials are included for HttpOnly cookies
+      options.credentials = 'include'
 
-      const headers = new Headers(options.headers as HeadersInit | undefined)
-      if (!headers.has('Authorization')) {
-        headers.set('Authorization', `Bearer ${token}`)
+      // Forward cookies from client to API during SSR
+      if (import.meta.server && isApiRequest(requestUrl, baseURL)) {
+        options.headers = {
+          ...options.headers,
+          ...useRequestHeaders(['cookie'])
+        }
       }
-      options.headers = headers
     }
   })
 

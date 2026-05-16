@@ -15,3 +15,4 @@ pub mod tasks;
 pub mod utils;
 pub mod views;
 pub mod workers;
+pub mod middleware;

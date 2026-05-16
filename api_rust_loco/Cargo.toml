@@ -46,6 +46,8 @@ rust-i18n = "4.0.0"
 urlencoding = "2.1"
 unicode-normalization = "0.1.25"
 ammonia = "4.1.2"
+axum-extra = { version = "0.10.0", features = ["cookie"] }
+time = "0.3"
 
 [[bin]]
 name = "api_rust_loco-cli"
