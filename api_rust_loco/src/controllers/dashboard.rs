@@ -198,7 +198,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .group_by(products::Column::Name)
         .order_by_desc(Expr::cust("sales_sum"))
         .limit(5)
-        .into_tuple::<(Option<String>, Option<Decimal>)>()
+        .into_tuple::<(Option<String>, Option<i64>)>()
         .all(&ctx.db)
         .await?;
 
@@ -206,7 +206,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .into_iter()
         .map(|(name, sales)| TopProduct {
             name: name.unwrap_or_else(|| "admin.statusLabels.unknown".to_string()),
-            sales: sales.unwrap_or_default().to_i64().unwrap_or(0),
+            sales: sales.unwrap_or_default(),
         })
         .collect();
 

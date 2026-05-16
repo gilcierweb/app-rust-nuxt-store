@@ -49,7 +49,8 @@
       "position": "Posição",
       "date": "Data",
       "price": "Preço",
-      "category": "Categoria"
+      "category": "Categoria",
+      "total": "Total"
     },
     "status": {
       "active": "Ativo",

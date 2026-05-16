@@ -7,7 +7,8 @@ export default defineEventHandler(async (event) => {
   
   // Extrai o caminho após o /uploads/
   const path = event.context.params?.path || ''
-  const target = `${backendUrl}/uploads/${path}`
+  const requestUrl = getRequestURL(event)
+  const target = `${backendUrl}/uploads/${path}${requestUrl.search}`
   
   return proxyRequest(event, target)
 })

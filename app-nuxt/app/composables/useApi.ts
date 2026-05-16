@@ -1,8 +1,6 @@
 import { toValue, computed } from 'vue'
 import type { MaybeRefOrGetter } from 'vue'
 
-type ApiHeaders = Record<string, string>
-
 function normalizePath(baseURL: string, path: string): string {
   if (!path) return ''
   if (path.startsWith('http://') || path.startsWith('https://')) return path
@@ -11,44 +9,39 @@ function normalizePath(baseURL: string, path: string): string {
 
 export function useApi() {
   const config = useRuntimeConfig()
-  const tokenCookie = useCookie<string | null>('auth_token', { default: () => null })
-
-  const withAuthHeaders = (headers: ApiHeaders = {}): ApiHeaders => {
-    if (!tokenCookie.value) return headers
-    return {
-      ...headers,
-      Authorization: `Bearer ${tokenCookie.value}`
-    }
-  }
 
   const apiFetch = <T>(path: MaybeRefOrGetter<string>, options: any = {}) => {
     const url = normalizePath(config.public.baseURL, toValue(path))
-    return $fetch<T>(url, {
-      ...options,
-      headers: withAuthHeaders((options.headers || {}) as ApiHeaders)
-    })
+    return $fetch<T>(url, options)
   }
 
   const useApiFetch = <T>(path: MaybeRefOrGetter<string>, options: any = {}) => {
     const resolvedPath = computed(() => normalizePath(config.public.baseURL, toValue(path)))
+    const nuxtApp = useNuxtApp()
     return useFetch<T>(resolvedPath, {
       ...options,
-      headers: withAuthHeaders((options.headers || {}) as ApiHeaders)
+      getCachedData(key) {
+        if (options.getCachedData) return options.getCachedData(key)
+        return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
+      }
     })
   }
 
   const useApiLazyFetch = <T>(path: MaybeRefOrGetter<string>, options: any = {}) => {
     const resolvedPath = computed(() => normalizePath(config.public.baseURL, toValue(path)))
+    const nuxtApp = useNuxtApp()
     return useLazyFetch<T>(resolvedPath, {
       ...options,
-      headers: withAuthHeaders((options.headers || {}) as ApiHeaders)
+      getCachedData(key) {
+        if (options.getCachedData) return options.getCachedData(key)
+        return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
+      }
     })
   }
 
   return {
     apiFetch,
     useApiFetch,
-    useApiLazyFetch,
-    withAuthHeaders
+    useApiLazyFetch
   }
 }

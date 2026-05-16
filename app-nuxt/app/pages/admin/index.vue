@@ -131,9 +131,12 @@
                 v-if="topProducts.length > 0"
                 :data="topProducts"
                 :categories="productCategories"
-                :height="260"
+                :y-axis="['sales']"
+                :height="300"
                 :x-formatter="productXFormatter"
+                :y-grid-line="true"
                 :show-tooltip="true"
+                :radius="4"
               />
               <div v-else class="absolute inset-0 flex items-center justify-center bg-base-100/50">
                 <span class="loading loading-spinner text-primary"></span>
