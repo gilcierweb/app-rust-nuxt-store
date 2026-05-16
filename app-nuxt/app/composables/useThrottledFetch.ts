@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 
 export function useThrottledFetch<T>(url: string, options: any = {}) {
+  const { $api } = useNuxtApp()
   const data = ref<T | null>(null)
   const pending = ref(false)
   const error = ref<Error | null>(null)
@@ -20,7 +21,7 @@ export function useThrottledFetch<T>(url: string, options: any = {}) {
     error.value = null
     
     try {
-      const response = await $fetch<T>(url, options)
+      const response = await ($api as typeof $fetch)<T>(url, options)
       data.value = response
     } catch (err) {
       error.value = err as Error

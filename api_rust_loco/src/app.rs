@@ -21,7 +21,7 @@ use loco_rs::{
     Result,
 };
 
-use crate::middleware::auth::AdminSession;
+use crate::middleware::{auth::AdminSession, csrf::csrf_guard};
 use crate::seeds;
 use crate::{models::ability::Ability, models::users::Model as UserModel};
 
@@ -110,6 +110,7 @@ impl Hooks for App {
                 ctx.clone(),
                 admin_namespace_guard,
             ))
+            .layer(middleware::from_fn_with_state(ctx.clone(), csrf_guard))
             .merge(swagger))
     }
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {

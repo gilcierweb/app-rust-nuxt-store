@@ -3,22 +3,16 @@
 #![allow(clippy::unused_async)]
 use crate::middleware::auth::CookieJWT;
 use axum::debug_handler;
-use axum::extract::Query;
 use loco_rs::prelude::*;
 use sea_orm::QueryOrder;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::wishlists::{ActiveModel, Entity};
 use crate::models::users;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AddParams {
     pub product_id: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct RemoveParams {
-    pub id: i32,
 }
 
 #[debug_handler]
@@ -41,7 +35,7 @@ pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Resp
 pub async fn add(
     auth: CookieJWT,
     State(ctx): State<AppContext>,
-    Query(params): Query<AddParams>,
+    Json(params): Json<AddParams>,
 ) -> Result<Response> {
     let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
 
@@ -72,12 +66,12 @@ pub async fn add(
 
 #[debug_handler]
 pub async fn remove(
+    Path(id): Path<i32>,
     auth: CookieJWT,
     State(ctx): State<AppContext>,
-    Query(params): Query<RemoveParams>,
 ) -> Result<Response> {
     let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
-    let item = Entity::find_by_id(params.id).one(&ctx.db).await?;
+    let item = Entity::find_by_id(id).one(&ctx.db).await?;
     let item = item.ok_or_else(|| Error::NotFound)?;
     if item.user_id != current_user.id {
         return unauthorized(t!("auth.unauthorized"));
@@ -94,8 +88,8 @@ pub fn routes() -> Routes {
         .prefix("api/wishlists")
         .add("/", get(index))
         .add("/list", get(list))
-        .add("/add", get(add))
-        .add("/remove", get(remove))
+        .add("/add", post(add))
+        .add("/remove/{id}", delete(remove))
 }
 
 pub fn account_routes() -> Routes {
@@ -103,6 +97,6 @@ pub fn account_routes() -> Routes {
         .prefix("api/account/wishlist")
         .add("/", get(list))
         .add("/list", get(list))
-        .add("/add", get(add))
-        .add("/remove", get(remove))
+        .add("/add", post(add))
+        .add("/remove/{id}", delete(remove))
 }

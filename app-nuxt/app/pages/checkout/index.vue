@@ -317,7 +317,7 @@ async function applyCoupon() {
   couponChecking.value = true
   couponMessage.value = ''
   try {
-    const result = await $fetch<any>(`${config.public.baseURL}/api/coupons/validate`, {
+    const result = await apiFetch<any>('/api/coupons/validate', {
       method: 'POST',
       body: {
         code: couponCode.value.trim().toUpperCase(),

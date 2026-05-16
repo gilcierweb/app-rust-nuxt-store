@@ -3,6 +3,7 @@ let fetchQueue = new Map<string, Promise<any>>()
 let debounceTimers = new Map<string, NodeJS.Timeout>()
 
 export function useDebouncedFetch<T>(url: string, options: any = {}, debounceMs = 100) {
+  const { $api } = useNuxtApp()
   const cacheKey = `${url}-${JSON.stringify(options)}`
   
   // Se já tem uma promise em andamento, retornar ela
@@ -19,7 +20,7 @@ export function useDebouncedFetch<T>(url: string, options: any = {}, debounceMs 
   const promise = new Promise<T>((resolve, reject) => {
     const timer = setTimeout(async () => {
       try {
-        const result = await $fetch<T>(url, options)
+        const result = await ($api as typeof $fetch)<T>(url, options)
         resolve(result as T)
         fetchQueue.delete(cacheKey)
         debounceTimers.delete(cacheKey)

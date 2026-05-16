@@ -241,7 +241,12 @@ export default defineNuxtConfig({
   },
 
   security: {
-    // csrf: true,
+    csrf: {
+      https: process.env.NODE_ENV === 'production',
+      addCsrfTokenToEventCtx: true,
+      methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
+      headerName: 'x-nuxt-csrf-token',
+    },
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],

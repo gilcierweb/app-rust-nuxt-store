@@ -5,6 +5,8 @@ expression: saved_user
 ---
 Ok(
     Model {
+        created_at: DATE,
+        updated_at: DATE,
         id: ID
         pid: PID,
         email: "test@loco.com",
@@ -22,7 +24,5 @@ Ok(
         email_verified_at: None,
         magic_link_token: None,
         magic_link_expiration: None,
-        created_at: DATE,
-        updated_at: DATE,
     },
 )

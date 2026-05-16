@@ -2,6 +2,7 @@ use crate::{
     cache::current_cache,
     mailers::auth::AuthMailer,
     middleware::auth::CookieJWT,
+    middleware::csrf::csrf_token,
     models::{
         _entities::users,
         users::{LoginParams, RegisterParams},
@@ -322,6 +323,7 @@ async fn magic_link_verify(
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("/api/auth")
+        .add("/csrf", get(csrf_token))
         .add("/register", post(register))
         .add("/verify/{token}", get(verify))
         .add("/login", post(login))

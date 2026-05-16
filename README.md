@@ -347,8 +347,8 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 
 ### Security & DevOps
 * [ ] API rate limiting (per IP + per user)
-* [ ] CSRF protection
-* [ ] Cookies HttpOnly
+* [x] CSRF protection
+* [x] Cookies HttpOnly
 * [ ] API protection API key,  JWT, OAuth 2.0, error 401, 403, 422
 * [ ] Two-factor authentication (2FA/TOTP)
 * [ ] CI/CD pipeline (GitHub Actions)

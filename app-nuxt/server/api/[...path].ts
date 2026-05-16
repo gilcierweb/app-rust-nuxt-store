@@ -1,4 +1,63 @@
-import { proxyRequest } from 'h3'
+const BACKEND_CSRF_HEADER = 'x-backend-csrf-token'
+const BACKEND_CSRF_ENDPOINT = '/api/auth/csrf'
+
+function isProtectedMethod(method: string): boolean {
+  return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())
+}
+
+function splitSetCookieHeader(value: string | null): string[] {
+  if (!value) return []
+  return value
+    .split(/,(?=\s*[^;,\s]+=)/)
+    .map(cookie => cookie.trim())
+    .filter(Boolean)
+}
+
+function mergeCookieHeader(existingCookieHeader: string | null | undefined, setCookies: string[]): string | undefined {
+  const jar = new Map<string, string>()
+
+  for (const entry of (existingCookieHeader || '').split(';')) {
+    const trimmed = entry.trim()
+    if (!trimmed) continue
+    const separatorIndex = trimmed.indexOf('=')
+    if (separatorIndex <= 0) continue
+    jar.set(trimmed.slice(0, separatorIndex), trimmed.slice(separatorIndex + 1))
+  }
+
+  for (const setCookie of setCookies) {
+    const cookiePair = setCookie.split(';', 1)[0]?.trim()
+    if (!cookiePair) continue
+    const separatorIndex = cookiePair.indexOf('=')
+    if (separatorIndex <= 0) continue
+    jar.set(cookiePair.slice(0, separatorIndex), cookiePair.slice(separatorIndex + 1))
+  }
+
+  if (jar.size === 0) return undefined
+  return Array.from(jar.entries())
+    .map(([name, value]) => `${name}=${value}`)
+    .join('; ')
+}
+
+async function ensureBackendCsrfToken(event: any, backendUrl: string, incomingCookieHeader?: string) {
+  const response = await $fetch.raw<{ token?: string }>(`${backendUrl}${BACKEND_CSRF_ENDPOINT}`, {
+    method: 'GET',
+    headers: incomingCookieHeader ? { cookie: incomingCookieHeader, accept: 'application/json' } : { accept: 'application/json' }
+  })
+
+  const setCookies = splitSetCookieHeader(response.headers.get('set-cookie'))
+  const cookieHeader = mergeCookieHeader(incomingCookieHeader, setCookies)
+
+  for (const cookie of setCookies) {
+    appendResponseHeader(event, 'set-cookie', cookie)
+  }
+
+  const token = response._data?.token
+  if (!token) {
+    throw createError({ statusCode: 500, statusMessage: 'Backend CSRF bootstrap failed' })
+  }
+
+  return { token, cookieHeader }
+}
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
@@ -13,7 +72,7 @@ export default defineEventHandler(async (event) => {
   // Forward essential headers
   const incomingHeaders = getRequestHeaders(event)
   const headers = new Headers()
-  const allowedHeaders = ['authorization', 'accept', 'content-type', 'cookie', 'user-agent']
+  const allowedHeaders = ['authorization', 'accept', 'content-type', 'cookie', 'user-agent', 'origin']
   
   for (const headerName of allowedHeaders) {
     const value = incomingHeaders[headerName]
@@ -24,6 +83,14 @@ export default defineEventHandler(async (event) => {
 
   const method = event.method || 'GET'
   const body = ['GET', 'HEAD'].includes(method) ? undefined : await readRawBody(event, false)
+
+  if (isProtectedMethod(method) && requestUrl.pathname !== BACKEND_CSRF_ENDPOINT) {
+    const { token, cookieHeader } = await ensureBackendCsrfToken(event, backendUrl, headers.get('cookie') || undefined)
+    headers.set(BACKEND_CSRF_HEADER, token)
+    if (cookieHeader) {
+      headers.set('cookie', cookieHeader)
+    }
+  }
 
   try {
     const response = await $fetch.raw(targetUrl, {

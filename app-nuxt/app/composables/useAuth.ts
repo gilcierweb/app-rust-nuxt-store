@@ -1,8 +1,6 @@
 import type { LoginResponse, CurrentResponse } from '~/types/index'
 
 export const useAuth = () => {
-  const config = useRuntimeConfig()
-  const baseURL = config.public.baseURL
   const { apiFetch } = useApi()
 
   const user = useState<CurrentResponse | null>('auth_user', () => null)
@@ -14,11 +12,10 @@ export const useAuth = () => {
     loading.value = true
     error.value = null
     try {
-      const data = await $fetch<LoginResponse>(`${baseURL}/api/auth/login`, {
+      const data = await apiFetch<LoginResponse>('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: { email, password },
-        credentials: 'include'
+        body: { email, password }
       })
       
       user.value = {
@@ -42,7 +39,7 @@ export const useAuth = () => {
     loading.value = true
     error.value = null
     try {
-      await $fetch(`${baseURL}/api/auth/register`, {
+      await apiFetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: { name, email, password }
@@ -58,10 +55,7 @@ export const useAuth = () => {
 
   async function logout() {
     try {
-      await $fetch(`${baseURL}/api/auth/logout`, {
-        method: 'POST',
-        credentials: 'include'
-      })
+      await apiFetch('/api/auth/logout', { method: 'POST' })
     } catch (err) {
       console.error('Erro ao fazer logout no servidor', err)
     } finally {
@@ -93,7 +87,7 @@ export const useAuth = () => {
     loading.value = true
     error.value = null
     try {
-      await $fetch(`${baseURL}/api/auth/forgot`, {
+      await apiFetch('/api/auth/forgot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: { email }
@@ -111,7 +105,7 @@ export const useAuth = () => {
     loading.value = true
     error.value = null
     try {
-      await $fetch(`${baseURL}/api/auth/reset`, {
+      await apiFetch('/api/auth/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: { token, password }

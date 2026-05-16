@@ -18,12 +18,15 @@ export function useWishlist() {
     const existing = wishlist.value.find(w => w.product_id === productId)
     if (existing) {
       try {
-        await apiFetch(`/api/account/wishlist/remove?id=${existing.id}`)
+        await apiFetch(`/api/account/wishlist/remove/${existing.id}`, { method: 'DELETE' })
         wishlist.value = wishlist.value.filter(w => w.id !== existing.id)
       } catch { /* ignore */ }
     } else {
       try {
-        const item = await apiFetch<WishlistItem>(`/api/account/wishlist/add?product_id=${productId}`)
+        const item = await apiFetch<WishlistItem>('/api/account/wishlist/add', {
+          method: 'POST',
+          body: { product_id: productId }
+        })
         wishlist.value.push(item)
       } catch { /* ignore */ }
     }

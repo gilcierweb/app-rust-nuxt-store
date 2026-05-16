@@ -22,7 +22,11 @@ macro_rules! configure_insta {
 async fn can_register() {
     configure_insta!();
 
-    request::<App, _, _>(|request, ctx| async move {
+    request::<App, _, _>(|mut request, ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         let email = "test@loco.com";
         let payload = serde_json::json!({
             "name": "loco",
@@ -56,6 +60,23 @@ async fn can_register() {
     .await;
 }
 
+#[tokio::test]
+#[serial]
+async fn rejects_unsafe_requests_without_csrf() {
+    request::<App, _, _>(|request, _ctx| async move {
+        let payload = serde_json::json!({
+            "name": "loco",
+            "email": "csrf-missing@loco.com",
+            "password": "12341234"
+        });
+
+        let response = request.post("/api/auth/register").json(&payload).await;
+        assert_eq!(response.status_code(), 403);
+        assert!(response.text().contains("csrf"));
+    })
+    .await;
+}
+
 #[rstest]
 #[case("login_with_valid_password", "12341234")]
 #[case("login_with_invalid_password", "invalid-password")]
@@ -64,7 +85,11 @@ async fn can_register() {
 async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) {
     configure_insta!();
 
-    request::<App, _, _>(|request, ctx| async move {
+    request::<App, _, _>(|mut request, ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         let email = "test@loco.com";
         let register_payload = serde_json::json!({
             "name": "loco",
@@ -126,7 +151,11 @@ async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) 
 async fn can_login_without_verify() {
     configure_insta!();
 
-    request::<App, _, _>(|request, _ctx| async move {
+    request::<App, _, _>(|mut request, _ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         let email = "test@loco.com";
         let password = "12341234";
         let register_payload = serde_json::json!({
@@ -176,7 +205,11 @@ async fn can_login_without_verify() {
 async fn can_reset_password() {
     configure_insta!();
 
-    request::<App, _, _>(|request, ctx| async move {
+    request::<App, _, _>(|mut request, ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         let login_data = prepare_data::init_user_login(&request, &ctx).await;
 
         let forgot_payload = serde_json::json!({
@@ -254,7 +287,11 @@ async fn can_reset_password() {
 async fn can_get_current_user() {
     configure_insta!();
 
-    request::<App, _, _>(|request, ctx| async move {
+    request::<App, _, _>(|mut request, ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         let user = prepare_data::init_user_login(&request, &ctx).await;
 
         let (auth_key, auth_value) = prepare_data::auth_header(&user.token);
@@ -282,7 +319,11 @@ async fn can_get_current_user() {
 #[serial]
 async fn can_auth_with_magic_link() {
     configure_insta!();
-    request::<App, _, _>(|request, ctx| async move {
+    request::<App, _, _>(|mut request, ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         seed::<App>(&ctx).await.unwrap();
 
         let payload = serde_json::json!({
@@ -338,7 +379,11 @@ async fn can_auth_with_magic_link() {
 #[serial]
 async fn can_reject_invalid_email() {
     configure_insta!();
-    request::<App, _, _>(|request, _ctx| async move {
+    request::<App, _, _>(|mut request, _ctx| async move {
+        let csrf = prepare_data::init_csrf(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+        request.add_header(csrf_key, csrf_value);
+
         let invalid_email = "user1@temp-mail.com";
         let payload = serde_json::json!({
             "email": invalid_email,

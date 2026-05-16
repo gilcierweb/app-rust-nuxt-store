@@ -83,7 +83,7 @@ const wishlist = computed(() => data.value ?? [])
 async function removeItem(item: WishlistItem) {
   removingId.value = item.id
   try {
-    await apiFetch(`/api/account/wishlist/remove?id=${item.id}`)
+    await apiFetch(`/api/account/wishlist/remove/${item.id}`, { method: 'DELETE' })
     await refresh()
   } finally {
     removingId.value = null
