@@ -153,7 +153,11 @@ async fn login(
     let cookie = Cookie::build(("auth_token", token.clone()))
         .path("/")
         .http_only(true)
-        .same_site(axum_extra::extract::cookie::SameSite::Lax)
+        .same_site(if ctx.environment == Environment::Production {
+            SameSite::None
+        } else {
+            SameSite::Lax
+        })
         .secure(ctx.environment == Environment::Production)
         .build();
 
@@ -243,7 +247,11 @@ async fn magic_link_verify(
     let cookie = Cookie::build(("auth_token", token.clone()))
         .path("/")
         .http_only(true)
-        .same_site(SameSite::Lax)
+        .same_site(if ctx.environment == Environment::Production {
+            SameSite::None
+        } else {
+            SameSite::Lax
+        })
         .secure(ctx.environment == Environment::Production)
         .build();
 
