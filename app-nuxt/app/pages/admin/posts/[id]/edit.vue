@@ -36,10 +36,10 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { useApiLazyFetch } = useApi()
 
-const { data: post, pending, error } = useLazyFetch<Post>(
-  `${config.public.baseURL}/api/admin/posts/${route.params.id}`
+const { data: post, pending, error } = useApiLazyFetch<Post>(
+  `/api/admin/posts/${route.params.id}`
 )
 
 const handleSaved = (savedPost: Post) => {

@@ -121,7 +121,10 @@ const { apiFetch, useApiLazyFetch } = useApi()
 
 const searchQuery = ref('')
 
-const { pending, data: users, error, refresh } = useApiLazyFetch<AdminUser[]>('/api/admin/users')
+const { pending, data: users, error, refresh } = useApiLazyFetch<AdminUser[]>(
+  '/api/admin/users',
+  { key: 'admin-users-list' }
+)
 
 const filteredUsers = computed(() => {
   if (!users.value) return []

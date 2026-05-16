@@ -121,13 +121,14 @@ definePageMeta({
   layout: 'admin'
 })
 
-const config = useRuntimeConfig()
+const { apiFetch, useApiLazyFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: coupons, error, refresh } = useLazyFetch<Coupon[]>(
-  `${config.public.baseURL}/api/admin/coupons`
+const { pending, data: coupons, error, refresh } = useApiLazyFetch<Coupon[]>(
+  '/api/admin/coupons',
+  { key: 'admin-coupons-list' }
 )
 
 // Filtered coupons based on search
@@ -192,7 +193,7 @@ const handleSearch = () => {
 const confirmDelete = async (coupon: Coupon) => {
   if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.code }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/coupons/${coupon.id}`, {
+      await apiFetch(`/api/admin/coupons/${coupon.id}`, {
         method: 'DELETE'
       })
       await refresh()

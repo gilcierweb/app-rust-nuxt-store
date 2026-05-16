@@ -74,6 +74,7 @@
 import type { Shipment, ShippingMethod } from '~/types'
 
 const { t } = useI18n()
+const { apiFetch, useApiLazyFetch } = useApi()
 const config = useRuntimeConfig()
 
 const props = withDefaults(defineProps<{
@@ -91,7 +92,12 @@ const emit = defineEmits<{
 const saving = ref(false)
 const submitError = ref('')
 const submitSuccess = ref('')
-const shippingMethods = ref<ShippingMethod[]>([])
+
+// SSR-friendly fetch (JWT via useApi composable)
+const { data: shippingMethods } = useApiLazyFetch<ShippingMethod[]>(
+  '/api/admin/shippings',
+  { key: 'admin-shipment-form-methods', default: () => [] }
+)
 
 const form = reactive({
   order_id: props.shipment?.order_id ?? 0,
@@ -99,14 +105,6 @@ const form = reactive({
   tracking_number: props.shipment?.tracking_number ?? '',
   carrier: props.shipment?.carrier ?? '',
   status: props.shipment?.status ?? 1,
-})
-
-onMounted(async () => {
-  try {
-    shippingMethods.value = await $fetch(`${config.public.baseURL}/api/admin/shippings`)
-  } catch {
-    shippingMethods.value = []
-  }
 })
 
 async function handleSubmit() {
@@ -125,13 +123,13 @@ async function handleSubmit() {
 
     let result: Shipment
     if (props.isEditing && props.shipment?.id) {
-      result = await $fetch(`${config.public.baseURL}/api/admin/shipments/${props.shipment.id}`, {
+      result = await apiFetch<Shipment>(`/api/admin/shipments/${props.shipment.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body,
       })
     } else {
-      result = await $fetch(`${config.public.baseURL}/api/admin/shipments`, {
+      result = await apiFetch<Shipment>('/api/admin/shipments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,

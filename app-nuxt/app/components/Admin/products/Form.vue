@@ -255,6 +255,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const { apiFetch, useApiLazyFetch } = useApi()
 const config = useRuntimeConfig()
 const propsIsEditing = computed(() => !!props.isEditing)
 
@@ -298,7 +299,7 @@ const imageFields = ref<Array<{
 }>>([])
 
 /* categories */
-const { data: categoriesData } = useLazyFetch<Category[]>(`${config.public.baseURL}/api/admin/categories`)
+const { data: categoriesData } = useApiLazyFetch<Category[]>('/api/admin/categories')
 const categories = computed(() => categoriesData.value || [])
 
 /* image handlers (unchanged) */
@@ -430,7 +431,7 @@ const onSubmit = handleSubmit(async (vals: FormValues) => {
   successMessage.value = ''
 
   try {
-    const url = props.isEditing ? `${config.public.baseURL}/api/admin/products/${props.product?.id}` : `${config.public.baseURL}/api/admin/products`
+    const url = props.isEditing ? `/api/admin/products/${props.product?.id}` : '/api/admin/products'
     const method = props.isEditing ? 'PUT' : 'POST'
 
     if (method === 'POST' && imageFields.value.some(f => f.file)) {
@@ -457,7 +458,7 @@ const onSubmit = handleSubmit(async (vals: FormValues) => {
         formData.append(`images[${index}][cover]`, String(field.cover))
       })
 
-      const response = await $fetch(url, { method, body: formData })
+      const response = await apiFetch(url, { method, body: formData })
       successMessage.value = 'Produto criado com sucesso!'
       emit('saved', response as ProductApi)
       resetForm()
@@ -473,7 +474,7 @@ const onSubmit = handleSubmit(async (vals: FormValues) => {
         featured: !!vals.featured,
         active: !!vals.active
       }
-      const response = await $fetch(url, { method, body: payload })
+      const response = await apiFetch(url, { method, body: payload })
       successMessage.value = props.isEditing ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!'
       emit('saved', response as ProductApi)
       if (!props.isEditing) resetForm()

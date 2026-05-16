@@ -166,7 +166,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const config = useRuntimeConfig()
+const { apiFetch, useApiLazyFetch } = useApi()
 
 // Form state
 const form = reactive({
@@ -187,8 +187,8 @@ const successMessage = ref('')
 const errorMessage = ref('')
 
 // Fetch parent categories
-const { data: parentCategories } = useLazyFetch<Category[]>(
-  `${config.public.baseURL}/api/admin/categories`
+const { data: parentCategories } = useApiLazyFetch<Category[]>(
+  '/api/admin/categories'
 )
 
 // Filter out current category from parent options (can't be parent of itself)
@@ -272,12 +272,12 @@ const onSubmit = async () => {
     }
 
     const url = props.isEditing
-      ? `${config.public.baseURL}/api/admin/categories/${props.category?.id}`
-      : `${config.public.baseURL}/api/admin/categories`
+      ? `/api/admin/categories/${props.category?.id}`
+      : '/api/admin/categories'
 
     const method = props.isEditing ? 'PUT' : 'POST'
 
-    const response = await $fetch<Category>(url, {
+    const response = await apiFetch<Category>(url, {
       method,
       body: payload
     })

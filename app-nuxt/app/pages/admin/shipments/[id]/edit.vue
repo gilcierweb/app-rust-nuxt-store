@@ -29,9 +29,8 @@ definePageMeta({ layout: 'admin' })
 
 const { t } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig()
-
-const { data: shipment, pending, error } = useLazyFetch<Shipment>(`${config.public.baseURL}/api/admin/shipments/${route.params.id}`)
+const { useApiLazyFetch } = useApi()
+const { data: shipment, pending, error } = useApiLazyFetch<Shipment>(`/api/admin/shipments/${route.params.id}`)
 
 const handleSaved = (_shipment: Shipment) => {
   navigateTo('/admin/shipments')

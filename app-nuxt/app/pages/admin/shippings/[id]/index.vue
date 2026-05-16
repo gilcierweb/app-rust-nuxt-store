@@ -127,19 +127,19 @@
 </template>
 
 <script setup lang="ts">
-const { t, locale } = useI18n()
 import type { ShippingMethod } from '~/types'
 
 definePageMeta({
   layout: 'admin'
 })
 
+const { t, locale } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: shipping, error, refresh } = useFetch<ShippingMethod>(
-  `${config.public.baseURL}/api/admin/shippings/${route.params.id}`
+const { pending, data: shipping, error, refresh } = useApiFetch<ShippingMethod>(
+  `/api/admin/shippings/${route.params.id}`
 )
 
 const formatCurrency = (value: number | undefined) => {
@@ -166,7 +166,7 @@ const deleteShipping = async () => {
 
   if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.value.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/shippings/${shipping.value.id}`, {
+      await apiFetch(`/api/admin/shippings/${shipping.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/shippings')

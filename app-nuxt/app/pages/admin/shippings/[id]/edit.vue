@@ -36,10 +36,10 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { useApiLazyFetch } = useApi()
 
-const { data: shipping, pending, error } = useLazyFetch<ShippingMethod>(
-  `${config.public.baseURL}/api/admin/shippings/${route.params.id}`
+const { data: shipping, pending, error } = useApiLazyFetch<ShippingMethod>(
+  `/api/admin/shippings/${route.params.id}`
 )
 
 const handleSaved = (savedShipping: ShippingMethod) => {

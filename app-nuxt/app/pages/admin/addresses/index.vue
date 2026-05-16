@@ -130,13 +130,14 @@ definePageMeta({
   layout: 'admin'
 })
 
-const config = useRuntimeConfig()
+const { apiFetch, useApiLazyFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: addresses, error, refresh } = useLazyFetch<Address[]>(
-  `${config.public.baseURL}/api/admin/addresses`
+const { pending, data: addresses, error, refresh } = useApiLazyFetch<Address[]>(
+  '/api/admin/addresses',
+  { key: 'admin-addresses-list' }
 )
 
 // Filtered addresses based on search
@@ -173,7 +174,7 @@ const confirmDelete = async (address: Address) => {
   const name = `${address.first_name} ${address.last_name}`
   if (confirm(t('admin.addresses.detail.confirmDelete', { name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/addresses/${address.id}`, {
+      await apiFetch(`/api/admin/addresses/${address.id}`, {
         method: 'DELETE'
       })
       await refresh()

@@ -153,11 +153,11 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: review, error, refresh } = useFetch<Review>(
-  `${config.public.baseURL}/api/admin/reviews/${route.params.id}`
+const { pending, data: review, error, refresh } = useApiFetch<Review>(
+  `/api/admin/reviews/${route.params.id}`
 )
 
 const formatDate = (dateString?: string) => {
@@ -176,7 +176,7 @@ const deleteReview = async () => {
 
   if (confirm(`Tem certeza que deseja excluir a avaliação #${review.value.id}?`)) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/reviews/${review.value.id}`, {
+      await apiFetch(`/api/admin/reviews/${review.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/reviews')

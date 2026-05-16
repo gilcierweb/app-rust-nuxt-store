@@ -64,18 +64,18 @@ import type { ProductVariant } from '~/types'
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const productId = route.params.id
 
-const { data: variants, pending, refresh } = await useFetch<ProductVariant[]>(
-  `${config.public.baseURL}/api/admin/variants/list?product_id=${productId}`,
+const { data: variants, pending, refresh } = await useApiFetch<ProductVariant[]>(
+  `/api/admin/variants/list?product_id=${productId}`,
   { key: `variants-${productId}` }
 )
 
 async function handleDelete(variantId: number) {
   if (!confirm(t('variant.deleteConfirm'))) return
   try {
-    await $fetch(`${config.public.baseURL}/api/admin/variants/${variantId}`, { method: 'DELETE' })
+    await apiFetch(`/api/admin/variants/${variantId}`, { method: 'DELETE' })
     refresh()
   } catch (e) {
     console.error(e)

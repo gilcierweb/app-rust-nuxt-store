@@ -148,7 +148,8 @@ useSeoMeta({
   ogDescription: t('pages.posts.description'),
 })
 
-const { pending, data: posts } = await useLazyFetch<Post[]>(`${config.public.baseURL}/api/posts`)
+const { useApiLazyFetch } = useApi()
+const { pending, data: posts } = await useApiLazyFetch<Post[]>('/api/posts')
 
 const blogCategories = [
   { key: 'all', label: 'pages.posts.categories.all' },

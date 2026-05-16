@@ -106,14 +106,15 @@ definePageMeta({
   layout: 'admin'
 })
 
-const config = useRuntimeConfig()
+const { apiFetch, useApiLazyFetch } = useApi()
 const { $truncate } = useNuxtApp()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: categories, error, refresh } = useLazyFetch<Category[]>(
-  `${config.public.baseURL}/api/admin/categories`
+const { pending, data: categories, error, refresh } = useApiLazyFetch<Category[]>(
+  '/api/admin/categories',
+  { key: 'admin-categories-list' }
 )
 
 // Filtered categories based on search
@@ -148,7 +149,7 @@ const handleSearch = () => {
 const confirmDelete = async (category: Category) => {
   if (confirm(t('admin.categories.detail.confirmDelete', { name: category.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/categories/${category.id}`, {
+      await apiFetch(`/api/admin/categories/${category.id}`, {
         method: 'DELETE'
       })
       await refresh()

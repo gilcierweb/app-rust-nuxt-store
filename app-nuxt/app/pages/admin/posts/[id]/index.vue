@@ -124,12 +124,12 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
 
-const { pending, data: post, error, refresh } = useFetch<Post>(
-  `${config.public.baseURL}/api/admin/posts/${route.params.id}`
+const { pending, data: post, error, refresh } = useApiFetch<Post>(
+  `/api/admin/posts/${route.params.id}`
 )
 
 // Status label
@@ -177,7 +177,7 @@ const deletePost = async () => {
 
   if (confirm(t('admin.posts.detail.confirmDelete', { name: post.value.title || t('admin.posts.noTitle') }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/posts/${post.value.id}`, {
+      await apiFetch(`/api/admin/posts/${post.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/posts')

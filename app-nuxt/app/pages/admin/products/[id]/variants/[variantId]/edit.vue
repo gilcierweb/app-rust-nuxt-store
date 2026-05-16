@@ -76,14 +76,14 @@ import type { ProductVariant } from '~/types'
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const productId = route.params.id
 const variantId = route.params.variantId
 const saving = ref(false)
 
-const { data: variant, pending } = await useFetch<ProductVariant>(
-  `${config.public.baseURL}/api/admin/variants/${variantId}`,
+const { data: variant, pending } = await useApiFetch<ProductVariant>(
+  `/api/admin/variants/${variantId}`,
   { key: `variant-${variantId}` }
 )
 
@@ -119,7 +119,7 @@ watch(variant, (v) => {
 async function handleSave() {
   saving.value = true
   try {
-    await $fetch(`${config.public.baseURL}/api/admin/variants/${variantId}`, {
+    await apiFetch(`/api/admin/variants/${variantId}`, {
       method: 'PUT',
       body: form,
     })

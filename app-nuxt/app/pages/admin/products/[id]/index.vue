@@ -148,11 +148,12 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { apiFetch, useApiLazyFetch } = useApi()
 const config = useRuntimeConfig()
 const { t } = useI18n()
 
-const { data: product, pending, error } = useLazyFetch<ProductApi>(
-  `${config.public.baseURL}/api/admin/products/${route.params.id}`
+const { data: product, pending, error } = useApiLazyFetch<ProductApi>(
+  `/api/admin/products/${route.params.id}`
 )
 
 // Computed para imagem de capa
@@ -195,7 +196,7 @@ const confirmDelete = async () => {
   
   if (confirm(t('admin.products.confirmDelete', { name: product.value.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/products/${product.value.id}`, {
+      await apiFetch(`/api/admin/products/${product.value.id}`, {
         method: 'DELETE'
       })
       navigateTo('/admin/products')

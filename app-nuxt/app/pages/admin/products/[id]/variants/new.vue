@@ -69,7 +69,7 @@
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 const router = useRouter()
 const productId = route.params.id
 const saving = ref(false)
@@ -91,7 +91,7 @@ const form = reactive({
 async function handleSave() {
   saving.value = true
   try {
-    await $fetch(`${config.public.baseURL}/api/admin/variants/`, {
+    await apiFetch('/api/admin/variants/', {
       method: 'POST',
       body: form,
     })

@@ -133,12 +133,12 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
 
-const { pending, data: category, error, refresh } = useFetch<Category>(
-  `${config.public.baseURL}/api/admin/categories/${route.params.id}`
+const { pending, data: category, error, refresh } = useApiFetch<Category>(
+  `/api/admin/categories/${route.params.id}`
 )
 
 const formatDate = (dateString?: string) => {
@@ -157,7 +157,7 @@ const deleteCategory = async () => {
   
   if (confirm(t('admin.categories.detail.confirmDelete', { name: category.value.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/categories/${category.value.id}`, {
+      await apiFetch(`/api/admin/categories/${category.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/categories')

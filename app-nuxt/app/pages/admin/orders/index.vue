@@ -124,15 +124,15 @@ import type { Order } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
-const config = useRuntimeConfig()
+const { useApiLazyFetch } = useApi()
 
 // Filters
 const searchQuery = ref('')
 const selectedStatus = ref('')
 
-const { data: ordersData, pending } = await useFetch<Order[]>(
-  `${config.public.baseURL}/api/admin/orders/list`,
-  { key: 'admin-orders' }
+const { data: ordersData, pending } = useApiLazyFetch<Order[]>(
+  '/api/admin/orders/list',
+  { key: 'admin-orders-list' }
 )
 
 const orders = computed(() => ordersData.value ?? [])

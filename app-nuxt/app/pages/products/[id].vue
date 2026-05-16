@@ -193,6 +193,7 @@
 <script setup lang="ts">
 import type { ProductApi, ProductVariant, Review } from '~/types'
 const { t } = useI18n()
+const { apiFetch, useApiFetch } = useApi()
 const config = useRuntimeConfig()
 const route = useRoute()
 const cartStore = useCartStore()
@@ -201,8 +202,8 @@ const { openCart } = useCartUI()
 const productId = computed(() => route.params.id as string)
 
 // Fetching Product
-const { data: productApi, pending: pendingApi } = await useFetch<ProductApi>(
-  () => `${config.public.baseURL}/api/products/${productId.value}`,
+const { data: productApi, pending: pendingApi } = await useApiFetch<ProductApi>(
+  () => `/api/products/${productId.value}`,
   { key: `product-${productId.value}` }
 )
 
@@ -222,8 +223,8 @@ useSeoMeta({
 })
 
 // Fetching Variants
-const { data: variants } = await useFetch<ProductVariant[]>(
-  () => `${config.public.baseURL}/api/variants/list?product_id=${productId.value}`,
+const { data: variants } = await useApiFetch<ProductVariant[]>(
+  () => `/api/variants/list?product_id=${productId.value}`,
   { key: `variants-${productId.value}` }
 )
 
@@ -265,8 +266,8 @@ const { fetchWishlist, toggleWishlist, isInWishlist } = useWishlist()
 onMounted(() => { fetchWishlist() })
 
 // Reviews
-const { data: reviews, refresh: refreshReviews } = await useFetch<Review[]>(
-  () => `${config.public.baseURL}/api/reviews?product_id=${productId.value}`,
+const { data: reviews, refresh: refreshReviews } = await useApiFetch<Review[]>(
+  () => `/api/reviews?product_id=${productId.value}`,
   { key: `reviews-${productId.value}` }
 )
 
@@ -285,7 +286,7 @@ async function submitReview() {
   reviewError.value = ''
   reviewSuccess.value = ''
   try {
-    await $fetch(`${config.public.baseURL}/api/reviews`, {
+    await apiFetch('/api/reviews', {
       method: 'POST',
       body: {
         product_id: Number(productId.value),

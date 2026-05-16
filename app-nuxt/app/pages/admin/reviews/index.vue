@@ -128,13 +128,14 @@ definePageMeta({
   layout: 'admin'
 })
 
-const config = useRuntimeConfig()
+const { apiFetch, useApiLazyFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: reviews, error, refresh } = useLazyFetch<Review[]>(
-  `${config.public.baseURL}/api/admin/reviews`
+const { pending, data: reviews, error, refresh } = useApiLazyFetch<Review[]>(
+  '/api/admin/reviews',
+  { key: 'admin-reviews-list' }
 )
 
 // Filtered reviews based on search
@@ -168,7 +169,7 @@ const handleSearch = () => {
 const confirmDelete = async (review: Review) => {
   if (confirm(t('admin.reviews.detail.confirmDelete', { id: review.id }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/reviews/${review.id}`, {
+      await apiFetch(`/api/admin/reviews/${review.id}`, {
         method: 'DELETE'
       })
       await refresh()

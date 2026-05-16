@@ -36,10 +36,10 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { useApiLazyFetch } = useApi()
 
-const { data: category, pending, error } = useLazyFetch<Category>(
-  `${config.public.baseURL}/api/admin/categories/${route.params.id}`
+const { data: category, pending, error } = useApiLazyFetch<Category>(
+  `/api/admin/categories/${route.params.id}`
 )
 
 const handleSaved = (savedCategory: Category) => {

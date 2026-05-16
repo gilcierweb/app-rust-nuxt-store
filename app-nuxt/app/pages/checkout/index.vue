@@ -259,9 +259,7 @@ import type { PaymentMethod, ShippingMethod } from '~/types'
 const submitting = ref(false)
 const error = ref('')
 const selectedPaymentMethod = ref<number | null>(null)
-const paymentMethods = ref<PaymentMethod[]>([])
 const selectedShippingMethod = ref<number | null>(null)
-const shippingMethods = ref<ShippingMethod[]>([])
 const couponCode = ref('')
 const couponDiscount = ref<number | null>(null)
 const couponMessage = ref('')
@@ -277,6 +275,29 @@ const address = reactive({
   zipCode: '',
   phone: '',
 })
+
+// SSR-friendly data fetching with useLazyFetch (cached, deduplicated, JWT via global plugin)
+const { data: paymentMethods } = useLazyFetch<PaymentMethod[]>(
+  `${config.public.baseURL}/api/payments/methods`,
+  { key: 'checkout-payment-methods', default: () => [] }
+)
+const { data: shippingMethods } = useLazyFetch<ShippingMethod[]>(
+  `${config.public.baseURL}/api/shippings`,
+  { key: 'checkout-shipping-methods', default: () => [] }
+)
+
+// Auto-select first method when data arrives
+watch(paymentMethods, (methods) => {
+  if (methods.length > 0 && !selectedPaymentMethod.value) {
+    selectedPaymentMethod.value = methods[0].id
+  }
+}, { immediate: true })
+
+watch(shippingMethods, (methods) => {
+  if (methods.length > 0 && !selectedShippingMethod.value) {
+    selectedShippingMethod.value = methods[0].id
+  }
+}, { immediate: true })
 
 const selectedShippingCost = computed(() => {
   if (!selectedShippingMethod.value) return null
@@ -325,21 +346,6 @@ function removeCoupon() {
   couponApplied.value = false
   couponMessage.value = ''
 }
-
-onMounted(async () => {
-  const [pm, sm] = await Promise.all([
-    $fetch<PaymentMethod[]>(`${config.public.baseURL}/api/payments/methods`).catch(() => []),
-    $fetch<ShippingMethod[]>(`${config.public.baseURL}/api/shippings`).catch(() => []),
-  ])
-  paymentMethods.value = pm
-  shippingMethods.value = sm
-  if (paymentMethods.value.length > 0) {
-    selectedPaymentMethod.value = paymentMethods.value[0].id
-  }
-  if (shippingMethods.value.length > 0) {
-    selectedShippingMethod.value = shippingMethods.value[0].id
-  }
-})
 
 async function placeOrder() {
   if (cartStore.isEmpty || !selectedPaymentMethod.value) return

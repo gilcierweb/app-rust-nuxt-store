@@ -141,6 +141,7 @@ definePageMeta({
   layout: 'admin'
 })
 
+const { apiFetch, useApiLazyFetch } = useApi()
 const config = useRuntimeConfig()
 const { t } = useI18n()
 
@@ -149,9 +150,14 @@ const searchQuery = ref('')
 const selectedCategory = ref('')
 const selectedStatus = ref('')
 
-// Fetch Products and Categories
-const { pending, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/admin/products`)
-const { data: categories } = await useFetch<Category[]>(`${config.public.baseURL}/api/admin/categories`)
+const { pending, data: productsData, refresh } = useApiLazyFetch<ProductApi[]>(
+  '/api/admin/products',
+  { key: 'admin-products-list' }
+)
+const { data: categories } = useApiLazyFetch<Category[]>(
+  '/api/admin/categories',
+  { key: 'admin-products-categories' }
+)
 
 const products = computed(() => productsData.value || [])
 
@@ -180,9 +186,8 @@ const formatNumberBR = (num: number | undefined) => {
 const confirmDelete = async (product: ProductApi) => {
   if (confirm(t('admin.products.confirmDelete', { name: product.name }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/products/${product.id}`, { method: 'DELETE' })
-      // Refresh logic would go here
-      window.location.reload()
+      await apiFetch(`/api/admin/products/${product.id}`, { method: 'DELETE' })
+      await refresh()
     } catch (err) {
       alert(t('admin.products.errorDelete'))
     }

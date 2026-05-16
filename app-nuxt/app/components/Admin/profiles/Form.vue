@@ -255,7 +255,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 
 // Form state
 const form = reactive({
@@ -372,12 +372,12 @@ const onSubmit = async () => {
     }
 
     const url = props.isEditing
-      ? `${config.public.baseURL}/api/admin/profiles/${props.profile?.id}`
-      : `${config.public.baseURL}/api/admin/profiles`
+      ? `/api/admin/profiles/${props.profile?.id}`
+      : '/api/admin/profiles'
 
     const method = props.isEditing ? 'PUT' : 'POST'
 
-    const response = await $fetch<Profile>(url, {
+    const response = await apiFetch<Profile>(url, {
       method,
       body: payload
     })

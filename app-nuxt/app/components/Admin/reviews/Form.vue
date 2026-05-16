@@ -191,7 +191,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-const config = useRuntimeConfig()
+const { apiFetch } = useApi()
 
 // Form state
 const form = reactive({
@@ -285,12 +285,12 @@ const onSubmit = async () => {
     }
 
     const url = props.isEditing
-      ? `${config.public.baseURL}/api/admin/reviews/${props.review?.id}`
-      : `${config.public.baseURL}/api/admin/reviews`
+      ? `/api/admin/reviews/${props.review?.id}`
+      : '/api/admin/reviews'
 
     const method = props.isEditing ? 'PUT' : 'POST'
 
-    const response = await $fetch<Review>(url, {
+    const response = await apiFetch<Review>(url, {
       method,
       body: payload
     })

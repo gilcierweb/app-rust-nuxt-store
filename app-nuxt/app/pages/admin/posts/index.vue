@@ -128,13 +128,14 @@ definePageMeta({
   layout: 'admin'
 })
 
-const config = useRuntimeConfig()
+const { apiFetch, useApiLazyFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: posts, error, refresh } = useLazyFetch<Post[]>(
-  `${config.public.baseURL}/api/admin/posts`
+const { pending, data: posts, error, refresh } = useApiLazyFetch<Post[]>(
+  '/api/admin/posts',
+  { key: 'admin-posts-list' }
 )
 
 // Filtered posts based on search
@@ -198,7 +199,7 @@ const handleSearch = () => {
 const confirmDelete = async (post: Post) => {
   if (confirm(t('admin.posts.detail.confirmDelete', { name: post.title || t('admin.posts.noTitle') }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/posts/${post.id}`, {
+      await apiFetch(`/api/admin/posts/${post.id}`, {
         method: 'DELETE'
       })
       await refresh()

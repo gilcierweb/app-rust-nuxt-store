@@ -18,6 +18,14 @@
       </div>
     </div>
 
+    <!-- Loading State -->
+    <div v-if="pending" class="flex flex-col items-center justify-center py-20 bg-base-100 rounded-box border shadow-sm">
+      <span class="loading loading-spinner text-primary size-12"></span>
+      <p class="mt-4 text-gray-500">{{ t('admin.dashboard.loading', 'Carregando dashboard...') }}</p>
+    </div>
+
+    <template v-else>
+
     <!-- KPI Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div v-for="stat in kpiStats" :key="stat.title" class="card bg-base-100 shadow-sm border">
@@ -167,6 +175,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -178,11 +187,14 @@ definePageMeta({
   layout: 'admin'
 })
 
+const { apiFetch, useApiLazyFetch } = useApi()
 const { t } = useI18n()
-const config = useRuntimeConfig()
 
-// Fetch Dashboard Stats
-const { pending, data: statsData } = await useFetch<DashboardStats>(`${config.public.baseURL}/api/admin/dashboards/stats`)
+// Fetch Dashboard Stats (useLazyFetch: non-blocking, cached, charts are client-only anyway)
+const { pending, data: statsData } = useApiLazyFetch<DashboardStats>(
+  '/api/admin/dashboards/stats',
+  { key: 'admin-dashboard-stats' }
+)
 
 // KPI Data
 const kpiStats = computed(() => {

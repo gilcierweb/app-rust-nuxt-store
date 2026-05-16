@@ -84,10 +84,10 @@ definePageMeta({ layout: 'admin' })
 
 const { t } = useI18n()
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: shipment, error, refresh } = useFetch<Shipment>(`${config.public.baseURL}/api/admin/shipments/${route.params.id}`)
+const { pending, data: shipment, error, refresh } = useApiFetch<Shipment>(`/api/admin/shipments/${route.params.id}`)
 
 const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('shipping.status.pending'), badge: 'badge-soft badge-warning' },
@@ -115,7 +115,7 @@ const deleteShipment = async () => {
   if (!shipment.value) return
   if (confirm(`Delete shipment #${shipment.value.id}?`)) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/shipments/${shipment.value.id}`, { method: 'DELETE' })
+      await apiFetch(`/api/admin/shipments/${shipment.value.id}`, { method: 'DELETE' })
       router.push('/admin/shipments')
     } catch {
       alert(t('common.error'))

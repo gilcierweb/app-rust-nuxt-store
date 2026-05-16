@@ -82,10 +82,13 @@ import type { Shipment } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 
+const { apiFetch, useApiLazyFetch } = useApi()
 const { t } = useI18n()
-const config = useRuntimeConfig()
 
-const { pending, data: shipments, error, refresh } = useLazyFetch<Shipment[]>(`${config.public.baseURL}/api/admin/shipments`)
+const { pending, data: shipments, error, refresh } = useApiLazyFetch<Shipment[]>(
+  '/api/admin/shipments',
+  { key: 'admin-shipments-list' }
+)
 
 const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('shipping.status.pending'), badge: 'badge-warning' },
@@ -112,7 +115,7 @@ const formatDate = (dateString: string) => {
 const confirmDelete = async (shipment: Shipment) => {
   if (confirm(t('admin.shipments.detail.confirmDelete', { id: shipment.id }))) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/shipments/${shipment.id}`, { method: 'DELETE' })
+      await apiFetch(`/api/admin/shipments/${shipment.id}`, { method: 'DELETE' })
       await refresh()
     } catch {
       alert(t('admin.shipments.detail.errorDelete'))

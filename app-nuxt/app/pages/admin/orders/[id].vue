@@ -196,14 +196,15 @@ import type { Order, Profile, Address } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
+const { apiFetch, useApiFetch } = useApi()
 const config = useRuntimeConfig()
 const route = useRoute()
 
 const id = route.params.id
 
 // Fetch Order
-const { data: order, pending } = await useFetch<Order>(
-  `${config.public.baseURL}/api/admin/orders/${id}`,
+const { data: order, pending } = await useApiFetch<Order>(
+  `/api/admin/orders/${id}`,
   { key: `admin-order-${id}` }
 )
 
@@ -213,7 +214,7 @@ const { data: customerProfile, pending: pendingCustomer } = await useAsyncData<P
   async () => {
     if (!order.value?.user_id) return null
     // We need to find the profile that matches this user_id
-    const profiles = await $fetch<Profile[]>(`${config.public.baseURL}/api/admin/profiles`)
+    const profiles = await apiFetch<Profile[]>('/api/admin/profiles')
     return profiles.find(p => p.user_id === order.value?.user_id) || null
   },
   { watch: [order] }
@@ -224,7 +225,7 @@ const { data: shippingAddress, pending: pendingAddresses } = await useAsyncData<
   `address-${id}`,
   async () => {
     if (!order.value?.user_id) return null
-    const addresses = await $fetch<Address[]>(`${config.public.baseURL}/api/admin/addresses`)
+    const addresses = await apiFetch<Address[]>('/api/admin/addresses')
     // Try to find the default shipping address for this user
     return addresses.find(a => a.user_id === order.value?.user_id && a.default) || 
            addresses.find(a => a.user_id === order.value?.user_id) || null
@@ -293,7 +294,7 @@ async function updateStatus() {
   updating.value = true
   statusMsg.value = ''
   try {
-    await $fetch(`${config.public.baseURL}/api/admin/orders/${order.value.id}/status`, {
+    await apiFetch(`/api/admin/orders/${order.value.id}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: { status: Number(selectedStatus.value) },

@@ -200,17 +200,17 @@ definePageMeta({
 })
 
 const route = useRoute()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
 // Fetch Profile
-const { pending, data: profile, error, refresh: refreshProfile } = useFetch<Profile>(
-  `${config.public.baseURL}/api/admin/profiles/${route.params.id}`
+const { pending, data: profile, error, refresh: refreshProfile } = useApiFetch<Profile>(
+  `/api/admin/profiles/${route.params.id}`
 )
 
 // Fetch All Addresses and filter by user_id
-const { pending: pendingAddresses, data: allAddresses, error: errorAddresses, refresh: refreshAddresses } = useFetch<Address[]>(
-  `${config.public.baseURL}/api/admin/addresses`
+const { pending: pendingAddresses, data: allAddresses, error: errorAddresses, refresh: refreshAddresses } = useApiFetch<Address[]>(
+  '/api/admin/addresses'
 )
 
 const customerAddresses = computed(() => {
@@ -251,7 +251,7 @@ const deleteProfile = async () => {
 
   if (confirm(`Tem certeza que deseja excluir o perfil de "${profileName.value}"?`)) {
     try {
-      await $fetch(`${config.public.baseURL}/api/admin/profiles/${profile.value.id}`, {
+      await apiFetch(`/api/admin/profiles/${profile.value.id}`, {
         method: 'DELETE'
       })
       router.push('/admin/customers')

@@ -109,7 +109,8 @@ interface UnifiedProduct {
 }
 
 // Data Fetching
-const { pending: pendingApi, data: productsData } = await useFetch<ProductApi[]>(`${config.public.baseURL}/api/products`)
+const { useApiFetch } = useApi()
+const { pending: pendingApi, data: productsData } = await useApiFetch<ProductApi[]>('/api/products')
 const { pending: pendingDummy, data: dummyData } = await useFetch<{ products: any[] }>(`https://dummyjson.com/products`)
 
 const isLoading = computed(() => pendingApi.value || pendingDummy.value)
