@@ -1,5 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 
+const csrfEncryptSecret = process.env.NUXT_CSRF_ENCRYPT_SECRET || process.env.NUXT_CSURF_ENCRYPT_SECRET
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -47,9 +49,9 @@ export default defineNuxtConfig({
   },
   
   runtimeConfig: {
+    apiRustBaseUrl: process.env.NUXT_API_RUST_BASE_URL || 'http://localhost:5150',
     public: {
       ApiBaseUrl: '',
-      ApiRustBaseUrl: process.env.NUXT_API_RUST_BASE_URL || process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:5150',
       baseURL: '' // Deixar vazio para forçar requisições relativas no front-end
     }
   },
@@ -234,15 +236,12 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ['vue', 'vue-router', 'pinia'],
     },
-    // Desabilitar prefetch para evitar rate limiting
-    experimental: {
-      renderBuiltUrl: (filename) => `/_nuxt/${filename}`,
-    },
   },
 
   security: {
     csrf: {
       https: process.env.NODE_ENV === 'production',
+      ...(csrfEncryptSecret ? { encryptSecret: csrfEncryptSecret } : {}),
       addCsrfTokenToEventCtx: true,
       methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
       headerName: 'x-nuxt-csrf-token',

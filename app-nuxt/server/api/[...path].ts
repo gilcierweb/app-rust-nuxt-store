@@ -1,5 +1,6 @@
 const BACKEND_CSRF_HEADER = 'x-backend-csrf-token'
 const BACKEND_CSRF_ENDPOINT = '/api/auth/csrf'
+const BACKEND_CSRF_COOKIE = 'backend_csrf'
 
 function isProtectedMethod(method: string): boolean {
   return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())
@@ -11,6 +12,19 @@ function splitSetCookieHeader(value: string | null): string[] {
     .split(/,(?=\s*[^;,\s]+=)/)
     .map(cookie => cookie.trim())
     .filter(Boolean)
+}
+
+function buildBackendCsrfCookie(token: string, secure: boolean): string {
+  const attrs = [
+    `${BACKEND_CSRF_COOKIE}=${encodeURIComponent(token)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax'
+  ]
+  if (secure) {
+    attrs.push('Secure')
+  }
+  return attrs.join('; ')
 }
 
 function mergeCookieHeader(existingCookieHeader: string | null | undefined, setCookies: string[]): string | undefined {
@@ -44,16 +58,25 @@ async function ensureBackendCsrfToken(event: any, backendUrl: string, incomingCo
     headers: incomingCookieHeader ? { cookie: incomingCookieHeader, accept: 'application/json' } : { accept: 'application/json' }
   })
 
+  const token = response._data?.token
+  if (!token) {
+    throw createError({ statusCode: 500, statusMessage: 'Backend CSRF bootstrap failed' })
+  }
+
   const setCookies = splitSetCookieHeader(response.headers.get('set-cookie'))
+  const hasBackendCsrfCookie = setCookies.some(cookie =>
+    cookie.toLowerCase().startsWith(`${BACKEND_CSRF_COOKIE}=`)
+  )
+
+  if (!hasBackendCsrfCookie) {
+    const isSecure = getRequestURL(event).protocol === 'https:'
+    setCookies.push(buildBackendCsrfCookie(token, isSecure))
+  }
+
   const cookieHeader = mergeCookieHeader(incomingCookieHeader, setCookies)
 
   for (const cookie of setCookies) {
     appendResponseHeader(event, 'set-cookie', cookie)
-  }
-
-  const token = response._data?.token
-  if (!token) {
-    throw createError({ statusCode: 500, statusMessage: 'Backend CSRF bootstrap failed' })
   }
 
   return { token, cookieHeader }
@@ -63,7 +86,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   
   // A URL base do Rust. Pega da config de runtime que é populada pelo .env
-  const backendUrl = config.public.ApiRustBaseUrl || 'http://localhost:5150'
+  const backendUrl = config.apiRustBaseUrl || 'http://localhost:5150'
   
   const path = event.context.params?.path || ''
   const requestUrl = getRequestURL(event)

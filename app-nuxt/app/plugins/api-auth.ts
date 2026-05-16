@@ -1,4 +1,9 @@
-import { ofetch } from 'ofetch'
+type NuxtCsrfTokenResponse = {
+  token?: string
+  headerName?: string
+}
+
+const NUXT_CSRF_ENDPOINT = '/api/csrf-token'
 
 function isApiRequest(request: string, baseURL: string): boolean {
   if (request.startsWith('/api/')) return true
@@ -11,12 +16,37 @@ function isProtectedMethod(method?: string): boolean {
   return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(normalized)
 }
 
+async function resolveNuxtCsrfHeader() {
+  if (import.meta.client) {
+    const config = useRuntimeConfig()
+    const response = await $fetch<NuxtCsrfTokenResponse>(NUXT_CSRF_ENDPOINT, {
+      method: 'GET',
+      credentials: 'include',
+      cache: 'no-store',
+      headers: {
+        accept: 'application/json'
+      }
+    })
+    const headerName = response.headerName || config.public.csurf?.headerName
+    if (response.token && headerName) {
+      return { headerName, token: response.token }
+    }
+  }
+
+  const { csrf, headerName } = useCsrf()
+  if (csrf && headerName) {
+    return { headerName, token: csrf }
+  }
+
+  return null
+}
+
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
   const baseURL = config.public.baseURL
 
   const wrappedFetch = $fetch.create({
-    onRequest({ request, options }) {
+    async onRequest({ request, options }) {
       const requestUrl = typeof request === 'string' ? request : request.toString()
       const headers = new Headers(options.headers || {})
       
@@ -24,9 +54,9 @@ export default defineNuxtPlugin(() => {
       options.credentials = 'include'
 
       if (isApiRequest(requestUrl, baseURL) && isProtectedMethod(options.method)) {
-        const { csrf, headerName } = useCsrf()
-        if (csrf && headerName) {
-          headers.set(headerName, csrf)
+        const csrfHeader = await resolveNuxtCsrfHeader()
+        if (csrfHeader) {
+          headers.set(csrfHeader.headerName, csrfHeader.token)
         }
       }
 

@@ -252,7 +252,6 @@ definePageMeta({
 const { t } = useI18n()
 const cartStore = useCartStore()
 const router = useRouter()
-const config = useRuntimeConfig()
 const { apiFetch } = useApi()
 import type { PaymentMethod, ShippingMethod } from '~/types'
 
@@ -278,11 +277,11 @@ const address = reactive({
 
 // SSR-friendly data fetching with useLazyFetch (cached, deduplicated, JWT via global plugin)
 const { data: paymentMethods } = useLazyFetch<PaymentMethod[]>(
-  `${config.public.baseURL}/api/payments/methods`,
+  '/api/payments/methods',
   { key: 'checkout-payment-methods', default: () => [] }
 )
 const { data: shippingMethods } = useLazyFetch<ShippingMethod[]>(
-  `${config.public.baseURL}/api/shippings`,
+  '/api/shippings',
   { key: 'checkout-shipping-methods', default: () => [] }
 )
 

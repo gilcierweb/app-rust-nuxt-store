@@ -14,9 +14,8 @@
 
 <script setup lang="ts">
 import type { Category } from '~/types';
-const config = useRuntimeConfig();
 
-const { data: categories } = await useFetch<Category[]>(`${config.public.baseURL}/api/categories/hierarchy`);
+const { data: categories } = await useFetch<Category[]>('/api/categories/hierarchy');
 </script>
 
 <style scoped>

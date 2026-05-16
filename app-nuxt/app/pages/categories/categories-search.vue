@@ -36,9 +36,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 const { t } = useI18n()
-const config = useRuntimeConfig();
 const searchTerm = ref('');
-const { data: categories, pending, error } = await useFetch(`${config.public.baseURL}/api/categories/hierarchy`);
+const { data: categories, pending, error } = await useFetch('/api/categories/hierarchy');
 
 const filteredRootCategories = computed(() => {
   if (!categories.value) return [];
