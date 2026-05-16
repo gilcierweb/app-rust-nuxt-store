@@ -171,6 +171,35 @@ async fn admin_namespace_guard(
         return admin_unauthorized().into_response();
     };
 
+    let current_user_id = claims
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|value| value.as_i64())
+        .and_then(|value| i32::try_from(value).ok());
+    let roles = claims.claims.claims.get("roles").and_then(|value| {
+        value.as_array().and_then(|items| {
+            items
+                .iter()
+                .map(|item| item.as_str().map(ToString::to_string))
+                .collect::<Option<Vec<_>>>()
+        })
+    });
+
+    if let (Some(current_user_id), Some(roles)) = (current_user_id, roles) {
+        let ability = Ability::for_roles_and_user(roles, Some(current_user_id));
+        if !ability.can_manage_admin() {
+            return admin_forbidden().into_response();
+        }
+
+        req.extensions_mut().insert(AdminSession {
+            current_user_id,
+            ability,
+        });
+
+        return next.run(req).await;
+    }
+
     let Ok(user) = UserModel::find_by_pid(&ctx.db, &claims.claims.pid).await else {
         return admin_unauthorized().into_response();
     };
@@ -181,7 +210,10 @@ async fn admin_namespace_guard(
         return admin_forbidden().into_response();
     }
 
-    req.extensions_mut().insert(AdminSession { user, ability });
+    req.extensions_mut().insert(AdminSession {
+        current_user_id: user.id,
+        ability,
+    });
 
     next.run(req).await
 }

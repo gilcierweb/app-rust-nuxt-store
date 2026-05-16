@@ -7,12 +7,14 @@ use axum::body::Bytes;
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
-use sea_orm::QueryOrder;
+use sea_orm::{Condition, QueryOrder};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use std::sync::Arc;
 use tracing::info;
 use uuid::Uuid;
 
+use crate::cache::{invalidate_dashboard_cache, invalidate_products_cache, products_cache};
 use crate::models::_entities::categories::Entity as Categories;
 use crate::models::_entities::product_images::{
     ActiveModel as ProductImageActiveModel, Entity as ProductImageEntity,
@@ -105,6 +107,10 @@ async fn save_image(
 pub async fn get_products_with_categories(
     State(ctx): State<AppContext>,
 ) -> Result<impl IntoResponse> {
+    if let Some(value) = products_cache().get("list") {
+        return format::json(value);
+    }
+
     let products = Products::find()
         .find_also_related(Categories)
         .all(&ctx.db)
@@ -120,6 +126,11 @@ pub async fn get_products_with_categories(
     let product_ids: Vec<i32> = data.iter().map(|p| p.id).collect();
     let all_images = ProductImageEntity::find()
         .filter(crate::models::_entities::product_images::Column::ProductId.is_in(product_ids))
+        .filter(
+            Condition::any()
+                .add(crate::models::_entities::product_images::Column::Cover.eq(Some(true)))
+                .add(crate::models::_entities::product_images::Column::Position.eq(Some(0))),
+        )
         .order_by_asc(crate::models::_entities::product_images::Column::Position)
         .all(&ctx.db)
         .await?;
@@ -148,6 +159,8 @@ pub async fn get_products_with_categories(
         );
     }
 
+    let data = Arc::new(data);
+    products_cache().insert("list", Arc::clone(&data));
     format::json(data)
 }
 
@@ -257,6 +270,8 @@ pub async fn add(
         "Produto criado com {} imagens: {:?}",
         images_count, saved_product
     );
+    invalidate_products_cache();
+    invalidate_dashboard_cache();
     format::json(saved_product)
 }
 
@@ -270,6 +285,8 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_products_cache();
+    invalidate_dashboard_cache();
     format::json(item)
 }
 
@@ -288,6 +305,8 @@ pub async fn update(
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_products_cache();
+    invalidate_dashboard_cache();
     format::empty()
 }
 

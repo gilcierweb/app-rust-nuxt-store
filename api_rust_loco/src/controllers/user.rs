@@ -82,12 +82,13 @@ async fn resolve_user_and_ability(
     ctx: &AppContext,
     pid: &str,
     admin_session: Option<Extension<AdminSession>>,
-) -> Result<(Model, Ability)> {
+) -> Result<(i32, Ability)> {
     if let Some(Extension(admin_session)) = admin_session {
-        return Ok((admin_session.user, admin_session.ability));
+        return Ok((admin_session.current_user_id, admin_session.ability));
     }
 
-    Ok(Ability::for_user_pid(&ctx.db, pid).await?)
+    let (current_user, ability) = Ability::for_user_pid(&ctx.db, pid).await?;
+    Ok((current_user.id, ability))
 }
 
 #[debug_handler]
@@ -96,12 +97,12 @@ pub async fn list(
     admin_session: Option<Extension<AdminSession>>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let (current_user, ability) =
+    let (current_user_id, ability) =
         resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
     ability.authorize(Action::Read, Subject::Admin)?;
 
     let items = ability
-        .accessible_users_query(Action::Read, current_user.id)
+        .accessible_users_query(Action::Read, current_user_id)
         .order_by_desc(crate::models::_entities::users::Column::CreatedAt)
         .all(&ctx.db)
         .await?;

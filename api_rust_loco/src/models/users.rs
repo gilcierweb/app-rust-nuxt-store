@@ -291,7 +291,21 @@ impl Model {
     ///
     /// when could not convert user claims to jwt token
     pub fn generate_jwt(&self, secret: &str, expiration: u64) -> ModelResult<String> {
-        Ok(jwt::JWT::new(secret).generate_token(expiration, self.pid.to_string(), Map::new())?)
+        self.generate_jwt_with_claims(secret, expiration, Map::new())
+    }
+
+    /// Creates a JWT with custom claims.
+    ///
+    /// # Errors
+    ///
+    /// when could not convert user claims to jwt token
+    pub fn generate_jwt_with_claims(
+        &self,
+        secret: &str,
+        expiration: u64,
+        claims: Map<String, serde_json::Value>,
+    ) -> ModelResult<String> {
+        Ok(jwt::JWT::new(secret).generate_token(expiration, self.pid.to_string(), claims)?)
     }
 
     pub async fn roles(&self, db: &DatabaseConnection) -> ModelResult<Vec<String>> {

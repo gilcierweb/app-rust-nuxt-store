@@ -1,4 +1,4 @@
-use crate::{models::ability::Ability, models::users::Model as UserModel};
+use crate::models::ability::Ability;
 use axum::{extract::FromRequestParts, http::request::Parts};
 use axum_extra::extract::CookieJar;
 use loco_rs::{app::AppContext, auth::jwt, errors::Error};
@@ -10,7 +10,7 @@ pub struct CookieJWT {
 
 #[derive(Clone, Debug)]
 pub struct AdminSession {
-    pub user: UserModel,
+    pub current_user_id: i32,
     pub ability: Ability,
 }
 

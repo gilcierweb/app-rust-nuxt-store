@@ -1,4 +1,5 @@
 use crate::{
+    cache::current_cache,
     mailers::auth::AuthMailer,
     middleware::auth::CookieJWT,
     models::{
@@ -9,10 +10,13 @@ use crate::{
 };
 use axum::debug_handler;
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
+use loco_rs::auth::jwt::UserClaims;
 use loco_rs::environment::Environment;
 use loco_rs::prelude::*;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use serde_json::{Map, Value};
+use std::sync::Arc;
 use std::sync::OnceLock;
 
 pub static EMAIL_DOMAIN_RE: OnceLock<Regex> = OnceLock::new();
@@ -20,6 +24,46 @@ pub static EMAIL_DOMAIN_RE: OnceLock<Regex> = OnceLock::new();
 fn get_allow_email_domain_re() -> &'static Regex {
     EMAIL_DOMAIN_RE.get_or_init(|| {
         Regex::new(r"@example\.com$|@gmail\.com$").expect("Failed to compile regex")
+    })
+}
+
+fn build_auth_claims(user: &users::Model, roles: &[String]) -> Map<String, Value> {
+    let mut claims = Map::new();
+    let can_manage_admin =
+        crate::models::ability::Ability::from_roles(roles.to_vec()).can_manage_admin();
+
+    claims.insert("user_id".to_string(), Value::from(user.id));
+    claims.insert("name".to_string(), Value::from(user.name.clone()));
+    claims.insert("email".to_string(), Value::from(user.email.clone()));
+    claims.insert(
+        "roles".to_string(),
+        Value::Array(roles.iter().cloned().map(Value::from).collect()),
+    );
+    claims.insert(
+        "can_manage_admin".to_string(),
+        Value::from(can_manage_admin),
+    );
+    claims
+}
+
+fn current_response_from_claims(claims: &UserClaims) -> Option<CurrentResponse> {
+    let name = claims.claims.get("name")?.as_str()?.to_string();
+    let email = claims.claims.get("email")?.as_str()?.to_string();
+    let can_manage_admin = claims.claims.get("can_manage_admin")?.as_bool()?;
+    let roles = claims
+        .claims
+        .get("roles")?
+        .as_array()?
+        .iter()
+        .map(|role| role.as_str().map(ToString::to_string))
+        .collect::<Option<Vec<_>>>()?;
+
+    Some(CurrentResponse {
+        pid: claims.pid.clone(),
+        name,
+        email,
+        roles,
+        can_manage_admin,
     })
 }
 
@@ -144,10 +188,12 @@ async fn login(
         return unauthorized(t!("auth.unauthorized"));
     }
 
+    let roles = user.roles(&ctx.db).await?;
     let jwt_secret = ctx.config.get_jwt_config()?;
+    let claims = build_auth_claims(&user, &roles);
 
     let token = user
-        .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
+        .generate_jwt_with_claims(&jwt_secret.secret, jwt_secret.expiration, claims)
         .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
     let cookie = Cookie::build(("auth_token", token.clone()))
@@ -162,15 +208,27 @@ async fn login(
         .build();
 
     let jar = jar.add(cookie);
-    let roles = user.roles(&ctx.db).await?;
     Ok((jar, format::json(LoginResponse::new(&user, &token, roles))?))
 }
 
 #[debug_handler]
 async fn current(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let pid = auth.claims.pid.clone();
+    if let Some(value) = current_cache().get(&pid) {
+        return format::json(value);
+    }
+
+    if let Some(payload) = current_response_from_claims(&auth.claims) {
+        let payload = Arc::new(payload);
+        current_cache().insert(pid, Arc::clone(&payload));
+        return format::json(payload);
+    }
+
+    let user = users::Model::find_by_pid(&ctx.db, &pid).await?;
     let roles = user.roles(&ctx.db).await?;
-    format::json(CurrentResponse::new(&user, roles))
+    let payload = Arc::new(CurrentResponse::new(&user, roles));
+    current_cache().insert(pid, Arc::clone(&payload));
+    format::json(payload)
 }
 
 #[debug_handler]
@@ -239,9 +297,11 @@ async fn magic_link_verify(
     let user = user.into_active_model().clear_magic_link(&ctx.db).await?;
 
     let jwt_secret = ctx.config.get_jwt_config()?;
+    let roles = user.roles(&ctx.db).await?;
+    let claims = build_auth_claims(&user, &roles);
 
     let token = user
-        .generate_jwt(&jwt_secret.secret, jwt_secret.expiration)
+        .generate_jwt_with_claims(&jwt_secret.secret, jwt_secret.expiration, claims)
         .or_else(|_| unauthorized(t!("auth.unauthorized")))?;
 
     let cookie = Cookie::build(("auth_token", token.clone()))
@@ -256,7 +316,6 @@ async fn magic_link_verify(
         .build();
 
     let jar = jar.add(cookie);
-    let roles = user.roles(&ctx.db).await?;
     Ok((jar, format::json(LoginResponse::new(&user, &token, roles))?))
 }
 

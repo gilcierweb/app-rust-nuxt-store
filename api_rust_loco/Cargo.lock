@@ -175,6 +175,7 @@ dependencies = [
  "insta",
  "loco-rs",
  "migration",
+ "moka",
  "rand 0.9.1",
  "regex",
  "rstest",

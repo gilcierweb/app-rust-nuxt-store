@@ -7,10 +7,12 @@ use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use sea_orm::{entity::*, query::*, sea_query::Expr};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
+use crate::cache::dashboard_cache;
 use crate::models::_entities::{categories, order_items, orders, products, users};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DashboardResponse {
     pub kpi_stats: Vec<KpiStat>,
@@ -20,7 +22,7 @@ pub struct DashboardResponse {
     pub recent_orders: Vec<RecentOrder>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct KpiStat {
     pub title: String,
@@ -32,7 +34,7 @@ pub struct KpiStat {
     pub text_class: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SalesDataPoint {
     pub date: String,
@@ -40,21 +42,21 @@ pub struct SalesDataPoint {
     pub orders: i64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CategoryDataPoint {
     pub name: String,
     pub value: i64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct TopProduct {
     pub name: String,
     pub sales: i64,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct RecentOrder {
     pub id: i32,
@@ -67,6 +69,10 @@ pub struct RecentOrder {
 
 #[debug_handler]
 pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
+    if let Some(value) = dashboard_cache().get("stats") {
+        return format::json(value);
+    }
+
     // Define all futures for parallel execution
     let total_revenue_fut = orders::Entity::find()
         .select_only()
@@ -254,13 +260,17 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         })
         .collect();
 
-    format::json(DashboardResponse {
+    let response = Arc::new(DashboardResponse {
         kpi_stats,
         sales_data,
         category_data,
         top_products,
         recent_orders,
-    })
+    });
+
+    dashboard_cache().insert("stats", Arc::clone(&response));
+
+    format::json(response)
 }
 
 pub fn routes() -> Routes {

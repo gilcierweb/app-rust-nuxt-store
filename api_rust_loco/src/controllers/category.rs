@@ -4,7 +4,9 @@
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
+use crate::cache::{categories_cache, invalidate_catalog_caches};
 use crate::models::_entities::categories::{ActiveModel, Entity, Model};
 use crate::models::_entities::products::Entity as ProductEntity;
 use crate::utils::slug::parameterize;
@@ -70,7 +72,13 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 
 #[debug_handler]
 pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(Entity::find().all(&ctx.db).await?)
+    if let Some(value) = categories_cache().get("list") {
+        return format::json(value);
+    }
+
+    let data = Arc::new(Entity::find().all(&ctx.db).await?);
+    categories_cache().insert("list", Arc::clone(&data));
+    format::json(data)
 }
 
 #[debug_handler]
@@ -92,6 +100,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
     };
     params.update(&mut item);
     let item = item.insert(&ctx.db).await?;
+    invalidate_catalog_caches();
     format::json(item)
 }
 
@@ -107,12 +116,14 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_catalog_caches();
     format::json(item)
 }
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_catalog_caches();
     format::empty()
 }
 

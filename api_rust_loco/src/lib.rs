@@ -4,6 +4,7 @@ extern crate rust_i18n;
 i18n!("locales", fallback = "pt-BR");
 
 pub mod app;
+pub mod cache;
 pub mod controllers;
 pub mod data;
 pub mod initializers;
