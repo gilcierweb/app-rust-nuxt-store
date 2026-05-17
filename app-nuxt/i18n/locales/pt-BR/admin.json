@@ -348,6 +348,119 @@
         "error": "Erro ao salvar cupom. Tente novamente."
       }
     },
+    "banners": {
+      "title": "Banners",
+      "description": "Gerencie campanhas visuais, posições, segmentação por dispositivo e desempenho.",
+      "search": "Buscar banner",
+      "searchPlaceholder": "Buscar por título, campanha ou descrição",
+      "add": "Adicionar banner",
+      "loading": "Carregando banners...",
+      "error": "Erro ao carregar banners: {message}",
+      "notFound": "Nenhum banner encontrado.",
+      "tabs": {
+        "banners": "Banners",
+        "positions": "Posições",
+        "analytics": "Analytics"
+      },
+      "filters": {
+        "allPositions": "Todas",
+        "allStatuses": "Todos",
+        "clear": "Limpar"
+      },
+      "table": {
+        "image": "Imagem",
+        "title": "Título",
+        "position": "Posição",
+        "device": "Dispositivo",
+        "period": "Período",
+        "priority": "Prioridade",
+        "status": "Status",
+        "actions": "Ações"
+      },
+      "status": {
+        "draft": "Rascunho",
+        "active": "Ativo",
+        "paused": "Pausado",
+        "expired": "Expirado"
+      },
+      "devices": {
+        "all": "Todos",
+        "desktop": "Desktop",
+        "mobile": "Mobile"
+      },
+      "linkTargets": {
+        "sameTab": "Mesma aba",
+        "newTab": "Nova aba"
+      },
+      "positions": {
+        "title": "Posições",
+        "add": "Nova posição",
+        "edit": "Editar posição",
+        "code": "Código",
+        "name": "Nome",
+        "description": "Descrição",
+        "status": "Status",
+        "active": "Ativa",
+        "inactive": "Inativa",
+        "confirmDelete": "Tem certeza que deseja excluir a posição \"{name}\"?",
+        "errorSave": "Erro ao salvar posição",
+        "errorDelete": "Erro ao excluir posição"
+      },
+      "analytics": {
+        "from": "De",
+        "to": "Até",
+        "refresh": "Atualizar",
+        "impressions": "Impressões",
+        "clicks": "Cliques",
+        "ctr": "CTR",
+        "empty": "Sem dados de analytics no período."
+      },
+      "detail": {
+        "title": "Detalhes do Banner",
+        "loading": "Carregando banner...",
+        "noEnd": "Sem término",
+        "assets": "Arquivos",
+        "audit": "Auditoria",
+        "createdAt": "Criado em",
+        "updatedAt": "Atualizado em",
+        "confirmDelete": "Tem certeza que deseja excluir o banner \"{name}\"?",
+        "errorDelete": "Erro ao excluir banner"
+      },
+      "form": {
+        "titleEdit": "Editar Banner",
+        "titleNew": "Novo Banner",
+        "saving": "Salvando banner...",
+        "title": "Título",
+        "description": "Descrição",
+        "position": "Posição",
+        "selectPosition": "Selecione uma posição",
+        "status": "Status",
+        "device": "Dispositivo",
+        "priority": "Prioridade",
+        "imageDesktopUrl": "Imagem desktop",
+        "imageMobileUrl": "Imagem mobile",
+        "altText": "Texto alternativo",
+        "linkUrl": "URL do link",
+        "linkTarget": "Destino do link",
+        "startAt": "Início",
+        "endAt": "Fim",
+        "campaignName": "Campanha",
+        "submitUpdate": "Atualizar banner",
+        "submitSave": "Salvar banner",
+        "validation": {
+          "titleRequired": "O título é obrigatório",
+          "imageRequired": "A imagem desktop é obrigatória",
+          "positionRequired": "A posição é obrigatória",
+          "startRequired": "A data de início é obrigatória",
+          "endAfterStart": "A data final deve ser maior ou igual ao início"
+        },
+        "success": {
+          "created": "Banner criado com sucesso!",
+          "updated": "Banner atualizado com sucesso!"
+        },
+        "error": "Erro ao salvar banner. Tente novamente."
+      }
+    },
     "orders": {
       "title": "Pedidos",
       "table": {

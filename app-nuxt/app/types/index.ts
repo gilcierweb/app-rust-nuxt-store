@@ -310,3 +310,57 @@ export interface Shipment {
   created_at: string
   updated_at: string
 }
+
+export interface BannerPosition {
+  id: number
+  code: string
+  name: string
+  description?: string
+  is_active: boolean
+  created_at: string
+}
+
+export type BannerLinkTarget = 1 | 2
+export type BannerDevice = 1 | 2 | 3
+export type BannerStatus = 1 | 2 | 3 | 4
+export type BannerEventType = 1 | 2
+
+export interface Banner {
+  id: number
+  title: string
+  description?: string
+  image_desktop_url: string
+  image_mobile_url?: string
+  alt_text?: string
+  link_url?: string
+  link_target: BannerLinkTarget
+  position_id: number
+  device: BannerDevice
+  start_at: string
+  end_at?: string
+  priority: number
+  status: BannerStatus
+  campaign_name?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface BannerEvent {
+  id: number
+  banner_id: number
+  event_type: BannerEventType
+  user_id?: number
+  session_id?: string
+  ip_address?: string
+  user_agent?: string
+  page_url?: string
+  created_at: string
+}
+
+export interface BannerAnalytics {
+  id: number
+  title: string
+  impressions: number
+  clicks: number
+  ctr_percent: number
+}

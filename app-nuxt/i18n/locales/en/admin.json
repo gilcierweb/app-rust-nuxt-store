@@ -348,6 +348,119 @@
         "error": "Error saving coupon. Please try again."
       }
     },
+    "banners": {
+      "title": "Banners",
+      "description": "Manage visual campaigns, positions, device targeting, and performance.",
+      "search": "Search banner",
+      "searchPlaceholder": "Search by title, campaign, or description",
+      "add": "Add banner",
+      "loading": "Loading banners...",
+      "error": "Error loading banners: {message}",
+      "notFound": "No banners found.",
+      "tabs": {
+        "banners": "Banners",
+        "positions": "Positions",
+        "analytics": "Analytics"
+      },
+      "filters": {
+        "allPositions": "All",
+        "allStatuses": "All",
+        "clear": "Clear"
+      },
+      "table": {
+        "image": "Image",
+        "title": "Title",
+        "position": "Position",
+        "device": "Device",
+        "period": "Period",
+        "priority": "Priority",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "paused": "Paused",
+        "expired": "Expired"
+      },
+      "devices": {
+        "all": "All",
+        "desktop": "Desktop",
+        "mobile": "Mobile"
+      },
+      "linkTargets": {
+        "sameTab": "Same tab",
+        "newTab": "New tab"
+      },
+      "positions": {
+        "title": "Positions",
+        "add": "New position",
+        "edit": "Edit position",
+        "code": "Code",
+        "name": "Name",
+        "description": "Description",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "confirmDelete": "Are you sure you want to delete position \"{name}\"?",
+        "errorSave": "Error saving position",
+        "errorDelete": "Error deleting position"
+      },
+      "analytics": {
+        "from": "From",
+        "to": "To",
+        "refresh": "Refresh",
+        "impressions": "Impressions",
+        "clicks": "Clicks",
+        "ctr": "CTR",
+        "empty": "No analytics data for this period."
+      },
+      "detail": {
+        "title": "Banner Details",
+        "loading": "Loading banner...",
+        "noEnd": "No end date",
+        "assets": "Assets",
+        "audit": "Audit",
+        "createdAt": "Created at",
+        "updatedAt": "Updated at",
+        "confirmDelete": "Are you sure you want to delete banner \"{name}\"?",
+        "errorDelete": "Error deleting banner"
+      },
+      "form": {
+        "titleEdit": "Edit Banner",
+        "titleNew": "New Banner",
+        "saving": "Saving banner...",
+        "title": "Title",
+        "description": "Description",
+        "position": "Position",
+        "selectPosition": "Select a position",
+        "status": "Status",
+        "device": "Device",
+        "priority": "Priority",
+        "imageDesktopUrl": "Desktop image",
+        "imageMobileUrl": "Mobile image",
+        "altText": "Alt text",
+        "linkUrl": "Link URL",
+        "linkTarget": "Link target",
+        "startAt": "Start",
+        "endAt": "End",
+        "campaignName": "Campaign",
+        "submitUpdate": "Update banner",
+        "submitSave": "Save banner",
+        "validation": {
+          "titleRequired": "Title is required",
+          "imageRequired": "Desktop image is required",
+          "positionRequired": "Position is required",
+          "startRequired": "Start date is required",
+          "endAfterStart": "End date must be greater than or equal to start"
+        },
+        "success": {
+          "created": "Banner created successfully!",
+          "updated": "Banner updated successfully!"
+        },
+        "error": "Error saving banner. Please try again."
+      }
+    },
     "orders": {
       "title": "Orders",
       "table": {

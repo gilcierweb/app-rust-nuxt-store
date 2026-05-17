@@ -348,6 +348,119 @@
         "error": "Error al guardar el cupón. Inténtalo de nuevo."
       }
     },
+    "banners": {
+      "title": "Banners",
+      "description": "Gestiona campañas visuales, posiciones, segmentación por dispositivo y rendimiento.",
+      "search": "Buscar banner",
+      "searchPlaceholder": "Buscar por título, campaña o descripción",
+      "add": "Añadir banner",
+      "loading": "Cargando banners...",
+      "error": "Error al cargar banners: {message}",
+      "notFound": "No se encontraron banners.",
+      "tabs": {
+        "banners": "Banners",
+        "positions": "Posiciones",
+        "analytics": "Analytics"
+      },
+      "filters": {
+        "allPositions": "Todas",
+        "allStatuses": "Todos",
+        "clear": "Limpiar"
+      },
+      "table": {
+        "image": "Imagen",
+        "title": "Título",
+        "position": "Posición",
+        "device": "Dispositivo",
+        "period": "Período",
+        "priority": "Prioridad",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "status": {
+        "draft": "Borrador",
+        "active": "Activo",
+        "paused": "Pausado",
+        "expired": "Expirado"
+      },
+      "devices": {
+        "all": "Todos",
+        "desktop": "Desktop",
+        "mobile": "Mobile"
+      },
+      "linkTargets": {
+        "sameTab": "Misma pestaña",
+        "newTab": "Nueva pestaña"
+      },
+      "positions": {
+        "title": "Posiciones",
+        "add": "Nueva posición",
+        "edit": "Editar posición",
+        "code": "Código",
+        "name": "Nombre",
+        "description": "Descripción",
+        "status": "Estado",
+        "active": "Activa",
+        "inactive": "Inactiva",
+        "confirmDelete": "¿Está seguro de que desea eliminar la posición \"{name}\"?",
+        "errorSave": "Error al guardar posición",
+        "errorDelete": "Error al eliminar posición"
+      },
+      "analytics": {
+        "from": "Desde",
+        "to": "Hasta",
+        "refresh": "Actualizar",
+        "impressions": "Impresiones",
+        "clicks": "Clics",
+        "ctr": "CTR",
+        "empty": "Sin datos de analytics en este período."
+      },
+      "detail": {
+        "title": "Detalles del Banner",
+        "loading": "Cargando banner...",
+        "noEnd": "Sin finalización",
+        "assets": "Archivos",
+        "audit": "Auditoría",
+        "createdAt": "Creado en",
+        "updatedAt": "Actualizado en",
+        "confirmDelete": "¿Está seguro de que desea eliminar el banner \"{name}\"?",
+        "errorDelete": "Error al eliminar banner"
+      },
+      "form": {
+        "titleEdit": "Editar Banner",
+        "titleNew": "Nuevo Banner",
+        "saving": "Guardando banner...",
+        "title": "Título",
+        "description": "Descripción",
+        "position": "Posición",
+        "selectPosition": "Seleccione una posición",
+        "status": "Estado",
+        "device": "Dispositivo",
+        "priority": "Prioridad",
+        "imageDesktopUrl": "Imagen desktop",
+        "imageMobileUrl": "Imagen mobile",
+        "altText": "Texto alternativo",
+        "linkUrl": "URL del enlace",
+        "linkTarget": "Destino del enlace",
+        "startAt": "Inicio",
+        "endAt": "Fin",
+        "campaignName": "Campaña",
+        "submitUpdate": "Actualizar banner",
+        "submitSave": "Guardar banner",
+        "validation": {
+          "titleRequired": "El título es obligatorio",
+          "imageRequired": "La imagen desktop es obligatoria",
+          "positionRequired": "La posición es obligatoria",
+          "startRequired": "La fecha de inicio es obligatoria",
+          "endAfterStart": "La fecha final debe ser mayor o igual al inicio"
+        },
+        "success": {
+          "created": "¡Banner creado con éxito!",
+          "updated": "¡Banner actualizado con éxito!"
+        },
+        "error": "Error al guardar banner. Inténtalo de nuevo."
+      }
+    },
     "orders": {
       "title": "Pedidos",
       "table": {
