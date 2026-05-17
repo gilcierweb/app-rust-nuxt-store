@@ -1,5 +1,6 @@
 import { proxyRequest } from 'h3'
 import { resolveBackendApiKey, resolveBackendBaseUrl } from '../../utils/backend-url'
+import { resolveForwardedClientHeaders } from '../../utils/request-ip'
 
 export default defineEventHandler(async (event) => {
   const backend = resolveBackendBaseUrl(event)
@@ -22,5 +23,10 @@ export default defineEventHandler(async (event) => {
   const target = `${backend.url}/uploads/${path}${requestUrl.search}`
 
   const apiKey = resolveBackendApiKey(event)
-  return proxyRequest(event, target, apiKey ? { headers: { 'x-api-key': apiKey } } : undefined)
+  return proxyRequest(event, target, {
+    headers: {
+      ...resolveForwardedClientHeaders(event),
+      ...(apiKey ? { 'x-api-key': apiKey } : {})
+    }
+  })
 })

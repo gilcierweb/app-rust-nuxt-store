@@ -113,6 +113,11 @@ CORS_ALLOWED_ORIGIN="change-me"
 # Required for direct backend access protection (Nuxt proxy will send it)
 # openssl rand -base64 32 or openssl rand -base64 64
 API_PROTECTION_API_KEY="change-me"
+API_RATE_LIMIT_ENABLED="true"
+API_RATE_LIMIT_IP_REQUESTS="120"
+API_RATE_LIMIT_IP_WINDOW_SECONDS="60"
+API_RATE_LIMIT_USER_REQUESTS="300"
+API_RATE_LIMIT_USER_WINDOW_SECONDS="60"
 # openssl rand -base64 32 or openssl rand -base64 64
 AUTH_JWT_SECRET="change-me"
 
@@ -359,7 +364,7 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 * [ ] RBAC (granular role-based access: Super Admin, Manager, Editor)
 
 ### Security & DevOps
-* [ ] API rate limiting (per IP + per user)
+* [x] API rate limiting (per IP + per user)
 * [x] CSRF protection
 * [x] Cookies HttpOnly
 * [x] API protection API key, error 401, 403, 422

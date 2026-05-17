@@ -1,4 +1,5 @@
 import { resolveBackendApiKey, resolveBackendBaseUrl } from '../utils/backend-url'
+import { resolveForwardedClientHeaders } from '../utils/request-ip'
 
 const BACKEND_CSRF_HEADER = 'x-backend-csrf-token'
 const BACKEND_CSRF_ENDPOINT = '/api/auth/csrf'
@@ -175,6 +176,10 @@ export default defineEventHandler(async (event) => {
     if (value) {
       headers.set(headerName, Array.isArray(value) ? value.join(headerName === 'cookie' ? '; ' : ', ') : value)
     }
+  }
+
+  for (const [headerName, value] of Object.entries(resolveForwardedClientHeaders(event))) {
+    headers.set(headerName, value)
   }
 
   const method = event.method || 'GET'
