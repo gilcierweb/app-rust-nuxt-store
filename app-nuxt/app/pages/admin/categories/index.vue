@@ -106,13 +106,13 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const { $truncate } = useNuxtApp()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: categories, error, refresh } = useApiLazyFetch<Category[]>(
+const { pending, data: categories, error, refresh } = await useApiFetch<Category[]>(
   '/api/admin/categories',
   { key: 'admin-categories-list' }
 )

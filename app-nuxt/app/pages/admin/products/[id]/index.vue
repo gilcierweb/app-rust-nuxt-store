@@ -148,11 +148,11 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const config = useRuntimeConfig()
 const { t } = useI18n()
 
-const { data: product, pending, error } = useApiLazyFetch<ProductApi>(
+const { data: product, pending, error } = await useApiFetch<ProductApi>(
   `/api/admin/products/${route.params.id}`
 )
 

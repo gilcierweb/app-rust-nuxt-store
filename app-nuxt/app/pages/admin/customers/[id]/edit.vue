@@ -36,9 +36,9 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { useApiLazyFetch } = useApi()
+const { useApiFetch } = useApi()
 
-const { data: profile, pending, error } = useApiLazyFetch<Profile>(
+const { data: profile, pending, error } = await useApiFetch<Profile>(
   `/api/admin/profiles/${route.params.id}`
 )
 

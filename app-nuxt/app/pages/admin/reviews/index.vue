@@ -128,12 +128,12 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: reviews, error, refresh } = useApiLazyFetch<Review[]>(
+const { pending, data: reviews, error, refresh } = await useApiFetch<Review[]>(
   '/api/admin/reviews',
   { key: 'admin-reviews-list' }
 )

@@ -130,12 +130,12 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: addresses, error, refresh } = useApiLazyFetch<Address[]>(
+const { pending, data: addresses, error, refresh } = await useApiFetch<Address[]>(
   '/api/admin/addresses',
   { key: 'admin-addresses-list' }
 )

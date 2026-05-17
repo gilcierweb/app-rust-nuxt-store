@@ -2,33 +2,61 @@ import type { WishlistItem } from '~/types'
 
 export function useWishlist() {
   const { apiFetch } = useApi()
+  const { isAuthenticated } = useAuth()
   const wishlist = useState<WishlistItem[]>('wishlist', () => [])
   const loading = ref(false)
 
+  function isAuthError(err: any): boolean {
+    const statusCode = err?.statusCode ?? err?.response?.status ?? err?.data?.statusCode
+    return statusCode === 401 || statusCode === 403
+  }
+
   async function fetchWishlist() {
+    if (!isAuthenticated.value) {
+      wishlist.value = []
+      return
+    }
+
+    loading.value = true
     try {
       const data = await apiFetch<WishlistItem[]>('/api/account/wishlist')
       wishlist.value = data
-    } catch {
+    } catch (err: any) {
+      if (isAuthError(err)) {
+        wishlist.value = []
+        return
+      }
       wishlist.value = []
+    } finally {
+      loading.value = false
     }
   }
 
   async function toggleWishlist(productId: number) {
-    const existing = wishlist.value.find(w => w.product_id === productId)
-    if (existing) {
-      try {
-        await apiFetch(`/api/account/wishlist/remove/${existing.id}`, { method: 'DELETE' })
-        wishlist.value = wishlist.value.filter(w => w.id !== existing.id)
-      } catch { /* ignore */ }
-    } else {
-      try {
-        const item = await apiFetch<WishlistItem>('/api/account/wishlist/add', {
-          method: 'POST',
-          body: { product_id: productId }
-        })
-        wishlist.value.push(item)
-      } catch { /* ignore */ }
+    if (!isAuthenticated.value) {
+      await navigateTo('/users/sessions')
+      return
+    }
+
+    loading.value = true
+    try {
+      const existing = wishlist.value.find(w => w.product_id === productId)
+      if (existing) {
+        try {
+          await apiFetch(`/api/account/wishlist/remove/${existing.id}`, { method: 'DELETE' })
+          wishlist.value = wishlist.value.filter(w => w.id !== existing.id)
+        } catch { /* ignore */ }
+      } else {
+        try {
+          const item = await apiFetch<WishlistItem>('/api/account/wishlist/add', {
+            method: 'POST',
+            body: { product_id: productId }
+          })
+          wishlist.value.push(item)
+        } catch { /* ignore */ }
+      }
+    } finally {
+      loading.value = false
     }
   }
 

@@ -141,8 +141,7 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
-const config = useRuntimeConfig()
+const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
 
 // Filters state
@@ -150,14 +149,13 @@ const searchQuery = ref('')
 const selectedCategory = ref('')
 const selectedStatus = ref('')
 
-const { pending, data: productsData, refresh } = useApiLazyFetch<ProductApi[]>(
-  '/api/admin/products',
-  { key: 'admin-products-list' }
-)
-const { data: categories } = useApiLazyFetch<Category[]>(
-  '/api/admin/categories',
-  { key: 'admin-products-categories' }
-)
+const [
+  { pending, data: productsData, refresh },
+  { data: categories }
+] = await Promise.all([
+  useApiFetch<ProductApi[]>('/api/admin/products', { key: 'admin-products-list' }),
+  useApiFetch<Category[]>('/api/admin/categories', { key: 'admin-categories-list' })
+])
 
 const products = computed(() => productsData.value || [])
 

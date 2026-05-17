@@ -128,7 +128,7 @@ const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
 
-const { pending, data: post, error, refresh } = useApiFetch<Post>(
+const { pending, data: post, error, refresh } = await useApiFetch<Post>(
   `/api/admin/posts/${route.params.id}`
 )
 

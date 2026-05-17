@@ -150,7 +150,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
 
-const { pending, data: user, error, refresh } = useApiFetch<AdminUserDetail>(`/api/admin/users/${route.params.id}`)
+const { pending, data: user, error, refresh } = await useApiFetch<AdminUserDetail>(`/api/admin/users/${route.params.id}`)
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return '-'

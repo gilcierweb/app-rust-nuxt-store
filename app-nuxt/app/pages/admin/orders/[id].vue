@@ -196,14 +196,14 @@ import type { Order, Profile, Address } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const config = useRuntimeConfig()
 const route = useRoute()
 
 const id = route.params.id
 
 // Fetch Order (non-blocking)
-const { data: order, pending } = useApiLazyFetch<Order>(
+const { data: order, pending } = await useApiFetch<Order>(
   `/api/admin/orders/${id}`,
   { key: `admin-order-${id}` }
 )

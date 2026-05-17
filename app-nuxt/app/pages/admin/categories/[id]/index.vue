@@ -137,7 +137,7 @@ const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
 
-const { pending, data: category, error, refresh } = useApiFetch<Category>(
+const { pending, data: category, error, refresh } = await useApiFetch<Category>(
   `/api/admin/categories/${route.params.id}`
 )
 

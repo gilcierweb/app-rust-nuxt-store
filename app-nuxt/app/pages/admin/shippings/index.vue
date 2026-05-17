@@ -127,11 +127,11 @@ definePageMeta({
 
 const config = useRuntimeConfig()
 const { t, locale } = useI18n()
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 
 const searchQuery = ref('')
 
-const { pending, data: shippings, error, refresh } = useApiLazyFetch<ShippingMethod[]>(
+const { pending, data: shippings, error, refresh } = await useApiFetch<ShippingMethod[]>(
   '/api/admin/shippings',
   { key: 'admin-shippings-list' }
 )

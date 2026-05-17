@@ -121,12 +121,12 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: coupons, error, refresh } = useApiLazyFetch<Coupon[]>(
+const { pending, data: coupons, error, refresh } = await useApiFetch<Coupon[]>(
   '/api/admin/coupons',
   { key: 'admin-coupons-list' }
 )

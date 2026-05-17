@@ -200,11 +200,10 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { useApiFetch } = useApi()
 const { t } = useI18n()
 
-// Fetch Dashboard Stats (useLazyFetch: non-blocking, cached, charts are client-only anyway)
-const { pending, data: statsData } = useApiLazyFetch<DashboardStats>(
+const { pending, data: statsData } = await useApiFetch<DashboardStats>(
   '/api/admin/dashboards/stats',
   { key: 'admin-dashboard-stats' }
 )

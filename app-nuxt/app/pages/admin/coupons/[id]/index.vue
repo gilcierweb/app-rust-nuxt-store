@@ -156,7 +156,7 @@ const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
 
-const { pending, data: coupon, error, refresh } = useApiFetch<Coupon>(
+const { pending, data: coupon, error, refresh } = await useApiFetch<Coupon>(
   `/api/admin/coupons/${route.params.id}`
 )
 

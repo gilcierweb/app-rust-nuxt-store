@@ -87,7 +87,7 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: shipment, error, refresh } = useApiFetch<Shipment>(`/api/admin/shipments/${route.params.id}`)
+const { pending, data: shipment, error, refresh } = await useApiFetch<Shipment>(`/api/admin/shipments/${route.params.id}`)
 
 const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('shipping.status.pending'), badge: 'badge-soft badge-warning' },

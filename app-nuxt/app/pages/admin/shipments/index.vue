@@ -82,10 +82,10 @@ import type { Shipment } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
 
-const { pending, data: shipments, error, refresh } = useApiLazyFetch<Shipment[]>(
+const { pending, data: shipments, error, refresh } = await useApiFetch<Shipment[]>(
   '/api/admin/shipments',
   { key: 'admin-shipments-list' }
 )

@@ -36,9 +36,9 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { useApiLazyFetch } = useApi()
+const { useApiFetch } = useApi()
 
-const { data: shipping, pending, error } = useApiLazyFetch<ShippingMethod>(
+const { data: shipping, pending, error } = await useApiFetch<ShippingMethod>(
   `/api/admin/shippings/${route.params.id}`
 )
 

@@ -156,7 +156,7 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: review, error, refresh } = useApiFetch<Review>(
+const { pending, data: review, error, refresh } = await useApiFetch<Review>(
   `/api/admin/reviews/${route.params.id}`
 )
 

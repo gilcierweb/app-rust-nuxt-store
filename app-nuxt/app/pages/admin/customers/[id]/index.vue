@@ -203,15 +203,13 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-// Fetch Profile
-const { pending, data: profile, error, refresh: refreshProfile } = useApiFetch<Profile>(
-  `/api/admin/profiles/${route.params.id}`
-)
-
-// Fetch All Addresses and filter by user_id
-const { pending: pendingAddresses, data: allAddresses, error: errorAddresses, refresh: refreshAddresses } = useApiFetch<Address[]>(
-  '/api/admin/addresses'
-)
+const [
+  { pending, data: profile, error, refresh: refreshProfile },
+  { pending: pendingAddresses, data: allAddresses, error: errorAddresses, refresh: refreshAddresses }
+] = await Promise.all([
+  useApiFetch<Profile>(`/api/admin/profiles/${route.params.id}`),
+  useApiFetch<Address[]>('/api/admin/addresses', { key: 'admin-addresses-list' })
+])
 
 const customerAddresses = computed(() => {
   if (!allAddresses.value || !profile.value) return []

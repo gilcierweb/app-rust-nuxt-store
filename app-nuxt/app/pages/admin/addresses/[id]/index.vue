@@ -157,7 +157,7 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: address, error, refresh } = useApiFetch<Address>(
+const { pending, data: address, error, refresh } = await useApiFetch<Address>(
   `/api/admin/addresses/${route.params.id}`
 )
 

@@ -96,7 +96,7 @@ const submitSuccess = ref('')
 // SSR-friendly fetch (JWT via useApi composable)
 const { data: shippingMethods } = useApiLazyFetch<ShippingMethod[]>(
   '/api/admin/shippings',
-  { key: 'admin-shipment-form-methods', default: () => [] }
+  { key: 'admin-shippings-list', default: () => [] }
 )
 
 const form = reactive({

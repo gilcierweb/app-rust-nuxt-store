@@ -76,13 +76,13 @@ import type { ProductVariant } from '~/types'
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const route = useRoute()
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const productId = route.params.id
 const variantId = route.params.variantId
 const saving = ref(false)
 
-const { data: variant, pending } = useApiLazyFetch<ProductVariant>(
+const { data: variant, pending } = await useApiFetch<ProductVariant>(
   `/api/admin/variants/${variantId}`,
   { key: `variant-${variantId}` }
 )

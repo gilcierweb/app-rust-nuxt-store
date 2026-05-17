@@ -299,7 +299,9 @@ const imageFields = ref<Array<{
 }>>([])
 
 /* categories */
-const { data: categoriesData } = useApiLazyFetch<Category[]>('/api/admin/categories')
+const { data: categoriesData } = useApiLazyFetch<Category[]>('/api/admin/categories', {
+  key: 'admin-categories-list'
+})
 const categories = computed(() => categoriesData.value || [])
 
 /* image handlers (unchanged) */

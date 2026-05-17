@@ -34,7 +34,7 @@
                     </ul>
                 </div>
 
-                <NuxtLinkLocale :to="isAuthenticated ? '/account/wishlist' : '/wishlist'" class="btn btn-text btn-square relative">
+                <NuxtLinkLocale :to="isAuthenticated ? '/account/wishlist' : '/users/sessions'" class="btn btn-text btn-square relative">
                     <span class="icon-[tabler--heart] size-5"></span>
                 </NuxtLinkLocale>
                 <button class="btn btn-text btn-square relative" @click="toggleCart">

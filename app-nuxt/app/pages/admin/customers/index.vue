@@ -114,12 +114,12 @@ definePageMeta({
   layout: 'admin'
 })
 
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
 
 const searchQuery = ref('')
 
-const { pending, data: profiles, error, refresh } = useApiLazyFetch<Profile[]>(
+const { pending, data: profiles, error, refresh } = await useApiFetch<Profile[]>(
   '/api/admin/profiles',
   { key: 'admin-customers-list' }
 )

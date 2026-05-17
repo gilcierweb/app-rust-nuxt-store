@@ -117,11 +117,11 @@ interface AdminUser {
 }
 
 const { t } = useI18n()
-const { apiFetch, useApiLazyFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 
 const searchQuery = ref('')
 
-const { pending, data: users, error, refresh } = useApiLazyFetch<AdminUser[]>(
+const { pending, data: users, error, refresh } = await useApiFetch<AdminUser[]>(
   '/api/admin/users',
   { key: 'admin-users-list' }
 )

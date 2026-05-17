@@ -138,7 +138,7 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 
-const { pending, data: shipping, error, refresh } = useApiFetch<ShippingMethod>(
+const { pending, data: shipping, error, refresh } = await useApiFetch<ShippingMethod>(
   `/api/admin/shippings/${route.params.id}`
 )
 

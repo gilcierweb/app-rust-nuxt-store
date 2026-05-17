@@ -188,7 +188,8 @@ const errorMessage = ref('')
 
 // Fetch parent categories
 const { data: parentCategories } = useApiLazyFetch<Category[]>(
-  '/api/admin/categories'
+  '/api/admin/categories',
+  { key: 'admin-categories-list' }
 )
 
 // Filter out current category from parent options (can't be parent of itself)
