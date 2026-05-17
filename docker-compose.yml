@@ -10,6 +10,7 @@ services:
     restart: always
     environment:
       FRONTEND_URL: http://app-nuxt:3000
+      API_PROTECTION_API_KEY: ${API_PROTECTION_API_KEY:-dev-api-key}
     depends_on:
       - database
       # - app-nuxt
@@ -46,6 +47,7 @@ services:
     restart: always
     environment:
       NUXT_API_RUST_BASE_URL: http://app:8080
+      NUXT_API_RUST_API_KEY: ${API_PROTECTION_API_KEY:-dev-api-key}
     ports: 
       - '3000:3000'
     volumes:

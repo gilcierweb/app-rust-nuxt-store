@@ -106,13 +106,13 @@ impl Hooks for App {
             .url("/api-docs/openapi.json", crate::openapi::ApiDoc::openapi());
 
         Ok(router
+            .merge(swagger)
             .layer(middleware::from_fn_with_state(
                 ctx.clone(),
                 admin_namespace_guard,
             ))
             .layer(middleware::from_fn_with_state(ctx.clone(), csrf_guard))
-            .layer(middleware::from_fn(api_key_guard))
-            .merge(swagger))
+            .layer(middleware::from_fn(api_key_guard)))
     }
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
         queue.register(DownloadWorker::build(ctx)).await?;

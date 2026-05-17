@@ -1,8 +1,7 @@
 import { proxyRequest } from 'h3'
-import { resolveBackendBaseUrl } from '../../utils/backend-url'
+import { resolveBackendApiKey, resolveBackendBaseUrl } from '../../utils/backend-url'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig(event)
   const backend = resolveBackendBaseUrl(event)
 
   if (!backend.ok) {
@@ -22,6 +21,6 @@ export default defineEventHandler(async (event) => {
   const requestUrl = getRequestURL(event)
   const target = `${backend.url}/uploads/${path}${requestUrl.search}`
 
-  const apiKey = (config.apiRustApiKey || '').trim()
+  const apiKey = resolveBackendApiKey(event)
   return proxyRequest(event, target, apiKey ? { headers: { 'x-api-key': apiKey } } : undefined)
 })

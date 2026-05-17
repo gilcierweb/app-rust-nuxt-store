@@ -3,6 +3,10 @@ const BACKEND_URL_ENV_KEYS = [
   'API_RUST_BASE_URL',
   'NUXT_PUBLIC_API_RUST_BASE_URL'
 ]
+const BACKEND_API_KEY_ENV_KEYS = [
+  'NUXT_API_RUST_API_KEY',
+  'API_PROTECTION_API_KEY'
+]
 
 type BackendUrlResolution =
   | { ok: true, url: string, source: string, host: string }
@@ -102,4 +106,17 @@ export function resolveBackendBaseUrl(event: any): BackendUrlResolution {
       source
     }
   }
+}
+
+export function resolveBackendApiKey(event: any): string {
+  const config = useRuntimeConfig(event)
+  const configValue = String(config.apiRustApiKey || '').trim()
+  if (configValue) return configValue
+
+  for (const key of BACKEND_API_KEY_ENV_KEYS) {
+    const value = String(runtimeEnvValue(event, key) || '').trim()
+    if (value) return value
+  }
+
+  return ''
 }

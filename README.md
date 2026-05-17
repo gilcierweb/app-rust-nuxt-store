@@ -13,14 +13,14 @@ A production-ready e-commerce application featuring a high-performance REST API 
 
 ## ✨ Key Features
 
-- **Full E-Commerce Flow** — Products, categories, cart, checkout, orders, payments, shipping, coupons, reviews, wishlists
-- **JWT Authentication** — Register, login, email verification, password reset, magic link (passwordless)
-- **Admin Dashboard** — Complete back-office with stats, CRUD management for all entities
-- **API Documentation** — OpenAPI/Swagger UI available at `/api/docs`
-- **Internationalization** — Multi-language support (pt-BR, en, es)
-- **PWA Ready** — Progressive Web App with offline caching via Workbox
-- **SEO Optimized** — SSR, meta tags, sitemap, Open Graph tags
-- **Fully Tested** — Backend unit/integration tests (89 tests), frontend component tests (Vitest), E2E tests (Playwright)
+- **Full E-Commerce Flow** - Products, categories, cart, checkout, orders, payments, shipping, coupons, reviews, wishlists
+- **JWT Authentication** - Register, login, email verification, password reset, magic link (passwordless)
+- **Admin Dashboard** - Complete back-office with stats, CRUD management for all entities
+- **API Documentation** - OpenAPI/Swagger UI available at `/api/docs`
+- **Internationalization** - Multi-language support (pt-BR, en, es)
+- **PWA Ready** - Progressive Web App with offline caching via Workbox
+- **SEO Optimized** - SSR, meta tags, sitemap, Open Graph tags
+- **Fully Tested** - Backend unit/integration tests (89 tests), frontend component tests (Vitest), E2E tests (Playwright)
 
 ## 🛠 Tech Stack
 
@@ -125,7 +125,7 @@ cargo loco db reset
 # Start the API server
 cargo loco start
 # API running at http://localhost:5150
-# Swagger UI at http://localhost:5150/api/docs
+# Swagger UI at http://localhost:5150/api/docs (requires x-api-key on direct backend access)
 ```
 
 ### Run Frontend (Nuxt)
@@ -222,27 +222,28 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 ## 🎨 Frontend Pages
 
 ### Public Pages
-- **Home** — Hero banner carousel, featured categories, product grid
-- **Products** — Product listing with filters and pagination
-- **Product Detail** — Gallery, pricing, variants, reviews, add to cart
-- **Categories** — Category listing and detail pages with product grids
-- **Posts** — Blog-style content listing and detail
-- **Cart** — Shopping cart with quantity management
-- **Checkout** — Multi-step checkout flow
-- **Wishlist** — Saved products
-- **Static Pages** — About, Contact, Privacy, Terms, Stores
+- **Home** - Hero banner carousel, featured categories, product grid
+- **Products** - Product listing with filters and pagination
+- **Product Detail** - Gallery, pricing, variants, reviews, add to cart
+- **Categories** - Category listing and detail pages with product grids
+- **Posts** - Blog-style content listing and detail
+- **Cart** - Shopping cart with quantity management
+- **Checkout** - Multi-step checkout flow
+- **Wishlist** - Saved products
+- **Static Pages** - About, Contact, Privacy, Terms, Stores
 
 ### Admin Panel
-- **Dashboard** — Statistics cards (orders, revenue, traffic, signups, retention)
-- **Products** — Full CRUD with image upload and drag-drop
-- **Categories** — Full CRUD with hierarchy management
-- **Orders** — Order management and status tracking
-- **Posts** — Content management
-- **Profiles** — User profile management
-- **Reviews** — Review moderation
-- **Coupons** — Coupon management
-- **Addresses** — Address management
-- **Shipments** — Shipping and tracking management
+- **Dashboard** - Statistics cards (orders, revenue, traffic, signups, retention)
+- **Products** - Full CRUD with image upload and drag-drop
+- **Categories** - Full CRUD with hierarchy management
+- **Orders** - Order management and status tracking
+- **Posts** - Content management
+- **Profiles** - User profile management
+- **Reviews** - Review moderation
+- **Coupons** - Coupon management
+- **Addresses** - Address management
+- **Shipments** - Shipping and tracking management
+- **Banners** - Banner management
 
 ---
 

@@ -1,4 +1,4 @@
-import { resolveBackendBaseUrl } from '../utils/backend-url'
+import { resolveBackendApiKey, resolveBackendBaseUrl } from '../utils/backend-url'
 
 const BACKEND_CSRF_HEADER = 'x-backend-csrf-token'
 const BACKEND_CSRF_ENDPOINT = '/api/auth/csrf'
@@ -133,7 +133,6 @@ function backendErrorPayload(error: any, phase: string, statusText?: string) {
 }
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig(event)
   const backend = resolveBackendBaseUrl(event)
 
   if (!backend.ok) {
@@ -149,6 +148,17 @@ export default defineEventHandler(async (event) => {
   }
 
   const backendUrl = backend.url
+  const apiKey = resolveBackendApiKey(event)
+
+  if (!apiKey) {
+    setResponseHeader(event, 'x-api-proxy-error-source', 'nuxt-runtime-config')
+    setResponseStatus(event, 500, 'Backend API key not configured')
+
+    return {
+      error: 'backend_api_key_not_configured',
+      description: 'Set NUXT_API_RUST_API_KEY in the Nuxt runtime environment.'
+    }
+  }
   
   const path = event.context.params?.path || ''
   const requestUrl = getRequestURL(event)
@@ -171,10 +181,7 @@ export default defineEventHandler(async (event) => {
   const body = ['GET', 'HEAD'].includes(method) ? undefined : await readRawBody(event, false)
 
   try {
-    const apiKey = (config.apiRustApiKey || '').trim()
-    if (apiKey) {
-      headers.set(BACKEND_API_KEY_HEADER, apiKey)
-    }
+    headers.set(BACKEND_API_KEY_HEADER, apiKey)
 
     if (isProtectedMethod(method) && requestUrl.pathname !== BACKEND_CSRF_ENDPOINT) {
       phase = 'backend-csrf-bootstrap'
@@ -182,7 +189,7 @@ export default defineEventHandler(async (event) => {
         event,
         backendUrl,
         headers.get('cookie') || undefined,
-        apiKey || undefined
+        apiKey
       )
       headers.set(BACKEND_CSRF_HEADER, token)
       if (cookieHeader) {
