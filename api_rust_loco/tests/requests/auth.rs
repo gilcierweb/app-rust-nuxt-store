@@ -292,13 +292,9 @@ async fn can_get_current_user() {
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
 
-        let user = prepare_data::init_user_login(&request, &ctx).await;
+        prepare_data::init_user_login(&request, &ctx).await;
 
-        let (auth_key, auth_value) = prepare_data::auth_header(&user.token);
-        let response = request
-            .get("/api/auth/current")
-            .add_header(auth_key, auth_value)
-            .await;
+        let response = request.get("/api/auth/current").await;
 
         assert_eq!(
             response.status_code(),

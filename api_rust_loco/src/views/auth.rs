@@ -5,7 +5,6 @@ use crate::models::ability::Ability;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginResponse {
-    pub token: String,
     pub pid: String,
     pub name: String,
     pub roles: Vec<String>,
@@ -15,11 +14,10 @@ pub struct LoginResponse {
 
 impl LoginResponse {
     #[must_use]
-    pub fn new(user: &users::Model, token: &String, roles: Vec<String>) -> Self {
+    pub fn new(user: &users::Model, roles: Vec<String>) -> Self {
         let can_manage_admin = Ability::from_roles(roles.clone()).can_manage_admin();
 
         Self {
-            token: token.to_string(),
             pid: user.pid.to_string(),
             name: user.name.clone(),
             roles,

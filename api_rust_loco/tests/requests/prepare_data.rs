@@ -1,4 +1,4 @@
-use api_rust_loco::{models::users, views::auth::LoginResponse};
+use api_rust_loco::models::users;
 use axum::http::{HeaderName, HeaderValue};
 use loco_rs::{app::AppContext, TestServer};
 use serde::Deserialize;
@@ -14,7 +14,6 @@ struct CsrfResponse {
 
 pub struct LoggedInUser {
     pub user: users::Model,
-    pub token: String,
 }
 
 pub async fn init_user_login(request: &TestServer, ctx: &AppContext) -> LoggedInUser {
@@ -57,13 +56,12 @@ pub async fn init_user_login(request: &TestServer, ctx: &AppContext) -> LoggedIn
         }))
         .await;
 
-    let login_response: LoginResponse = serde_json::from_str(&response.text()).unwrap();
+    assert_eq!(response.status_code(), 200, "Login request should succeed");
 
     LoggedInUser {
         user: users::Model::find_by_email(&ctx.db, USER_EMAIL)
             .await
             .unwrap(),
-        token: login_response.token,
     }
 }
 
@@ -71,12 +69,6 @@ pub async fn init_csrf(request: &TestServer) -> String {
     let response = request.get("/api/auth/csrf").save_cookies().await;
     let payload: CsrfResponse = serde_json::from_str(&response.text()).unwrap();
     payload.token
-}
-
-pub fn auth_header(token: &str) -> (HeaderName, HeaderValue) {
-    let auth_header_value = HeaderValue::from_str(&format!("Bearer {}", &token)).unwrap();
-
-    (HeaderName::from_static("authorization"), auth_header_value)
 }
 
 pub fn csrf_header(token: &str) -> (HeaderName, HeaderValue) {

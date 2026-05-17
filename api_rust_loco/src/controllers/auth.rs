@@ -209,7 +209,7 @@ async fn login(
         .build();
 
     let jar = jar.add(cookie);
-    Ok((jar, format::json(LoginResponse::new(&user, &token, roles))?))
+    Ok((jar, format::json(LoginResponse::new(&user, roles))?))
 }
 
 #[debug_handler]
@@ -253,7 +253,7 @@ async fn logout(jar: CookieJar) -> Result<(CookieJar, Response)> {
 ///
 /// 2. **Click the Magic Link**:
 ///    The user clicks the link (/magic-link/{token}), which validates the token and its expiration.
-///    If valid, the server generates a JWT and responds with a [`LoginResponse`].
+///    If valid, the server generates a JWT cookie and responds with a [`LoginResponse`].
 ///    If invalid or expired, an unauthorized response is returned.
 ///
 /// This flow enhances security by avoiding traditional passwords and providing a seamless login experience.
@@ -317,7 +317,7 @@ async fn magic_link_verify(
         .build();
 
     let jar = jar.add(cookie);
-    Ok((jar, format::json(LoginResponse::new(&user, &token, roles))?))
+    Ok((jar, format::json(LoginResponse::new(&user, roles))?))
 }
 
 pub fn routes() -> Routes {

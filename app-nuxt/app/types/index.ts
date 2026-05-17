@@ -122,7 +122,6 @@ export interface ProductApi {
 }
 
 export interface LoginResponse {
-  token: string
   pid: string
   name: string
   roles: string[]
