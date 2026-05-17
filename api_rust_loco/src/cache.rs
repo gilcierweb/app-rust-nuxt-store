@@ -9,8 +9,7 @@ use crate::models::products::ProductWithCategory;
 use crate::views::auth::CurrentResponse;
 
 static CURRENT_CACHE: OnceLock<Cache<String, Arc<CurrentResponse>>> = OnceLock::new();
-static PRODUCTS_CACHE: OnceLock<Cache<&'static str, Arc<Vec<ProductWithCategory>>>> =
-    OnceLock::new();
+static PRODUCTS_CACHE: OnceLock<Cache<String, Arc<Vec<ProductWithCategory>>>> = OnceLock::new();
 static CATEGORIES_CACHE: OnceLock<Cache<&'static str, Arc<Vec<categories::Model>>>> =
     OnceLock::new();
 static DASHBOARD_CACHE: OnceLock<Cache<&'static str, Arc<DashboardResponse>>> = OnceLock::new();
@@ -24,7 +23,7 @@ pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
     })
 }
 
-pub fn products_cache() -> &'static Cache<&'static str, Arc<Vec<ProductWithCategory>>> {
+pub fn products_cache() -> &'static Cache<String, Arc<Vec<ProductWithCategory>>> {
     PRODUCTS_CACHE.get_or_init(|| {
         Cache::builder()
             .time_to_live(Duration::from_secs(5))
@@ -52,7 +51,7 @@ pub fn dashboard_cache() -> &'static Cache<&'static str, Arc<DashboardResponse>>
 }
 
 pub fn invalidate_products_cache() {
-    products_cache().invalidate("list");
+    products_cache().invalidate_all();
 }
 
 pub fn invalidate_categories_cache() {

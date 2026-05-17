@@ -6,8 +6,8 @@ use axum::{debug_handler, extract::Query};
 use ipnetwork::IpNetwork;
 use loco_rs::prelude::*;
 use sea_orm::{
-    ColumnTrait, Condition, EntityTrait, FromQueryResult, JoinType, QueryFilter, QueryOrder,
-    QuerySelect, RelationTrait, Statement,
+    ColumnTrait, Condition, EntityTrait, FromQueryResult, JoinType, PaginatorTrait, QueryFilter,
+    QueryOrder, QuerySelect, RelationTrait, Statement,
 };
 use serde::{Deserialize, Serialize};
 
@@ -26,6 +26,7 @@ use crate::models::{
     banner_events::banner_event_type,
     banners::{banner_status, device, link_target},
 };
+use crate::utils::pagination::PaginationParams;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BannerPositionParams {
@@ -328,11 +329,15 @@ pub async fn remove_position(
 }
 
 #[debug_handler]
-pub async fn list_banners(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list_banners(
+    State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
+) -> Result<Response> {
     format::json(
         BannerEntity::find()
             .order_by_desc(BannerColumn::CreatedAt)
-            .all(&ctx.db)
+            .paginate(&ctx.db, pagination.page_size())
+            .fetch_page(pagination.page_index())
             .await?,
     )
 }
@@ -409,11 +414,15 @@ pub async fn remove_banner(Path(id): Path<i64>, State(ctx): State<AppContext>) -
 }
 
 #[debug_handler]
-pub async fn list_events(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list_events(
+    State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
+) -> Result<Response> {
     format::json(
         BannerEventEntity::find()
             .order_by_desc(BannerEventColumn::CreatedAt)
-            .all(&ctx.db)
+            .paginate(&ctx.db, pagination.page_size())
+            .fetch_page(pagination.page_index())
             .await?,
     )
 }

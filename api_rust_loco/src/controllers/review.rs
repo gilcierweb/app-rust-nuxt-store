@@ -4,13 +4,17 @@
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
+use sea_orm::{PaginatorTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::reviews::{ActiveModel, Entity, Model};
+use crate::utils::pagination::PaginationParams;
 
 #[derive(Debug, Deserialize)]
 pub struct ListQuery {
     pub product_id: Option<i32>,
+    #[serde(flatten)]
+    pub pagination: PaginationParams,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -55,7 +59,13 @@ pub async fn list(
         query_builder = query_builder
             .filter(crate::models::_entities::reviews::Column::ProductId.eq(product_id));
     }
-    format::json(query_builder.all(&ctx.db).await?)
+    let items = query_builder
+        .order_by_desc(crate::models::_entities::reviews::Column::CreatedAt)
+        .paginate(&ctx.db, query.pagination.page_size())
+        .fetch_page(query.pagination.page_index())
+        .await?;
+
+    format::json(items)
 }
 
 #[debug_handler]

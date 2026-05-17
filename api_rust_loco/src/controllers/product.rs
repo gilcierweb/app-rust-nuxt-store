@@ -5,9 +5,10 @@ use std::collections::HashMap;
 
 use axum::body::Bytes;
 use axum::debug_handler;
+use axum::extract::Query;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
-use sea_orm::{Condition, QueryOrder};
+use sea_orm::{Condition, PaginatorTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -21,6 +22,7 @@ use crate::models::_entities::product_images::{
 };
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
 use crate::models::products::{ProductWithCategory, Products};
+use crate::utils::pagination::PaginationParams;
 use crate::utils::slug::parameterize;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -106,14 +108,21 @@ async fn save_image(
 )]
 pub async fn get_products_with_categories(
     State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
 ) -> Result<impl IntoResponse> {
-    if let Some(value) = products_cache().get("list") {
+    let cache_key = format!(
+        "list:{}:{}",
+        pagination.page_index(),
+        pagination.page_size()
+    );
+    if let Some(value) = products_cache().get(&cache_key) {
         return format::json(value);
     }
 
     let products = Products::find()
         .find_also_related(Categories)
-        .all(&ctx.db)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
         .await?;
 
     let mut data: Vec<ProductWithCategory> = products.into_iter().map(Into::into).collect();
@@ -160,7 +169,7 @@ pub async fn get_products_with_categories(
     }
 
     let data = Arc::new(data);
-    products_cache().insert("list", Arc::clone(&data));
+    products_cache().insert(cache_key, Arc::clone(&data));
     format::json(data)
 }
 

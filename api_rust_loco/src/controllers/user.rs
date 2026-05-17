@@ -4,14 +4,15 @@
 use std::collections::HashMap;
 
 use axum::debug_handler;
-use axum::extract::Extension;
+use axum::extract::{Extension, Query};
 use loco_rs::prelude::*;
-use sea_orm::QueryOrder;
+use sea_orm::{PaginatorTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
 
 use crate::middleware::auth::{AdminSession, CookieJWT};
 use crate::models::_entities::users::{Entity, Model};
 use crate::models::ability::{Ability, Action, Resource, Subject};
+use crate::utils::pagination::PaginationParams;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -96,6 +97,7 @@ pub async fn list(
     auth: CookieJWT,
     admin_session: Option<Extension<AdminSession>>,
     State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
     let (current_user_id, ability) =
         resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
@@ -104,7 +106,8 @@ pub async fn list(
     let items = ability
         .accessible_users_query(Action::Read, current_user_id)
         .order_by_desc(crate::models::_entities::users::Column::CreatedAt)
-        .all(&ctx.db)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
         .await?;
 
     if items.is_empty() {

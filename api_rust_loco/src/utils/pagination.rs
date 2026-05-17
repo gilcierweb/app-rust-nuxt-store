@@ -24,6 +24,18 @@ impl PaginationParams {
         self.per_page.clamp(1, 100)
     }
 
+    /// Returns the zero-based page index expected by SeaORM paginator.
+    #[must_use]
+    pub fn page_index(&self) -> u64 {
+        self.page.max(1).saturating_sub(1) as u64
+    }
+
+    /// Returns the page size expected by SeaORM paginator.
+    #[must_use]
+    pub fn page_size(&self) -> u64 {
+        self.limit() as u64
+    }
+
     /// Creates pagination params with defaults
     pub fn new(page: i64, per_page: i64) -> Self {
         Self {

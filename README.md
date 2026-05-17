@@ -181,6 +181,8 @@ pnpm run test:e2e
 
 All routes are prefixed with `/api/` and return JSON. Full Swagger documentation available at `/api/docs`.
 
+Large list endpoints accept `page` and `per_page` query parameters and use SeaORM pagination internally. The default is `page=1&per_page=20`, with a maximum `per_page` of `100`.
+
 | Module | Prefix | Endpoints | Auth |
 |---|---|---|---|
 | **Auth** | `/api/auth/` | register, verify, login, forgot, reset, current, magic-link | Mixed |

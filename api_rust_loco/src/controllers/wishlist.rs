@@ -15,6 +15,22 @@ pub struct AddParams {
     pub product_id: i32,
 }
 
+async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
+    if let Some(user_id) = auth
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|value| value.as_i64())
+        .and_then(|value| i32::try_from(value).ok())
+    {
+        return Ok(user_id);
+    }
+
+    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
+        .await?
+        .id)
+}
+
 #[debug_handler]
 pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
     format::empty()
@@ -22,9 +38,9 @@ pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
 
 #[debug_handler]
 pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let current_user_id = current_user_id(&ctx, &auth).await?;
     let items = Entity::find()
-        .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user.id))
+        .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user_id))
         .order_by_desc(crate::models::_entities::wishlists::Column::CreatedAt)
         .all(&ctx.db)
         .await?;
@@ -37,10 +53,10 @@ pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<AddParams>,
 ) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let current_user_id = current_user_id(&ctx, &auth).await?;
 
     let existing = Entity::find()
-        .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user.id))
+        .filter(crate::models::_entities::wishlists::Column::UserId.eq(current_user_id))
         .filter(crate::models::_entities::wishlists::Column::ProductId.eq(params.product_id))
         .one(&ctx.db)
         .await?;
@@ -51,7 +67,7 @@ pub async fn add(
 
     let now = chrono::Utc::now().into();
     let item = ActiveModel {
-        user_id: Set(current_user.id),
+        user_id: Set(current_user_id),
         product_id: Set(params.product_id),
         created_at: Set(now),
         updated_at: Set(now),
@@ -70,10 +86,10 @@ pub async fn remove(
     auth: CookieJWT,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let current_user_id = current_user_id(&ctx, &auth).await?;
     let item = Entity::find_by_id(id).one(&ctx.db).await?;
     let item = item.ok_or_else(|| Error::NotFound)?;
-    if item.user_id != current_user.id {
+    if item.user_id != current_user_id {
         return unauthorized(t!("auth.unauthorized"));
     }
     item.delete(&ctx.db).await.map_err(|e| {

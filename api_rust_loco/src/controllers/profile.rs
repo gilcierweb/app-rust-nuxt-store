@@ -2,10 +2,13 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use axum::debug_handler;
+use axum::extract::Query;
 use loco_rs::prelude::*;
+use sea_orm::{PaginatorTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::profiles::{ActiveModel, Entity, Model};
+use crate::utils::pagination::PaginationParams;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -42,8 +45,17 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 #[debug_handler]
-pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(Entity::find().all(&ctx.db).await?)
+pub async fn list(
+    State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
+) -> Result<Response> {
+    let items = Entity::find()
+        .order_by_asc(crate::models::_entities::profiles::Column::Id)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+
+    format::json(items)
 }
 
 #[debug_handler]

@@ -2,11 +2,11 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use crate::middleware::auth::CookieJWT;
-use axum::debug_handler;
+use axum::{debug_handler, extract::Query};
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
-use sea_orm::QueryOrder;
+use sea_orm::{PaginatorTrait, QueryOrder, TransactionTrait};
 use uuid::Uuid;
 
 use crate::models::_entities::addresses;
@@ -19,11 +19,28 @@ use crate::models::_entities::shipments;
 use crate::models::order_status::OrderStatus;
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::users;
+use crate::utils::pagination::PaginationParams;
 
 fn generate_order_number() -> String {
     let ts = chrono::Utc::now().timestamp();
     let short = &Uuid::new_v4().to_string()[..8];
     format!("ORD-{}-{}", ts, short)
+}
+
+async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
+    if let Some(user_id) = auth
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|value| value.as_i64())
+        .and_then(|value| i32::try_from(value).ok())
+    {
+        return Ok(user_id);
+    }
+
+    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
+        .await?
+        .id)
 }
 
 #[debug_handler]
@@ -37,13 +54,13 @@ pub async fn checkout(
     State(ctx): State<AppContext>,
     Json(params): Json<CreateOrderParams>,
 ) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let current_user_id = current_user_id(&ctx, &auth).await?;
 
     if params.items.is_empty() {
         return Err(Error::BadRequest(t!("cart.empty").into()));
     }
 
-    if let Some(ref code) = params.coupon_code {
+    let coupon = if let Some(ref code) = params.coupon_code {
         let coupon = coupons::Entity::find()
             .filter(coupons::Column::Code.eq(Some(code.clone())))
             .one(&ctx.db)
@@ -71,10 +88,15 @@ pub async fn checkout(
                 return Err(Error::BadRequest(t!("coupon.min_amount", min = min).into()));
             }
         }
-    }
+
+        Some(coupon)
+    } else {
+        None
+    };
 
     let order_number = generate_order_number();
     let now = chrono::Utc::now().into();
+    let txn = ctx.db.begin().await?;
 
     let order = ActiveModel {
         order_number: Set(Some(order_number)),
@@ -88,13 +110,13 @@ pub async fn checkout(
         payment_status: Set(Some(1)),     // unpaid
         fulfillment_status: Set(Some(1)), // unfulfilled
         notes: Set(params.notes),
-        user_id: Set(current_user.id),
+        user_id: Set(current_user_id),
         created_at: Set(now),
         updated_at: Set(now),
         ..Default::default()
     };
 
-    let saved = order.insert(&ctx.db).await.map_err(|e| {
+    let saved = order.insert(&txn).await.map_err(|e| {
         tracing::error!(error = ?e, "failed to create order");
         Error::InternalServerError
     })?;
@@ -112,29 +134,23 @@ pub async fn checkout(
             updated_at: Set(now),
             ..Default::default()
         };
-        order_item.insert(&ctx.db).await.map_err(|e| {
+        order_item.insert(&txn).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to create order item");
             Error::InternalServerError
         })?;
     }
 
-    if params.coupon_code.is_some() {
-        let coupon = coupons::Entity::find()
-            .filter(coupons::Column::Code.eq(params.coupon_code.clone()))
-            .one(&ctx.db)
-            .await?
-            .ok_or_else(|| Error::BadRequest(t!("coupon.not_found").into()))?;
-
+    if let Some(coupon) = coupon {
         let usage = coupon_usages::ActiveModel {
             coupon_id: Set(coupon.id),
-            user_id: Set(current_user.id),
+            user_id: Set(current_user_id),
             order_id: Set(saved.id),
             used_at: Set(Some(chrono::Utc::now().naive_utc())),
             created_at: Set(now),
             updated_at: Set(now),
             ..Default::default()
         };
-        usage.insert(&ctx.db).await.map_err(|e| {
+        usage.insert(&txn).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to record coupon usage");
             Error::InternalServerError
         })?;
@@ -143,7 +159,7 @@ pub async fn checkout(
         let mut coupon_active: coupons::ActiveModel = coupon.into();
         coupon_active.used_count = Set(Some(current_count + 1));
         coupon_active.updated_at = Set(now);
-        coupon_active.update(&ctx.db).await.map_err(|e| {
+        coupon_active.update(&txn).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to update coupon count");
             Error::InternalServerError
         })?;
@@ -166,7 +182,7 @@ pub async fn checkout(
             updated_at: Set(now),
             ..Default::default()
         };
-        let saved_payment = payment.insert(&ctx.db).await.map_err(|e| {
+        let saved_payment = payment.insert(&txn).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to create payment");
             Error::InternalServerError
         })?;
@@ -176,7 +192,7 @@ pub async fn checkout(
         let mut order_active: crate::models::_entities::orders::ActiveModel = saved.clone().into();
         order_active.payment_status = Set(Some(2));
         order_active.updated_at = Set(chrono::Utc::now().into());
-        order_active.update(&ctx.db).await?;
+        order_active.update(&txn).await?;
     }
 
     let mut address_id = None;
@@ -193,13 +209,13 @@ pub async fn checkout(
             zip_code: Set(params.address_zip_code.clone()),
             country: Set(params.address_country.clone()),
             phone: Set(params.address_phone.clone()),
-            user_id: Set(current_user.id),
+            user_id: Set(current_user_id),
             r#type: Set(Some("shipping".to_string())),
             created_at: Set(now),
             updated_at: Set(now),
             ..Default::default()
         };
-        let saved_addr = addr.insert(&ctx.db).await.map_err(|e| {
+        let saved_addr = addr.insert(&txn).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to create address");
             Error::InternalServerError
         })?;
@@ -217,12 +233,14 @@ pub async fn checkout(
             updated_at: Set(now),
             ..Default::default()
         };
-        let saved_ship = ship.insert(&ctx.db).await.map_err(|e| {
+        let saved_ship = ship.insert(&txn).await.map_err(|e| {
             tracing::error!(error = ?e, "failed to create shipment");
             Error::InternalServerError
         })?;
         shipment_id = Some(saved_ship.id);
     }
+
+    txn.commit().await?;
 
     format::json(serde_json::json!({
         "id": saved.id,
@@ -237,22 +255,31 @@ pub async fn checkout(
 }
 
 #[debug_handler]
-pub async fn my_orders(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+pub async fn my_orders(
+    auth: CookieJWT,
+    State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
+) -> Result<Response> {
+    let current_user_id = current_user_id(&ctx, &auth).await?;
     let orders: Vec<crate::models::_entities::orders::Model> = Entity::find()
-        .filter(crate::models::_entities::orders::Column::UserId.eq(current_user.id))
+        .filter(crate::models::_entities::orders::Column::UserId.eq(current_user_id))
         .order_by_desc(crate::models::_entities::orders::Column::CreatedAt)
-        .all(&ctx.db)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
         .await?;
 
     format::json(orders)
 }
 
 #[debug_handler]
-pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list(
+    State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
+) -> Result<Response> {
     let orders: Vec<crate::models::_entities::orders::Model> = Entity::find()
         .order_by_desc(crate::models::_entities::orders::Column::CreatedAt)
-        .all(&ctx.db)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
         .await?;
 
     format::json(orders)
@@ -271,10 +298,10 @@ pub async fn account_get_one(
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let current_user = users::Model::find_by_pid(&ctx.db, &auth.claims.pid).await?;
+    let current_user_id = current_user_id(&ctx, &auth).await?;
     let order = Entity::find_by_id(id).one(&ctx.db).await?;
     let order = order.ok_or(Error::NotFound)?;
-    if order.user_id != current_user.id {
+    if order.user_id != current_user_id {
         return unauthorized(t!("auth.unauthorized"));
     }
 

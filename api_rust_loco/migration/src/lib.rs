@@ -33,6 +33,8 @@ mod m20260517_072928_banner_positions;
 mod m20260517_073000_normalize_banner_positions;
 mod m20260517_073137_banners;
 mod m20260517_073909_banner_events;
+mod m20260517_203700_add_catalog_lookup_indexes;
+mod m20260517_211000_add_controller_query_indexes;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -69,6 +71,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20260517_073000_normalize_banner_positions::Migration),
             Box::new(m20260517_073137_banners::Migration),
             Box::new(m20260517_073909_banner_events::Migration),
+            Box::new(m20260517_203700_add_catalog_lookup_indexes::Migration),
+            Box::new(m20260517_211000_add_controller_query_indexes::Migration),
             // inject-above (do not remove this comment)
         ]
     }
