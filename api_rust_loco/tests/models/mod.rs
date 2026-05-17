@@ -21,3 +21,7 @@ mod shipments;
 mod shipping_methods;
 mod variant_options;
 mod wishlists;
+
+mod banner_events;
+mod banner_positions;
+mod banners;

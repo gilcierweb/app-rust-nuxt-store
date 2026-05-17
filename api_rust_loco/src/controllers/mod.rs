@@ -1,6 +1,7 @@
 pub mod auth;
 
 pub mod address;
+pub mod banner;
 pub mod cart;
 pub mod category;
 pub mod coupon;

@@ -67,6 +67,8 @@ impl Hooks for App {
         AppRoutes::with_default_routes() // controller routes below
             .add_route(controllers::dashboard::routes())
             .add_route(controllers::dashboard::admin_routes())
+            .add_route(controllers::banner::routes())
+            .add_route(controllers::banner::admin_routes())
             .add_route(controllers::user::routes())
             .add_route(controllers::user::admin_routes())
             .add_route(controllers::variant::routes())

@@ -3,6 +3,9 @@ pub mod ability;
 pub mod users;
 
 pub mod addresses;
+pub mod banner_events;
+pub mod banner_positions;
+pub mod banners;
 pub mod cart_items;
 pub mod carts;
 pub mod categories;

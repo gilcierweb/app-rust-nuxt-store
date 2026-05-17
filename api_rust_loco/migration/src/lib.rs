@@ -29,6 +29,10 @@ mod m20260510_083524_wishlists;
 mod m20260510_101510_alter_order_items_product_variant_nullable;
 mod m20260513_223617_create_roles_and_users_roles;
 mod m20260516_000001_add_performance_indexes;
+mod m20260517_072928_banner_positions;
+mod m20260517_073000_normalize_banner_positions;
+mod m20260517_073137_banners;
+mod m20260517_073909_banner_events;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -61,6 +65,10 @@ impl MigratorTrait for Migrator {
             Box::new(m20260510_101510_alter_order_items_product_variant_nullable::Migration),
             Box::new(m20260513_223617_create_roles_and_users_roles::Migration),
             Box::new(m20260516_000001_add_performance_indexes::Migration),
+            Box::new(m20260517_072928_banner_positions::Migration),
+            Box::new(m20260517_073000_normalize_banner_positions::Migration),
+            Box::new(m20260517_073137_banners::Migration),
+            Box::new(m20260517_073909_banner_events::Migration),
             // inject-above (do not remove this comment)
         ]
     }
