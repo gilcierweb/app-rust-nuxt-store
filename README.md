@@ -111,8 +111,9 @@ cd api_rust_loco/
 DATABASE_URL="change-me"
 CORS_ALLOWED_ORIGIN="change-me"
 # Required for direct backend access protection (Nuxt proxy will send it)
-# openssl rand -base64 32
-export API_PROTECTION_API_KEY="change-me"
+# openssl rand -base64 32 or openssl rand -base64 64
+API_PROTECTION_API_KEY="change-me"
+# openssl rand -base64 32 or openssl rand -base64 64
 AUTH_JWT_SECRET="change-me"
 
 # Create database and run migrations
@@ -132,7 +133,7 @@ cargo loco start
 ```shell
 cd app-nuxt/
 NUXT_API_RUST_BASE_URL="change-me"
-# openssl rand -base64 32
+# openssl rand -base64 32 or openssl rand -hex 32
 NUXT_API_RUST_API_KEY="change-me"
 NUXT_CSRF_ENCRYPT_SECRET="change-me"
 
