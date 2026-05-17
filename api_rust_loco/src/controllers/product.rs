@@ -15,7 +15,9 @@ use std::sync::Arc;
 use tracing::info;
 use uuid::Uuid;
 
-use crate::cache::{invalidate_dashboard_cache, invalidate_products_cache, products_cache};
+use crate::cache::{
+    invalidate_dashboard_cache, invalidate_products_cache, product_detail_cache, products_cache,
+};
 use crate::models::_entities::categories::Entity as Categories;
 use crate::models::_entities::product_images::{
     ActiveModel as ProductImageActiveModel, Entity as ProductImageEntity,
@@ -333,6 +335,11 @@ pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resul
 )]
 #[debug_handler]
 pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+    let cache_key = format!("detail:{id}");
+    if let Some(value) = product_detail_cache().get(&cache_key) {
+        return format::json(value);
+    }
+
     let result = Products::find_by_id(id)
         .find_also_related(Categories)
         .one(&ctx.db)
@@ -367,6 +374,8 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
                     .collect(),
             );
 
+            let product_with_category = Arc::new(product_with_category);
+            product_detail_cache().insert(cache_key, Arc::clone(&product_with_category));
             format::json(product_with_category)
         }
         None => Err(Error::NotFound),

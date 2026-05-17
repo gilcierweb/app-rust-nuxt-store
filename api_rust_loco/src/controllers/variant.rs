@@ -2,10 +2,13 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use std::collections::HashMap;
+use std::sync::{Arc, OnceLock};
+use std::time::Duration;
 
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
+use moka::sync::Cache;
 use rust_decimal::Decimal;
 use sea_orm::{ColumnTrait, PaginatorTrait, QueryFilter, QueryOrder};
 use serde::{Deserialize, Serialize};
@@ -20,6 +23,21 @@ use crate::models::_entities::variant_options::{
     Column as OptionColumn, Entity as OptionTypeEntity,
 };
 use crate::utils::pagination::PaginationParams;
+
+static VARIANTS_CACHE: OnceLock<Cache<String, Arc<Vec<VariantWithOptions>>>> = OnceLock::new();
+
+fn variants_cache() -> &'static Cache<String, Arc<Vec<VariantWithOptions>>> {
+    VARIANTS_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(5))
+            .max_capacity(128)
+            .build()
+    })
+}
+
+fn invalidate_variants_cache() {
+    variants_cache().invalidate_all();
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -59,7 +77,7 @@ impl Params {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct VariantWithOptions {
     pub id: i32,
     pub name: Option<String>,
@@ -76,7 +94,7 @@ pub struct VariantWithOptions {
     pub options: Vec<VariantOptionJson>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct VariantOptionJson {
     pub id: i32,
     pub option_name: Option<String>,
@@ -181,13 +199,25 @@ async fn variants_with_options(
 
 #[debug_handler]
 pub async fn index(State(ctx): State<AppContext>) -> Result<Response> {
+    let default_pagination = PaginationParams::default();
+    let cache_key = format!(
+        "index:{}:{}",
+        default_pagination.page_index(),
+        default_pagination.page_size()
+    );
+    if let Some(value) = variants_cache().get(&cache_key) {
+        return format::json(value);
+    }
+
     let variants: Vec<Model> = Entity::find()
         .order_by_asc(VariantColumn::Position)
-        .paginate(&ctx.db, PaginationParams::default().page_size())
-        .fetch_page(PaginationParams::default().page_index())
+        .paginate(&ctx.db, default_pagination.page_size())
+        .fetch_page(default_pagination.page_index())
         .await?;
 
-    format::json(variants_with_options(&ctx, variants).await?)
+    let variants = Arc::new(variants_with_options(&ctx, variants).await?);
+    variants_cache().insert(cache_key, Arc::clone(&variants));
+    format::json(variants)
 }
 
 #[debug_handler]
@@ -195,6 +225,16 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Query(params): Query<ListQuery>,
 ) -> Result<Response> {
+    let cache_key = format!(
+        "list:{:?}:{}:{}",
+        params.product_id,
+        params.pagination.page_index(),
+        params.pagination.page_size()
+    );
+    if let Some(value) = variants_cache().get(&cache_key) {
+        return format::json(value);
+    }
+
     let mut query = Entity::find().order_by_asc(VariantColumn::Position);
     if let Some(pid) = params.product_id {
         query = query.filter(VariantColumn::ProductId.eq(pid));
@@ -204,7 +244,9 @@ pub async fn list(
         .fetch_page(params.pagination.page_index())
         .await?;
 
-    format::json(variants_with_options(&ctx, variants).await?)
+    let variants = Arc::new(variants_with_options(&ctx, variants).await?);
+    variants_cache().insert(cache_key, Arc::clone(&variants));
+    format::json(variants)
 }
 
 #[debug_handler]
@@ -238,6 +280,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
     item.created_at = Set(now);
     item.updated_at = Set(now);
     let saved = item.insert(&ctx.db).await?;
+    invalidate_variants_cache();
     format::json(saved)
 }
 
@@ -251,12 +294,14 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_variants_cache();
     format::json(item)
 }
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_variants_cache();
     format::empty()
 }
 

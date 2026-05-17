@@ -6,7 +6,7 @@ use super::_entities::categories::Model as CategoryModel;
 // use super::_entities::product_images::Model as ProductImageModel;
 use serde::Serialize;
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct ProductWithCategory {
     pub id: i32,
     pub name: Option<String>,
@@ -24,14 +24,14 @@ pub struct ProductWithCategory {
     pub images: Option<Vec<ProductImageJson>>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct CategoryJson {
     pub id: i32,
     pub name: Option<String>,
     pub slug: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct ProductImageJson {
     pub id: i32,
     pub image: Option<String>,

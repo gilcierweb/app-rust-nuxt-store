@@ -183,6 +183,8 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 
 Large list endpoints accept `page` and `per_page` query parameters and use SeaORM pagination internally. The default is `page=1&per_page=20`, with a maximum `per_page` of `100`.
 
+Read-heavy catalog/content endpoints use short-lived in-memory caches and production keeps database pool connections warm by default (`DB_IDLE_TIMEOUT=300000`, `DB_MIN_CONNECTIONS=5`, `DB_MAX_CONNECTIONS=20`) to avoid cold reconnect latency during normal navigation.
+
 | Module | Prefix | Endpoints | Auth |
 |---|---|---|---|
 | **Auth** | `/api/auth/` | register, verify, login, forgot, reset, current, magic-link | Mixed |

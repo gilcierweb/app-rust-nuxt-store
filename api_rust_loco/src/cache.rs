@@ -4,12 +4,17 @@ use std::time::Duration;
 use moka::sync::Cache;
 
 use crate::controllers::dashboard::DashboardResponse;
-use crate::models::_entities::categories;
+use crate::models::_entities::{categories, posts, profiles};
 use crate::models::products::ProductWithCategory;
 use crate::views::auth::CurrentResponse;
 
 static CURRENT_CACHE: OnceLock<Cache<String, Arc<CurrentResponse>>> = OnceLock::new();
 static PRODUCTS_CACHE: OnceLock<Cache<String, Arc<Vec<ProductWithCategory>>>> = OnceLock::new();
+static PRODUCT_DETAIL_CACHE: OnceLock<Cache<String, Arc<ProductWithCategory>>> = OnceLock::new();
+static POSTS_CACHE: OnceLock<Cache<String, Arc<Vec<posts::Model>>>> = OnceLock::new();
+static POST_DETAIL_CACHE: OnceLock<Cache<String, Arc<posts::Model>>> = OnceLock::new();
+static PROFILES_CACHE: OnceLock<Cache<String, Arc<Vec<profiles::Model>>>> = OnceLock::new();
+static PROFILE_DETAIL_CACHE: OnceLock<Cache<String, Arc<profiles::Model>>> = OnceLock::new();
 static CATEGORIES_CACHE: OnceLock<Cache<&'static str, Arc<Vec<categories::Model>>>> =
     OnceLock::new();
 static DASHBOARD_CACHE: OnceLock<Cache<&'static str, Arc<DashboardResponse>>> = OnceLock::new();
@@ -28,6 +33,51 @@ pub fn products_cache() -> &'static Cache<String, Arc<Vec<ProductWithCategory>>>
         Cache::builder()
             .time_to_live(Duration::from_secs(5))
             .max_capacity(32)
+            .build()
+    })
+}
+
+pub fn product_detail_cache() -> &'static Cache<String, Arc<ProductWithCategory>> {
+    PRODUCT_DETAIL_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(5))
+            .max_capacity(256)
+            .build()
+    })
+}
+
+pub fn posts_cache() -> &'static Cache<String, Arc<Vec<posts::Model>>> {
+    POSTS_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(5))
+            .max_capacity(64)
+            .build()
+    })
+}
+
+pub fn post_detail_cache() -> &'static Cache<String, Arc<posts::Model>> {
+    POST_DETAIL_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(5))
+            .max_capacity(256)
+            .build()
+    })
+}
+
+pub fn profiles_cache() -> &'static Cache<String, Arc<Vec<profiles::Model>>> {
+    PROFILES_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(5))
+            .max_capacity(64)
+            .build()
+    })
+}
+
+pub fn profile_detail_cache() -> &'static Cache<String, Arc<profiles::Model>> {
+    PROFILE_DETAIL_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(5))
+            .max_capacity(256)
             .build()
     })
 }
@@ -52,6 +102,17 @@ pub fn dashboard_cache() -> &'static Cache<&'static str, Arc<DashboardResponse>>
 
 pub fn invalidate_products_cache() {
     products_cache().invalidate_all();
+    product_detail_cache().invalidate_all();
+}
+
+pub fn invalidate_posts_cache() {
+    posts_cache().invalidate_all();
+    post_detail_cache().invalidate_all();
+}
+
+pub fn invalidate_profiles_cache() {
+    profiles_cache().invalidate_all();
+    profile_detail_cache().invalidate_all();
 }
 
 pub fn invalidate_categories_cache() {
