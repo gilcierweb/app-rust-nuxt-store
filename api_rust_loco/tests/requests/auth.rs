@@ -5,6 +5,7 @@ use rstest::rstest;
 use serial_test::serial;
 
 use super::prepare_data;
+use super::with_api_key;
 
 // TODO: see how to dedup / extract this to app-local test utils
 // not to framework, because that would require a runtime dep on insta
@@ -23,6 +24,7 @@ async fn can_register() {
     configure_insta!();
 
     request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -63,7 +65,8 @@ async fn can_register() {
 #[tokio::test]
 #[serial]
 async fn rejects_unsafe_requests_without_csrf() {
-    request::<App, _, _>(|request, _ctx| async move {
+    request::<App, _, _>(|mut request, _ctx| async move {
+        with_api_key(&mut request);
         let payload = serde_json::json!({
             "name": "loco",
             "email": "csrf-missing@loco.com",
@@ -86,6 +89,7 @@ async fn can_login_with_verify(#[case] test_name: &str, #[case] password: &str) 
     configure_insta!();
 
     request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -152,6 +156,7 @@ async fn can_login_without_verify() {
     configure_insta!();
 
     request::<App, _, _>(|mut request, _ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -206,6 +211,7 @@ async fn can_reset_password() {
     configure_insta!();
 
     request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -288,6 +294,7 @@ async fn can_get_current_user() {
     configure_insta!();
 
     request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -316,6 +323,7 @@ async fn can_get_current_user() {
 async fn can_auth_with_magic_link() {
     configure_insta!();
     request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -376,6 +384,7 @@ async fn can_auth_with_magic_link() {
 async fn can_reject_invalid_email() {
     configure_insta!();
     request::<App, _, _>(|mut request, _ctx| async move {
+        with_api_key(&mut request);
         let csrf = prepare_data::init_csrf(&request).await;
         let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
         request.add_header(csrf_key, csrf_value);
@@ -398,7 +407,8 @@ async fn can_reject_invalid_email() {
 #[serial]
 async fn can_reject_invalid_magic_link_token() {
     configure_insta!();
-    request::<App, _, _>(|request, ctx| async move {
+    request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
         seed::<App>(&ctx).await.unwrap();
 
         let magic_link_response = request.get("/api/auth/magic-link/invalid-token").await;

@@ -108,6 +108,13 @@ app-rust-nuxt-store/
 ```shell
 cd api_rust_loco/
 
+DATABASE_URL="change-me"
+CORS_ALLOWED_ORIGIN="change-me"
+# Required for direct backend access protection (Nuxt proxy will send it)
+# openssl rand -base64 32
+export API_PROTECTION_API_KEY="change-me"
+AUTH_JWT_SECRET="change-me"
+
 # Create database and run migrations
 cargo loco db create
 cargo loco db migrate
@@ -124,6 +131,10 @@ cargo loco start
 
 ```shell
 cd app-nuxt/
+NUXT_API_RUST_BASE_URL="change-me"
+# openssl rand -base64 32
+NUXT_API_RUST_API_KEY="change-me"
+NUXT_CSRF_ENCRYPT_SECRET="change-me"
 
 pnpm install
 pnpm dev --open
@@ -349,7 +360,9 @@ All routes are prefixed with `/api/` and return JSON. Full Swagger documentation
 * [ ] API rate limiting (per IP + per user)
 * [x] CSRF protection
 * [x] Cookies HttpOnly
-* [ ] API protection API key,  JWT, OAuth 2.0, error 401, 403, 422
+* [x] API protection API key, error 401, 403, 422
+* [x] JWT
+* [ ] OAuth 2.0
 * [ ] Two-factor authentication (2FA/TOTP)
 * [ ] CI/CD pipeline (GitHub Actions)
 * [ ] Error monitoring (Sentry integration)

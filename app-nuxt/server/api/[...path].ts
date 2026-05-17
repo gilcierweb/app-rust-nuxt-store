@@ -3,6 +3,7 @@ import { resolveBackendBaseUrl } from '../utils/backend-url'
 const BACKEND_CSRF_HEADER = 'x-backend-csrf-token'
 const BACKEND_CSRF_ENDPOINT = '/api/auth/csrf'
 const BACKEND_CSRF_COOKIE = 'backend_csrf'
+const BACKEND_API_KEY_HEADER = 'x-api-key'
 const SKIPPED_RESPONSE_HEADERS = new Set([
   'content-length',
   'content-encoding',
@@ -63,10 +64,19 @@ function mergeCookieHeader(existingCookieHeader: string | null | undefined, setC
     .join('; ')
 }
 
-async function ensureBackendCsrfToken(event: any, backendUrl: string, incomingCookieHeader?: string) {
+async function ensureBackendCsrfToken(
+  event: any,
+  backendUrl: string,
+  incomingCookieHeader?: string,
+  apiKey?: string
+) {
   const response = await $fetch.raw<{ token?: string }>(`${backendUrl}${BACKEND_CSRF_ENDPOINT}`, {
     method: 'GET',
-    headers: incomingCookieHeader ? { cookie: incomingCookieHeader, accept: 'application/json' } : { accept: 'application/json' }
+    headers: {
+      ...(incomingCookieHeader ? { cookie: incomingCookieHeader } : {}),
+      ...(apiKey ? { [BACKEND_API_KEY_HEADER]: apiKey } : {}),
+      accept: 'application/json'
+    }
   })
 
   const token = response._data?.token
@@ -123,6 +133,7 @@ function backendErrorPayload(error: any, phase: string, statusText?: string) {
 }
 
 export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event)
   const backend = resolveBackendBaseUrl(event)
 
   if (!backend.ok) {
@@ -160,9 +171,19 @@ export default defineEventHandler(async (event) => {
   const body = ['GET', 'HEAD'].includes(method) ? undefined : await readRawBody(event, false)
 
   try {
+    const apiKey = (config.apiRustApiKey || '').trim()
+    if (apiKey) {
+      headers.set(BACKEND_API_KEY_HEADER, apiKey)
+    }
+
     if (isProtectedMethod(method) && requestUrl.pathname !== BACKEND_CSRF_ENDPOINT) {
       phase = 'backend-csrf-bootstrap'
-      const { token, cookieHeader } = await ensureBackendCsrfToken(event, backendUrl, headers.get('cookie') || undefined)
+      const { token, cookieHeader } = await ensureBackendCsrfToken(
+        event,
+        backendUrl,
+        headers.get('cookie') || undefined,
+        apiKey || undefined
+      )
       headers.set(BACKEND_CSRF_HEADER, token)
       if (cookieHeader) {
         headers.set('cookie', cookieHeader)

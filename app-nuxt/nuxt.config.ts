@@ -53,6 +53,7 @@ export default defineNuxtConfig({
       process.env.API_RUST_BASE_URL ||
       process.env.NUXT_PUBLIC_API_RUST_BASE_URL ||
       'http://localhost:5150',
+    apiRustApiKey: process.env.NUXT_API_RUST_API_KEY || process.env.API_PROTECTION_API_KEY || '',
     public: {
       ApiBaseUrl: '',
       baseURL: '' // Deixar vazio para forçar requisições relativas no front-end
