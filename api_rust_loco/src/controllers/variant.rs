@@ -10,18 +10,14 @@ use axum::extract::Query;
 use loco_rs::prelude::*;
 use moka::sync::Cache;
 use rust_decimal::Decimal;
-use sea_orm::{ColumnTrait, PaginatorTrait, QueryFilter, QueryOrder};
+use sea_orm::{ColumnTrait, FromQueryResult, QueryFilter, Statement};
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::product_variant_options::{
     Column as PivotColumn, Entity as PivotEntity,
 };
-use crate::models::_entities::product_variants::{
-    ActiveModel, Column as VariantColumn, Entity, Model,
-};
-use crate::models::_entities::variant_options::{
-    Column as OptionColumn, Entity as OptionTypeEntity,
-};
+use crate::models::_entities::product_variants::{ActiveModel, Entity, Model};
+use crate::models::_entities::variant_options::Entity as OptionTypeEntity;
 use crate::utils::pagination::PaginationParams;
 
 static VARIANTS_CACHE: OnceLock<Cache<String, Arc<Vec<VariantWithOptions>>>> = OnceLock::new();
@@ -37,6 +33,123 @@ fn variants_cache() -> &'static Cache<String, Arc<Vec<VariantWithOptions>>> {
 
 fn invalidate_variants_cache() {
     variants_cache().invalidate_all();
+}
+
+#[derive(Debug, FromQueryResult)]
+struct VariantJoinedRow {
+    id: i32,
+    name: Option<String>,
+    sku: Option<String>,
+    price: Option<Decimal>,
+    cost_price: Option<Decimal>,
+    compare_price: Option<Decimal>,
+    inventory_quantity: Option<i32>,
+    weight: Option<Decimal>,
+    barcode: Option<String>,
+    position: Option<i32>,
+    active: Option<bool>,
+    product_id: i32,
+    option_id: Option<i32>,
+    option_name: Option<String>,
+    option_value: Option<String>,
+}
+
+fn variant_from_row(row: &VariantJoinedRow) -> VariantWithOptions {
+    VariantWithOptions {
+        id: row.id,
+        name: row.name.clone(),
+        sku: row.sku.clone(),
+        price: row.price,
+        cost_price: row.cost_price,
+        compare_price: row.compare_price,
+        inventory_quantity: row.inventory_quantity,
+        weight: row.weight,
+        barcode: row.barcode.clone(),
+        position: row.position,
+        active: row.active,
+        product_id: row.product_id,
+        options: Vec::new(),
+    }
+}
+
+fn variants_from_rows(rows: Vec<VariantJoinedRow>) -> Vec<VariantWithOptions> {
+    let mut variants = Vec::new();
+    let mut positions = HashMap::new();
+
+    for row in rows {
+        let index = *positions.entry(row.id).or_insert_with(|| {
+            variants.push(variant_from_row(&row));
+            variants.len() - 1
+        });
+
+        if let Some(option_id) = row.option_id {
+            variants[index].options.push(VariantOptionJson {
+                id: option_id,
+                option_name: row.option_name,
+                value: row.option_value,
+            });
+        }
+    }
+
+    variants
+}
+
+fn variants_select_sql(from_clause: &str) -> String {
+    format!(
+        r#"
+        SELECT
+            pv.id,
+            pv.name,
+            pv.sku,
+            pv.price,
+            pv.cost_price,
+            pv.compare_price,
+            pv.inventory_quantity,
+            pv.weight,
+            pv.barcode,
+            pv.position,
+            pv.active,
+            pv.product_id,
+            pvo.id AS option_id,
+            vo.name AS option_name,
+            pvo.value AS option_value
+        FROM {from_clause} pv
+        LEFT JOIN product_variant_options pvo ON pvo.product_variant_id = pv.id
+        LEFT JOIN variant_options vo ON vo.id = pvo.variant_option_id
+        ORDER BY pv.position ASC, pv.id ASC, pvo.id ASC
+        "#
+    )
+}
+
+fn variants_index_select_sql() -> String {
+    variants_select_sql(
+        r#"
+        (
+            SELECT *
+            FROM product_variants
+            ORDER BY position ASC, id ASC
+            LIMIT $1 OFFSET $2
+        )
+        "#,
+    )
+}
+
+fn variants_by_product_select_sql() -> String {
+    variants_select_sql(
+        r#"
+        (
+            SELECT *
+            FROM product_variants
+            WHERE product_id = $1
+            ORDER BY position ASC, id ASC
+            LIMIT $2 OFFSET $3
+        )
+        "#,
+    )
+}
+
+fn variants_all_select_sql() -> String {
+    variants_index_select_sql()
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -126,77 +239,6 @@ async fn load_variant_options(ctx: &AppContext, variant_id: i32) -> Result<Vec<V
     Ok(result)
 }
 
-async fn load_options_by_variant(
-    ctx: &AppContext,
-    variant_ids: &[i32],
-) -> Result<HashMap<i32, Vec<VariantOptionJson>>> {
-    if variant_ids.is_empty() {
-        return Ok(HashMap::new());
-    }
-
-    let pivots = PivotEntity::find()
-        .filter(PivotColumn::ProductVariantId.is_in(variant_ids.to_vec()))
-        .all(&ctx.db)
-        .await?;
-
-    if pivots.is_empty() {
-        return Ok(HashMap::new());
-    }
-
-    let option_ids: Vec<i32> = pivots.iter().map(|p| p.variant_option_id).collect();
-    let options = OptionTypeEntity::find()
-        .filter(OptionColumn::Id.is_in(option_ids))
-        .all(&ctx.db)
-        .await?;
-
-    let option_names: HashMap<i32, Option<String>> =
-        options.into_iter().map(|o| (o.id, o.name)).collect();
-    let mut by_variant: HashMap<i32, Vec<VariantOptionJson>> = HashMap::new();
-
-    for pivot in pivots {
-        by_variant
-            .entry(pivot.product_variant_id)
-            .or_default()
-            .push(VariantOptionJson {
-                id: pivot.id,
-                option_name: option_names
-                    .get(&pivot.variant_option_id)
-                    .cloned()
-                    .flatten(),
-                value: pivot.value,
-            });
-    }
-
-    Ok(by_variant)
-}
-
-async fn variants_with_options(
-    ctx: &AppContext,
-    variants: Vec<Model>,
-) -> Result<Vec<VariantWithOptions>> {
-    let variant_ids: Vec<i32> = variants.iter().map(|v| v.id).collect();
-    let mut options_by_variant = load_options_by_variant(ctx, &variant_ids).await?;
-
-    Ok(variants
-        .into_iter()
-        .map(|v| VariantWithOptions {
-            id: v.id,
-            name: v.name,
-            sku: v.sku,
-            price: v.price,
-            cost_price: v.cost_price,
-            compare_price: v.compare_price,
-            inventory_quantity: v.inventory_quantity,
-            weight: v.weight,
-            barcode: v.barcode,
-            position: v.position,
-            active: v.active,
-            product_id: v.product_id,
-            options: options_by_variant.remove(&v.id).unwrap_or_default(),
-        })
-        .collect())
-}
-
 #[debug_handler]
 pub async fn index(State(ctx): State<AppContext>) -> Result<Response> {
     let default_pagination = PaginationParams::default();
@@ -209,13 +251,18 @@ pub async fn index(State(ctx): State<AppContext>) -> Result<Response> {
         return format::json(value);
     }
 
-    let variants: Vec<Model> = Entity::find()
-        .order_by_asc(VariantColumn::Position)
-        .paginate(&ctx.db, default_pagination.page_size())
-        .fetch_page(default_pagination.page_index())
-        .await?;
+    let rows = VariantJoinedRow::find_by_statement(Statement::from_sql_and_values(
+        ctx.db.get_database_backend(),
+        &variants_index_select_sql(),
+        [
+            (default_pagination.page_size() as i64).into(),
+            default_pagination.offset().into(),
+        ],
+    ))
+    .all(&ctx.db)
+    .await?;
 
-    let variants = Arc::new(variants_with_options(&ctx, variants).await?);
+    let variants = Arc::new(variants_from_rows(rows));
     variants_cache().insert(cache_key, Arc::clone(&variants));
     format::json(variants)
 }
@@ -235,16 +282,32 @@ pub async fn list(
         return format::json(value);
     }
 
-    let mut query = Entity::find().order_by_asc(VariantColumn::Position);
-    if let Some(pid) = params.product_id {
-        query = query.filter(VariantColumn::ProductId.eq(pid));
-    }
-    let variants: Vec<Model> = query
-        .paginate(&ctx.db, params.pagination.page_size())
-        .fetch_page(params.pagination.page_index())
-        .await?;
+    let rows = if let Some(pid) = params.product_id {
+        VariantJoinedRow::find_by_statement(Statement::from_sql_and_values(
+            ctx.db.get_database_backend(),
+            &variants_by_product_select_sql(),
+            [
+                pid.into(),
+                (params.pagination.page_size() as i64).into(),
+                params.pagination.offset().into(),
+            ],
+        ))
+        .all(&ctx.db)
+        .await?
+    } else {
+        VariantJoinedRow::find_by_statement(Statement::from_sql_and_values(
+            ctx.db.get_database_backend(),
+            &variants_all_select_sql(),
+            [
+                (params.pagination.page_size() as i64).into(),
+                params.pagination.offset().into(),
+            ],
+        ))
+        .all(&ctx.db)
+        .await?
+    };
 
-    let variants = Arc::new(variants_with_options(&ctx, variants).await?);
+    let variants = Arc::new(variants_from_rows(rows));
     variants_cache().insert(cache_key, Arc::clone(&variants));
     format::json(variants)
 }

@@ -8,7 +8,7 @@ use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
-use sea_orm::{Condition, PaginatorTrait, QueryOrder};
+use sea_orm::{FromQueryResult, Statement};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -18,14 +18,156 @@ use uuid::Uuid;
 use crate::cache::{
     invalidate_dashboard_cache, invalidate_products_cache, product_detail_cache, products_cache,
 };
-use crate::models::_entities::categories::Entity as Categories;
-use crate::models::_entities::product_images::{
-    ActiveModel as ProductImageActiveModel, Entity as ProductImageEntity,
-};
+use crate::models::_entities::product_images::ActiveModel as ProductImageActiveModel;
 use crate::models::_entities::products::{ActiveModel, Entity, Model};
-use crate::models::products::{ProductWithCategory, Products};
+use crate::models::products::{CategoryJson, ProductImageJson, ProductWithCategory};
 use crate::utils::pagination::PaginationParams;
 use crate::utils::slug::parameterize;
+
+#[derive(Debug, FromQueryResult)]
+struct ProductJoinedRow {
+    id: i32,
+    name: Option<String>,
+    slug: Option<String>,
+    sku: Option<String>,
+    short_description: Option<String>,
+    description: Option<String>,
+    price: Option<Decimal>,
+    cost_price: Option<Decimal>,
+    compare_price: Option<Decimal>,
+    featured: Option<bool>,
+    active: Option<bool>,
+    status: Option<i32>,
+    category_id: Option<i32>,
+    category_name: Option<String>,
+    category_slug: Option<String>,
+    image_id: Option<i32>,
+    image: Option<String>,
+    alt_text: Option<String>,
+    image_active: Option<bool>,
+    cover: Option<bool>,
+    position: Option<i32>,
+    image_product_id: Option<i32>,
+}
+
+fn product_from_row(row: &ProductJoinedRow) -> ProductWithCategory {
+    ProductWithCategory {
+        id: row.id,
+        name: row.name.clone(),
+        slug: row.slug.clone(),
+        sku: row.sku.clone(),
+        short_description: row.short_description.clone(),
+        description: row.description.clone(),
+        price: row.price,
+        cost_price: row.cost_price,
+        compare_price: row.compare_price,
+        featured: row.featured,
+        active: row.active,
+        status: row.status,
+        category: row.category_id.map(|id| CategoryJson {
+            id,
+            name: row.category_name.clone(),
+            slug: row.category_slug.clone(),
+        }),
+        images: Some(Vec::new()),
+    }
+}
+
+fn image_from_row(row: &ProductJoinedRow) -> Option<ProductImageJson> {
+    Some(ProductImageJson {
+        id: row.image_id?,
+        image: row.image.clone(),
+        alt_text: row.alt_text.clone(),
+        active: row.image_active,
+        cover: row.cover,
+        position: row.position,
+        product_id: row.image_product_id.unwrap_or(row.id),
+    })
+}
+
+fn products_from_rows(rows: Vec<ProductJoinedRow>) -> Vec<ProductWithCategory> {
+    let mut products = Vec::new();
+    let mut positions = HashMap::new();
+
+    for row in rows {
+        let index = *positions.entry(row.id).or_insert_with(|| {
+            products.push(product_from_row(&row));
+            products.len() - 1
+        });
+
+        if let Some(image) = image_from_row(&row) {
+            products[index]
+                .images
+                .get_or_insert_with(Vec::new)
+                .push(image);
+        }
+    }
+
+    products
+}
+
+fn product_select_sql(from_clause: &str, image_join_filter: &str) -> String {
+    format!(
+        r#"
+        SELECT
+            p.id,
+            p.name,
+            p.slug,
+            p.sku,
+            p.short_description,
+            p.description,
+            p.price,
+            p.cost_price,
+            p.compare_price,
+            p.featured,
+            p.active,
+            p.status,
+            c.id AS category_id,
+            c.name AS category_name,
+            c.slug AS category_slug,
+            pi.id AS image_id,
+            pi.image,
+            pi.alt_text,
+            pi.active AS image_active,
+            pi.cover,
+            pi.position,
+            pi.product_id AS image_product_id
+        FROM {from_clause} p
+        LEFT JOIN categories c ON c.id = p.category_id
+        LEFT JOIN product_images pi
+            ON pi.product_id = p.id
+            {image_join_filter}
+        ORDER BY p.id ASC, pi.position ASC, pi.id ASC
+        "#
+    )
+}
+
+fn product_list_select_sql() -> String {
+    product_select_sql(
+        r#"
+        (
+            SELECT *
+            FROM products
+            ORDER BY id ASC
+            LIMIT $1 OFFSET $2
+        )
+        "#,
+        "AND (pi.cover = TRUE OR pi.position = 0)",
+    )
+}
+
+fn product_detail_select_sql() -> String {
+    product_select_sql(
+        r#"
+        (
+            SELECT *
+            FROM products
+            WHERE id = $1
+        )
+        "#,
+        "",
+    )
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -121,55 +263,18 @@ pub async fn get_products_with_categories(
         return format::json(value);
     }
 
-    let products = Products::find()
-        .find_also_related(Categories)
-        .paginate(&ctx.db, pagination.page_size())
-        .fetch_page(pagination.page_index())
-        .await?;
+    let rows = ProductJoinedRow::find_by_statement(Statement::from_sql_and_values(
+        ctx.db.get_database_backend(),
+        &product_list_select_sql(),
+        [
+            (pagination.page_size() as i64).into(),
+            pagination.offset().into(),
+        ],
+    ))
+    .all(&ctx.db)
+    .await?;
 
-    let mut data: Vec<ProductWithCategory> = products.into_iter().map(Into::into).collect();
-
-    if data.is_empty() {
-        return format::json(data);
-    }
-
-    // Optimization: Fetch all images for all products in a single query (Fix N+1)
-    let product_ids: Vec<i32> = data.iter().map(|p| p.id).collect();
-    let all_images = ProductImageEntity::find()
-        .filter(crate::models::_entities::product_images::Column::ProductId.is_in(product_ids))
-        .filter(
-            Condition::any()
-                .add(crate::models::_entities::product_images::Column::Cover.eq(Some(true)))
-                .add(crate::models::_entities::product_images::Column::Position.eq(Some(0))),
-        )
-        .order_by_asc(crate::models::_entities::product_images::Column::Position)
-        .all(&ctx.db)
-        .await?;
-
-    let mut images_by_product: HashMap<i32, Vec<crate::models::products::ProductImageJson>> =
-        HashMap::new();
-    for img in all_images {
-        images_by_product.entry(img.product_id).or_default().push(
-            crate::models::products::ProductImageJson {
-                id: img.id,
-                image: img.image,
-                alt_text: img.alt_text,
-                active: img.active,
-                cover: img.cover,
-                position: img.position,
-                product_id: img.product_id,
-            },
-        );
-    }
-
-    for product_with_category in &mut data {
-        product_with_category.images = Some(
-            images_by_product
-                .remove(&product_with_category.id)
-                .unwrap_or_default(),
-        );
-    }
-
+    let data = products_from_rows(rows);
     let data = Arc::new(data);
     products_cache().insert(cache_key, Arc::clone(&data));
     format::json(data)
@@ -340,46 +445,21 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
         return format::json(value);
     }
 
-    let result = Products::find_by_id(id)
-        .find_also_related(Categories)
-        .one(&ctx.db)
-        .await?;
+    let rows = ProductJoinedRow::find_by_statement(Statement::from_sql_and_values(
+        ctx.db.get_database_backend(),
+        &product_detail_select_sql(),
+        [id.into()],
+    ))
+    .all(&ctx.db)
+    .await?;
 
-    match result {
-        Some((product, category)) => {
-            let mut product_with_category = ProductWithCategory::from((product, category));
+    let Some(product_with_category) = products_from_rows(rows).into_iter().next() else {
+        return Err(Error::NotFound);
+    };
 
-            // Load images for the product
-            let images = ProductImageEntity::find()
-                .filter(
-                    crate::models::_entities::product_images::Column::ProductId
-                        .eq(product_with_category.id),
-                )
-                .order_by_asc(crate::models::_entities::product_images::Column::Position)
-                .all(&ctx.db)
-                .await?;
-
-            product_with_category.images = Some(
-                images
-                    .into_iter()
-                    .map(|img| crate::models::products::ProductImageJson {
-                        id: img.id,
-                        image: img.image,
-                        alt_text: img.alt_text,
-                        active: img.active,
-                        cover: img.cover,
-                        position: img.position,
-                        product_id: img.product_id,
-                    })
-                    .collect(),
-            );
-
-            let product_with_category = Arc::new(product_with_category);
-            product_detail_cache().insert(cache_key, Arc::clone(&product_with_category));
-            format::json(product_with_category)
-        }
-        None => Err(Error::NotFound),
-    }
+    let product_with_category = Arc::new(product_with_category);
+    product_detail_cache().insert(cache_key, Arc::clone(&product_with_category));
+    format::json(product_with_category)
 }
 
 pub fn routes() -> Routes {
