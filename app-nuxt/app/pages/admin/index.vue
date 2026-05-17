@@ -138,8 +138,8 @@
                 :show-tooltip="true"
                 :radius="4"
               />
-              <div v-else class="absolute inset-0 flex items-center justify-center bg-base-100/50">
-                <span class="loading loading-spinner text-primary"></span>
+              <div v-else class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+                {{ t('admin.dashboard.charts.noData', 'Nenhum dado disponível') }}
               </div>
             </ClientOnly>
           </div>
@@ -218,7 +218,31 @@ const kpiStats = computed(() => {
 })
 
 // Charts Data
-const salesData = computed(() => statsData.value?.salesData || [])
+const salesData = computed(() => {
+  const rawData = statsData.value?.salesData || []
+  const list = []
+  
+  // Generate the last 7 days to ensure a complete timeline
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const day = String(d.getDate()).padStart(2, '0')
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const dateStr = `${day}/${month}`
+    
+    const realPoint = rawData.find(p => p.date === dateStr)
+    if (realPoint) {
+      list.push(realPoint)
+    } else {
+      list.push({
+        date: dateStr,
+        sales: 0,
+        orders: 0
+      })
+    }
+  }
+  return list
+})
 
 const salesCategories = computed(() => ({
   sales: { name: t('admin.dashboard.kpis.monthlyRevenue'), color: '#FF6F00' },
