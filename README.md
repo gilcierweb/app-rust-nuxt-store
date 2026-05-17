@@ -140,6 +140,7 @@ cd app-nuxt/
 NUXT_API_RUST_BASE_URL="change-me"
 # openssl rand -base64 32 or openssl rand -hex 32
 NUXT_API_RUST_API_KEY="change-me"
+# to generate only 32 chars openssl rand -base64 24 | cut -c1-32, openssl rand -hex 16, openssl rand -base64 22, openssl rand -base64 24 | head -c 32
 NUXT_CSRF_ENCRYPT_SECRET="change-me"
 
 pnpm install

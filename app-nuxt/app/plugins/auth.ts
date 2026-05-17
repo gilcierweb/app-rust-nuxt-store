@@ -1,5 +1,5 @@
 export default defineNuxtPlugin(async () => {
-  if (import.meta.client) return
+  if (import.meta.server) return
   const auth = useAuth()
   await auth.init()
 })

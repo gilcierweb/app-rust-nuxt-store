@@ -1,6 +1,10 @@
 import tailwindcss from "@tailwindcss/vite";
 
-const csrfEncryptSecret = process.env.NUXT_CSRF_ENCRYPT_SECRET || process.env.NUXT_CSURF_ENCRYPT_SECRET
+let csrfEncryptSecret = process.env.NUXT_CSRF_ENCRYPT_SECRET || process.env.NUXT_CSURF_ENCRYPT_SECRET
+if (csrfEncryptSecret) {
+  // Ensure the key is exactly 32 bytes (32 characters UTF-8) for AES-256-CBC key length
+  csrfEncryptSecret = csrfEncryptSecret.slice(0, 32).padEnd(32, '0')
+}
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -208,6 +212,7 @@ export default defineNuxtConfig({
   // Nitro build optimization
   nitro: {
     preset: 'cloudflare_pages',
+    plugins: ['utils/i18n-context-fallback-plugin.ts'],
     compressPublicAssets: true,
     minify: true,
     routeRules: {
