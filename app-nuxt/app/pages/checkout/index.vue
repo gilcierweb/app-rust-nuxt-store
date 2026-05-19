@@ -133,9 +133,11 @@
               </label>
             </div>
             <div v-if="selectedGatewayDriver === 'braintree'" class="mt-4">
-              <label class="label-text" for="braintreePaymentMethodId">Payment method ID</label>
-              <input id="braintreePaymentMethodId" v-model="braintreePaymentMethodId" type="text"
-                class="input input-bordered w-full mt-1" autocomplete="off" />
+              <div id="braintree-dropin" class="rounded-box border border-base-200 bg-base-100 p-4" />
+              <div v-if="braintreeLoading" class="mt-3 flex items-center gap-2 text-sm text-base-content/60">
+                <span class="loading loading-spinner loading-xs" />
+                <span>{{ t('pages.checkout.loadingPayment') }}</span>
+              </div>
             </div>
             <div v-else-if="selectedGatewayDriver === 'getnet'" class="mt-4">
               <label class="label-text" for="getnetGatewayPayload">Getnet JSON</label>
@@ -274,11 +276,16 @@ const config = useRuntimeConfig()
 const cartStore = useCartStore()
 const router = useRouter()
 const { apiFetch } = useApi()
-import type { PaymentMethod, ShippingMethod } from '~/types'
+import type { PaymentMethod, PaymentSetupSession, ShippingMethod } from '~/types'
 
 declare global {
   interface Window {
     Stripe?: (publishableKey: string) => any
+    braintree?: {
+      dropin: {
+        create: (options: Record<string, unknown>, callback: (error: Error | null, instance?: any) => void) => void
+      }
+    }
   }
 }
 
@@ -292,7 +299,10 @@ const pendingStripeOrderId = ref<number | null>(null)
 const stripeClientSecret = ref('')
 let stripeClient: any = null
 let stripeElements: any = null
+const braintreeLoading = ref(false)
+const braintreeReady = ref(false)
 const braintreePaymentMethodId = ref('')
+let braintreeDropin: any = null
 const getnetGatewayPayload = ref('')
 const couponCode = ref('')
 const couponDiscount = ref<number | null>(null)
@@ -346,6 +356,15 @@ const selectedPaymentMethodRecord = computed(() => {
 
 const selectedGatewayDriver = computed(() => selectedPaymentMethodRecord.value?.gateway_driver || null)
 
+watch(selectedGatewayDriver, async (driver) => {
+  if (driver === 'braintree') {
+    await mountBraintreeDropin()
+    return
+  }
+
+  teardownBraintreeDropin()
+})
+
 function paymentMethodIcon(method: PaymentMethod) {
   const code = method.code?.toLowerCase() || ''
   if (code.includes('card')) return 'icon-[tabler--credit-card]'
@@ -355,7 +374,7 @@ function paymentMethodIcon(method: PaymentMethod) {
 
 const canPlaceOrder = computed(() => {
   if (!selectedPaymentMethod.value) return false
-  if (selectedGatewayDriver.value === 'braintree') return braintreePaymentMethodId.value.trim().length > 0
+  if (selectedGatewayDriver.value === 'braintree') return braintreeReady.value
   if (selectedGatewayDriver.value === 'getnet') return getnetGatewayPayload.value.trim().length > 0
   return true
 })
@@ -420,6 +439,7 @@ async function placeOrder() {
     let paymentGatewayPayload: Record<string, unknown> | null = null
 
     if (selectedGatewayDriver.value === 'braintree') {
+      braintreePaymentMethodId.value = await requestBraintreePaymentMethodId()
       paymentGatewayPayload = {
         payment_method_id: braintreePaymentMethodId.value.trim(),
       }
@@ -527,6 +547,85 @@ async function loadStripeClient() {
     throw new Error('Stripe.js failed to load')
   }
   return window.Stripe(config.public.stripePublishableKey as string)
+}
+
+async function mountBraintreeDropin() {
+  if (!selectedPaymentMethod.value || braintreeDropin || braintreeLoading.value) return
+  braintreeLoading.value = true
+  braintreeReady.value = false
+  error.value = ''
+
+  try {
+    const setupSession = await apiFetch<PaymentSetupSession>('/api/account/payment-setup-sessions', {
+      method: 'POST',
+      body: {
+        payment_method_id: selectedPaymentMethod.value,
+      },
+    })
+    if (!setupSession.external_client_secret) {
+      throw new Error('Braintree setup session did not return a client token')
+    }
+
+    await loadBraintreeDropinClient()
+    await nextTick()
+    braintreeDropin = await createBraintreeDropin(setupSession.external_client_secret)
+    braintreeReady.value = true
+  } catch (err: any) {
+    error.value = err?.data?.message || err?.message || t('pages.products.edit.error', { message: '' })
+  } finally {
+    braintreeLoading.value = false
+  }
+}
+
+async function requestBraintreePaymentMethodId() {
+  if (!braintreeDropin) {
+    throw new Error('Braintree checkout is not ready')
+  }
+
+  const payload = await braintreeDropin.requestPaymentMethod()
+  const nonce = payload?.nonce
+  if (!nonce) {
+    throw new Error('Braintree did not return a payment method nonce')
+  }
+  return nonce
+}
+
+function createBraintreeDropin(authorization: string) {
+  return new Promise<any>((resolve, reject) => {
+    window.braintree?.dropin.create(
+      {
+        authorization,
+        container: '#braintree-dropin',
+      },
+      (error, instance) => {
+        if (error) {
+          reject(error)
+          return
+        }
+        resolve(instance)
+      }
+    )
+  })
+}
+
+async function loadBraintreeDropinClient() {
+  if (!window.braintree?.dropin) {
+    await loadScript('braintree-dropin-js', 'https://js.braintreegateway.com/web/dropin/1.44.1/js/dropin.min.js')
+  }
+  if (!window.braintree?.dropin) {
+    throw new Error('Braintree Drop-in failed to load')
+  }
+}
+
+function teardownBraintreeDropin() {
+  braintreeReady.value = false
+  braintreePaymentMethodId.value = ''
+  const instance = braintreeDropin
+  braintreeDropin = null
+
+  if (instance?.teardown) {
+    instance.teardown(() => undefined)
+  }
 }
 
 function loadScript(id: string, src: string) {

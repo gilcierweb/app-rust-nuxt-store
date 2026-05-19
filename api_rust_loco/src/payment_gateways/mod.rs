@@ -17,7 +17,10 @@ pub mod webhooks;
 
 pub use drivers::*;
 pub use registry::gateway_for_driver;
-pub use service::{create_payment_attempt, CreatePaymentAttemptInput};
+pub use service::{
+    create_payment_attempt, create_payment_setup_session, CreatePaymentAttemptInput,
+    CreatePaymentSetupSessionInput,
+};
 pub use session_response::{latest_payment_session_json, order_payment_status};
 pub use types::*;
 pub use webhooks::{receive_webhook, ReceiveWebhookInput, ReceiveWebhookOutput};

@@ -235,6 +235,17 @@ export interface PaymentSession {
   requires_action?: boolean
 }
 
+export interface PaymentSetupSession {
+  id: number
+  user_id: number
+  payment_method_id: number
+  status: number
+  external_setup_id?: string
+  external_client_secret?: string
+  action_url?: string
+  requires_action?: boolean
+}
+
 export interface Payment {
   id: number
   order_id: number

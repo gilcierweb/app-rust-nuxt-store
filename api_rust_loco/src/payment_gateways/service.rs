@@ -8,13 +8,14 @@ use uuid::Uuid;
 use crate::models::_entities::payment_gateways;
 use crate::models::_entities::payment_methods;
 use crate::models::_entities::payment_sessions;
+use crate::models::_entities::payment_setup_sessions;
 use crate::models::_entities::payments;
 use crate::models::payment_gateway_status::{
     PaymentAttemptStatus, PaymentIntent, PaymentSessionStatus,
 };
 use crate::payment_gateways::drivers::MANUAL_DRIVER;
 use crate::payment_gateways::registry::gateway_for_driver;
-use crate::payment_gateways::types::CreatePaymentSessionInput;
+use crate::payment_gateways::types::{CreatePaymentSessionInput, CreateSetupSessionInput};
 
 pub struct CreatePaymentAttemptInput {
     pub order_id: i32,
@@ -22,6 +23,11 @@ pub struct CreatePaymentAttemptInput {
     pub amount: Decimal,
     pub currency: String,
     pub gateway_payload: Option<Value>,
+}
+
+pub struct CreatePaymentSetupSessionInput {
+    pub user_id: i32,
+    pub payment_method: payment_methods::Model,
 }
 
 pub async fn create_payment_attempt<C>(
@@ -118,6 +124,47 @@ where
     payment_update.updated_at = Set(now.into());
 
     payment_update.update(db).await.map_err(Into::into)
+}
+
+pub async fn create_payment_setup_session<C>(
+    db: &C,
+    input: CreatePaymentSetupSessionInput,
+) -> Result<payment_setup_sessions::Model>
+where
+    C: ConnectionTrait,
+{
+    let now = chrono::Utc::now();
+    let idempotency_key = format!("setup-{}", Uuid::new_v4());
+    let driver = driver_for_payment_method(db, &input.payment_method).await?;
+    let gateway = gateway_for_driver(&driver)?;
+    let output = gateway
+        .create_setup_session(CreateSetupSessionInput {
+            user_id: input.user_id,
+            payment_method_id: input.payment_method.id,
+            idempotency_key,
+        })
+        .await?;
+
+    payment_setup_sessions::ActiveModel {
+        user_id: Set(input.user_id),
+        payment_method_id: Set(input.payment_method.id),
+        payment_source_id: Set(None),
+        status: Set(output.status.to_i16()),
+        external_setup_id: Set(output.external_setup_id),
+        external_client_secret: Set(output.external_client_secret),
+        expires_at: Set(None),
+        completed_at: Set(if output.status == PaymentSessionStatus::Completed {
+            Some(now.naive_utc())
+        } else {
+            None
+        }),
+        created_at: Set(now.into()),
+        updated_at: Set(now.into()),
+        ..Default::default()
+    }
+    .insert(db)
+    .await
+    .map_err(Into::into)
 }
 
 async fn driver_for_payment_method<C>(
