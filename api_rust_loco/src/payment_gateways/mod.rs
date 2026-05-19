@@ -1,7 +1,9 @@
 pub mod abacatepay;
 pub mod drivers;
+pub mod iugu;
 pub mod manual;
 pub mod mercado_pago;
+pub mod pagarme;
 pub mod paypal;
 pub mod registry;
 pub mod service;
