@@ -25,3 +25,5 @@ mod wishlists;
 mod banner_events;
 mod banner_positions;
 mod banners;
+
+mod payment_gateways;

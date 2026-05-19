@@ -35,7 +35,18 @@ mod m20260517_073137_banners;
 mod m20260517_073909_banner_events;
 mod m20260517_203700_add_catalog_lookup_indexes;
 mod m20260517_211000_add_controller_query_indexes;
-mod m20260519_000001_payment_gateway_domain;
+mod m20260519_064033_payment_gateways;
+mod m20260519_064100_expand_payment_methods_for_gateways;
+mod m20260519_064101_payment_method_countries;
+mod m20260519_064102_payment_method_currencies;
+mod m20260519_064103_gateway_customers;
+mod m20260519_064104_payment_sources;
+mod m20260519_064105_expand_payments_for_gateways;
+mod m20260519_064106_payment_sessions;
+mod m20260519_064107_payment_setup_sessions;
+mod m20260519_064108_payment_refunds;
+mod m20260519_064109_payment_gateway_events;
+mod m20260519_064110_payment_gateway_logs;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -74,7 +85,18 @@ impl MigratorTrait for Migrator {
             Box::new(m20260517_073909_banner_events::Migration),
             Box::new(m20260517_203700_add_catalog_lookup_indexes::Migration),
             Box::new(m20260517_211000_add_controller_query_indexes::Migration),
-            Box::new(m20260519_000001_payment_gateway_domain::Migration),
+            Box::new(m20260519_064033_payment_gateways::Migration),
+            Box::new(m20260519_064100_expand_payment_methods_for_gateways::Migration),
+            Box::new(m20260519_064101_payment_method_countries::Migration),
+            Box::new(m20260519_064102_payment_method_currencies::Migration),
+            Box::new(m20260519_064103_gateway_customers::Migration),
+            Box::new(m20260519_064104_payment_sources::Migration),
+            Box::new(m20260519_064105_expand_payments_for_gateways::Migration),
+            Box::new(m20260519_064106_payment_sessions::Migration),
+            Box::new(m20260519_064107_payment_setup_sessions::Migration),
+            Box::new(m20260519_064108_payment_refunds::Migration),
+            Box::new(m20260519_064109_payment_gateway_events::Migration),
+            Box::new(m20260519_064110_payment_gateway_logs::Migration),
             // inject-above (do not remove this comment)
         ]
     }

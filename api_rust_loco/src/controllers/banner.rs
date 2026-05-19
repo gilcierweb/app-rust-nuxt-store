@@ -242,7 +242,8 @@ pub async fn record_event(
         .as_deref()
         .map(str::parse::<IpNetwork>)
         .transpose()
-        .map_err(|_| bad_request("ip_address must be a valid INET value"))?;
+        .map_err(|_| bad_request("ip_address must be a valid INET value"))?
+        .map(|value| value.to_string());
 
     let item = BannerEventActiveModel {
         id: sea_orm::ActiveValue::NotSet,

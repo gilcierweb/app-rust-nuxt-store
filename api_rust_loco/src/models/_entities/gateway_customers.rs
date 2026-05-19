@@ -4,24 +4,30 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "users_roles")]
+#[sea_orm(table_name = "gateway_customers")]
 pub struct Model {
-    #[sea_orm(primary_key, auto_increment = false)]
+    #[sea_orm(primary_key)]
+    pub id: i32,
     pub user_id: i32,
-    #[sea_orm(primary_key, auto_increment = false)]
-    pub role_id: i32,
+    pub payment_gateway_id: i32,
+    pub external_customer_id: String,
+    pub status: i16,
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "super::roles::Entity",
-        from = "Column::RoleId",
-        to = "super::roles::Column::Id",
+        belongs_to = "super::payment_gateways::Entity",
+        from = "Column::PaymentGatewayId",
+        to = "super::payment_gateways::Column::Id",
         on_update = "Cascade",
         on_delete = "Cascade"
     )]
-    Roles,
+    PaymentGateways,
+    #[sea_orm(has_many = "super::payment_sources::Entity")]
+    PaymentSources,
     #[sea_orm(
         belongs_to = "super::users::Entity",
         from = "Column::UserId",
@@ -32,9 +38,15 @@ pub enum Relation {
     Users,
 }
 
-impl Related<super::roles::Entity> for Entity {
+impl Related<super::payment_gateways::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Roles.def()
+        Relation::PaymentGateways.def()
+    }
+}
+
+impl Related<super::payment_sources::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentSources.def()
     }
 }
 

@@ -10,6 +10,7 @@ pub struct Model {
     pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key)]
     pub id: i32,
+    #[sea_orm(unique)]
     pub pid: Uuid,
     #[sea_orm(unique)]
     pub email: String,
@@ -34,8 +35,14 @@ pub enum Relation {
     Carts,
     #[sea_orm(has_many = "super::coupon_usages::Entity")]
     CouponUsages,
+    #[sea_orm(has_many = "super::gateway_customers::Entity")]
+    GatewayCustomers,
     #[sea_orm(has_many = "super::orders::Entity")]
     Orders,
+    #[sea_orm(has_many = "super::payment_setup_sessions::Entity")]
+    PaymentSetupSessions,
+    #[sea_orm(has_many = "super::payment_sources::Entity")]
+    PaymentSources,
     #[sea_orm(has_many = "super::posts::Entity")]
     Posts,
     #[sea_orm(has_many = "super::profiles::Entity")]
@@ -66,9 +73,27 @@ impl Related<super::coupon_usages::Entity> for Entity {
     }
 }
 
+impl Related<super::gateway_customers::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::GatewayCustomers.def()
+    }
+}
+
 impl Related<super::orders::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Orders.def()
+    }
+}
+
+impl Related<super::payment_setup_sessions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentSetupSessions.def()
+    }
+}
+
+impl Related<super::payment_sources::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentSources.def()
     }
 }
 
@@ -99,5 +124,14 @@ impl Related<super::users_roles::Entity> for Entity {
 impl Related<super::wishlists::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Wishlists.def()
+    }
+}
+
+impl Related<super::roles::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::users_roles::Relation::Roles.def()
+    }
+    fn via() -> Option<RelationDef> {
+        Some(super::users_roles::Relation::Users.def().rev())
     }
 }

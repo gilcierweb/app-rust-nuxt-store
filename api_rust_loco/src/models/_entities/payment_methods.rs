@@ -11,16 +11,78 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: Option<String>,
+    #[sea_orm(unique)]
     pub code: Option<String>,
     pub active: Option<bool>,
     #[sea_orm(column_type = "Text", nullable)]
     pub settings: Option<String>,
+    pub payment_gateway_id: Option<i32>,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub description: Option<String>,
+    pub method_type: i16,
+    pub display_on: i16,
+    pub position: i32,
+    pub auto_capture: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::payment_gateways::Entity",
+        from = "Column::PaymentGatewayId",
+        to = "super::payment_gateways::Column::Id",
+        on_update = "Cascade",
+        on_delete = "SetNull"
+    )]
+    PaymentGateways,
+    #[sea_orm(has_many = "super::payment_method_countries::Entity")]
+    PaymentMethodCountries,
+    #[sea_orm(has_many = "super::payment_method_currencies::Entity")]
+    PaymentMethodCurrencies,
+    #[sea_orm(has_many = "super::payment_sessions::Entity")]
+    PaymentSessions,
+    #[sea_orm(has_many = "super::payment_setup_sessions::Entity")]
+    PaymentSetupSessions,
+    #[sea_orm(has_many = "super::payment_sources::Entity")]
+    PaymentSources,
     #[sea_orm(has_many = "super::payments::Entity")]
     Payments,
+}
+
+impl Related<super::payment_gateways::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentGateways.def()
+    }
+}
+
+impl Related<super::payment_method_countries::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentMethodCountries.def()
+    }
+}
+
+impl Related<super::payment_method_currencies::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentMethodCurrencies.def()
+    }
+}
+
+impl Related<super::payment_sessions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentSessions.def()
+    }
+}
+
+impl Related<super::payment_setup_sessions::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentSetupSessions.def()
+    }
+}
+
+impl Related<super::payment_sources::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::PaymentSources.def()
+    }
 }
 
 impl Related<super::payments::Entity> for Entity {
