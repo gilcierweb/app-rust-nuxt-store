@@ -1,5 +1,8 @@
+pub mod abacatepay;
 pub mod drivers;
 pub mod manual;
+pub mod mercado_pago;
+pub mod paypal;
 pub mod registry;
 pub mod service;
 pub mod stripe;
