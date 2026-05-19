@@ -1,0 +1,10 @@
+pub const MANUAL_DRIVER: &str = "manual";
+pub const STRIPE_DRIVER: &str = "stripe";
+pub const PAYPAL_DRIVER: &str = "paypal";
+pub const BRAINTREE_DRIVER: &str = "braintree";
+pub const MERCADO_PAGO_DRIVER: &str = "mercado_pago";
+pub const PAGARME_DRIVER: &str = "pagarme";
+pub const IUGU_DRIVER: &str = "iugu";
+pub const ABACATEPAY_DRIVER: &str = "abacatepay";
+pub const CIELO_DRIVER: &str = "cielo";
+pub const GETNET_DRIVER: &str = "getnet";
