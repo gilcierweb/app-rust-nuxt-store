@@ -28,7 +28,7 @@ fn is_protected_method(method: &Method) -> bool {
 }
 
 fn is_exempt_path(path: &str) -> bool {
-    matches!(path, "/api/auth/csrf")
+    matches!(path, "/api/auth/csrf") || path.starts_with("/api/webhooks/payments/")
 }
 
 fn build_csrf_cookie(ctx: &AppContext, token: &str) -> Cookie<'static> {

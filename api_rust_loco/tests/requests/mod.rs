@@ -29,3 +29,5 @@ pub mod review;
 pub mod shipping;
 pub mod variant;
 pub mod wishlist;
+
+pub mod payment_webhook;

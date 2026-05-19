@@ -17,3 +17,5 @@ pub mod shipping;
 pub mod user;
 pub mod variant;
 pub mod wishlist;
+
+pub mod payment_webhook;

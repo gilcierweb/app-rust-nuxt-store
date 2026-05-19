@@ -50,6 +50,10 @@ fn validate_api_key(configured: Option<&str>, provided: Option<&str>) -> Result<
 }
 
 fn is_protected_path(path: &str) -> bool {
+    if path.starts_with("/api/webhooks/payments/") {
+        return false;
+    }
+
     path == "/api"
         || path.starts_with("/api/")
         || path == "/api-docs"
