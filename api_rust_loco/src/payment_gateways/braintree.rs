@@ -411,6 +411,8 @@ fn string_field(value: &Value, key: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
@@ -440,5 +442,59 @@ mod tests {
             braintree_endpoint(),
             "https://payments.sandbox.braintree-api.com/graphql"
         );
+    }
+
+    #[test]
+    fn maps_braintree_session_statuses_to_local_statuses() {
+        assert_eq!(
+            braintree_session_status(Some("AUTHORIZED")),
+            PaymentSessionStatus::Completed
+        );
+        assert_eq!(
+            braintree_session_status(Some("SETTLED")),
+            PaymentSessionStatus::Completed
+        );
+        assert_eq!(
+            braintree_session_status(Some("PROCESSOR_DECLINED")),
+            PaymentSessionStatus::Failed
+        );
+        assert_eq!(
+            braintree_session_status(Some("VOIDED")),
+            PaymentSessionStatus::Cancelled
+        );
+    }
+
+    #[test]
+    fn reads_payment_method_id_from_gateway_payload() {
+        let payload = json!({
+            "payment_method_id": "  pm_braintree_123  ",
+        });
+
+        assert_eq!(
+            payload_string(Some(&payload), &["payment_method_id"]).unwrap(),
+            "pm_braintree_123"
+        );
+    }
+
+    #[test]
+    fn accepts_camel_case_payment_method_id_alias() {
+        let payload = json!({
+            "paymentMethodId": "pm_braintree_456",
+        });
+
+        assert_eq!(
+            payload_string(Some(&payload), &["payment_method_id", "paymentMethodId"]).unwrap(),
+            "pm_braintree_456"
+        );
+    }
+
+    #[test]
+    fn rejects_missing_payment_method_payload() {
+        assert!(payload_string(None, &["payment_method_id"]).is_err());
+        assert!(payload_string(
+            Some(&json!({"payment_method_id": ""})),
+            &["payment_method_id"]
+        )
+        .is_err());
     }
 }

@@ -327,6 +327,33 @@ mod tests {
     }
 
     #[test]
+    fn maps_getnet_session_statuses_to_local_statuses() {
+        assert_eq!(
+            getnet_session_status(Some("AUTHORIZED")),
+            PaymentSessionStatus::Completed
+        );
+        assert_eq!(
+            getnet_session_status(Some("CAPTURED")),
+            PaymentSessionStatus::Completed
+        );
+        assert_eq!(
+            getnet_session_status(Some("DENIED")),
+            PaymentSessionStatus::Failed
+        );
+        assert_eq!(
+            getnet_session_status(Some("CANCELED")),
+            PaymentSessionStatus::Cancelled
+        );
+    }
+
+    #[test]
+    fn converts_decimal_amount_to_minor_units() {
+        assert_eq!(amount_to_minor_units(Decimal::new(1234, 2)).unwrap(), 1234);
+        assert_eq!(amount_to_minor_units(Decimal::new(999, 1)).unwrap(), 9990);
+        assert!(amount_to_minor_units(Decimal::ZERO).is_err());
+    }
+
+    #[test]
     fn uses_sandbox_base_url_by_default() {
         std::env::remove_var(GETNET_ENV_ENV);
         std::env::remove_var(GETNET_BASE_URL_ENV);
