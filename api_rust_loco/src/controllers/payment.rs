@@ -5,11 +5,13 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
+use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::models::_entities::payment_gateways;
 use crate::models::_entities::payment_methods;
+use crate::models::_entities::payment_sessions;
 use crate::models::_entities::payments::Entity;
 use crate::models::order_status::PaymentStatus;
 use crate::models::payment_gateway_status::PaymentAttemptStatus;
@@ -44,6 +46,7 @@ pub struct PaymentJson {
     pub status: Option<i32>,
     pub transaction_id: Option<String>,
     pub processed_at: Option<String>,
+    pub payment_session: Option<Value>,
 }
 
 #[debug_handler]
@@ -112,6 +115,7 @@ pub async fn process(
     order_active.payment_status = Set(Some(order_payment_status(saved.status).to_i32()));
     order_active.updated_at = Set(now.into());
     order_active.update(&ctx.db).await?;
+    let payment_session = latest_payment_session_json(&ctx.db, saved.id).await?;
 
     format::json(PaymentJson {
         id: saved.id,
@@ -122,6 +126,7 @@ pub async fn process(
         status: saved.status,
         transaction_id: saved.transaction_id,
         processed_at: saved.processed_at.map(|dt| dt.and_utc().to_rfc3339()),
+        payment_session,
     })
 }
 
@@ -145,9 +150,41 @@ pub async fn get_by_order(
             status: p.status,
             transaction_id: p.transaction_id,
             processed_at: p.processed_at.map(|dt| dt.and_utc().to_rfc3339()),
+            payment_session: latest_payment_session_json(&ctx.db, p.id).await?,
         }),
         None => Err(Error::NotFound),
     }
+}
+
+async fn latest_payment_session_json<C>(db: &C, payment_id: i32) -> Result<Option<Value>>
+where
+    C: sea_orm::ConnectionTrait,
+{
+    let session = payment_sessions::Entity::find()
+        .filter(payment_sessions::Column::PaymentId.eq(payment_id))
+        .order_by_desc(payment_sessions::Column::CreatedAt)
+        .one(db)
+        .await?;
+
+    Ok(session.map(|session| {
+        let action_url = session
+            .external_client_secret
+            .as_deref()
+            .filter(|value| value.starts_with("http://") || value.starts_with("https://"))
+            .map(ToString::to_string);
+        let requires_action = action_url.is_some() || session.status == 3;
+
+        serde_json::json!({
+            "id": session.id,
+            "payment_id": session.payment_id,
+            "payment_method_id": session.payment_method_id,
+            "status": session.status,
+            "external_session_id": session.external_session_id,
+            "external_client_secret": session.external_client_secret,
+            "action_url": action_url,
+            "requires_action": requires_action,
+        })
+    }))
 }
 
 pub fn routes() -> Routes {

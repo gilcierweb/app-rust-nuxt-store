@@ -6,7 +6,10 @@ use axum::{debug_handler, extract::Query};
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
-use sea_orm::{PaginatorTrait, QueryOrder, TransactionTrait};
+use sea_orm::{
+    ColumnTrait, ConnectionTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder,
+    TransactionTrait,
+};
 use uuid::Uuid;
 
 use crate::models::_entities::addresses;
@@ -15,6 +18,7 @@ use crate::models::_entities::coupons;
 use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
 use crate::models::_entities::payment_methods;
+use crate::models::_entities::payment_sessions;
 use crate::models::_entities::shipments;
 use crate::models::order_status::{OrderStatus, PaymentStatus};
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
@@ -169,6 +173,7 @@ pub async fn checkout(
 
     let mut payment_id = None;
     let mut payment_status = None;
+    let mut payment_session = None;
 
     if let Some(pm_id) = params.payment_method_id {
         let payment_method = payment_methods::Entity::find_by_id(pm_id)
@@ -193,6 +198,7 @@ pub async fn checkout(
         })?;
         payment_id = Some(saved_payment.id);
         payment_status = saved_payment.status;
+        payment_session = latest_payment_session_json(&txn, saved_payment.id).await?;
 
         let mut order_active: crate::models::_entities::orders::ActiveModel = saved.clone().into();
         order_active.payment_status =
@@ -255,6 +261,7 @@ pub async fn checkout(
         "total_amount": saved.total_amount,
         "payment_id": payment_id,
         "payment_status": payment_status,
+        "payment_session": payment_session,
         "address_id": address_id,
         "shipment_id": shipment_id,
     }))
@@ -434,4 +441,38 @@ fn order_payment_status(status: Option<i32>) -> PaymentStatus {
         Some(PaymentAttemptStatus::PartiallyRefunded) => PaymentStatus::PartiallyRefunded,
         _ => PaymentStatus::Unpaid,
     }
+}
+
+async fn latest_payment_session_json<C>(
+    db: &C,
+    payment_id: i32,
+) -> Result<Option<serde_json::Value>>
+where
+    C: ConnectionTrait,
+{
+    let session = payment_sessions::Entity::find()
+        .filter(payment_sessions::Column::PaymentId.eq(payment_id))
+        .order_by_desc(payment_sessions::Column::CreatedAt)
+        .one(db)
+        .await?;
+
+    Ok(session.map(|session| {
+        let action_url = session
+            .external_client_secret
+            .as_deref()
+            .filter(|value| value.starts_with("http://") || value.starts_with("https://"))
+            .map(ToString::to_string);
+        let requires_action = action_url.is_some() || session.status == 3;
+
+        serde_json::json!({
+            "id": session.id,
+            "payment_id": session.payment_id,
+            "payment_method_id": session.payment_method_id,
+            "status": session.status,
+            "external_session_id": session.external_session_id,
+            "external_client_secret": session.external_client_secret,
+            "action_url": action_url,
+            "requires_action": requires_action,
+        })
+    }))
 }

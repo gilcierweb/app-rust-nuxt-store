@@ -17,6 +17,11 @@
       <h1 class="h1 mb-2">{{ t('pages.confirmation.title') }}</h1>
       <p class="mb-8 text-lg text-base-content/60">{{ t('pages.confirmation.success') }}</p>
 
+      <div v-if="paymentActionRequired" class="alert alert-warning mb-6 text-left">
+        <span class="icon-[tabler--alert-triangle] size-5" />
+        <span>{{ t('order.paymentStatus.unpaid') }}</span>
+      </div>
+
       <div class="rounded-box border p-6 text-left">
         <div class="flex justify-between py-2">
           <span class="text-base-content/60">{{ t('pages.confirmation.number') }}</span>
@@ -67,6 +72,7 @@ import type { Order } from '~/types'
 const { useApiLazyFetch } = useApi()
 
 const id = route.params.id
+const paymentActionRequired = computed(() => route.query.payment_action === 'required')
 const { data: order, pending } = useApiLazyFetch<Order>(
   `/api/account/orders/${id}`,
   { key: `confirmation-${id}` }

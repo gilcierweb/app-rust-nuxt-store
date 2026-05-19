@@ -422,7 +422,15 @@ async function placeOrder() {
     })
 
     cartStore.clearCart()
-    router.push(`/orders/confirmation/${data.id}`)
+    if (data.payment_session?.action_url) {
+      await navigateTo(data.payment_session.action_url, { external: true })
+      return
+    }
+
+    const confirmationPath = data.payment_session?.requires_action
+      ? `/orders/confirmation/${data.id}?payment_action=required`
+      : `/orders/confirmation/${data.id}`
+    router.push(confirmationPath)
   } catch (err: any) {
     error.value = err?.data?.message || err?.message || t('pages.products.edit.error', { message: '' })
   } finally {
