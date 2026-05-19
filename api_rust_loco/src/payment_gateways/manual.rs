@@ -110,6 +110,7 @@ mod tests {
                 currency: "BRL".to_string(),
                 idempotency_key: "manual-test-key".to_string(),
                 auto_capture: true,
+                gateway_payload: None,
             })
             .await
             .unwrap();
@@ -131,6 +132,7 @@ mod tests {
                 currency: "BRL".to_string(),
                 idempotency_key: "manual-test-key".to_string(),
                 auto_capture: false,
+                gateway_payload: None,
             })
             .await
             .unwrap();

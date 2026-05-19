@@ -29,11 +29,53 @@ impl PaymentGateway for BraintreeGateway {
 
     async fn create_payment_session(
         &self,
-        _input: CreatePaymentSessionInput,
+        input: CreatePaymentSessionInput,
     ) -> Result<PaymentSessionOutput> {
-        Err(Error::BadRequest(
-            "Braintree payments require a frontend-generated payment method ID/nonce; create a setup session first and submit the nonce through checkout".into(),
-        ))
+        let payment_method_id = payload_string(
+            input.gateway_payload.as_ref(),
+            &["payment_method_id", "paymentMethodId"],
+        )?;
+        let value = braintree_graphql(
+            r#"
+            mutation ChargePaymentMethod($input: ChargePaymentMethodInput!) {
+              chargePaymentMethod(input: $input) {
+                transaction {
+                  id
+                  status
+                }
+              }
+            }
+            "#,
+            json!({
+                "input": {
+                    "paymentMethodId": payment_method_id,
+                    "transaction": {
+                        "amount": amount_string(input.amount),
+                        "orderId": input.order_id.to_string(),
+                        "options": {
+                            "submitForSettlement": input.auto_capture,
+                        },
+                    },
+                    "clientMutationId": input.idempotency_key,
+                }
+            }),
+        )
+        .await?;
+        let transaction = value
+            .pointer("/data/chargePaymentMethod/transaction")
+            .ok_or_else(|| {
+                Error::Message("Braintree charge response missing transaction".to_string())
+            })?;
+        let payment_status = braintree_attempt_status(status_value(transaction));
+
+        Ok(PaymentSessionOutput {
+            status: braintree_session_status(status_value(transaction)),
+            payment_status,
+            external_session_id: string_field(transaction, "id"),
+            external_payment_id: string_field(transaction, "id"),
+            external_status: status_value(transaction).map(ToString::to_string),
+            external_client_secret: None,
+        })
     }
 
     async fn capture_payment(&self, input: CapturePaymentInput) -> Result<PaymentOperationOutput> {
@@ -286,6 +328,19 @@ fn braintree_refund_status(status: Option<&str>) -> PaymentRefundStatus {
     }
 }
 
+fn braintree_session_status(status: Option<&str>) -> PaymentSessionStatus {
+    match status {
+        Some("AUTHORIZED" | "SUBMITTED_FOR_SETTLEMENT" | "SETTLING" | "SETTLED") => {
+            PaymentSessionStatus::Completed
+        }
+        Some("PROCESSOR_DECLINED" | "GATEWAY_REJECTED" | "FAILED" | "SETTLEMENT_DECLINED") => {
+            PaymentSessionStatus::Failed
+        }
+        Some("VOIDED") => PaymentSessionStatus::Cancelled,
+        _ => PaymentSessionStatus::Processing,
+    }
+}
+
 fn amount_string(amount: Decimal) -> String {
     amount.round_dp(2).to_string()
 }
@@ -296,6 +351,25 @@ fn env_value(name: &str) -> Result<String> {
         .ok()
         .filter(|value| !value.is_empty())
         .ok_or_else(|| Error::Message(format!("missing required environment variable: {name}")))
+}
+
+fn payload_string(payload: Option<&Value>, keys: &[&str]) -> Result<String> {
+    let payload = payload
+        .and_then(Value::as_object)
+        .ok_or_else(|| Error::BadRequest("Braintree gateway payload is required".into()))?;
+
+    keys.iter()
+        .find_map(|key| {
+            payload
+                .get(*key)
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToString::to_string)
+        })
+        .ok_or_else(|| {
+            Error::BadRequest("Braintree gateway payload must include payment_method_id".into())
+        })
 }
 
 fn first_graphql_error_message(value: &Value) -> Option<String> {

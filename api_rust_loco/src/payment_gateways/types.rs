@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::models::payment_gateway_status::{
     PaymentAttemptStatus, PaymentRefundStatus, PaymentSessionStatus,
@@ -16,6 +17,7 @@ pub struct CreatePaymentSessionInput {
     pub currency: String,
     pub idempotency_key: String,
     pub auto_capture: bool,
+    pub gateway_payload: Option<Value>,
 }
 
 #[derive(Debug, Clone, Serialize)]

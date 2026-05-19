@@ -132,6 +132,16 @@
                 <div class="font-bold text-lg">{{ method.name || method.code }}</div>
               </label>
             </div>
+            <div v-if="selectedGatewayDriver === 'braintree'" class="mt-4">
+              <label class="label-text" for="braintreePaymentMethodId">Payment method ID</label>
+              <input id="braintreePaymentMethodId" v-model="braintreePaymentMethodId" type="text"
+                class="input input-bordered w-full mt-1" autocomplete="off" />
+            </div>
+            <div v-else-if="selectedGatewayDriver === 'getnet'" class="mt-4">
+              <label class="label-text" for="getnetGatewayPayload">Getnet JSON</label>
+              <textarea id="getnetGatewayPayload" v-model="getnetGatewayPayload" rows="5"
+                class="textarea textarea-bordered w-full mt-1 font-mono text-xs" spellcheck="false" />
+            </div>
           </div>
           </div>
         </div>
@@ -222,7 +232,7 @@
           
           <div class="space-y-4">
             <button class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300"
-              :disabled="submitting || !selectedPaymentMethod" @click="placeOrder">
+              :disabled="submitting || !canPlaceOrder" @click="placeOrder">
               <span v-if="submitting" class="loading loading-spinner mr-2" />
               <span v-else class="icon-[tabler--lock] size-6 mr-2"></span>
               {{ t('pages.checkout.placeOrder') }}
@@ -259,6 +269,8 @@ const submitting = ref(false)
 const error = ref('')
 const selectedPaymentMethod = ref<number | null>(null)
 const selectedShippingMethod = ref<number | null>(null)
+const braintreePaymentMethodId = ref('')
+const getnetGatewayPayload = ref('')
 const couponCode = ref('')
 const couponDiscount = ref<number | null>(null)
 const couponMessage = ref('')
@@ -302,6 +314,20 @@ const selectedShippingCost = computed(() => {
   if (!selectedShippingMethod.value) return null
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
   return method?.base_price ?? null
+})
+
+const selectedPaymentMethodRecord = computed(() => {
+  if (!selectedPaymentMethod.value) return null
+  return paymentMethods.value.find(method => method.id === selectedPaymentMethod.value) ?? null
+})
+
+const selectedGatewayDriver = computed(() => selectedPaymentMethodRecord.value?.gateway_driver || null)
+
+const canPlaceOrder = computed(() => {
+  if (!selectedPaymentMethod.value) return false
+  if (selectedGatewayDriver.value === 'braintree') return braintreePaymentMethodId.value.trim().length > 0
+  if (selectedGatewayDriver.value === 'getnet') return getnetGatewayPayload.value.trim().length > 0
+  return true
 })
 
 const totalAmount = computed(() => {
@@ -361,6 +387,16 @@ async function placeOrder() {
   const discount = couponDiscount.value || 0
 
   try {
+    let paymentGatewayPayload: Record<string, unknown> | null = null
+
+    if (selectedGatewayDriver.value === 'braintree') {
+      paymentGatewayPayload = {
+        payment_method_id: braintreePaymentMethodId.value.trim(),
+      }
+    } else if (selectedGatewayDriver.value === 'getnet' && getnetGatewayPayload.value.trim()) {
+      paymentGatewayPayload = JSON.parse(getnetGatewayPayload.value)
+    }
+
     const data = await apiFetch<any>('/api/account/orders/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -372,6 +408,7 @@ async function placeOrder() {
         discount_amount: discount || null,
         coupon_code: couponApplied.value ? couponCode.value.trim().toUpperCase() : null,
         payment_method_id: selectedPaymentMethod.value,
+        payment_gateway_payload: paymentGatewayPayload,
         shipping_method_id: selectedShippingMethod.value,
         address_first_name: address.firstName || null,
         address_last_name: address.lastName || null,

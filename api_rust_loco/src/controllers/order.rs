@@ -18,6 +18,7 @@ use crate::models::_entities::payment_methods;
 use crate::models::_entities::shipments;
 use crate::models::order_status::{OrderStatus, PaymentStatus};
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
+use crate::models::payment_gateway_status::PaymentAttemptStatus;
 use crate::models::users;
 use crate::payment_gateways::{create_payment_attempt, CreatePaymentAttemptInput};
 use crate::utils::pagination::PaginationParams;
@@ -182,18 +183,20 @@ pub async fn checkout(
                 payment_method,
                 amount: params.total_amount,
                 currency: "BRL".to_string(),
+                gateway_payload: params.payment_gateway_payload.clone(),
             },
         )
         .await
         .map_err(|e| {
             tracing::error!(error = ?e, "failed to create payment");
-            Error::InternalServerError
+            e
         })?;
         payment_id = Some(saved_payment.id);
         payment_status = saved_payment.status;
 
         let mut order_active: crate::models::_entities::orders::ActiveModel = saved.clone().into();
-        order_active.payment_status = Set(Some(PaymentStatus::Paid.to_i32()));
+        order_active.payment_status =
+            Set(Some(order_payment_status(saved_payment.status).to_i32()));
         order_active.updated_at = Set(chrono::Utc::now().into());
         order_active.update(&txn).await?;
     }
@@ -419,4 +422,16 @@ fn routes_with_prefix(prefix: &str) -> Routes {
         .add("/list", get(list))
         .add("/{id}", get(get_one))
         .add("/{id}/status", put(update_status))
+}
+
+fn order_payment_status(status: Option<i32>) -> PaymentStatus {
+    match status
+        .and_then(|value| i16::try_from(value).ok())
+        .and_then(PaymentAttemptStatus::from_i16)
+    {
+        Some(PaymentAttemptStatus::Captured) => PaymentStatus::Paid,
+        Some(PaymentAttemptStatus::Refunded) => PaymentStatus::Refunded,
+        Some(PaymentAttemptStatus::PartiallyRefunded) => PaymentStatus::PartiallyRefunded,
+        _ => PaymentStatus::Unpaid,
+    }
 }

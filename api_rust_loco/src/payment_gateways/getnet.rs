@@ -5,7 +5,9 @@ use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use serde_json::{json, Value};
 
-use crate::models::payment_gateway_status::{PaymentAttemptStatus, PaymentRefundStatus};
+use crate::models::payment_gateway_status::{
+    PaymentAttemptStatus, PaymentRefundStatus, PaymentSessionStatus,
+};
 use crate::payment_gateways::drivers::GETNET_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
@@ -30,11 +32,41 @@ impl PaymentGateway for GetnetGateway {
 
     async fn create_payment_session(
         &self,
-        _input: CreatePaymentSessionInput,
+        input: CreatePaymentSessionInput,
     ) -> Result<PaymentSessionOutput> {
-        Err(Error::BadRequest(
-            "Getnet payment creation requires tokenized card/customer/device data or Web Checkout payload support before it can be enabled".into(),
-        ))
+        let mut body = input
+            .gateway_payload
+            .and_then(|value| value.as_object().cloned())
+            .ok_or_else(|| Error::BadRequest("Getnet gateway payload is required".into()))?;
+
+        body.insert(
+            "idempotency_key".to_string(),
+            Value::String(input.idempotency_key),
+        );
+        body.insert(
+            "amount".to_string(),
+            Value::Number(amount_to_minor_units(input.amount)?.into()),
+        );
+        body.insert("currency".to_string(), Value::String(input.currency));
+        body.entry("order_id".to_string())
+            .or_insert_with(|| Value::String(input.order_id.to_string()));
+
+        if let Some(seller_id) = optional_env_value(GETNET_SELLER_ID_ENV) {
+            body.entry("seller_id".to_string())
+                .or_insert_with(|| Value::String(seller_id));
+        }
+
+        let value = getnet_post("/dpm/payments-gwproxy/v2/payments", Value::Object(body)).await?;
+
+        Ok(PaymentSessionOutput {
+            status: getnet_session_status(status_value(&value)),
+            payment_status: getnet_attempt_status(status_value(&value)),
+            external_session_id: string_field(&value, "payment_id"),
+            external_payment_id: string_field(&value, "payment_id"),
+            external_status: status_value(&value).map(ToString::to_string),
+            external_client_secret: string_field(&value, "redirect_url")
+                .or_else(|| string_field(&value, "checkout_url")),
+        })
     }
 
     async fn capture_payment(&self, input: CapturePaymentInput) -> Result<PaymentOperationOutput> {
@@ -219,6 +251,15 @@ fn getnet_refund_status(status: Option<&str>) -> PaymentRefundStatus {
         Some("CANCELLED" | "CANCELED" | "REFUNDED" | "APPROVED") => PaymentRefundStatus::Succeeded,
         Some("DENIED" | "REJECTED" | "FAILED") => PaymentRefundStatus::Failed,
         _ => PaymentRefundStatus::Processing,
+    }
+}
+
+fn getnet_session_status(status: Option<&str>) -> PaymentSessionStatus {
+    match status {
+        Some("APPROVED" | "AUTHORIZED" | "CAPTURED") => PaymentSessionStatus::Completed,
+        Some("DENIED" | "REJECTED" | "FAILED") => PaymentSessionStatus::Failed,
+        Some("CANCELLED" | "CANCELED") => PaymentSessionStatus::Cancelled,
+        _ => PaymentSessionStatus::Processing,
     }
 }
 

@@ -2,6 +2,7 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, ConnectionTrait, EntityTrait};
+use serde_json::Value;
 use uuid::Uuid;
 
 use crate::models::_entities::payment_gateways;
@@ -20,6 +21,7 @@ pub struct CreatePaymentAttemptInput {
     pub payment_method: payment_methods::Model,
     pub amount: Decimal,
     pub currency: String,
+    pub gateway_payload: Option<Value>,
 }
 
 pub async fn create_payment_attempt<C>(
@@ -72,6 +74,7 @@ where
             currency: input.currency,
             idempotency_key,
             auto_capture: input.payment_method.auto_capture,
+            gateway_payload: input.gateway_payload,
         })
         .await?;
 

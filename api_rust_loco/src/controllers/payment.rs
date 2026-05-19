@@ -6,10 +6,13 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
+use crate::models::_entities::payment_gateways;
 use crate::models::_entities::payment_methods;
 use crate::models::_entities::payments::Entity;
 use crate::models::order_status::PaymentStatus;
+use crate::models::payment_gateway_status::PaymentAttemptStatus;
 use crate::payment_gateways::{create_payment_attempt, CreatePaymentAttemptInput};
 
 #[derive(Debug, Deserialize)]
@@ -17,6 +20,7 @@ pub struct ProcessPaymentParams {
     pub order_id: i32,
     pub payment_method_id: i32,
     pub amount: Decimal,
+    pub payment_gateway_payload: Option<Value>,
 }
 
 #[derive(Debug, Serialize)]
@@ -25,6 +29,9 @@ pub struct PaymentMethodJson {
     pub name: Option<String>,
     pub code: Option<String>,
     pub active: Option<bool>,
+    pub method_type: i16,
+    pub gateway_driver: Option<String>,
+    pub requires_gateway_payload: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -43,16 +50,26 @@ pub struct PaymentJson {
 pub async fn list_methods(State(ctx): State<AppContext>) -> Result<Response> {
     let methods = payment_methods::Entity::find()
         .filter(payment_methods::Column::Active.eq(true))
+        .find_also_related(payment_gateways::Entity)
         .all(&ctx.db)
         .await?;
 
     let result: Vec<PaymentMethodJson> = methods
         .into_iter()
-        .map(|m| PaymentMethodJson {
-            id: m.id,
-            name: m.name,
-            code: m.code,
-            active: m.active,
+        .map(|(method, gateway)| {
+            let gateway_driver = gateway.map(|gateway| gateway.driver);
+            let requires_gateway_payload =
+                matches!(gateway_driver.as_deref(), Some("braintree" | "getnet"));
+
+            PaymentMethodJson {
+                id: method.id,
+                name: method.name,
+                code: method.code,
+                active: method.active,
+                method_type: method.method_type,
+                gateway_driver,
+                requires_gateway_payload,
+            }
         })
         .collect();
 
@@ -82,16 +99,17 @@ pub async fn process(
             payment_method,
             amount: params.amount,
             currency: "BRL".to_string(),
+            gateway_payload: params.payment_gateway_payload,
         },
     )
     .await
     .map_err(|e| {
         tracing::error!(error = ?e, "failed to process payment");
-        Error::InternalServerError
+        e
     })?;
 
     let mut order_active: crate::models::_entities::orders::ActiveModel = order.into();
-    order_active.payment_status = Set(Some(PaymentStatus::Paid.to_i32()));
+    order_active.payment_status = Set(Some(order_payment_status(saved.status).to_i32()));
     order_active.updated_at = Set(now.into());
     order_active.update(&ctx.db).await?;
 
@@ -146,4 +164,16 @@ fn routes_with_prefix(prefix: &str) -> Routes {
         .add("process", post(process))
         .add("order/{order_id}", get(get_by_order))
         .add("methods", get(list_methods))
+}
+
+fn order_payment_status(status: Option<i32>) -> PaymentStatus {
+    match status
+        .and_then(|value| i16::try_from(value).ok())
+        .and_then(PaymentAttemptStatus::from_i16)
+    {
+        Some(PaymentAttemptStatus::Captured) => PaymentStatus::Paid,
+        Some(PaymentAttemptStatus::Refunded) => PaymentStatus::Refunded,
+        Some(PaymentAttemptStatus::PartiallyRefunded) => PaymentStatus::PartiallyRefunded,
+        _ => PaymentStatus::Unpaid,
+    }
 }

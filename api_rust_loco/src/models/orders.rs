@@ -1,6 +1,7 @@
 pub use super::_entities::orders::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 pub type Orders = Entity;
 
 #[derive(Debug, Deserialize)]
@@ -12,6 +13,7 @@ pub struct CreateOrderParams {
     pub discount_amount: Option<Decimal>,
     pub notes: Option<String>,
     pub payment_method_id: Option<i32>,
+    pub payment_gateway_payload: Option<Value>,
     pub shipping_method_id: Option<i32>,
     pub address_first_name: Option<String>,
     pub address_last_name: Option<String>,

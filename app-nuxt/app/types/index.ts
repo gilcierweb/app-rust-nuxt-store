@@ -219,6 +219,9 @@ export interface PaymentMethod {
   name?: string
   code?: string
   active?: boolean
+  method_type?: number
+  gateway_driver?: string
+  requires_gateway_payload?: boolean
 }
 
 export interface Payment {
