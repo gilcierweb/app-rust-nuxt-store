@@ -12,7 +12,11 @@ impl MigrationTrait for Migration {
                     .table(PaymentGatewayLogs::Table)
                     .if_not_exists()
                     .col(pk(PaymentGatewayLogs::Id))
-                    .col(ColumnDef::new(PaymentGatewayLogs::PaymentId).integer().null())
+                    .col(
+                        ColumnDef::new(PaymentGatewayLogs::PaymentId)
+                            .integer()
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(PaymentGatewayLogs::PaymentSessionId)
                             .integer()
@@ -121,7 +125,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 

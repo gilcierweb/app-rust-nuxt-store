@@ -12,7 +12,11 @@ impl MigrationTrait for Migration {
                     .table(PaymentSessions::Table)
                     .if_not_exists()
                     .col(pk(PaymentSessions::Id))
-                    .col(ColumnDef::new(PaymentSessions::PaymentId).integer().not_null())
+                    .col(
+                        ColumnDef::new(PaymentSessions::PaymentId)
+                            .integer()
+                            .not_null(),
+                    )
                     .col(
                         ColumnDef::new(PaymentSessions::PaymentMethodId)
                             .integer()
@@ -33,8 +37,16 @@ impl MigrationTrait for Migration {
                             .text()
                             .null(),
                     )
-                    .col(ColumnDef::new(PaymentSessions::ExpiresAt).timestamp().null())
-                    .col(ColumnDef::new(PaymentSessions::CompletedAt).timestamp().null())
+                    .col(
+                        ColumnDef::new(PaymentSessions::ExpiresAt)
+                            .timestamp()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSessions::CompletedAt)
+                            .timestamp()
+                            .null(),
+                    )
                     .col(timestamptz(PaymentSessions::CreatedAt))
                     .col(timestamptz(PaymentSessions::UpdatedAt))
                     .foreign_key(
@@ -101,7 +113,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 

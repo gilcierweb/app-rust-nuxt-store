@@ -30,11 +30,19 @@ impl MigrationTrait for Migration {
                         ColumnDef::new(Payments::IdempotencyKey).string().null(),
                     )
                     .add_column_if_not_exists(ColumnDef::new(Payments::FailureCode).string().null())
-                    .add_column_if_not_exists(ColumnDef::new(Payments::FailureMessage).text().null())
-                    .add_column_if_not_exists(ColumnDef::new(Payments::AuthorizedAt).timestamp().null())
-                    .add_column_if_not_exists(ColumnDef::new(Payments::CapturedAt).timestamp().null())
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::FailureMessage).text().null(),
+                    )
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::AuthorizedAt).timestamp().null(),
+                    )
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::CapturedAt).timestamp().null(),
+                    )
                     .add_column_if_not_exists(ColumnDef::new(Payments::VoidedAt).timestamp().null())
-                    .add_column_if_not_exists(ColumnDef::new(Payments::CancelledAt).timestamp().null())
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::CancelledAt).timestamp().null(),
+                    )
                     .to_owned(),
             )
             .await?;

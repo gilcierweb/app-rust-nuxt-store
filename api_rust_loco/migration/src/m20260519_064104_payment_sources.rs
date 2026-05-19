@@ -35,8 +35,16 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(PaymentSources::Brand).string().null())
                     .col(ColumnDef::new(PaymentSources::Last4).string().null())
-                    .col(ColumnDef::new(PaymentSources::ExpMonth).small_integer().null())
-                    .col(ColumnDef::new(PaymentSources::ExpYear).small_integer().null())
+                    .col(
+                        ColumnDef::new(PaymentSources::ExpMonth)
+                            .small_integer()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSources::ExpYear)
+                            .small_integer()
+                            .null(),
+                    )
                     .col(ColumnDef::new(PaymentSources::HolderName).string().null())
                     .col(
                         ColumnDef::new(PaymentSources::BillingAddressId)
@@ -144,7 +152,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 

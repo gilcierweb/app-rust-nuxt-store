@@ -1,5 +1,5 @@
+pub use super::_entities::payment_setup_sessions::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::payment_setup_sessions::{ActiveModel, Model, Entity};
 pub type PaymentSetupSessions = Entity;
 
 #[async_trait::async_trait]

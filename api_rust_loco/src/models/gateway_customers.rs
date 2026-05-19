@@ -1,5 +1,5 @@
+pub use super::_entities::gateway_customers::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::gateway_customers::{ActiveModel, Model, Entity};
 pub type GatewayCustomers = Entity;
 
 #[async_trait::async_trait]

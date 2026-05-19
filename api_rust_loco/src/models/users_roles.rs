@@ -1,9 +1,8 @@
+pub use super::_entities::users_roles::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::users_roles::{ActiveModel, Model, Entity};
 pub type UsersRoles = Entity;
 
-impl ActiveModelBehavior for ActiveModel {
-}
+impl ActiveModelBehavior for ActiveModel {}
 
 // implement your read-oriented logic here
 impl Model {}

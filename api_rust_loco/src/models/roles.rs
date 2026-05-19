@@ -1,5 +1,5 @@
+pub use super::_entities::roles::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::roles::{ActiveModel, Model, Entity};
 pub type Roles = Entity;
 
 #[async_trait::async_trait]

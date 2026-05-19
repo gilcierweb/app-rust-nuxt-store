@@ -6,10 +6,11 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::models::_entities::payment_methods;
-use crate::models::_entities::payments::{ActiveModel, Entity};
+use crate::models::_entities::payments::Entity;
+use crate::models::order_status::PaymentStatus;
+use crate::payment_gateways::{create_payment_attempt, CreatePaymentAttemptInput};
 
 #[derive(Debug, Deserialize)]
 pub struct ProcessPaymentParams {
@@ -68,34 +69,29 @@ pub async fn process(
         .await?
         .ok_or_else(|| Error::NotFound)?;
 
-    payment_methods::Entity::find_by_id(params.payment_method_id)
+    let payment_method = payment_methods::Entity::find_by_id(params.payment_method_id)
         .one(&ctx.db)
         .await?
         .ok_or_else(|| Error::NotFound)?;
 
     let now = chrono::Utc::now();
-    let transaction_id = format!("TXN-{}", Uuid::new_v4());
-
-    let payment = ActiveModel {
-        order_id: Set(params.order_id),
-        payment_method_id: Set(params.payment_method_id),
-        amount: Set(Some(params.amount)),
-        currency: Set(Some("BRL".to_string())),
-        status: Set(Some(1)),
-        transaction_id: Set(Some(transaction_id)),
-        processed_at: Set(Some(now.naive_utc())),
-        created_at: Set(now.into()),
-        updated_at: Set(now.into()),
-        ..Default::default()
-    };
-
-    let saved = payment.insert(&ctx.db).await.map_err(|e| {
+    let saved = create_payment_attempt(
+        &ctx.db,
+        CreatePaymentAttemptInput {
+            order_id: params.order_id,
+            payment_method,
+            amount: params.amount,
+            currency: "BRL".to_string(),
+        },
+    )
+    .await
+    .map_err(|e| {
         tracing::error!(error = ?e, "failed to process payment");
         Error::InternalServerError
     })?;
 
     let mut order_active: crate::models::_entities::orders::ActiveModel = order.into();
-    order_active.payment_status = Set(Some(2));
+    order_active.payment_status = Set(Some(PaymentStatus::Paid.to_i32()));
     order_active.updated_at = Set(now.into());
     order_active.update(&ctx.db).await?;
 

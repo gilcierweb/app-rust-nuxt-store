@@ -12,6 +12,7 @@ pub mod mailers;
 pub mod middleware;
 pub mod models;
 pub mod openapi;
+pub mod payment_gateways;
 pub mod seeds;
 pub mod tasks;
 pub mod utils;

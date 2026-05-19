@@ -1,9 +1,8 @@
+pub use super::_entities::payment_method_countries::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::payment_method_countries::{ActiveModel, Model, Entity};
 pub type PaymentMethodCountries = Entity;
 
-impl ActiveModelBehavior for ActiveModel {
-}
+impl ActiveModelBehavior for ActiveModel {}
 
 // implement your read-oriented logic here
 impl Model {}

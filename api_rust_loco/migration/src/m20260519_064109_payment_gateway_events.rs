@@ -38,7 +38,11 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .default(false),
                     )
-                    .col(ColumnDef::new(PaymentGatewayEvents::Payload).text().not_null())
+                    .col(
+                        ColumnDef::new(PaymentGatewayEvents::Payload)
+                            .text()
+                            .not_null(),
+                    )
                     .col(
                         ColumnDef::new(PaymentGatewayEvents::ProcessedAt)
                             .timestamp()
@@ -114,7 +118,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 

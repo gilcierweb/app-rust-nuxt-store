@@ -1,5 +1,5 @@
+pub use super::_entities::payment_gateway_events::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::payment_gateway_events::{ActiveModel, Model, Entity};
 pub type PaymentGatewayEvents = Entity;
 
 #[async_trait::async_trait]

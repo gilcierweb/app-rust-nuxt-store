@@ -14,11 +14,12 @@ use crate::models::_entities::coupon_usages;
 use crate::models::_entities::coupons;
 use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
-use crate::models::_entities::payments;
+use crate::models::_entities::payment_methods;
 use crate::models::_entities::shipments;
-use crate::models::order_status::OrderStatus;
+use crate::models::order_status::{OrderStatus, PaymentStatus};
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::users;
+use crate::payment_gateways::{create_payment_attempt, CreatePaymentAttemptInput};
 use crate::utils::pagination::PaginationParams;
 
 fn generate_order_number() -> String {
@@ -169,28 +170,30 @@ pub async fn checkout(
     let mut payment_status = None;
 
     if let Some(pm_id) = params.payment_method_id {
-        let transaction_id = format!("TXN-{}", uuid::Uuid::new_v4());
-        let payment = payments::ActiveModel {
-            order_id: Set(saved.id),
-            payment_method_id: Set(pm_id),
-            amount: Set(Some(params.total_amount)),
-            currency: Set(Some("BRL".to_string())),
-            status: Set(Some(1)),
-            transaction_id: Set(Some(transaction_id)),
-            processed_at: Set(Some(chrono::Utc::now().naive_utc())),
-            created_at: Set(now),
-            updated_at: Set(now),
-            ..Default::default()
-        };
-        let saved_payment = payment.insert(&txn).await.map_err(|e| {
+        let payment_method = payment_methods::Entity::find_by_id(pm_id)
+            .one(&txn)
+            .await?
+            .ok_or_else(|| Error::NotFound)?;
+
+        let saved_payment = create_payment_attempt(
+            &txn,
+            CreatePaymentAttemptInput {
+                order_id: saved.id,
+                payment_method,
+                amount: params.total_amount,
+                currency: "BRL".to_string(),
+            },
+        )
+        .await
+        .map_err(|e| {
             tracing::error!(error = ?e, "failed to create payment");
             Error::InternalServerError
         })?;
         payment_id = Some(saved_payment.id);
-        payment_status = Some(1);
+        payment_status = saved_payment.status;
 
         let mut order_active: crate::models::_entities::orders::ActiveModel = saved.clone().into();
-        order_active.payment_status = Set(Some(2));
+        order_active.payment_status = Set(Some(PaymentStatus::Paid.to_i32()));
         order_active.updated_at = Set(chrono::Utc::now().into());
         order_active.update(&txn).await?;
     }

@@ -6,6 +6,7 @@ pub mod coupon_usages;
 pub mod coupons;
 pub mod order_items;
 pub mod orders;
+pub mod payment_gateways;
 pub mod payment_methods;
 pub mod payments;
 pub mod posts;
@@ -33,6 +34,7 @@ pub async fn seed_all(db: &DatabaseConnection) -> Result<()> {
     posts::seed(db).await?;
     variant_options::seed(db).await?;
     shipping_methods::seed(db).await?;
+    payment_gateways::seed(db).await?;
     payment_methods::seed(db).await?;
     coupons::seed(db).await?;
 

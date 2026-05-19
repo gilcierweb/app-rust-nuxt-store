@@ -12,7 +12,11 @@ impl MigrationTrait for Migration {
                     .table(GatewayCustomers::Table)
                     .if_not_exists()
                     .col(pk(GatewayCustomers::Id))
-                    .col(ColumnDef::new(GatewayCustomers::UserId).integer().not_null())
+                    .col(
+                        ColumnDef::new(GatewayCustomers::UserId)
+                            .integer()
+                            .not_null(),
+                    )
                     .col(
                         ColumnDef::new(GatewayCustomers::PaymentGatewayId)
                             .integer()
@@ -98,7 +102,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 

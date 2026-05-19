@@ -57,8 +57,16 @@ impl MigrationTrait for Migration {
                             .not_null()
                             .default(false),
                     )
-                    .col(ColumnDef::new(PaymentGateways::PublicKeyEnv).string().null())
-                    .col(ColumnDef::new(PaymentGateways::SecretKeyEnv).string().null())
+                    .col(
+                        ColumnDef::new(PaymentGateways::PublicKeyEnv)
+                            .string()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentGateways::SecretKeyEnv)
+                            .string()
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(PaymentGateways::WebhookSecretEnv)
                             .string()
@@ -115,7 +123,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 

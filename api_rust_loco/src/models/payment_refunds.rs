@@ -1,5 +1,5 @@
+pub use super::_entities::payment_refunds::{ActiveModel, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::payment_refunds::{ActiveModel, Model, Entity};
 pub type PaymentRefunds = Entity;
 
 #[async_trait::async_trait]

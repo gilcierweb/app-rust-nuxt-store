@@ -12,7 +12,11 @@ impl MigrationTrait for Migration {
                     .table(PaymentRefunds::Table)
                     .if_not_exists()
                     .col(pk(PaymentRefunds::Id))
-                    .col(ColumnDef::new(PaymentRefunds::PaymentId).integer().not_null())
+                    .col(
+                        ColumnDef::new(PaymentRefunds::PaymentId)
+                            .integer()
+                            .not_null(),
+                    )
                     .col(ColumnDef::new(PaymentRefunds::Amount).decimal().not_null())
                     .col(ColumnDef::new(PaymentRefunds::Currency).string().not_null())
                     .col(
@@ -20,7 +24,11 @@ impl MigrationTrait for Migration {
                             .small_integer()
                             .not_null(),
                     )
-                    .col(ColumnDef::new(PaymentRefunds::Reason).small_integer().null())
+                    .col(
+                        ColumnDef::new(PaymentRefunds::Reason)
+                            .small_integer()
+                            .null(),
+                    )
                     .col(
                         ColumnDef::new(PaymentRefunds::ExternalRefundId)
                             .string()
@@ -34,7 +42,11 @@ impl MigrationTrait for Migration {
                     )
                     .col(ColumnDef::new(PaymentRefunds::FailureCode).string().null())
                     .col(ColumnDef::new(PaymentRefunds::FailureMessage).text().null())
-                    .col(ColumnDef::new(PaymentRefunds::ProcessedAt).timestamp().null())
+                    .col(
+                        ColumnDef::new(PaymentRefunds::ProcessedAt)
+                            .timestamp()
+                            .null(),
+                    )
                     .col(timestamptz(PaymentRefunds::CreatedAt))
                     .col(timestamptz(PaymentRefunds::UpdatedAt))
                     .foreign_key(
@@ -93,7 +105,11 @@ where
     T: Iden + 'static,
 {
     let mut column_def = ColumnDef::new(column);
-    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+        .integer()
+        .not_null()
+        .auto_increment()
+        .primary_key();
     column_def
 }
 
