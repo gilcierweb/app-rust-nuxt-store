@@ -127,7 +127,7 @@
               <input v-model="selectedPaymentMethod" type="radio" name="payment_method" :value="method.id" class="radio radio-primary" :id="`payment-${method.id}`" />
               <label class="label-text text-base grow cursor-pointer flex items-center gap-4" :for="`payment-${method.id}`">
                 <div class="size-10 rounded-xl bg-white shadow-sm flex items-center justify-center border border-base-200">
-                  <span :class="[method.code.toLowerCase().includes('card') ? 'icon-[tabler--credit-card]' : method.code.toLowerCase().includes('pix') ? 'icon-[tabler--qrcode]' : 'icon-[tabler--wallet]', 'size-5 text-primary']"></span>
+                  <span :class="[paymentMethodIcon(method), 'size-5 text-primary']"></span>
                 </div>
                 <div class="font-bold text-lg">{{ method.name || method.code }}</div>
               </label>
@@ -231,7 +231,17 @@
           </div>
           
           <div class="space-y-4">
-            <button class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300"
+            <div v-if="stripeClientSecret" class="space-y-4 rounded-box border border-base-200 p-4">
+              <div id="stripe-payment-element" class="min-h-24" />
+              <button class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                :disabled="confirmingStripe || !stripeReady" @click="confirmStripePayment">
+                <span v-if="confirmingStripe" class="loading loading-spinner mr-2" />
+                <span v-else class="icon-[tabler--credit-card-pay] size-6 mr-2"></span>
+                {{ t('pages.checkout.placeOrder') }}
+              </button>
+            </div>
+
+            <button v-else class="btn btn-primary btn-lg w-full shadow-lg hover:shadow-primary/20 transition-all duration-300"
               :disabled="submitting || !canPlaceOrder" @click="placeOrder">
               <span v-if="submitting" class="loading loading-spinner mr-2" />
               <span v-else class="icon-[tabler--lock] size-6 mr-2"></span>
@@ -260,15 +270,28 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 const cartStore = useCartStore()
 const router = useRouter()
 const { apiFetch } = useApi()
 import type { PaymentMethod, ShippingMethod } from '~/types'
 
+declare global {
+  interface Window {
+    Stripe?: (publishableKey: string) => any
+  }
+}
+
 const submitting = ref(false)
+const confirmingStripe = ref(false)
+const stripeReady = ref(false)
 const error = ref('')
 const selectedPaymentMethod = ref<number | null>(null)
 const selectedShippingMethod = ref<number | null>(null)
+const pendingStripeOrderId = ref<number | null>(null)
+const stripeClientSecret = ref('')
+let stripeClient: any = null
+let stripeElements: any = null
 const braintreePaymentMethodId = ref('')
 const getnetGatewayPayload = ref('')
 const couponCode = ref('')
@@ -300,13 +323,13 @@ const { data: shippingMethods } = useLazyFetch<ShippingMethod[]>(
 // Auto-select first method when data arrives
 watch(paymentMethods, (methods) => {
   if (methods.length > 0 && !selectedPaymentMethod.value) {
-    selectedPaymentMethod.value = methods[0].id
+    selectedPaymentMethod.value = methods[0]?.id ?? null
   }
 }, { immediate: true })
 
 watch(shippingMethods, (methods) => {
   if (methods.length > 0 && !selectedShippingMethod.value) {
-    selectedShippingMethod.value = methods[0].id
+    selectedShippingMethod.value = methods[0]?.id ?? null
   }
 }, { immediate: true })
 
@@ -322,6 +345,13 @@ const selectedPaymentMethodRecord = computed(() => {
 })
 
 const selectedGatewayDriver = computed(() => selectedPaymentMethodRecord.value?.gateway_driver || null)
+
+function paymentMethodIcon(method: PaymentMethod) {
+  const code = method.code?.toLowerCase() || ''
+  if (code.includes('card')) return 'icon-[tabler--credit-card]'
+  if (code.includes('pix')) return 'icon-[tabler--qrcode]'
+  return 'icon-[tabler--wallet]'
+}
 
 const canPlaceOrder = computed(() => {
   if (!selectedPaymentMethod.value) return false
@@ -421,21 +451,105 @@ async function placeOrder() {
       },
     })
 
-    cartStore.clearCart()
     if (data.payment_session?.action_url) {
+      cartStore.clearCart()
       await navigateTo(data.payment_session.action_url, { external: true })
+      return
+    }
+
+    if (
+      selectedGatewayDriver.value === 'stripe' &&
+      data.payment_session?.external_client_secret &&
+      !data.payment_session?.action_url
+    ) {
+      pendingStripeOrderId.value = data.id
+      stripeClientSecret.value = data.payment_session.external_client_secret
+      cartStore.clearCart()
+      await mountStripePaymentElement(stripeClientSecret.value)
       return
     }
 
     const confirmationPath = data.payment_session?.requires_action
       ? `/orders/confirmation/${data.id}?payment_action=required`
       : `/orders/confirmation/${data.id}`
+    cartStore.clearCart()
     router.push(confirmationPath)
   } catch (err: any) {
     error.value = err?.data?.message || err?.message || t('pages.products.edit.error', { message: '' })
   } finally {
     submitting.value = false
   }
+}
+
+async function mountStripePaymentElement(clientSecret: string) {
+  stripeReady.value = false
+  stripeClient = await loadStripeClient()
+  stripeElements = stripeClient.elements({ clientSecret })
+  await nextTick()
+  const paymentElement = stripeElements.create('payment')
+  paymentElement.mount('#stripe-payment-element')
+  stripeReady.value = true
+}
+
+async function confirmStripePayment() {
+  if (!stripeClient || !stripeElements || !pendingStripeOrderId.value) return
+  confirmingStripe.value = true
+  error.value = ''
+
+  try {
+    const result = await stripeClient.confirmPayment({
+      elements: stripeElements,
+      confirmParams: {
+        return_url: `${window.location.origin}/orders/confirmation/${pendingStripeOrderId.value}`,
+      },
+      redirect: 'if_required',
+    })
+
+    if (result.error) {
+      error.value = result.error.message || t('pages.products.edit.error', { message: '' })
+      return
+    }
+
+    router.push(`/orders/confirmation/${pendingStripeOrderId.value}`)
+  } finally {
+    confirmingStripe.value = false
+  }
+}
+
+async function loadStripeClient() {
+  if (!config.public.stripePublishableKey) {
+    throw new Error('Missing Stripe publishable key')
+  }
+  if (!window.Stripe) {
+    await loadScript('stripe-js', 'https://js.stripe.com/v3/')
+  }
+  if (!window.Stripe) {
+    throw new Error('Stripe.js failed to load')
+  }
+  return window.Stripe(config.public.stripePublishableKey as string)
+}
+
+function loadScript(id: string, src: string) {
+  return new Promise<void>((resolve, reject) => {
+    const existing = document.getElementById(id) as HTMLScriptElement | null
+    if (existing) {
+      existing.addEventListener('load', () => resolve(), { once: true })
+      existing.addEventListener('error', () => reject(new Error(`${id} failed to load`)), { once: true })
+      if ((existing as any).dataset.loaded === 'true') resolve()
+      return
+    }
+
+    const script = document.createElement('script')
+    script.id = id
+    script.src = src
+    script.async = true
+    script.onload = () => {
+      script.dataset.loaded = 'true'
+      resolve()
+    }
+    script.onerror = () => reject(new Error(`${id} failed to load`))
+    document.head.appendChild(script)
+  })
 }
 </script>
 

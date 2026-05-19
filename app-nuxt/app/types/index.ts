@@ -224,6 +224,17 @@ export interface PaymentMethod {
   requires_gateway_payload?: boolean
 }
 
+export interface PaymentSession {
+  id: number
+  payment_id: number
+  payment_method_id: number
+  status: number
+  external_session_id?: string
+  external_client_secret?: string
+  action_url?: string
+  requires_action?: boolean
+}
+
 export interface Payment {
   id: number
   order_id: number
@@ -233,6 +244,7 @@ export interface Payment {
   status?: number
   transaction_id?: string
   processed_at?: string
+  payment_session?: PaymentSession
 }
 
 export interface Review {

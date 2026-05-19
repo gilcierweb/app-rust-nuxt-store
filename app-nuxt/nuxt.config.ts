@@ -60,7 +60,8 @@ export default defineNuxtConfig({
     apiRustApiKey: process.env.NUXT_API_RUST_API_KEY || process.env.API_PROTECTION_API_KEY || '',
     public: {
       ApiBaseUrl: '',
-      baseURL: '' // Deixar vazio para forçar requisições relativas no front-end
+      baseURL: '', // Deixar vazio para forçar requisições relativas no front-end
+      stripePublishableKey: process.env.NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
     }
   },
   
