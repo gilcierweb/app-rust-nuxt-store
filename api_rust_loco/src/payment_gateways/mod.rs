@@ -1,5 +1,8 @@
 pub mod abacatepay;
+pub mod braintree;
+pub mod cielo;
 pub mod drivers;
+pub mod getnet;
 pub mod iugu;
 pub mod manual;
 pub mod mercado_pago;
