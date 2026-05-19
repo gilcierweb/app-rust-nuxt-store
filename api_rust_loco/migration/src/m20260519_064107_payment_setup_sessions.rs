@@ -5,41 +5,177 @@ pub struct Migration;
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-    async fn up(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        let db = m.get_connection();
-        db.execute_unprepared(
-            r#"
-            CREATE TABLE IF NOT EXISTS payment_setup_sessions (
-                id SERIAL PRIMARY KEY,
-                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                payment_method_id INTEGER NOT NULL REFERENCES payment_methods(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-                payment_source_id INTEGER REFERENCES payment_sources(id) ON DELETE SET NULL ON UPDATE CASCADE,
-                status SMALLINT NOT NULL,
-                external_setup_id VARCHAR,
-                external_client_secret TEXT,
-                expires_at TIMESTAMP,
-                completed_at TIMESTAMP,
-                created_at TIMESTAMPTZ NOT NULL,
-                updated_at TIMESTAMPTZ NOT NULL
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .create_table(
+                Table::create()
+                    .table(PaymentSetupSessions::Table)
+                    .if_not_exists()
+                    .col(pk(PaymentSetupSessions::Id))
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::UserId)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::PaymentMethodId)
+                            .integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::PaymentSourceId)
+                            .integer()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::Status)
+                            .small_integer()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::ExternalSetupId)
+                            .string()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::ExternalClientSecret)
+                            .text()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::ExpiresAt)
+                            .timestamp()
+                            .null(),
+                    )
+                    .col(
+                        ColumnDef::new(PaymentSetupSessions::CompletedAt)
+                            .timestamp()
+                            .null(),
+                    )
+                    .col(timestamptz(PaymentSetupSessions::CreatedAt))
+                    .col(timestamptz(PaymentSetupSessions::UpdatedAt))
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_payment_setup_sessions_user")
+                            .from(PaymentSetupSessions::Table, PaymentSetupSessions::UserId)
+                            .to(Users::Table, Users::Id)
+                            .on_delete(ForeignKeyAction::Cascade)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_payment_setup_sessions_payment_method")
+                            .from(
+                                PaymentSetupSessions::Table,
+                                PaymentSetupSessions::PaymentMethodId,
+                            )
+                            .to(PaymentMethods::Table, PaymentMethods::Id)
+                            .on_delete(ForeignKeyAction::Restrict)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk_payment_setup_sessions_payment_source")
+                            .from(
+                                PaymentSetupSessions::Table,
+                                PaymentSetupSessions::PaymentSourceId,
+                            )
+                            .to(PaymentSources::Table, PaymentSources::Id)
+                            .on_delete(ForeignKeyAction::SetNull)
+                            .on_update(ForeignKeyAction::Cascade),
+                    )
+                    .to_owned(),
             )
-            "#,
-        )
-        .await?;
-        db.execute_unprepared(
-            "CREATE INDEX IF NOT EXISTS idx_payment_setup_sessions_user_status ON payment_setup_sessions (user_id, status)",
-        )
-        .await?;
-        db.execute_unprepared(
-            "CREATE INDEX IF NOT EXISTS idx_payment_setup_sessions_method_external ON payment_setup_sessions (payment_method_id, external_setup_id)",
-        )
-        .await?;
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_payment_setup_sessions_user_status")
+                    .table(PaymentSetupSessions::Table)
+                    .col(PaymentSetupSessions::UserId)
+                    .col(PaymentSetupSessions::Status)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_payment_setup_sessions_method_external")
+                    .table(PaymentSetupSessions::Table)
+                    .col(PaymentSetupSessions::PaymentMethodId)
+                    .col(PaymentSetupSessions::ExternalSetupId)
+                    .to_owned(),
+            )
+            .await?;
+
         Ok(())
     }
 
-    async fn down(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        m.get_connection()
-            .execute_unprepared("DROP TABLE IF EXISTS payment_setup_sessions")
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .drop_table(
+                Table::drop()
+                    .if_exists()
+                    .table(PaymentSetupSessions::Table)
+                    .to_owned(),
+            )
             .await?;
         Ok(())
     }
+}
+
+fn pk<T>(column: T) -> ColumnDef
+where
+    T: Iden + 'static,
+{
+    let mut column_def = ColumnDef::new(column);
+    column_def.integer().not_null().auto_increment().primary_key();
+    column_def
+}
+
+fn timestamptz<T>(column: T) -> ColumnDef
+where
+    T: Iden + 'static,
+{
+    let mut column_def = ColumnDef::new(column);
+    column_def.timestamp_with_time_zone().not_null();
+    column_def
+}
+
+#[derive(Iden)]
+enum PaymentSetupSessions {
+    Table,
+    Id,
+    UserId,
+    PaymentMethodId,
+    PaymentSourceId,
+    Status,
+    ExternalSetupId,
+    ExternalClientSecret,
+    ExpiresAt,
+    CompletedAt,
+    CreatedAt,
+    UpdatedAt,
+}
+
+#[derive(Iden)]
+enum Users {
+    Table,
+    Id,
+}
+
+#[derive(Iden)]
+enum PaymentMethods {
+    Table,
+    Id,
+}
+
+#[derive(Iden)]
+enum PaymentSources {
+    Table,
+    Id,
 }

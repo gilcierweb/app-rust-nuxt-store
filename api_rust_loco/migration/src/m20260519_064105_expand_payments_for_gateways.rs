@@ -5,77 +5,168 @@ pub struct Migration;
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
-    async fn up(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        let db = m.get_connection();
-        db.execute_unprepared(
-            r#"
-            ALTER TABLE payments
-                ADD COLUMN IF NOT EXISTS number VARCHAR,
-                ADD COLUMN IF NOT EXISTS payment_source_id INTEGER REFERENCES payment_sources(id) ON DELETE SET NULL ON UPDATE CASCADE,
-                ADD COLUMN IF NOT EXISTS intent SMALLINT NOT NULL DEFAULT 1,
-                ADD COLUMN IF NOT EXISTS external_payment_id VARCHAR,
-                ADD COLUMN IF NOT EXISTS external_status VARCHAR,
-                ADD COLUMN IF NOT EXISTS idempotency_key VARCHAR,
-                ADD COLUMN IF NOT EXISTS failure_code VARCHAR,
-                ADD COLUMN IF NOT EXISTS failure_message TEXT,
-                ADD COLUMN IF NOT EXISTS authorized_at TIMESTAMP,
-                ADD COLUMN IF NOT EXISTS captured_at TIMESTAMP,
-                ADD COLUMN IF NOT EXISTS voided_at TIMESTAMP,
-                ADD COLUMN IF NOT EXISTS cancelled_at TIMESTAMP
-            "#,
-        )
-        .await?;
-        db.execute_unprepared("CREATE UNIQUE INDEX IF NOT EXISTS uidx_payments_number ON payments (number)")
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .alter_table(
+                Table::alter()
+                    .table(Payments::Table)
+                    .add_column_if_not_exists(ColumnDef::new(Payments::Number).string().null())
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::PaymentSourceId).integer().null(),
+                    )
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::Intent)
+                            .small_integer()
+                            .not_null()
+                            .default(1),
+                    )
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::ExternalPaymentId).string().null(),
+                    )
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::ExternalStatus).string().null(),
+                    )
+                    .add_column_if_not_exists(
+                        ColumnDef::new(Payments::IdempotencyKey).string().null(),
+                    )
+                    .add_column_if_not_exists(ColumnDef::new(Payments::FailureCode).string().null())
+                    .add_column_if_not_exists(ColumnDef::new(Payments::FailureMessage).text().null())
+                    .add_column_if_not_exists(ColumnDef::new(Payments::AuthorizedAt).timestamp().null())
+                    .add_column_if_not_exists(ColumnDef::new(Payments::CapturedAt).timestamp().null())
+                    .add_column_if_not_exists(ColumnDef::new(Payments::VoidedAt).timestamp().null())
+                    .add_column_if_not_exists(ColumnDef::new(Payments::CancelledAt).timestamp().null())
+                    .to_owned(),
+            )
             .await?;
-        db.execute_unprepared(
-            "CREATE UNIQUE INDEX IF NOT EXISTS uidx_payments_idempotency_key ON payments (idempotency_key)",
-        )
-        .await?;
-        db.execute_unprepared(
-            "CREATE INDEX IF NOT EXISTS idx_payments_order_status ON payments (order_id, status)",
-        )
-        .await?;
-        db.execute_unprepared(
-            "CREATE INDEX IF NOT EXISTS idx_payments_payment_source_id ON payments (payment_source_id)",
-        )
-        .await?;
-        db.execute_unprepared(
-            "CREATE INDEX IF NOT EXISTS idx_payments_method_external ON payments (payment_method_id, external_payment_id)",
-        )
-        .await?;
+
+        manager
+            .create_foreign_key(
+                ForeignKey::create()
+                    .name("fk_payments_payment_source")
+                    .from(Payments::Table, Payments::PaymentSourceId)
+                    .to(PaymentSources::Table, PaymentSources::Id)
+                    .on_delete(ForeignKeyAction::SetNull)
+                    .on_update(ForeignKeyAction::Cascade)
+                    .to_owned(),
+            )
+            .await?;
+
+        for index_statement in [
+            Index::create()
+                .if_not_exists()
+                .unique()
+                .name("uidx_payments_number")
+                .table(Payments::Table)
+                .col(Payments::Number)
+                .to_owned(),
+            Index::create()
+                .if_not_exists()
+                .unique()
+                .name("uidx_payments_idempotency_key")
+                .table(Payments::Table)
+                .col(Payments::IdempotencyKey)
+                .to_owned(),
+            Index::create()
+                .if_not_exists()
+                .name("idx_payments_order_status")
+                .table(Payments::Table)
+                .col(Payments::OrderId)
+                .col(Payments::Status)
+                .to_owned(),
+            Index::create()
+                .if_not_exists()
+                .name("idx_payments_payment_source_id")
+                .table(Payments::Table)
+                .col(Payments::PaymentSourceId)
+                .to_owned(),
+            Index::create()
+                .if_not_exists()
+                .name("idx_payments_method_external")
+                .table(Payments::Table)
+                .col(Payments::PaymentMethodId)
+                .col(Payments::ExternalPaymentId)
+                .to_owned(),
+        ] {
+            manager.create_index(index_statement).await?;
+        }
+
         Ok(())
     }
 
-    async fn down(&self, m: &SchemaManager) -> Result<(), DbErr> {
-        let db = m.get_connection();
-        db.execute_unprepared("DROP INDEX IF EXISTS idx_payments_method_external")
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        for index_name in [
+            "idx_payments_method_external",
+            "idx_payments_payment_source_id",
+            "idx_payments_order_status",
+            "uidx_payments_idempotency_key",
+            "uidx_payments_number",
+        ] {
+            manager
+                .drop_index(
+                    Index::drop()
+                        .if_exists()
+                        .name(index_name)
+                        .table(Payments::Table)
+                        .to_owned(),
+                )
+                .await?;
+        }
+
+        manager
+            .drop_foreign_key(
+                ForeignKey::drop()
+                    .name("fk_payments_payment_source")
+                    .table(Payments::Table)
+                    .to_owned(),
+            )
             .await?;
-        db.execute_unprepared("DROP INDEX IF EXISTS idx_payments_payment_source_id")
+
+        manager
+            .alter_table(
+                Table::alter()
+                    .table(Payments::Table)
+                    .drop_column(Payments::CancelledAt)
+                    .drop_column(Payments::VoidedAt)
+                    .drop_column(Payments::CapturedAt)
+                    .drop_column(Payments::AuthorizedAt)
+                    .drop_column(Payments::FailureMessage)
+                    .drop_column(Payments::FailureCode)
+                    .drop_column(Payments::IdempotencyKey)
+                    .drop_column(Payments::ExternalStatus)
+                    .drop_column(Payments::ExternalPaymentId)
+                    .drop_column(Payments::Intent)
+                    .drop_column(Payments::PaymentSourceId)
+                    .drop_column(Payments::Number)
+                    .to_owned(),
+            )
             .await?;
-        db.execute_unprepared("DROP INDEX IF EXISTS idx_payments_order_status")
-            .await?;
-        db.execute_unprepared("DROP INDEX IF EXISTS uidx_payments_idempotency_key")
-            .await?;
-        db.execute_unprepared("DROP INDEX IF EXISTS uidx_payments_number")
-            .await?;
-        db.execute_unprepared(
-            r#"
-            ALTER TABLE payments
-                DROP COLUMN IF EXISTS cancelled_at,
-                DROP COLUMN IF EXISTS voided_at,
-                DROP COLUMN IF EXISTS captured_at,
-                DROP COLUMN IF EXISTS authorized_at,
-                DROP COLUMN IF EXISTS failure_message,
-                DROP COLUMN IF EXISTS failure_code,
-                DROP COLUMN IF EXISTS idempotency_key,
-                DROP COLUMN IF EXISTS external_status,
-                DROP COLUMN IF EXISTS external_payment_id,
-                DROP COLUMN IF EXISTS intent,
-                DROP COLUMN IF EXISTS payment_source_id,
-                DROP COLUMN IF EXISTS number
-            "#,
-        )
-        .await?;
+
         Ok(())
     }
+}
+
+#[derive(Iden)]
+enum Payments {
+    Table,
+    OrderId,
+    PaymentMethodId,
+    Status,
+    Number,
+    PaymentSourceId,
+    Intent,
+    ExternalPaymentId,
+    ExternalStatus,
+    IdempotencyKey,
+    FailureCode,
+    FailureMessage,
+    AuthorizedAt,
+    CapturedAt,
+    VoidedAt,
+    CancelledAt,
+}
+
+#[derive(Iden)]
+enum PaymentSources {
+    Table,
+    Id,
 }
