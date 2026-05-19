@@ -43,6 +43,10 @@ ipnetwork = "0.20"
 utoipa = { version = "5", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "9", features = ["axum"] }
 rust-i18n = "4.0.0"
+hex = "0.4"
+hmac = "0.12"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+sha2 = "0.10"
 
 # -- Utils
 urlencoding = "2.1"

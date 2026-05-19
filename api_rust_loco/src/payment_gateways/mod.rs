@@ -2,6 +2,7 @@ pub mod drivers;
 pub mod manual;
 pub mod registry;
 pub mod service;
+pub mod stripe;
 pub mod types;
 pub mod webhooks;
 
