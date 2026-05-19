@@ -35,6 +35,7 @@ mod m20260517_073137_banners;
 mod m20260517_073909_banner_events;
 mod m20260517_203700_add_catalog_lookup_indexes;
 mod m20260517_211000_add_controller_query_indexes;
+mod m20260519_000001_payment_gateway_domain;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -73,6 +74,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260517_073909_banner_events::Migration),
             Box::new(m20260517_203700_add_catalog_lookup_indexes::Migration),
             Box::new(m20260517_211000_add_controller_query_indexes::Migration),
+            Box::new(m20260519_000001_payment_gateway_domain::Migration),
             // inject-above (do not remove this comment)
         ]
     }

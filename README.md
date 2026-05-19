@@ -15,7 +15,10 @@ A production-ready e-commerce application featuring a high-performance REST API 
 
 - **Full E-Commerce Flow** - Products, categories, cart, checkout, orders, payments, shipping, coupons, reviews, wishlists
 - **JWT Authentication** - Register, login, email verification, password reset, magic link (passwordless)
+- **API Protection Layer** - `x-api-key` gateway for direct backend access + per-IP/per-user rate limiting
+- **Namespaced API** - Shared auth at `/api/auth`, customer self-service at `/api/account`, admin surface at `/api/admin`
 - **Admin Dashboard** - Complete back-office with stats, CRUD management for all entities
+- **Banners System** - Public active banners API + admin banner CRUD/events/analytics endpoints
 - **API Documentation** - OpenAPI/Swagger UI available at `/api/docs`
 - **Internationalization** - Multi-language support (pt-BR, en, es)
 - **PWA Ready** - Progressive Web App with offline caching via Workbox
@@ -60,18 +63,19 @@ viewer: viewer@example.com
 
 Everyone's password: Password123!
 
+
 ## 📂 Project Structure
 
 ```
 app-rust-nuxt-store/
 ├── api_rust_loco/          # Rust backend (Loco.rs REST API)
 │   ├── src/
-│   │   ├── controllers/    # 16 API controllers
+│   │   ├── controllers/    # 18 API controllers (includes admin/banner surfaces)
 │   │   ├── models/         # SeaORM entities + business logic
 │   │   ├── views/          # Response serialization
 │   │   ├── mailers/        # Email templates (welcome, reset, magic-link)
 │   │   ├── workers/        # Background jobs
-│   │   ├── seeds/          # Database seeders
+│   │   ├── seeds/          # Dependency-aware seeders (22 entities)
 │   │   ├── openapi.rs      # OpenAPI/Swagger configuration
 │   │   └── app.rs          # App hooks + route registration
 │   ├── config/             # Environment configs (dev, test, prod)
@@ -185,6 +189,21 @@ Large list endpoints accept `page` and `per_page` query parameters and use SeaOR
 
 Read-heavy catalog/content endpoints use short-lived in-memory caches, product and variant reads use single-query joins on cold cache, and production keeps database pool connections warm by default (`DB_IDLE_TIMEOUT=300000`, `DB_MIN_CONNECTIONS=5`, `DB_MAX_CONNECTIONS=20`) to avoid cold reconnect latency during normal navigation.
 
+Current API namespaces:
+
+- `/api/auth/*` - shared authentication surface (customer + admin login/session)
+- `/api/account/*` - authenticated customer-owned resources (orders, wishlist, checkout)
+- `/api/admin/*` - administrative resources protected by admin namespace guard
+- Public read APIs remain under `/api/*` for catalog/content delivery
+
+Implemented namespaced endpoints (current state):
+
+| Namespace | Endpoints | Auth |
+|---|---|---|
+| **Account** | `/api/account/orders`, `/api/account/orders/:id`, `/api/account/orders/checkout`, `/api/account/wishlist/*` | JWT |
+| **Admin** | `/api/admin/dashboards/stats`, `/api/admin/{users,products,categories,orders,profiles,addresses,posts,reviews,banners,coupons,shippings,shipments,variants,payments}` | JWT + admin ability |
+| **Banners Public** | `/api/banners/active`, `/api/banners/events` | Public |
+
 | Module | Prefix | Endpoints | Auth |
 |---|---|---|---|
 | **Auth** | `/api/auth/` | register, verify, login, forgot, reset, current, magic-link | Mixed |
@@ -202,7 +221,9 @@ Read-heavy catalog/content endpoints use short-lived in-memory caches, product a
 | **Posts** | `/api/posts/` | CRUD | JWT (write) |
 | **Profiles** | `/api/profiles/` | CRUD | JWT (write) |
 
-## 📊 Database Entities (19 tables)
+Legacy endpoints such as `/api/orders/*`, `/api/wishlists/*`, and `/api/users/*` remain available for compatibility while frontend migration to namespaces continues.
+
+## 📊 Database Entities (22 tables)
 
 | Entity | Description | Status |
 |---|---|---|
@@ -228,6 +249,27 @@ Read-heavy catalog/content endpoints use short-lived in-memory caches, product a
 | `coupon_usages` | Coupon redemption tracking | ✅ Done |
 | `reviews` | Product reviews and ratings | ✅ Done |
 | `wishlists` | User wishlists | ✅ Done |
+
+## ⚡ Performance & Security Status
+
+Highlights from performance and authentication:
+
+- Navigation-scoped auth initialization reduced duplicate `/api/auth/current` calls.
+- Admin auth context is resolved once in namespace middleware and reused downstream.
+- Hot list endpoints support SeaORM pagination (`page`, `per_page`, max `100`).
+- Additional indexes were added on auth, catalog, orders, and banner analytics paths.
+- Read-heavy endpoints use short-lived in-memory caches with invalidation on writes.
+- API protection now layers: `x-api-key` guard -> rate limiting -> CSRF/JWT handling.
+
+Key backend auth env vars:
+
+- `API_PROTECTION_API_KEY`
+- `API_RATE_LIMIT_ENABLED`
+- `API_RATE_LIMIT_IP_REQUESTS`
+- `API_RATE_LIMIT_IP_WINDOW_SECONDS`
+- `API_RATE_LIMIT_USER_REQUESTS`
+- `API_RATE_LIMIT_USER_WINDOW_SECONDS`
+- `AUTH_JWT_SECRET`
 
 ## 🎨 Frontend Pages
 
@@ -340,7 +382,7 @@ Read-heavy catalog/content endpoints use short-lived in-memory caches, product a
 * [ ] Health checks and readiness probes
 
 ### Customer Experience
-* [ ] Customer account dashboard (order history, saved addresses, settings)
+* [x] Customer account dashboard (order history, saved addresses, settings)
 * [ ] Order status email notifications (confirmation, shipped, delivered)
 * [ ] Abandoned cart recovery emails
 * [ ] Back-in-stock notifications
@@ -388,6 +430,8 @@ Read-heavy catalog/content endpoints use short-lived in-memory caches, product a
 * [ ] AI-powered product descriptions (LLM integration)
 * [ ] Headless CMS integration (Strapi / Directus)
 * [ ] Progressive image loading (blur-up technique)
+* [ ] Product variant images CRUD finalization (currently in progress in backlog)
+
 
 ---
 

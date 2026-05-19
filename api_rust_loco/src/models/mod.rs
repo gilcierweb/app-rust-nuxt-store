@@ -14,6 +14,7 @@ pub mod coupons;
 pub mod order_items;
 pub mod order_status;
 pub mod orders;
+pub mod payment_gateway_status;
 pub mod payment_methods;
 pub mod payments;
 pub mod post_status;
