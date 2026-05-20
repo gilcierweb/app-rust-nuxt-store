@@ -21,6 +21,7 @@ pub mod wishlist;
 pub mod payment_webhook;
 
 pub mod payment_setup_session;
+pub mod admin_inventory;
 pub mod admin_settings;
 pub mod admin_payment_gateways;
 pub mod admin_payment_methods;

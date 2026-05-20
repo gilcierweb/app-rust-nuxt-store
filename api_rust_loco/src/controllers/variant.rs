@@ -31,7 +31,7 @@ fn variants_cache() -> &'static Cache<String, Arc<Vec<VariantWithOptions>>> {
     })
 }
 
-fn invalidate_variants_cache() {
+pub(crate) fn invalidate_variants_cache() {
     variants_cache().invalidate_all();
 }
 

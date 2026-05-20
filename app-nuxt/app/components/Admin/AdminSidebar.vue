@@ -54,6 +54,12 @@
             </NuxtLinkLocale>
           </li>
           <li>
+            <NuxtLinkLocale to="/admin/inventory" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--packages] size-5"></i>
+              Inventory
+            </NuxtLinkLocale>
+          </li>
+          <li>
             <NuxtLinkLocale to="/admin/categories" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--category] size-5"></i>
               {{ $t('admin.categories.title') }}
