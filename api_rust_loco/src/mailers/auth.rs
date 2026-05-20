@@ -89,4 +89,73 @@ impl AuthMailer {
 
         Ok(())
     }
+
+    pub async fn mail_template_public(
+        ctx: &AppContext,
+        template_name: &str,
+        to: String,
+        locals: serde_json::Value,
+    ) -> Result<()> {
+        let dir = match template_name {
+            "welcome" => &welcome,
+            "forgot_password" | "forgot" => &forgot,
+            "magic_link" => &magic_link,
+            _ => return Err(Error::string(&format!("Unknown template: {template_name}"))),
+        };
+        Self::mail_template(
+            ctx,
+            dir,
+            mailer::Args {
+                to,
+                locals,
+                ..Default::default()
+            },
+        )
+        .await?;
+        Ok(())
+    }
+
+    pub fn get_all_templates() -> Vec<TemplateInfo> {
+        let mut list = Vec::new();
+        let templates = vec![
+            ("welcome", &welcome),
+            ("forgot_password", &forgot),
+            ("magic_link", &magic_link),
+        ];
+
+        for (name, dir) in templates {
+            let subject = dir.get_file("subject.txt")
+                .and_then(|f| f.contents_utf8())
+                .unwrap_or("")
+                .trim()
+                .to_string();
+
+            let html = dir.get_file("html.tera")
+                .and_then(|f| f.contents_utf8())
+                .unwrap_or("")
+                .to_string();
+
+            let text = dir.get_file("text.tera")
+                .and_then(|f| f.contents_utf8())
+                .unwrap_or("")
+                .to_string();
+
+            list.push(TemplateInfo {
+                name: name.to_string(),
+                subject,
+                html,
+                text,
+            });
+        }
+
+        list
+    }
+}
+
+#[derive(serde::Serialize)]
+pub struct TemplateInfo {
+    pub name: String,
+    pub subject: String,
+    pub html: String,
+    pub text: String,
 }

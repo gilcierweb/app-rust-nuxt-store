@@ -10,6 +10,7 @@ pub use super::carts::Entity as Carts;
 pub use super::categories::Entity as Categories;
 pub use super::coupon_usages::Entity as CouponUsages;
 pub use super::coupons::Entity as Coupons;
+pub use super::email_logs::Entity as EmailLogs;
 pub use super::gateway_customers::Entity as GatewayCustomers;
 pub use super::order_items::Entity as OrderItems;
 pub use super::orders::Entity as Orders;

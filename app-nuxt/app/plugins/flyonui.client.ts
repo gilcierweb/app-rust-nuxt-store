@@ -1,33 +1,29 @@
-import { useRouter } from "vue-router";
+export default defineNuxtPlugin(async () => {
+  if (import.meta.client) {
+    await import("flyonui/flyonui");
+    await import("flyonui/dist/accordion");
+    await import("flyonui/dist/dropdown");
+    await import("flyonui/dist/carousel");
+  }
 
-// FlyonUI
-import "flyonui/flyonui";
-import "flyonui/dist/accordion";
-import "flyonui/dist/dropdown";
-import "flyonui/dist/carousel";
-
-// import "flyonui/dist/modal";
-// import "flyonui/dist/tooltip";
-// import "flyonui/dist/tab";
-// import "flyonui/dist/collapse";
-
-export default defineNuxtPlugin(() => {
   const router = useRouter();
   router.afterEach(async () => {
-    setTimeout(() => {
-       if (window.HSStaticMethods) {
-         window.HSStaticMethods.autoInit();
-       }     
-        if (window.HSAccordion) {
-            window.HSAccordion.autoInit();
-        }
-        if (window.HSDropdown) {
-            window.HSDropdown.autoInit();
-        } 
-        if (window.HSCarousel) {     
-            window.HSCarousel.autoInit();      
-        }
-    }, 100);
-   
+    await nextTick();
+    try {
+      if (window.HSStaticMethods) {
+        window.HSStaticMethods.autoInit();
+      }
+      if (window.HSAccordion) {
+        window.HSAccordion.autoInit();
+      }
+      if (window.HSDropdown) {
+        window.HSDropdown.autoInit();
+      }
+      if (window.HSCarousel) {
+        window.HSCarousel.autoInit();
+      }
+    } catch {
+      // Ignore errors from FlyonUI autoInit when DOM nodes are temporarily unavailable
+    }
   });
 });

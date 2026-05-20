@@ -1,5 +1,5 @@
 <template>
-  <aside id="with-navbar-sidebar"
+  <aside id="layout-sidebar"
     class="overlay [--auto-close:lg] lg:z-50 lg:block lg:translate-x-0 lg:shadow-none overlay-open:translate-x-0 drawer drawer-start hidden max-w-75 w-75 sm:fixed sm:inset-y-0 sm:start-0 bg-base-100 border-e border-base-content/20 transition-transform duration-300"
     role="dialog" tabindex="-1">
     
@@ -129,6 +129,12 @@
             <NuxtLinkLocale to="/admin/users" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--user-shield] size-5"></i>
               {{ $t('admin.users.title') }}
+            </NuxtLinkLocale>
+          </li>
+          <li>
+            <NuxtLinkLocale to="/admin/emails" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--mail] size-5"></i>
+              Emails
             </NuxtLinkLocale>
           </li>
           <li>

@@ -12,6 +12,7 @@ pub mod carts;
 pub mod categories;
 pub mod coupon_usages;
 pub mod coupons;
+pub mod email_logs;
 pub mod gateway_customers;
 pub mod order_items;
 pub mod orders;

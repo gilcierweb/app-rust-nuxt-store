@@ -116,6 +116,10 @@ const isSaving = ref(false)
 const saveMessage = ref('')
 const saveError = ref('')
 
+const settingId = (setting: Pick<AdminSetting, 'namespace' | 'key'>) => {
+  return `${setting.namespace}.${setting.key}`
+}
+
 const { pending, data, error, refresh } = await useApiFetch<AdminSettingsResponse>(
   '/api/admin/settings/',
   { key: 'admin-settings' }
@@ -141,10 +145,6 @@ watch(
   },
   { immediate: true }
 )
-
-const settingId = (setting: Pick<AdminSetting, 'namespace' | 'key'>) => {
-  return `${setting.namespace}.${setting.key}`
-}
 
 const groupIcon = (namespace: string) => {
   switch (namespace) {

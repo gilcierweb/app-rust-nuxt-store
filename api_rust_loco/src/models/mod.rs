@@ -43,3 +43,4 @@ pub mod users_roles;
 pub mod variant_options;
 pub mod wishlists;
 pub mod product_variant_images;
+pub mod email_logs;

@@ -4,17 +4,21 @@ use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "admin_settings")]
+#[sea_orm(table_name = "email_logs")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
-    pub namespace: String,
-    pub key: String,
-    #[sea_orm(column_type = "Text", nullable)]
-    pub value: Option<String>,
-    pub value_type: i16,
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
+    #[sea_orm(primary_key)]
+    pub id: i32,
+    pub recipient: String,
+    pub template_name: String,
+    pub subject: String,
+    #[sea_orm(column_type = "Text")]
+    pub locals_json: String,
+    pub status: i16,
+    #[sea_orm(column_type = "Text", nullable)]
+    pub error_message: Option<String>,
+    pub sent_at: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

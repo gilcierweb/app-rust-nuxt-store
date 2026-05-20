@@ -29,3 +29,4 @@ mod banners;
 mod payment_gateways;
 
 mod product_variant_images;
+mod email_logs;
