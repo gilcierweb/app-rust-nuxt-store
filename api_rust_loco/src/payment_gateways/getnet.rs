@@ -12,7 +12,7 @@ use crate::payment_gateways::drivers::GETNET_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput,
+    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
 };
 
 const GETNET_CLIENT_ID_ENV: &str = "GETNET_CLIENT_ID";
@@ -151,9 +151,15 @@ impl PaymentGateway for GetnetGateway {
                 .or_else(|| string_field(value, "payment_id"))
         });
 
+        let action = external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
+            external_payment_id: id.to_string(),
+            status: getnet_attempt_status(event_type.as_deref()),
+        });
+
         Ok(WebhookDecision {
             event_type,
             external_event_id,
+            action,
             signature_valid: false,
             processed: false,
             ignored: false,

@@ -128,3 +128,104 @@ async fn webhook_invalid_signature_fails() {
     })
     .await;
 }
+
+#[tokio::test]
+#[serial]
+async fn webhook_state_transition_works() {
+    request::<App, _, _>(|request, ctx| async move {
+        let now = chrono::Utc::now();
+        // Setup user, order, payment method, payment
+        let user = api_rust_loco::models::_entities::users::ActiveModel {
+            name: Set("Test User".to_string()),
+            email: Set(format!("test{}@example.com", uuid::Uuid::new_v4())),
+            password: Set("password123".to_string()),
+            ..Default::default()
+        }
+        .insert(&ctx.db)
+        .await
+        .unwrap();
+
+        let gateway = setup_webhook_gateway(&ctx, "pagarme").await;
+
+        let method = api_rust_loco::models::_entities::payment_methods::ActiveModel {
+            payment_gateway_id: Set(Some(gateway.id)),
+            code: Set(Some("pagarme_cc".to_string())),
+            name: Set(Some("Pagarme CC".to_string())),
+            active: Set(Some(true)),
+            method_type: Set(1),
+            auto_capture: Set(true),
+            created_at: Set(now.into()),
+            updated_at: Set(now.into()),
+            ..Default::default()
+        }
+        .insert(&ctx.db)
+        .await
+        .unwrap();
+
+        let order = api_rust_loco::models::_entities::orders::ActiveModel {
+            user_id: Set(user.id),
+            status: Set(Some(api_rust_loco::models::order_status::OrderStatus::Pending.to_i32())),
+            payment_status: Set(Some(api_rust_loco::models::order_status::PaymentStatus::Unpaid.to_i32())),
+            total_amount: Set(Some(rust_decimal::Decimal::new(1000, 2))),
+            created_at: Set(now.into()),
+            updated_at: Set(now.into()),
+            ..Default::default()
+        }
+        .insert(&ctx.db)
+        .await
+        .unwrap();
+
+        let payment = api_rust_loco::models::_entities::payments::ActiveModel {
+            order_id: Set(order.id),
+            payment_method_id: Set(method.id),
+            amount: Set(Some(rust_decimal::Decimal::new(1000, 2))),
+            status: Set(Some(api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Pending.to_i16() as i32)),
+            intent: Set(api_rust_loco::models::payment_gateway_status::PaymentIntent::Purchase.to_i16()),
+            created_at: Set(now.into()),
+            updated_at: Set(now.into()),
+            ..Default::default()
+        }
+        .insert(&ctx.db)
+        .await
+        .unwrap();
+
+        let payload = serde_json::json!({
+            "type": "order.paid",
+            "data": {
+                "id": "or_pagarme_123",
+                "status": "paid",
+                "metadata": {
+                    "payment_id": payment.id.to_string()
+                }
+            }
+        });
+
+        let res = request
+            .post(&format!("/api/webhooks/payments/{}", gateway.code))
+            .json(&payload)
+            .await;
+        
+        assert_eq!(res.status_code(), 200);
+        let json: Value = serde_json::from_str(&res.text()).unwrap();
+        assert_eq!(json["signature_valid"], true);
+        assert_eq!(json["processed"], true);
+        assert_eq!(json["status"], PaymentGatewayEventStatus::Processed.to_i16() as i32);
+
+        // Verify the payment status was updated to Captured
+        let updated_payment = api_rust_loco::models::_entities::payments::Entity::find_by_id(payment.id)
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(updated_payment.status, Some(api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Captured.to_i16() as i32));
+
+        // Verify the order payment status was updated to Paid
+        let updated_order = api_rust_loco::models::_entities::orders::Entity::find_by_id(order.id)
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(updated_order.payment_status, Some(api_rust_loco::models::order_status::PaymentStatus::Paid.to_i32()));
+    })
+    .await;
+}

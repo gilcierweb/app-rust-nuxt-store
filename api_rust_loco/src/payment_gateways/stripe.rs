@@ -14,7 +14,7 @@ use crate::payment_gateways::drivers::STRIPE_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput,
+    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
 };
 
 const STRIPE_API_BASE: &str = "https://api.stripe.com/v1";
@@ -152,9 +152,32 @@ impl PaymentGateway for StripeGateway {
             .and_then(|value| string_field(value, "type"));
         let external_event_id = parsed.as_ref().and_then(|value| string_field(value, "id"));
 
+        let action = match event_type.as_deref() {
+            Some("payment_intent.succeeded") => {
+                parsed.as_ref().and_then(|v| v.pointer("/data/object/id")).and_then(Value::as_str).map(|id| WebhookAction::UpdatePaymentStatus {
+                    external_payment_id: id.to_string(),
+                    status: PaymentAttemptStatus::Captured,
+                })
+            }
+            Some("payment_intent.payment_failed") => {
+                parsed.as_ref().and_then(|v| v.pointer("/data/object/id")).and_then(Value::as_str).map(|id| WebhookAction::UpdatePaymentStatus {
+                    external_payment_id: id.to_string(),
+                    status: PaymentAttemptStatus::Failed,
+                })
+            }
+            Some("payment_intent.canceled") => {
+                parsed.as_ref().and_then(|v| v.pointer("/data/object/id")).and_then(Value::as_str).map(|id| WebhookAction::UpdatePaymentStatus {
+                    external_payment_id: id.to_string(),
+                    status: PaymentAttemptStatus::Cancelled,
+                })
+            }
+            _ => None,
+        };
+
         Ok(WebhookDecision {
             event_type,
             external_event_id,
+            action,
             signature_valid,
             processed: false,
             ignored: false,

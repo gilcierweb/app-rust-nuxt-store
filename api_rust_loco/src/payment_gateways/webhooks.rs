@@ -8,9 +8,11 @@ use uuid::Uuid;
 use crate::models::_entities::payment_gateway_events;
 use crate::models::_entities::payment_gateway_logs;
 use crate::models::_entities::payment_gateways;
+use crate::models::_entities::{orders, payment_methods, payments};
 use crate::models::payment_gateway_status::PaymentGatewayEventStatus;
 use crate::payment_gateways::registry::gateway_for_driver;
-use crate::payment_gateways::types::WebhookInput;
+use crate::payment_gateways::session_response::order_payment_status;
+use crate::payment_gateways::types::{WebhookAction, WebhookDecision, WebhookInput};
 
 const LOG_DIRECTION_WEBHOOK: i16 = 3;
 const LOG_LEVEL_INFO: i16 = 1;
@@ -89,7 +91,7 @@ where
     .insert(db)
     .await?;
 
-    let gateway_result = match gateway_for_driver(&gateway.driver) {
+    let mut gateway_result = match gateway_for_driver(&gateway.driver) {
         Ok(gateway_driver) => gateway_driver
             .handle_webhook(WebhookInput {
                 gateway_code: gateway.code.clone(),
@@ -100,6 +102,88 @@ where
             .map_err(|err| err.to_string()),
         Err(err) => Err(err.to_string()),
     };
+
+    if let Ok(ref mut decision) = gateway_result {
+        if decision.signature_valid {
+            if let Some(action) = &decision.action {
+                match action {
+                    WebhookAction::UpdatePaymentStatus { external_payment_id, status } => {
+                        let apply_result: Result<(), String> = async {
+                            let payment_opt = payments::Entity::find()
+                                .filter(payments::Column::ExternalPaymentId.eq(external_payment_id.clone()))
+                                .inner_join(payment_methods::Entity)
+                                .filter(payment_methods::Column::PaymentGatewayId.eq(gateway.id))
+                                .one(db)
+                                .await
+                                .map_err(|e| e.to_string())?;
+
+                            if let Some(payment) = payment_opt {
+                                let mut active_payment: payments::ActiveModel = payment.clone().into();
+                                active_payment.status = Set(Some(status.to_i16() as i32));
+                                let now = chrono::Utc::now().into();
+                                active_payment.updated_at = Set(now);
+                                active_payment.update(db).await.map_err(|e| e.to_string())?;
+
+                                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
+                                    let mut active_order: orders::ActiveModel = order.into();
+                                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
+                                    active_order.updated_at = Set(now);
+                                    active_order.update(db).await.map_err(|e| e.to_string())?;
+                                }
+                            }
+                            Ok(())
+                        }.await;
+
+                        match apply_result {
+                            Ok(_) => {
+                                decision.processed = true;
+                            }
+                            Err(e) => {
+                                decision.processed = false;
+                                decision.failure_message = Some(format!("failed to apply webhook action: {}", e));
+                            }
+                        }
+                    }
+                    WebhookAction::UpdatePaymentStatusById { payment_id, status } => {
+                        let apply_result: Result<(), String> = async {
+                            let payment_opt = payments::Entity::find_by_id(*payment_id)
+                                .inner_join(payment_methods::Entity)
+                                .filter(payment_methods::Column::PaymentGatewayId.eq(gateway.id))
+                                .one(db)
+                                .await
+                                .map_err(|e| e.to_string())?;
+
+                            if let Some(payment) = payment_opt {
+                                let mut active_payment: payments::ActiveModel = payment.clone().into();
+                                active_payment.status = Set(Some(status.to_i16() as i32));
+                                let now = chrono::Utc::now().into();
+                                active_payment.updated_at = Set(now);
+                                active_payment.update(db).await.map_err(|e| e.to_string())?;
+
+                                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
+                                    let mut active_order: orders::ActiveModel = order.into();
+                                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
+                                    active_order.updated_at = Set(now);
+                                    active_order.update(db).await.map_err(|e| e.to_string())?;
+                                }
+                            }
+                            Ok(())
+                        }.await;
+
+                        match apply_result {
+                            Ok(_) => {
+                                decision.processed = true;
+                            }
+                            Err(e) => {
+                                decision.processed = false;
+                                decision.failure_message = Some(format!("failed to apply webhook action: {}", e));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     let (status, signature_valid, processed, ignored, failure_message) = match gateway_result {
         Ok(decision) if !decision.signature_valid => (

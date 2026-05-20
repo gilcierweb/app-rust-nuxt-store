@@ -94,6 +94,7 @@ impl PaymentGateway for ManualGateway {
         Ok(WebhookDecision {
             event_type: None,
             external_event_id: None,
+            action: None,
             signature_valid: true,
             processed: false,
             ignored: true,

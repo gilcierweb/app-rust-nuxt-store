@@ -94,10 +94,23 @@ pub struct WebhookInput {
     pub payload: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum WebhookAction {
+    UpdatePaymentStatus {
+        external_payment_id: String,
+        status: PaymentAttemptStatus,
+    },
+    UpdatePaymentStatusById {
+        payment_id: i32,
+        status: PaymentAttemptStatus,
+    },
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct WebhookDecision {
     pub event_type: Option<String>,
     pub external_event_id: Option<String>,
+    pub action: Option<WebhookAction>,
     pub signature_valid: bool,
     pub processed: bool,
     pub ignored: bool,

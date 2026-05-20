@@ -12,7 +12,7 @@ use crate::payment_gateways::drivers::ABACATEPAY_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput,
+    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
 };
 
 const ABACATEPAY_BASE: &str = "https://api.abacatepay.com/v1";
@@ -108,9 +108,24 @@ impl PaymentGateway for AbacatePayGateway {
         });
         let signature_valid = verify_signature(&input.headers, &input.payload)?;
 
+        let action = match event_type.as_deref() {
+            Some("billing.paid" | "billing.cancelled" | "billing.expired" | "billing.refunded") => {
+                let status_str = parsed.as_ref().and_then(|v| {
+                    string_field(v, "status")
+                        .or_else(|| v.pointer("/data/status").and_then(Value::as_str).map(ToString::to_string))
+                });
+                external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
+                    external_payment_id: id.to_string(),
+                    status: abacatepay_attempt_status(status_str.as_deref()),
+                })
+            }
+            _ => None,
+        };
+
         Ok(WebhookDecision {
             event_type,
             external_event_id,
+            action,
             signature_valid,
             processed: false,
             ignored: false,

@@ -1,6 +1,6 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentGatewayEnvironment {
     Test = 1,
     Production = 2,
@@ -27,7 +27,7 @@ impl PaymentGatewayEnvironment {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentGatewayStatus {
     Inactive = 1,
     Active = 2,
@@ -57,7 +57,7 @@ impl PaymentGatewayStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentMethodType {
     Card = 1,
     Wallet = 2,
@@ -99,7 +99,7 @@ impl PaymentMethodType {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentMethodDisplay {
     Frontend = 1,
     Backend = 2,
@@ -129,7 +129,7 @@ impl PaymentMethodDisplay {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentIntent {
     Purchase = 1,
     Authorize = 2,
@@ -159,7 +159,7 @@ impl PaymentIntent {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentAttemptStatus {
     Checkout = 1,
     Pending = 2,
@@ -210,7 +210,7 @@ impl PaymentAttemptStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentSessionStatus {
     Pending = 1,
     Processing = 2,
@@ -252,7 +252,7 @@ impl PaymentSessionStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentRefundStatus {
     Pending = 1,
     Processing = 2,
@@ -288,7 +288,7 @@ impl PaymentRefundStatus {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PaymentGatewayEventStatus {
     Received = 1,
     Processing = 2,
