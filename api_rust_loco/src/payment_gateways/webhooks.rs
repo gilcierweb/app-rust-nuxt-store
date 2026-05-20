@@ -106,81 +106,19 @@ where
     if let Ok(ref mut decision) = gateway_result {
         if decision.signature_valid {
             if let Some(action) = &decision.action {
-                match action {
-                    WebhookAction::UpdatePaymentStatus { external_payment_id, status } => {
-                        let apply_result: Result<(), String> = async {
-                            let payment_opt = payments::Entity::find()
-                                .filter(payments::Column::ExternalPaymentId.eq(external_payment_id.clone()))
-                                .inner_join(payment_methods::Entity)
-                                .filter(payment_methods::Column::PaymentGatewayId.eq(gateway.id))
-                                .one(db)
-                                .await
-                                .map_err(|e| e.to_string())?;
-
-                            if let Some(payment) = payment_opt {
-                                let mut active_payment: payments::ActiveModel = payment.clone().into();
-                                active_payment.status = Set(Some(status.to_i16() as i32));
-                                let now = chrono::Utc::now().into();
-                                active_payment.updated_at = Set(now);
-                                active_payment.update(db).await.map_err(|e| e.to_string())?;
-
-                                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
-                                    let mut active_order: orders::ActiveModel = order.into();
-                                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
-                                    active_order.updated_at = Set(now);
-                                    active_order.update(db).await.map_err(|e| e.to_string())?;
-                                }
-                            }
-                            Ok(())
-                        }.await;
-
-                        match apply_result {
-                            Ok(_) => {
-                                decision.processed = true;
-                            }
-                            Err(e) => {
-                                decision.processed = false;
-                                decision.failure_message = Some(format!("failed to apply webhook action: {}", e));
-                            }
-                        }
+                match apply_webhook_action(db, gateway.id, action).await {
+                    Ok(_) => {
+                        decision.processed = true;
                     }
-                    WebhookAction::UpdatePaymentStatusById { payment_id, status } => {
-                        let apply_result: Result<(), String> = async {
-                            let payment_opt = payments::Entity::find_by_id(*payment_id)
-                                .inner_join(payment_methods::Entity)
-                                .filter(payment_methods::Column::PaymentGatewayId.eq(gateway.id))
-                                .one(db)
-                                .await
-                                .map_err(|e| e.to_string())?;
-
-                            if let Some(payment) = payment_opt {
-                                let mut active_payment: payments::ActiveModel = payment.clone().into();
-                                active_payment.status = Set(Some(status.to_i16() as i32));
-                                let now = chrono::Utc::now().into();
-                                active_payment.updated_at = Set(now);
-                                active_payment.update(db).await.map_err(|e| e.to_string())?;
-
-                                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
-                                    let mut active_order: orders::ActiveModel = order.into();
-                                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
-                                    active_order.updated_at = Set(now);
-                                    active_order.update(db).await.map_err(|e| e.to_string())?;
-                                }
-                            }
-                            Ok(())
-                        }.await;
-
-                        match apply_result {
-                            Ok(_) => {
-                                decision.processed = true;
-                            }
-                            Err(e) => {
-                                decision.processed = false;
-                                decision.failure_message = Some(format!("failed to apply webhook action: {}", e));
-                            }
-                        }
+                    Err(e) => {
+                        decision.processed = false;
+                        decision.failure_message = Some(format!("failed to apply webhook action: {}", e));
                     }
                 }
+            } else {
+                // No action implies ignored
+                decision.processed = false;
+                decision.ignored = true;
             }
         }
     }
@@ -287,6 +225,71 @@ where
     .await?;
 
     Ok(())
+}
+
+pub async fn apply_webhook_action<C>(
+    db: &C,
+    gateway_id: i32,
+    action: &WebhookAction,
+) -> std::result::Result<(), String>
+where
+    C: ConnectionTrait,
+{
+    match action {
+        WebhookAction::UpdatePaymentStatus { external_payment_id, status } => {
+            let payment_opt = payments::Entity::find()
+                .filter(payments::Column::ExternalPaymentId.eq(external_payment_id.clone()))
+                .inner_join(payment_methods::Entity)
+                .filter(payment_methods::Column::PaymentGatewayId.eq(gateway_id))
+                .one(db)
+                .await
+                .map_err(|e| e.to_string())?;
+
+            if let Some(payment) = payment_opt {
+                let mut active_payment: payments::ActiveModel = payment.clone().into();
+                active_payment.status = Set(Some(status.to_i16() as i32));
+                let now = chrono::Utc::now().into();
+                active_payment.updated_at = Set(now);
+                active_payment.update(db).await.map_err(|e| e.to_string())?;
+
+                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
+                    let mut active_order: orders::ActiveModel = order.into();
+                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
+                    active_order.updated_at = Set(now);
+                    active_order.update(db).await.map_err(|e| e.to_string())?;
+                }
+            } else {
+                return Err(format!("payment with external id {} not found", external_payment_id));
+            }
+            Ok(())
+        }
+        WebhookAction::UpdatePaymentStatusById { payment_id, status } => {
+            let payment_opt = payments::Entity::find_by_id(*payment_id)
+                .inner_join(payment_methods::Entity)
+                .filter(payment_methods::Column::PaymentGatewayId.eq(gateway_id))
+                .one(db)
+                .await
+                .map_err(|e| e.to_string())?;
+
+            if let Some(payment) = payment_opt {
+                let mut active_payment: payments::ActiveModel = payment.clone().into();
+                active_payment.status = Set(Some(status.to_i16() as i32));
+                let now = chrono::Utc::now().into();
+                active_payment.updated_at = Set(now);
+                active_payment.update(db).await.map_err(|e| e.to_string())?;
+
+                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
+                    let mut active_order: orders::ActiveModel = order.into();
+                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
+                    active_order.updated_at = Set(now);
+                    active_order.update(db).await.map_err(|e| e.to_string())?;
+                }
+            } else {
+                return Err(format!("payment with id {} not found", payment_id));
+            }
+            Ok(())
+        }
+    }
 }
 
 struct PayloadInfo {

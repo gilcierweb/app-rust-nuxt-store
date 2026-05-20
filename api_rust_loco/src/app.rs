@@ -102,6 +102,9 @@ impl Hooks for App {
             .add_route(controllers::auth::routes())
             .add_route(controllers::shipment::routes())
             .add_route(controllers::shipment::admin_routes())
+            .add_route(controllers::admin_payment_gateways::routes())
+            .add_route(controllers::admin_payment_methods::routes())
+            .add_route(controllers::admin_payments::routes())
     }
 
     async fn after_routes(router: axum::Router, ctx: &AppContext) -> Result<axum::Router> {
