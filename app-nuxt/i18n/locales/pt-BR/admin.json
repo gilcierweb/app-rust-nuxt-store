@@ -598,6 +598,41 @@
         "actions": "Ações"
       }
     },
+    "rbac": {
+      "title": "RBAC",
+      "description": "Gerencie papéis, atribuições com escopo e a matriz atual de permissões definida no código.",
+      "loading": "Carregando dados de RBAC...",
+      "error": "Erro ao carregar dados de RBAC: {message}",
+      "tabs": {
+        "roles": "Papéis",
+        "assignments": "Atribuições",
+        "permissions": "Permissões"
+      },
+      "roles": {
+        "create": "Criar Papel",
+        "name": "Nome do papel",
+        "resourceType": "Tipo do recurso",
+        "resourceId": "ID do recurso",
+        "scope": "Escopo",
+        "global": "Global",
+        "assignments": "Atribuições"
+      },
+      "assignments": {
+        "assign": "Atribuir",
+        "selectUser": "Selecione o usuário",
+        "selectRole": "Selecione o papel",
+        "roles": "Papéis",
+        "noRoles": "Nenhum papel atribuído"
+      },
+      "permissions": {
+        "subject": "Sujeito",
+        "actions": "Ações",
+        "source": "Origem"
+      },
+      "errors": {
+        "action": "Não foi possível concluir a ação de RBAC."
+      }
+    },
     "settings": {
       "title": "Configurações",
       "general": "Geral",

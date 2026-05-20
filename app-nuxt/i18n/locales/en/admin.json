@@ -598,6 +598,41 @@
         "actions": "Actions"
       }
     },
+    "rbac": {
+      "title": "RBAC",
+      "description": "Manage roles, scoped assignments, and the current code-defined permission matrix.",
+      "loading": "Loading RBAC data...",
+      "error": "Error loading RBAC data: {message}",
+      "tabs": {
+        "roles": "Roles",
+        "assignments": "Assignments",
+        "permissions": "Permissions"
+      },
+      "roles": {
+        "create": "Create Role",
+        "name": "Role name",
+        "resourceType": "Resource type",
+        "resourceId": "Resource ID",
+        "scope": "Scope",
+        "global": "Global",
+        "assignments": "Assignments"
+      },
+      "assignments": {
+        "assign": "Assign",
+        "selectUser": "Select user",
+        "selectRole": "Select role",
+        "roles": "Roles",
+        "noRoles": "No roles assigned"
+      },
+      "permissions": {
+        "subject": "Subject",
+        "actions": "Actions",
+        "source": "Source"
+      },
+      "errors": {
+        "action": "Unable to complete RBAC action."
+      }
+    },
     "settings": {
       "title": "Settings",
       "general": "General",

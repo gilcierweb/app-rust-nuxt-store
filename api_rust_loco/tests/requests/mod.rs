@@ -1,3 +1,4 @@
+mod admin_rbac;
 mod auth;
 mod prepare_data;
 

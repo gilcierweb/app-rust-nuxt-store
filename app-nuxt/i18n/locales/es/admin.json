@@ -598,6 +598,41 @@
         "actions": "Acciones"
       }
     },
+    "rbac": {
+      "title": "RBAC",
+      "description": "Administre roles, asignaciones con alcance y la matriz actual de permisos definida en código.",
+      "loading": "Cargando datos de RBAC...",
+      "error": "Error al cargar datos de RBAC: {message}",
+      "tabs": {
+        "roles": "Roles",
+        "assignments": "Asignaciones",
+        "permissions": "Permisos"
+      },
+      "roles": {
+        "create": "Crear Rol",
+        "name": "Nombre del rol",
+        "resourceType": "Tipo de recurso",
+        "resourceId": "ID del recurso",
+        "scope": "Alcance",
+        "global": "Global",
+        "assignments": "Asignaciones"
+      },
+      "assignments": {
+        "assign": "Asignar",
+        "selectUser": "Seleccione usuario",
+        "selectRole": "Seleccione rol",
+        "roles": "Roles",
+        "noRoles": "Sin roles asignados"
+      },
+      "permissions": {
+        "subject": "Sujeto",
+        "actions": "Acciones",
+        "source": "Origen"
+      },
+      "errors": {
+        "action": "No se pudo completar la acción de RBAC."
+      }
+    },
     "settings": {
       "title": "Configuración",
       "general": "General",

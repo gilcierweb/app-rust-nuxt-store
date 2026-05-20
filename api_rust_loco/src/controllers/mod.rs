@@ -26,4 +26,5 @@ pub mod admin_settings;
 pub mod admin_payment_gateways;
 pub mod admin_payment_methods;
 pub mod admin_payments;
+pub mod admin_rbac;
 pub mod admin_emails;
