@@ -3,6 +3,7 @@
 pub mod prelude;
 
 pub mod addresses;
+pub mod admin_settings;
 pub mod banner_events;
 pub mod banner_positions;
 pub mod banners;
