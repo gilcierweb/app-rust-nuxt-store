@@ -566,6 +566,30 @@
         "createdAt": "Creado En",
         "updatedAt": "Actualizado En"
       },
+      "form": {
+        "newTitle": "Nuevo Usuario",
+        "editTitle": "Editar Usuario",
+        "name": "Nombre",
+        "email": "E-mail",
+        "password": "Contraseña",
+        "newPassword": "Nueva contraseña",
+        "role": "Rol",
+        "active": "Cuenta activa",
+        "errors": {
+          "name": "El nombre debe tener al menos 2 caracteres.",
+          "email": "Ingrese un e-mail válido.",
+          "password": "La contraseña debe tener al menos 8 caracteres.",
+          "save": "No se pudo guardar el usuario."
+        }
+      },
+      "roles": {
+        "admin": "Admin",
+        "user": "Usuario",
+        "storeManager": "Gerente de Tienda",
+        "editor": "Editor",
+        "support": "Soporte",
+        "viewer": "Visualizador"
+      },
       "table": {
         "email": "E-mail",
         "role": "Rol",

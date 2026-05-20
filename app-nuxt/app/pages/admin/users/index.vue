@@ -2,10 +2,10 @@
   <div>
     <div class="mb-6 flex justify-between items-center">
       <h1 class="h1">{{ $t('admin.users.title') }}</h1>
-      <button class="btn btn-primary" type="button" disabled>
+      <NuxtLinkLocale to="/admin/users/new" class="btn btn-primary">
         <i class="icon-[tabler--plus] size-5 mr-2"></i>
         {{ $t('admin.users.add') }}
-      </button>
+      </NuxtLinkLocale>
     </div>
 
     <div class="mb-6">
@@ -83,6 +83,13 @@
                     :aria-label="$t('common.view')"
                   >
                     <i class="icon-[tabler--eye] size-5"></i>
+                  </NuxtLinkLocale>
+                  <NuxtLinkLocale
+                    :to="`/admin/users/${user.id}/edit`"
+                    class="btn btn-circle btn-text btn-sm"
+                    :aria-label="$t('common.edit')"
+                  >
+                    <i class="icon-[tabler--pencil] size-5"></i>
                   </NuxtLinkLocale>
                   <button
                     class="btn btn-circle btn-text btn-sm text-error"

@@ -566,6 +566,30 @@
         "createdAt": "Created At",
         "updatedAt": "Updated At"
       },
+      "form": {
+        "newTitle": "New User",
+        "editTitle": "Edit User",
+        "name": "Name",
+        "email": "E-mail",
+        "password": "Password",
+        "newPassword": "New password",
+        "role": "Role",
+        "active": "Active account",
+        "errors": {
+          "name": "Name must be at least 2 characters.",
+          "email": "Enter a valid e-mail address.",
+          "password": "Password must be at least 8 characters.",
+          "save": "Unable to save user."
+        }
+      },
+      "roles": {
+        "admin": "Admin",
+        "user": "User",
+        "storeManager": "Store Manager",
+        "editor": "Editor",
+        "support": "Support",
+        "viewer": "Viewer"
+      },
       "table": {
         "email": "E-mail",
         "role": "Role",

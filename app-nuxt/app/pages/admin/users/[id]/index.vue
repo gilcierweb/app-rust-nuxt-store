@@ -12,6 +12,10 @@
       </div>
 
       <div v-if="user" class="flex gap-2">
+        <NuxtLinkLocale :to="`/admin/users/${user.id}/edit`" class="btn btn-primary">
+          <i class="icon-[tabler--pencil] size-5 mr-2"></i>
+          {{ $t('common.edit') }}
+        </NuxtLinkLocale>
         <button type="button" class="btn btn-error btn-outline" @click="deleteUser">
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
           {{ $t('common.delete') }}

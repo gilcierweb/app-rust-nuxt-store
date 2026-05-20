@@ -27,6 +27,7 @@ pub mod product;
 pub mod profile;
 pub mod review;
 pub mod shipping;
+pub mod user;
 pub mod variant;
 pub mod wishlist;
 
