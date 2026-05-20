@@ -48,9 +48,12 @@
       />
 
       <section v-if="activeTab === 'roles'" class="grid grid-cols-1 gap-6 xl:grid-cols-[360px_1fr]">
-        <div class="rounded-box bg-base-100 border shadow-sm p-5">
-          <h2 class="text-lg font-bold mb-4">{{ $t('admin.rbac.roles.create') }}</h2>
-          <form class="space-y-4" @submit.prevent="createRole">
+        <div class="card shadow-base-300/10 shadow-md">
+          <div class="card-header">
+            <h2 class="card-title text-xl">{{ $t('admin.rbac.roles.create') }}</h2>
+          </div>
+
+          <form class="card-body space-y-4" @submit.prevent="createRole">
             <div class="form-control">
               <label class="label" for="roleName">
                 <span class="label-text font-semibold">{{ $t('admin.rbac.roles.name') }}</span>
@@ -77,43 +80,45 @@
           </form>
         </div>
 
-        <div class="rounded-box bg-base-100 border shadow-sm overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>{{ $t('admin.rbac.roles.name') }}</th>
-                  <th>{{ $t('admin.rbac.roles.scope') }}</th>
-                  <th>{{ $t('admin.rbac.roles.assignments') }}</th>
-                  <th class="text-right">{{ $t('common.table.actions') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="role in roles" :key="role.id">
-                  <td class="font-medium">{{ role.name }}</td>
-                  <td>{{ roleScope(role) }}</td>
-                  <td>{{ role.assignment_count }}</td>
-                  <td class="text-right">
-                    <button
-                      type="button"
-                      class="btn btn-circle btn-text btn-sm text-error"
-                      :disabled="role.protected || role.assignment_count > 0"
-                      :aria-label="$t('common.delete')"
-                      @click="deleteRole(role)"
-                    >
-                      <i class="icon-[tabler--trash] size-5"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="card shadow-base-300/10 shadow-md overflow-hidden">
+          <div class="card-body p-0">
+            <div class="overflow-x-auto">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ $t('admin.rbac.roles.name') }}</th>
+                    <th>{{ $t('admin.rbac.roles.scope') }}</th>
+                    <th>{{ $t('admin.rbac.roles.assignments') }}</th>
+                    <th class="text-right">{{ $t('common.table.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="role in roles" :key="role.id">
+                    <td class="font-medium">{{ role.name }}</td>
+                    <td>{{ roleScope(role) }}</td>
+                    <td>{{ role.assignment_count }}</td>
+                    <td class="text-right">
+                      <button
+                        type="button"
+                        class="btn btn-circle btn-text btn-sm text-error"
+                        :disabled="role.protected || role.assignment_count > 0"
+                        :aria-label="$t('common.delete')"
+                        @click="deleteRole(role)"
+                      >
+                        <i class="icon-[tabler--trash] size-5"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
       <section v-else-if="activeTab === 'assignments'" class="space-y-6">
-        <div class="rounded-box bg-base-100 border shadow-sm p-5">
-          <form class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto]" @submit.prevent="assignRole">
+        <div class="card shadow-base-300/10 shadow-md">
+          <form class="card-body grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_auto]" @submit.prevent="assignRole">
             <select v-model.number="assignmentForm.user_id" class="select select-bordered w-full" required>
               <option :value="0">{{ $t('admin.rbac.assignments.selectUser') }}</option>
               <option v-for="user in users" :key="user.id" :value="user.id">
@@ -134,65 +139,69 @@
           </form>
         </div>
 
-        <div class="rounded-box bg-base-100 border shadow-sm overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>{{ $t('admin.users.table.email') }}</th>
-                  <th>{{ $t('admin.rbac.assignments.roles') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="user in users" :key="user.id">
-                  <td>
-                    <div class="font-medium">{{ user.email }}</div>
-                    <div class="text-xs text-base-content/60">{{ user.name }}</div>
-                  </td>
-                  <td>
-                    <div class="flex flex-wrap gap-2">
-                      <span v-for="role in user.roles" :key="role.id" class="badge badge-soft badge-primary gap-1">
-                        {{ role.name }}
-                        <button type="button" class="btn btn-xs btn-circle btn-text" @click="removeAssignment(user, role)">
-                          <i class="icon-[tabler--x] size-3"></i>
-                        </button>
-                      </span>
-                      <span v-if="user.roles.length === 0" class="text-sm text-base-content/50">
-                        {{ $t('admin.rbac.assignments.noRoles') }}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+        <div class="card shadow-base-300/10 shadow-md overflow-hidden">
+          <div class="card-body p-0">
+            <div class="overflow-x-auto">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>{{ $t('admin.users.table.email') }}</th>
+                    <th>{{ $t('admin.rbac.assignments.roles') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="user in users" :key="user.id">
+                    <td>
+                      <div class="font-medium">{{ user.email }}</div>
+                      <div class="text-xs text-base-content/60">{{ user.name }}</div>
+                    </td>
+                    <td>
+                      <div class="flex flex-wrap gap-2">
+                        <span v-for="role in user.roles" :key="role.id" class="badge badge-soft badge-primary gap-1">
+                          {{ role.name }}
+                          <button type="button" class="btn btn-xs btn-circle btn-text" @click="removeAssignment(user, role)">
+                            <i class="icon-[tabler--x] size-3"></i>
+                          </button>
+                        </span>
+                        <span v-if="user.roles.length === 0" class="text-sm text-base-content/50">
+                          {{ $t('admin.rbac.assignments.noRoles') }}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
-      <section v-else class="rounded-box bg-base-100 border shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ $t('admin.rbac.permissions.subject') }}</th>
-                <th>{{ $t('admin.rbac.permissions.actions') }}</th>
-                <th>{{ $t('admin.rbac.permissions.source') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="group in permissions?.groups || []" :key="group.subject">
-                <td class="font-medium">{{ group.subject }}</td>
-                <td>
-                  <div class="flex flex-wrap gap-2">
-                    <span v-for="action in group.actions" :key="action" class="badge badge-outline">
-                      {{ action }}
-                    </span>
-                  </div>
-                </td>
-                <td class="font-mono text-xs text-base-content/60">{{ group.source }}</td>
-              </tr>
-            </tbody>
-          </table>
+      <section v-else class="card shadow-base-300/10 shadow-md overflow-hidden">
+        <div class="card-body p-0">
+          <div class="overflow-x-auto">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>{{ $t('admin.rbac.permissions.subject') }}</th>
+                  <th>{{ $t('admin.rbac.permissions.actions') }}</th>
+                  <th>{{ $t('admin.rbac.permissions.source') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="group in permissions?.groups || []" :key="group.subject">
+                  <td class="font-medium">{{ group.subject }}</td>
+                  <td>
+                    <div class="flex flex-wrap gap-2">
+                      <span v-for="action in group.actions" :key="action" class="badge badge-outline">
+                        {{ action }}
+                      </span>
+                    </div>
+                  </td>
+                  <td class="font-mono text-xs text-base-content/60">{{ group.source }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </div>

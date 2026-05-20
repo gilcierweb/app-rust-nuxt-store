@@ -35,7 +35,7 @@
     </div>
 
     <div v-else-if="user" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="card bg-base-100 shadow-sm lg:col-span-1">
+      <div class="card shadow-base-300/10 shadow-md lg:col-span-1">
         <div class="card-body items-center text-center">
           <div class="avatar avatar-placeholder mb-4">
             <div class="bg-neutral text-neutral-content rounded-full w-24 h-24">
@@ -69,10 +69,12 @@
         </div>
       </div>
 
-      <div class="card bg-base-100 shadow-sm lg:col-span-2">
-        <div class="card-body">
-          <h2 class="card-title mb-4">{{ $t('common.view') }}</h2>
+      <div class="card shadow-base-300/10 shadow-md lg:col-span-2">
+        <div class="card-header">
+          <h2 class="card-title">{{ $t('common.view') }}</h2>
+        </div>
 
+        <div class="card-body">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
               <label class="label">

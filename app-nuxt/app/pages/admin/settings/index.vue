@@ -12,9 +12,11 @@
       </button>
     </div>
 
-    <div v-if="pending" class="flex flex-col items-center justify-center py-20 bg-base-100 rounded-box border shadow-sm">
-      <span class="loading loading-spinner text-primary size-12"></span>
-      <p class="mt-4 text-base-content/60">Loading settings...</p>
+    <div v-if="pending" class="card shadow-base-300/10 shadow-md">
+      <div class="card-body flex flex-col items-center justify-center py-20">
+        <span class="loading loading-spinner text-primary size-12"></span>
+        <p class="mt-4 text-base-content/60">Loading settings...</p>
+      </div>
     </div>
 
     <div v-else-if="error" class="alert alert-error">
@@ -23,61 +25,65 @@
     </div>
 
     <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
-      <div class="rounded-box bg-base-100 shadow-sm border p-2">
-        <button
-          v-for="group in groups"
-          :key="group.namespace"
-          type="button"
-          :class="[
-            'flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors',
-            activeNamespace === group.namespace ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-base-200'
-          ]"
-          @click="activeNamespace = group.namespace"
-        >
-          <i :class="[groupIcon(group.namespace), 'size-5']"></i>
-          <span>{{ group.label }}</span>
-        </button>
+      <div class="card shadow-base-300/10 shadow-md">
+        <div class="card-body p-2">
+          <button
+            v-for="group in groups"
+            :key="group.namespace"
+            type="button"
+            :class="[
+              'flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors',
+              activeNamespace === group.namespace ? 'bg-primary/10 text-primary font-bold' : 'hover:bg-base-200'
+            ]"
+            @click="activeNamespace = group.namespace"
+          >
+            <i :class="[groupIcon(group.namespace), 'size-5']"></i>
+            <span>{{ group.label }}</span>
+          </button>
+        </div>
       </div>
 
-      <div class="rounded-box bg-base-100 shadow-sm border">
-        <div v-if="currentGroup" class="p-6">
-          <div class="mb-6">
-            <h2 class="text-xl font-bold">{{ currentGroup.label }}</h2>
+      <div class="card shadow-base-300/10 shadow-md">
+        <div v-if="currentGroup">
+          <div class="card-header">
+            <h2 class="card-title text-xl">{{ currentGroup.label }}</h2>
           </div>
 
-          <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
-            <div v-for="setting in currentGroup.settings" :key="settingId(setting)" class="form-control">
-              <label class="label">
-                <span class="label-text font-medium">{{ setting.label }}</span>
-              </label>
+          <div class="card-body">
+            <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+              <div v-for="setting in currentGroup.settings" :key="settingId(setting)" class="form-control">
+                <label class="label">
+                  <span class="label-text font-medium">{{ setting.label }}</span>
+                </label>
 
-              <input
-                v-if="setting.value_type === 1"
-                v-model="formValues[settingId(setting)]"
-                class="input input-bordered w-full"
-                :type="setting.key.includes('email') ? 'email' : 'text'"
-              />
-
-              <label v-else class="flex min-h-12 items-center justify-between rounded-lg border border-base-300 px-4">
-                <span class="text-sm text-base-content/70">{{ booleanLabel(formValues[settingId(setting)]) }}</span>
                 <input
-                  type="checkbox"
-                  class="toggle toggle-success"
-                  :checked="formValues[settingId(setting)] === 'true'"
-                  @change="setBooleanValue(setting, $event)"
+                  v-if="setting.value_type === 1"
+                  v-model="formValues[settingId(setting)]"
+                  class="input input-bordered w-full"
+                  :type="setting.key.includes('email') ? 'email' : 'text'"
                 />
-              </label>
+
+                <label v-else class="flex min-h-12 items-center justify-between rounded-lg border border-base-300 px-4">
+                  <span class="text-sm text-base-content/70">{{ booleanLabel(formValues[settingId(setting)]) }}</span>
+                  <input
+                    type="checkbox"
+                    class="toggle toggle-success"
+                    :checked="formValues[settingId(setting)] === 'true'"
+                    @change="setBooleanValue(setting, $event)"
+                  />
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div v-if="saveMessage" class="alert alert-success mt-6">
-            <i class="icon-[tabler--check] size-6"></i>
-            <span>{{ saveMessage }}</span>
-          </div>
+            <div v-if="saveMessage" class="alert alert-success mt-6">
+              <i class="icon-[tabler--check] size-6"></i>
+              <span>{{ saveMessage }}</span>
+            </div>
 
-          <div v-if="saveError" class="alert alert-error mt-6">
-            <i class="icon-[tabler--alert-circle] size-6"></i>
-            <span>{{ saveError }}</span>
+            <div v-if="saveError" class="alert alert-error mt-6">
+              <i class="icon-[tabler--alert-circle] size-6"></i>
+              <span>{{ saveError }}</span>
+            </div>
           </div>
         </div>
       </div>

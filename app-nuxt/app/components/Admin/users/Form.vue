@@ -1,11 +1,13 @@
 <template>
   <div class="max-w-3xl">
-    <div class="card bg-base-100 shadow-sm">
-      <div class="card-body">
+    <div class="card shadow-base-300/10 shadow-md">
+      <div class="card-header">
         <h2 class="card-title text-xl">
           {{ isEditing ? $t('admin.users.form.editTitle') : $t('admin.users.form.newTitle') }}
         </h2>
+      </div>
 
+      <div class="card-body">
         <AppAlert
           v-if="errorMessage"
           type="error"

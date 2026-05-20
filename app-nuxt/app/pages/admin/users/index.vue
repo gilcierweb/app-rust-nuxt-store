@@ -8,8 +8,8 @@
       </NuxtLinkLocale>
     </div>
 
-    <div class="mb-6">
-      <form @submit.prevent="handleSearch">
+    <div class="card shadow-base-300/10 mb-6 shadow-md">
+      <form class="card-body" @submit.prevent="handleSearch">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto]">
           <input
             v-model="searchQuery"
@@ -37,73 +37,75 @@
     </div>
 
     <!-- Users Table -->
-    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>{{ $t('admin.users.table.email') }}</th>
-              <th>{{ $t('admin.users.table.role') }}</th>
-              <th>{{ $t('admin.users.table.status') }}</th>
-              <th>{{ $t('admin.users.table.date') }}</th>
-              <th class="text-right">{{ $t('admin.users.table.actions') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in filteredUsers" :key="user.id" class="row-hover">
-              <td>
-                <div class="flex items-center gap-3">
-                  <div class="avatar avatar-placeholder">
-                    <div class="bg-neutral text-neutral-content rounded-full size-10">
-                      <span class="text-lg">{{ (user.email.at(0) || '?').toUpperCase() }}</span>
+    <div v-else class="card shadow-base-300/10 w-full shadow-md overflow-hidden">
+      <div class="card-body p-0">
+        <div class="overflow-x-auto">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>{{ $t('admin.users.table.email') }}</th>
+                <th>{{ $t('admin.users.table.role') }}</th>
+                <th>{{ $t('admin.users.table.status') }}</th>
+                <th>{{ $t('admin.users.table.date') }}</th>
+                <th class="text-right">{{ $t('admin.users.table.actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredUsers" :key="user.id" class="row-hover">
+                <td>
+                  <div class="flex items-center gap-3">
+                    <div class="avatar avatar-placeholder">
+                      <div class="bg-neutral text-neutral-content rounded-full size-10">
+                        <span class="text-lg">{{ (user.email.at(0) || '?').toUpperCase() }}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="font-medium">{{ user.email }}</div>
+                      <div class="text-xs text-gray-500">{{ user.name }}</div>
                     </div>
                   </div>
-                  <div>
-                    <div class="font-medium">{{ user.email }}</div>
-                    <div class="text-xs text-gray-500">{{ user.name }}</div>
+                </td>
+                <td>
+                  <span class="badge badge-soft" :class="user.role === 'Admin' ? 'badge-primary' : 'badge-secondary'">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge badge-soft text-xs" :class="user.active ? 'badge-success' : 'badge-error'">
+                    {{ user.active ? $t('common.status.active') : $t('common.status.inactive') }}
+                  </span>
+                </td>
+                <td>{{ formatDate(user.createdAt) }}</td>
+                <td class="text-right">
+                  <div class="flex justify-end gap-1">
+                    <NuxtLinkLocale
+                      :to="`/admin/users/${user.id}`"
+                      class="btn btn-circle btn-text btn-sm"
+                      :aria-label="$t('common.view')"
+                    >
+                      <i class="icon-[tabler--eye] size-5"></i>
+                    </NuxtLinkLocale>
+                    <NuxtLinkLocale
+                      :to="`/admin/users/${user.id}/edit`"
+                      class="btn btn-circle btn-text btn-sm"
+                      :aria-label="$t('common.edit')"
+                    >
+                      <i class="icon-[tabler--pencil] size-5"></i>
+                    </NuxtLinkLocale>
+                    <button
+                      class="btn btn-circle btn-text btn-sm text-error"
+                      type="button"
+                      :aria-label="$t('common.delete')"
+                      @click="confirmDelete(user)"
+                    >
+                      <i class="icon-[tabler--trash] size-5"></i>
+                    </button>
                   </div>
-                </div>
-              </td>
-              <td>
-                <span class="badge badge-soft" :class="user.role === 'Admin' ? 'badge-primary' : 'badge-secondary'">
-                  {{ user.role }}
-                </span>
-              </td>
-              <td>
-                <span class="badge badge-soft text-xs" :class="user.active ? 'badge-success' : 'badge-error'">
-                  {{ user.active ? $t('common.status.active') : $t('common.status.inactive') }}
-                </span>
-              </td>
-              <td>{{ formatDate(user.createdAt) }}</td>
-              <td class="text-right">
-                <div class="flex justify-end gap-1">
-                  <NuxtLinkLocale
-                    :to="`/admin/users/${user.id}`"
-                    class="btn btn-circle btn-text btn-sm"
-                    :aria-label="$t('common.view')"
-                  >
-                    <i class="icon-[tabler--eye] size-5"></i>
-                  </NuxtLinkLocale>
-                  <NuxtLinkLocale
-                    :to="`/admin/users/${user.id}/edit`"
-                    class="btn btn-circle btn-text btn-sm"
-                    :aria-label="$t('common.edit')"
-                  >
-                    <i class="icon-[tabler--pencil] size-5"></i>
-                  </NuxtLinkLocale>
-                  <button
-                    class="btn btn-circle btn-text btn-sm text-error"
-                    type="button"
-                    :aria-label="$t('common.delete')"
-                    @click="confirmDelete(user)"
-                  >
-                    <i class="icon-[tabler--trash] size-5"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
