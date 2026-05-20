@@ -2,7 +2,7 @@
   <div>
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <NuxtLinkLocale to="/admin/orders" class="btn btn-circle btn-text btn-sm">
+        <NuxtLinkLocale to="/admin/payments" class="btn btn-circle btn-text btn-sm">
           <i class="icon-[tabler--arrow-left] size-5"></i>
         </NuxtLinkLocale>
         <h1 class="h1">Payment #{{ paymentId }}</h1>

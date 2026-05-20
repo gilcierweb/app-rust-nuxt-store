@@ -42,6 +42,12 @@
             </NuxtLinkLocale>
           </li>
           <li>
+            <NuxtLinkLocale to="/admin/payments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--credit-card] size-5"></i>
+              Payments
+            </NuxtLinkLocale>
+          </li>
+          <li>
             <NuxtLinkLocale to="/admin/products" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--package] size-5"></i>
               {{ $t('admin.products.title') }}
@@ -75,6 +81,12 @@
               {{ $t('admin.shippings.title') }}
             </NuxtLinkLocale>
           </li>
+          <li>
+            <NuxtLinkLocale to="/admin/addresses" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--address-book] size-5"></i>
+              Addresses
+            </NuxtLinkLocale>
+          </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
             {{ $t('admin.sidebar.category_content') || 'Content' }}
@@ -83,6 +95,18 @@
             <NuxtLinkLocale to="/admin/posts" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--article] size-5"></i>
               {{ $t('admin.posts.title') }}
+            </NuxtLinkLocale>
+          </li>
+          <li>
+            <NuxtLinkLocale to="/admin/reviews" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--star] size-5"></i>
+              {{ $t('admin.reviews.title') }}
+            </NuxtLinkLocale>
+          </li>
+          <li>
+            <NuxtLinkLocale to="/admin/coupons" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--ticket] size-5"></i>
+              {{ $t('admin.coupons.title') }}
             </NuxtLinkLocale>
           </li>
 

@@ -177,9 +177,9 @@
                     </span>
                   </td>
                   <td class="text-right">
-                    <button class="btn btn-soft btn-info btn-xs btn-circle">
+                    <NuxtLinkLocale :to="`/admin/orders/${order.id}`" class="btn btn-soft btn-info btn-xs btn-circle" aria-label="View order">
                       <i class="icon-[tabler--eye] size-4"></i>
-                    </button>
+                    </NuxtLinkLocale>
                   </td>
                 </tr>
               </tbody>
