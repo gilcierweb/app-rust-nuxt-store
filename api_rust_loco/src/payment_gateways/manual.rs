@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use loco_rs::prelude::*;
+use rust_decimal::Decimal;
 use uuid::Uuid;
 
 use crate::models::payment_gateway_status::{
@@ -24,14 +25,22 @@ impl PaymentGateway for ManualGateway {
         input: CreatePaymentSessionInput,
     ) -> Result<PaymentSessionOutput> {
         let external_id = format!("manual-session-{}", Uuid::new_v4());
-        let payment_status = if input.auto_capture {
+        let payment_status = if input.amount == Decimal::new(99999, 2) {
+            PaymentAttemptStatus::Failed
+        } else if input.auto_capture {
             PaymentAttemptStatus::Captured
         } else {
             PaymentAttemptStatus::Authorized
         };
 
+        let session_status = if payment_status == PaymentAttemptStatus::Failed {
+            PaymentSessionStatus::Failed
+        } else {
+            PaymentSessionStatus::Completed
+        };
+
         Ok(PaymentSessionOutput {
-            status: PaymentSessionStatus::Completed,
+            status: session_status,
             payment_status,
             external_session_id: Some(external_id.clone()),
             external_payment_id: Some(external_id),
