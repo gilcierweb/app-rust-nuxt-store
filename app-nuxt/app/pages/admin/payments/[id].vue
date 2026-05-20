@@ -70,6 +70,95 @@
           </div>
         </div>
 
+        <!-- Payment Sessions -->
+        <div class="card bg-base-100 shadow-sm border border-base-200">
+          <div class="card-body">
+            <h2 class="card-title">Payment Sessions</h2>
+            <div class="overflow-x-auto mt-4">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Session</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Expires</th>
+                    <th>Completed</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="session in paymentSessions" :key="session.id">
+                    <td>
+                      <div class="font-mono text-sm">#{{ session.id }}</div>
+                      <div class="mt-1 max-w-56 truncate font-mono text-xs text-base-content/50">
+                        {{ session.external_session_id || '-' }}
+                      </div>
+                    </td>
+                    <td class="font-mono text-sm">#{{ session.payment_method_id }}</td>
+                    <td>
+                      <span :class="['badge badge-sm badge-soft', sessionStatusBadge(session.status)]">
+                        {{ sessionStatusLabel(session.status) }}
+                      </span>
+                    </td>
+                    <td>{{ formatDate(session.expires_at) }}</td>
+                    <td>{{ formatDate(session.completed_at) }}</td>
+                    <td>{{ formatDate(session.created_at) }}</td>
+                  </tr>
+                  <tr v-if="paymentSessions.length === 0">
+                    <td colspan="6" class="text-center py-4 text-gray-500">No sessions found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refund History -->
+        <div class="card bg-base-100 shadow-sm border border-base-200">
+          <div class="card-body">
+            <h2 class="card-title">Refund History</h2>
+            <div class="overflow-x-auto mt-4">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Refund</th>
+                    <th>Status</th>
+                    <th class="text-right">Amount</th>
+                    <th>Processed</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="refund in paymentRefunds" :key="refund.id">
+                    <td>
+                      <div class="font-mono text-sm">#{{ refund.id }}</div>
+                      <div class="mt-1 max-w-56 truncate font-mono text-xs text-base-content/50">
+                        {{ refund.external_refund_id || refund.idempotency_key }}
+                      </div>
+                      <div v-if="refund.failure_code || refund.failure_message" class="mt-1 max-w-56 truncate text-xs text-error">
+                        {{ refund.failure_code || refund.failure_message }}
+                      </div>
+                    </td>
+                    <td>
+                      <span :class="['badge badge-sm badge-soft', refundStatusBadge(refund.status)]">
+                        {{ refundStatusLabel(refund.status) }}
+                      </span>
+                    </td>
+                    <td class="text-right font-bold">
+                      {{ formatCurrency(refund.amount, refund.currency || detail.payment.currency || 'USD') }}
+                    </td>
+                    <td>{{ formatDate(refund.processed_at) }}</td>
+                    <td>{{ formatDate(refund.created_at) }}</td>
+                  </tr>
+                  <tr v-if="paymentRefunds.length === 0">
+                    <td colspan="5" class="text-center py-4 text-gray-500">No refunds found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- Events Log -->
         <div class="card bg-base-100 shadow-sm border border-base-200">
           <div class="card-body">
@@ -85,7 +174,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="event in detail.events" :key="event.id">
+                  <tr v-for="event in paymentEvents" :key="event.id">
                     <td><span class="badge badge-soft">{{ event.event_type }}</span></td>
                     <td class="font-mono text-xs">{{ event.external_event_id }}</td>
                     <td>
@@ -95,7 +184,7 @@
                     </td>
                     <td>{{ formatDate(event.created_at) }}</td>
                   </tr>
-                  <tr v-if="detail.events.length === 0">
+                  <tr v-if="paymentEvents.length === 0">
                     <td colspan="4" class="text-center py-4 text-gray-500">No events found</td>
                   </tr>
                 </tbody>
@@ -111,15 +200,15 @@
           <div class="card-body">
             <h2 class="card-title">Gateway Logs</h2>
             <div class="space-y-4 mt-4 max-h-[600px] overflow-y-auto">
-              <div v-for="log in detail.logs" :key="log.id" class="p-3 bg-base-200 rounded-lg text-sm">
+              <div v-for="log in paymentLogs" :key="log.id" class="p-3 bg-base-200 rounded-lg text-sm">
                 <div class="flex justify-between mb-1">
-                  <span class="font-medium">{{ logLevelLabel(log.log_level) }}</span>
+                  <span class="font-medium">{{ logLevelLabel(log.level) }}</span>
                   <span class="text-gray-500 text-xs">{{ formatDate(log.created_at) }}</span>
                 </div>
-                <p class="text-gray-700">{{ log.message }}</p>
-                <pre v-if="log.details" class="mt-2 p-2 bg-base-300 rounded text-xs overflow-x-auto">{{ log.details }}</pre>
+                <p class="text-gray-700">{{ log.message || '-' }}</p>
+                <pre v-if="log.payload" class="mt-2 p-2 bg-base-300 rounded text-xs overflow-x-auto">{{ log.payload }}</pre>
               </div>
-              <div v-if="detail.logs.length === 0" class="text-center py-4 text-gray-500">
+              <div v-if="paymentLogs.length === 0" class="text-center py-4 text-gray-500">
                 No logs found
               </div>
             </div>
@@ -141,12 +230,75 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 
-const { pending, data: detail, error, refresh } = await useApiFetch<any>(
+interface AdminPaymentDetail {
+  payment: {
+    id: number
+    order_id: number
+    payment_method_id: number
+    amount?: string | number | null
+    currency?: string | null
+    status?: number | null
+    transaction_id?: string | null
+    external_payment_id?: string | null
+    created_at?: string | null
+  }
+  sessions?: AdminPaymentSession[]
+  refunds?: AdminPaymentRefund[]
+  logs?: AdminPaymentGatewayLog[]
+  events?: AdminPaymentGatewayEvent[]
+}
+
+interface AdminPaymentSession {
+  id: number
+  payment_id: number
+  payment_method_id: number
+  status: number
+  external_session_id?: string | null
+  expires_at?: string | null
+  completed_at?: string | null
+  created_at?: string | null
+}
+
+interface AdminPaymentRefund {
+  id: number
+  payment_id: number
+  amount: string | number
+  currency: string
+  status: number
+  external_refund_id?: string | null
+  idempotency_key: string
+  failure_code?: string | null
+  failure_message?: string | null
+  processed_at?: string | null
+  created_at?: string | null
+}
+
+interface AdminPaymentGatewayLog {
+  id: number
+  level: number
+  message?: string | null
+  payload?: string | null
+  created_at?: string | null
+}
+
+interface AdminPaymentGatewayEvent {
+  id: number
+  event_type: string
+  external_event_id: string
+  status: number
+  created_at?: string | null
+}
+
+const { pending, data: detail, error, refresh } = await useApiFetch<AdminPaymentDetail>(
   `/api/admin/payments/${paymentId}`,
   { key: `admin-payment-${paymentId}` }
 )
 
 const isActionLoading = ref(false)
+const paymentSessions = computed(() => detail.value?.sessions || [])
+const paymentRefunds = computed(() => detail.value?.refunds || [])
+const paymentLogs = computed(() => detail.value?.logs || [])
+const paymentEvents = computed(() => detail.value?.events || [])
 
 const capturePayment = async () => {
   if (!confirm('Are you sure you want to capture this payment?')) return
@@ -206,31 +358,39 @@ const formatCurrency = (value: string | number, currency: string) => {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(Number(value))
 }
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString?: string | null) => {
   if (!dateString) return '-'
   return new Date(dateString).toLocaleString()
 }
 
 const statusLabel = (status: number) => {
   switch (status) {
-    case 1: return 'Pending'
-    case 2: return 'Authorized'
-    case 3: return 'Captured'
-    case 4: return 'Failed'
-    case 5: return 'Cancelled'
-    case 6: return 'Refunded'
+    case 1: return 'Checkout'
+    case 2: return 'Pending'
+    case 3: return 'Processing'
+    case 4: return 'Authorized'
+    case 5: return 'Captured'
+    case 6: return 'Failed'
+    case 7: return 'Voided'
+    case 8: return 'Cancelled'
+    case 9: return 'Refunded'
+    case 10: return 'Partially refunded'
     default: return 'Unknown'
   }
 }
 
 const statusBadge = (status: number) => {
   switch (status) {
-    case 1: return 'badge-warning'
-    case 2: return 'badge-info'
-    case 3: return 'badge-success'
-    case 4: return 'badge-error'
-    case 5: return 'badge-neutral'
-    case 6: return 'badge-soft badge-error'
+    case 1: return 'badge-neutral'
+    case 2: return 'badge-warning'
+    case 3: return 'badge-info'
+    case 4: return 'badge-primary'
+    case 5: return 'badge-success'
+    case 6: return 'badge-error'
+    case 7: return 'badge-neutral'
+    case 8: return 'badge-neutral'
+    case 9: return 'badge-error'
+    case 10: return 'badge-warning'
     default: return 'badge-ghost'
   }
 }
@@ -238,9 +398,10 @@ const statusBadge = (status: number) => {
 const eventStatusLabel = (status: number) => {
   switch (status) {
     case 1: return 'Received'
-    case 2: return 'Processed'
-    case 3: return 'Failed'
-    case 4: return 'Ignored'
+    case 2: return 'Processing'
+    case 3: return 'Processed'
+    case 4: return 'Failed'
+    case 5: return 'Ignored'
     default: return 'Unknown'
   }
 }
@@ -248,9 +409,58 @@ const eventStatusLabel = (status: number) => {
 const eventStatusBadge = (status: number) => {
   switch (status) {
     case 1: return 'badge-info'
-    case 2: return 'badge-success'
-    case 3: return 'badge-error'
-    case 4: return 'badge-neutral'
+    case 2: return 'badge-warning'
+    case 3: return 'badge-success'
+    case 4: return 'badge-error'
+    case 5: return 'badge-neutral'
+    default: return 'badge-ghost'
+  }
+}
+
+const sessionStatusLabel = (status: number) => {
+  switch (status) {
+    case 1: return 'Pending'
+    case 2: return 'Processing'
+    case 3: return 'Requires action'
+    case 4: return 'Completed'
+    case 5: return 'Failed'
+    case 6: return 'Cancelled'
+    case 7: return 'Expired'
+    default: return 'Unknown'
+  }
+}
+
+const sessionStatusBadge = (status: number) => {
+  switch (status) {
+    case 1: return 'badge-warning'
+    case 2: return 'badge-warning'
+    case 3: return 'badge-info'
+    case 4: return 'badge-success'
+    case 5: return 'badge-error'
+    case 6: return 'badge-neutral'
+    case 7: return 'badge-neutral'
+    default: return 'badge-ghost'
+  }
+}
+
+const refundStatusLabel = (status: number) => {
+  switch (status) {
+    case 1: return 'Pending'
+    case 2: return 'Processing'
+    case 3: return 'Succeeded'
+    case 4: return 'Failed'
+    case 5: return 'Cancelled'
+    default: return 'Unknown'
+  }
+}
+
+const refundStatusBadge = (status: number) => {
+  switch (status) {
+    case 1: return 'badge-warning'
+    case 2: return 'badge-info'
+    case 3: return 'badge-success'
+    case 4: return 'badge-error'
+    case 5: return 'badge-neutral'
     default: return 'badge-ghost'
   }
 }

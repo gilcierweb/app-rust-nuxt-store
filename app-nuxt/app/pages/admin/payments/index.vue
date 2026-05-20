@@ -6,6 +6,14 @@
         <p class="text-sm text-base-content/60">Review payment attempts, gateway references, and operational status.</p>
       </div>
       <div class="flex gap-2">
+        <NuxtLinkLocale to="/admin/payments/events" class="btn btn-outline btn-sm">
+          <i class="icon-[tabler--inbox] size-4"></i>
+          Events
+        </NuxtLinkLocale>
+        <NuxtLinkLocale to="/admin/payments/logs" class="btn btn-outline btn-sm">
+          <i class="icon-[tabler--list-details] size-4"></i>
+          Logs
+        </NuxtLinkLocale>
         <NuxtLinkLocale to="/admin/payments/gateways" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--building-bank] size-4"></i>
           Gateways
