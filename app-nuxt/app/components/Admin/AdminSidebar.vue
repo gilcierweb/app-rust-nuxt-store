@@ -144,6 +144,12 @@
             </NuxtLinkLocale>
           </li>
           <li>
+            <NuxtLinkLocale to="/admin/monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--activity-heartbeat] size-5"></i>
+              {{ $t('admin.monitoring.title') }}
+            </NuxtLinkLocale>
+          </li>
+          <li>
             <NuxtLinkLocale to="/admin/settings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--settings] size-5"></i>
               {{ $t('admin.settings.title') }}

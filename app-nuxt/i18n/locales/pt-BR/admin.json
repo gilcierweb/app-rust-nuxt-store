@@ -853,6 +853,79 @@
         "htmlTemplate": "HTML Template (html.tera)",
         "textTemplate": "Text Template (text.tera)"
       }
+    },
+    "monitoring": {
+      "title": "Monitoramento",
+      "description": "Acompanhe falhas de webhook, erros de gateway e pagamentos que exigem atenção operacional.",
+      "loading": "Carregando monitoramento...",
+      "error": "Erro ao carregar monitoramento: {message}",
+      "empty": "Nenhum alerta operacional no momento.",
+      "actions": {
+        "events": "Eventos",
+        "logs": "Logs"
+      },
+      "metrics": {
+        "failedEvents": "Eventos falhos",
+        "failedEventsHelp": "Webhooks que falharam no processamento.",
+        "invalidSignatures": "Assinaturas inválidas",
+        "invalidSignaturesHelp": "Eventos recebidos com assinatura inválida.",
+        "errorLogs": "Logs de erro",
+        "errorLogsHelp": "Ocorrências sanitizadas marcadas como erro.",
+        "paymentsAtRisk": "Pagamentos em risco",
+        "paymentsAtRiskHelp": "Pagamentos pendentes, processando, autorizados ou falhos."
+      },
+      "status": {
+        "checkout": "Checkout",
+        "pending": "Pendente",
+        "processing": "Processando",
+        "authorized": "Autorizado",
+        "captured": "Capturado",
+        "failed": "Falhou",
+        "voided": "Cancelado",
+        "cancelled": "Cancelado",
+        "refunded": "Reembolsado",
+        "partiallyRefunded": "Parcialmente reembolsado",
+        "received": "Recebido",
+        "processed": "Processado",
+        "ignored": "Ignorado"
+      },
+      "events": {
+        "title": "Alertas de webhook",
+        "description": "Eventos com falha, em processamento ou assinatura inválida.",
+        "valid": "Válida",
+        "invalid": "Inválida",
+        "columns": {
+          "event": "Evento",
+          "gateway": "Gateway",
+          "status": "Status",
+          "signature": "Assinatura",
+          "received": "Recebido em"
+        }
+      },
+      "logs": {
+        "title": "Erros recentes",
+        "description": "Logs operacionais com nível warning ou error.",
+        "session": "Sessão #{id}",
+        "event": "Evento #{id}",
+        "levels": {
+          "info": "Info",
+          "warning": "Warning",
+          "error": "Error"
+        }
+      },
+      "payments": {
+        "title": "Pagamentos que exigem atenção",
+        "description": "Tentativas não concluídas que precisam de acompanhamento manual.",
+        "noReason": "Sem detalhe adicional.",
+        "columns": {
+          "payment": "Pagamento",
+          "order": "Pedido",
+          "status": "Status",
+          "amount": "Valor",
+          "reason": "Motivo",
+          "createdAt": "Criado em"
+        }
+      }
     }
   }
 }

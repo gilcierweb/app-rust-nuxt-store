@@ -855,6 +855,79 @@
         "htmlTemplate": "HTML Template (html.tera)",
         "textTemplate": "Text Template (text.tera)"
       }
+    },
+    "monitoring": {
+      "title": "Monitoring",
+      "description": "Track webhook failures, gateway errors, and payments that require operational attention.",
+      "loading": "Loading monitoring...",
+      "error": "Failed to load monitoring: {message}",
+      "empty": "No operational alerts right now.",
+      "actions": {
+        "events": "Events",
+        "logs": "Logs"
+      },
+      "metrics": {
+        "failedEvents": "Failed events",
+        "failedEventsHelp": "Webhooks that failed during processing.",
+        "invalidSignatures": "Invalid signatures",
+        "invalidSignaturesHelp": "Received events with an invalid signature.",
+        "errorLogs": "Error logs",
+        "errorLogsHelp": "Sanitized gateway entries marked as errors.",
+        "paymentsAtRisk": "Payments at risk",
+        "paymentsAtRiskHelp": "Payments still pending, processing, authorized, or failed."
+      },
+      "status": {
+        "checkout": "Checkout",
+        "pending": "Pending",
+        "processing": "Processing",
+        "authorized": "Authorized",
+        "captured": "Captured",
+        "failed": "Failed",
+        "voided": "Voided",
+        "cancelled": "Cancelled",
+        "refunded": "Refunded",
+        "partiallyRefunded": "Partially refunded",
+        "received": "Received",
+        "processed": "Processed",
+        "ignored": "Ignored"
+      },
+      "events": {
+        "title": "Webhook alerts",
+        "description": "Events that failed, are still processing, or have an invalid signature.",
+        "valid": "Valid",
+        "invalid": "Invalid",
+        "columns": {
+          "event": "Event",
+          "gateway": "Gateway",
+          "status": "Status",
+          "signature": "Signature",
+          "received": "Received at"
+        }
+      },
+      "logs": {
+        "title": "Recent errors",
+        "description": "Operational logs with warning or error level.",
+        "session": "Session #{id}",
+        "event": "Event #{id}",
+        "levels": {
+          "info": "Info",
+          "warning": "Warning",
+          "error": "Error"
+        }
+      },
+      "payments": {
+        "title": "Payments needing attention",
+        "description": "Unresolved attempts that still need manual follow-up.",
+        "noReason": "No additional detail.",
+        "columns": {
+          "payment": "Payment",
+          "order": "Order",
+          "status": "Status",
+          "amount": "Amount",
+          "reason": "Reason",
+          "createdAt": "Created at"
+        }
+      }
     }
   }
 }
