@@ -114,7 +114,9 @@
                   <button 
                     type="button"
                     class="btn btn-sm btn-ghost gap-1.5"
-                    @click="viewLogDetails(log)"
+                    aria-haspopup="dialog" aria-expanded="false" aria-controls="log-details-modal"
+                    data-overlay="#log-details-modal"
+                    @click="selectedLog = log"
                   >
                     <i class="icon-[tabler--eye] size-4"></i>
                     {{ $t('admin.emails.actions.view') }}
@@ -163,6 +165,84 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal: View Log Details (FlyonUI overlay) -->
+      <div id="log-details-modal" class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 modal-middle z-50 hidden" role="dialog" tabindex="-1">
+        <div class="modal-dialog max-w-4xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title flex items-center gap-2">
+                <i class="icon-[tabler--mail-opened] size-6 text-primary"></i>
+                {{ $t('admin.emails.detailsModal.title', { id: selectedLog?.id }) }}
+              </h3>
+              <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3" aria-label="Close" data-overlay="#log-details-modal">
+                <span class="icon-[tabler--x] size-4"></span>
+              </button>
+            </div>
+            
+            <div v-if="selectedLog" class="modal-body">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="space-y-3">
+                  <div>
+                    <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.recipient') }}</span>
+                    <span class="font-medium text-base-content">{{ selectedLog.recipient }}</span>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.template') }}</span>
+                    <span class="badge badge-neutral capitalize">{{ selectedLog.template_name }}</span>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.createdAt') }}</span>
+                    <span>{{ formatDate(selectedLog.created_at) }}</span>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.status') }}</span>
+                    <span :class="['badge font-semibold px-2 py-1 rounded text-xs mt-1', getStatusBadgeClass(selectedLog.status)]">
+                      {{ getStatusLabel(selectedLog.status) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <div>
+                    <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.subject') }}</span>
+                    <span class="font-medium text-base-content block mt-0.5">{{ selectedLog.subject }}</span>
+                  </div>
+                  <div v-if="selectedLog.sent_at">
+                    <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.sentAt') }}</span>
+                    <span>{{ formatDate(selectedLog.sent_at) }}</span>
+                  </div>
+                  <div v-if="selectedLog.error_message">
+                    <span class="text-xs text-error font-semibold block">{{ $t('admin.emails.detailsModal.errorMessage') }}</span>
+                    <pre class="bg-error/10 border border-error/20 text-error p-3 rounded-lg text-xs overflow-x-auto font-mono mt-1 whitespace-pre-wrap">{{ selectedLog.error_message }}</pre>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="selectedLog" class="mb-6">
+                <span class="text-xs text-gray-400 block mb-2 font-semibold">{{ $t('admin.emails.detailsModal.variables') }}</span>
+                <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-48 text-base-content">{{ formatJson(selectedLog.locals_json) }}</pre>
+              </div>
+            </div>
+
+            <div class="modal-footer flex justify-between items-center">
+              <button 
+                type="button" 
+                class="btn btn-primary gap-2"
+                :disabled="resendingIds.includes(selectedLog?.id)"
+                @click="resendLog(selectedLog?.id)"
+              >
+                <span v-if="resendingIds.includes(selectedLog?.id)" class="loading loading-spinner loading-xs"></span>
+                <i v-else class="icon-[tabler--send] size-4"></i>
+                {{ $t('admin.emails.actions.resendNow') }}
+              </button>
+              <button type="button" class="btn btn-soft btn-secondary" data-overlay="#log-details-modal">
+                {{ $t('admin.emails.actions.close') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TAB 2: TEMPLATES -->
@@ -197,7 +277,9 @@
               <button 
                 type="button" 
                 class="btn btn-outline btn-sm gap-1.5"
-                @click="previewTemplate(tmpl)"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="template-preview-modal"
+                data-overlay="#template-preview-modal"
+                @click="selectedTemplate = tmpl"
               >
                 <i class="icon-[tabler--eye] size-4"></i>
                 {{ $t('admin.emails.templates.viewCode') }}
@@ -206,118 +288,48 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal: Preview Template (FlyonUI overlay) -->
+      <div id="template-preview-modal" class="overlay modal overlay-open:opacity-100 overlay-open:duration-300 modal-middle z-50 hidden" role="dialog" tabindex="-1">
+        <div class="modal-dialog max-w-5xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title capitalize flex items-center gap-2">
+                <i class="icon-[tabler--code] size-6 text-primary"></i>
+                {{ $t('admin.emails.codeModal.title', { name: (selectedTemplate?.name || '').replace('_', ' ') }) }}
+              </h3>
+              <button type="button" class="btn btn-text btn-circle btn-sm absolute end-3 top-3" aria-label="Close" data-overlay="#template-preview-modal">
+                <span class="icon-[tabler--x] size-4"></span>
+              </button>
+            </div>
+            
+            <div v-if="selectedTemplate" class="modal-body">
+              <div class="mb-4">
+                <span class="text-xs text-gray-400 block font-semibold mb-1">{{ $t('admin.emails.codeModal.defaultSubject') }}</span>
+                <span class="font-medium text-base-content border border-base-200 p-2.5 rounded-lg block bg-base-200/50">{{ selectedTemplate.subject }}</span>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <span class="text-xs text-gray-400 block font-semibold mb-2">{{ $t('admin.emails.codeModal.htmlTemplate') }}</span>
+                  <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-auto h-96 text-base-content">{{ selectedTemplate.html }}</pre>
+                </div>
+                <div>
+                  <span class="text-xs text-gray-400 block font-semibold mb-2">{{ $t('admin.emails.codeModal.textTemplate') }}</span>
+                  <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-auto h-96 text-base-content">{{ selectedTemplate.text }}</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-soft btn-secondary" data-overlay="#template-preview-modal">
+                {{ $t('admin.emails.actions.close') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Modal: View Log Details -->
-    <dialog ref="logDetailsModal" class="modal">
-      <div class="modal-box w-11/12 max-w-4xl bg-base-100 border border-base-200">
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" :aria-label="$t('admin.emails.actions.close')">✕</button>
-        </form>
-        
-        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-          <i class="icon-[tabler--mail-opened] size-6 text-primary"></i>
-          {{ $t('admin.emails.detailsModal.title', { id: selectedLog?.id }) }}
-        </h3>
-        
-        <div v-if="selectedLog" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div class="space-y-3">
-            <div>
-              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.recipient') }}</span>
-              <span class="font-medium text-base-content">{{ selectedLog.recipient }}</span>
-            </div>
-            <div>
-              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.template') }}</span>
-              <span class="badge badge-neutral capitalize">{{ selectedLog.template_name }}</span>
-            </div>
-            <div>
-              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.createdAt') }}</span>
-              <span>{{ formatDate(selectedLog.created_at) }}</span>
-            </div>
-            <div>
-              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.status') }}</span>
-              <span :class="['badge font-semibold px-2 py-1 rounded text-xs mt-1', getStatusBadgeClass(selectedLog.status)]">
-                {{ getStatusLabel(selectedLog.status) }}
-              </span>
-            </div>
-          </div>
-
-          <div class="space-y-3">
-            <div>
-              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.subject') }}</span>
-              <span class="font-medium text-base-content block mt-0.5">{{ selectedLog.subject }}</span>
-            </div>
-            <div v-if="selectedLog.sent_at">
-              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.sentAt') }}</span>
-              <span>{{ formatDate(selectedLog.sent_at) }}</span>
-            </div>
-            <div v-if="selectedLog.error_message">
-              <span class="text-xs text-error font-semibold block">{{ $t('admin.emails.detailsModal.errorMessage') }}</span>
-              <pre class="bg-error/10 border border-error/20 text-error p-3 rounded-lg text-xs overflow-x-auto font-mono mt-1 whitespace-pre-wrap">{{ selectedLog.error_message }}</pre>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="selectedLog" class="mb-6">
-          <span class="text-xs text-gray-400 block mb-2 font-semibold">{{ $t('admin.emails.detailsModal.variables') }}</span>
-          <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-48 text-base-content">{{ formatJson(selectedLog.locals_json) }}</pre>
-        </div>
-
-        <div class="modal-action flex justify-between items-center pt-4 border-t border-base-200">
-          <button 
-            type="button" 
-            class="btn btn-primary gap-2"
-            :disabled="resendingIds.includes(selectedLog?.id)"
-            @click="resendLog(selectedLog?.id)"
-          >
-            <span v-if="resendingIds.includes(selectedLog?.id)" class="loading loading-spinner loading-xs"></span>
-            <i v-else class="icon-[tabler--send] size-4"></i>
-            {{ $t('admin.emails.actions.resendNow') }}
-          </button>
-          <form method="dialog">
-            <button class="btn btn-outline">{{ $t('admin.emails.actions.close') }}</button>
-          </form>
-        </div>
-      </div>
-    </dialog>
-
-    <!-- Modal: Preview Template -->
-    <dialog ref="templateModal" class="modal">
-      <div class="modal-box w-11/12 max-w-5xl bg-base-100 border border-base-200">
-        <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" :aria-label="$t('admin.emails.actions.close')">✕</button>
-        </form>
-        
-        <h3 class="font-bold text-lg mb-4 flex items-center gap-2 capitalize">
-          <i class="icon-[tabler--code] size-6 text-primary"></i>
-          {{ $t('admin.emails.codeModal.title', { name: (selectedTemplate?.name || '').replace('_', ' ') }) }}
-        </h3>
-        
-        <div v-if="selectedTemplate" class="space-y-4">
-          <div>
-            <span class="text-xs text-gray-400 block font-semibold mb-1">{{ $t('admin.emails.codeModal.defaultSubject') }}</span>
-            <span class="font-medium text-base-content border border-base-200 p-2.5 rounded-lg block bg-base-200/50">{{ selectedTemplate.subject }}</span>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <span class="text-xs text-gray-400 block font-semibold mb-2">{{ $t('admin.emails.codeModal.htmlTemplate') }}</span>
-              <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-auto h-96 text-base-content">{{ selectedTemplate.html }}</pre>
-            </div>
-            <div>
-              <span class="text-xs text-gray-400 block font-semibold mb-2">{{ $t('admin.emails.codeModal.textTemplate') }}</span>
-              <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-auto h-96 text-base-content">{{ selectedTemplate.text }}</pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-action pt-4 border-t border-base-200">
-          <form method="dialog">
-            <button class="btn btn-outline">{{ $t('admin.emails.actions.close') }}</button>
-          </form>
-        </div>
-      </div>
-    </dialog>
   </div>
 </template>
 
@@ -335,10 +347,6 @@ const statusFilter = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 const resendingIds = ref<number[]>([])
-
-// Modals
-const logDetailsModal = ref<HTMLDialogElement | null>(null)
-const templateModal = ref<HTMLDialogElement | null>(null)
 
 const selectedLog = ref<any>(null)
 const selectedTemplate = ref<any>(null)
@@ -417,21 +425,15 @@ const formatJson = (jsonStr: string) => {
   }
 }
 
+// Re-init FlyonUI when tab changes (new DOM elements with data-overlay need processing)
+watch(activeTab, async () => {
+  await nextTick()
+  if (window.HSStaticMethods) {
+    window.HSStaticMethods.autoInit()
+  }
+})
+
 // Actions
-const viewLogDetails = (log: any) => {
-  selectedLog.value = log
-  if (logDetailsModal.value) {
-    logDetailsModal.value.showModal()
-  }
-}
-
-const previewTemplate = (tmpl: any) => {
-  selectedTemplate.value = tmpl
-  if (templateModal.value) {
-    templateModal.value.showModal()
-  }
-}
-
 const resendLog = async (logId: number) => {
   if (!logId) return
   resendingIds.value.push(logId)

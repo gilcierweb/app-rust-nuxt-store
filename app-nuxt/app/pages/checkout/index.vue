@@ -6,8 +6,14 @@
       <p class="text-base-content/60 mt-1">{{ t('pages.checkout.description') }}</p>
     </div>
 
+    <!-- Loading State (SSR / pre-hydration) -->
+    <div v-if="!cartHydrated" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
+      <span class="loading loading-spinner text-primary size-12"></span>
+      <p class="mt-4 text-base-content/60">{{ t('pages.checkout.loadingCart') }}</p>
+    </div>
+
     <!-- Empty State -->
-    <div v-if="cartStore.isEmpty" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
+    <div v-else-if="cartStore.isEmpty" class="flex flex-col items-center justify-center py-24 bg-base-200/30 rounded-[3rem] border-2 border-dashed border-base-200">
       <div class="alert alert-warning max-w-md">
         <div class="flex items-center gap-4">
           <div class="size-16 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
@@ -243,7 +249,7 @@
               <span class="font-bold text-lg text-base-content/60">{{ t('cart.total') }}</span>
               <div class="text-right">
                 <span class="block text-3xl font-black text-primary">{{ formatNumberBR(totalAmount) }}</span>
-                <span class="text-[10px] text-base-content/40 uppercase tracking-widest">{{ t('orders.finalPrice') }}</span>
+                <span class="text-[10px] text-base-content/40 uppercase tracking-widest">{{ t('order.finalPrice') }}</span>
               </div>
             </div>
           </div>
@@ -295,7 +301,7 @@ const { t } = useI18n()
 const config = useRuntimeConfig()
 const cartStore = useCartStore()
 const router = useRouter()
-const { apiFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 import type { PaymentMethod, PaymentSetupSession, ShippingMethod } from '~/types'
 
 declare global {
@@ -308,6 +314,14 @@ declare global {
     }
   }
 }
+
+const cartHydrated = ref(false)
+
+onMounted(() => {
+  nextTick(() => {
+    cartHydrated.value = true
+  })
+})
 
 const submitting = ref(false)
 const confirmingStripe = ref(false)
@@ -402,28 +416,23 @@ const address = computed(() => ({
   phone: phone.value,
 }))
 
-// SSR-friendly data fetching with useLazyFetch (cached, deduplicated, JWT via global plugin)
-const { data: paymentMethods } = useLazyFetch<PaymentMethod[]>(
+// Fetch payment and shipping methods — await for SSR consistency
+const { data: paymentMethods } = await useApiFetch<PaymentMethod[]>(
   '/api/payments/methods',
   { key: 'checkout-payment-methods', default: () => [] }
 )
-const { data: shippingMethods } = useLazyFetch<ShippingMethod[]>(
+const { data: shippingMethods } = await useApiFetch<ShippingMethod[]>(
   '/api/shippings',
   { key: 'checkout-shipping-methods', default: () => [] }
 )
 
-// Auto-select first method when data arrives
-watch(paymentMethods, (methods) => {
-  if (methods.length > 0 && !selectedPaymentMethod.value) {
-    selectedPaymentMethod.value = methods[0]?.id ?? null
-  }
-}, { immediate: true })
-
-watch(shippingMethods, (methods) => {
-  if (methods.length > 0 && !selectedShippingMethod.value) {
-    selectedShippingMethod.value = methods[0]?.id ?? null
-  }
-}, { immediate: true })
+// Auto-select first method (data is already available after await)
+if (paymentMethods.value.length > 0) {
+  selectedPaymentMethod.value = paymentMethods.value[0]?.id ?? null
+}
+if (shippingMethods.value.length > 0) {
+  selectedShippingMethod.value = shippingMethods.value[0]?.id ?? null
+}
 
 const selectedShippingCost = computed(() => {
   if (!selectedShippingMethod.value) return null

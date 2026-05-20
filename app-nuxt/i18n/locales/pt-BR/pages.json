@@ -264,6 +264,7 @@
       "title": "Finalizar Compra",
       "description": "Complete sua compra fornecendo os detalhes de entrega e pagamento.",
       "emptyDescription": "Seu carrinho está vazio. Adicione alguns produtos para prosseguir com a compra.",
+      "loadingCart": "Carregando seu carrinho...",
       "loadingShipping": "Carregando métodos de envio...",
       "loadingPayment": "Carregando métodos de pagamento...",
       "promoInfo": "Tem um código promocional? Aplique aqui para descontos!",

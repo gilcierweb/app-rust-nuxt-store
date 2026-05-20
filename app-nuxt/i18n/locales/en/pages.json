@@ -264,6 +264,7 @@
       "title": "Checkout",
       "description": "Complete your purchase by providing delivery and payment details.",
       "emptyDescription": "Your cart is empty. Add some products to proceed with checkout.",
+      "loadingCart": "Loading your cart...",
       "loadingShipping": "Loading shipping methods...",
       "loadingPayment": "Loading payment methods...",
       "promoInfo": "Have a promo code? Apply it here for discounts!",

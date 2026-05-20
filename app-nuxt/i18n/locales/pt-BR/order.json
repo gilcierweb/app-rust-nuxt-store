@@ -33,6 +33,7 @@
     "adminTitle": "Pedidos",
     "adminSearch": "Buscar pedidos...",
     "updateStatus": "Atualizar Status",
-    "selectStatus": "Selecionar novo status"
+    "selectStatus": "Selecionar novo status",
+    "finalPrice": "Preço final"
   }
 }

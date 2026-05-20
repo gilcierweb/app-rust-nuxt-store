@@ -1,4 +1,4 @@
-import type { HSCarousel, HSAccordion, HSDropdown, IStaticMethods } from "flyonui/flyonui";
+import type { HSCarousel, HSAccordion, HSDropdown, HSOverlay, IStaticMethods } from "flyonui/flyonui";
 
 declare global {
   interface Window {
@@ -12,9 +12,10 @@ declare global {
     // Specific JS component
     // FlyonUI
     HSStaticMethods: IStaticMethods;
-    // HSAccordion: typeof HSAccordion;
-    // HSDropdown: typeof HSDropdown;
-    // HSCarousel: typeof HSCarousel;
+    HSAccordion: typeof HSAccordion;
+    HSDropdown: typeof HSDropdown;
+    HSCarousel: typeof HSCarousel;
+    HSOverlay: typeof HSOverlay;
   }
 }
 

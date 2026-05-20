@@ -33,6 +33,7 @@
     "adminTitle": "Orders",
     "adminSearch": "Search orders...",
     "updateStatus": "Update Status",
-    "selectStatus": "Select new status"
+    "selectStatus": "Select new status",
+    "finalPrice": "Final price"
   }
 }

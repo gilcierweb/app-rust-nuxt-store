@@ -4,6 +4,7 @@ export default defineNuxtPlugin(async () => {
     await import("flyonui/dist/accordion");
     await import("flyonui/dist/dropdown");
     await import("flyonui/dist/carousel");
+    await import("flyonui/dist/overlay");
   }
 
   const router = useRouter();
@@ -21,6 +22,9 @@ export default defineNuxtPlugin(async () => {
       }
       if (window.HSCarousel) {
         window.HSCarousel.autoInit();
+      }
+      if (window.HSOverlay) {
+        window.HSOverlay.autoInit();
       }
     } catch {
       // Ignore errors from FlyonUI autoInit when DOM nodes are temporarily unavailable

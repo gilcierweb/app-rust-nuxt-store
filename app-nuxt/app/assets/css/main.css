@@ -11,7 +11,7 @@
 /* Iconify – the plugin that generates the icon‑[…] utilities */
 @plugin "@iconify/tailwind4";
 
-@source inline("bg-info bg-warning text-info text-warning text-success text-primary");
+@source inline("bg-info bg-warning text-info text-warning text-success text-primary bg-base-300/60");
 
 @source inline("icon-[tabler--cash] icon-[tabler--package] icon-[tabler--chart-pie]");
 
