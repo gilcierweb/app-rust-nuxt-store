@@ -722,6 +722,76 @@
         "confirmDelete": "¿Está seguro de que desea eliminar la dirección de \"{name}\"?",
         "errorDelete": "Error al eliminar la dirección"
       }
+    },
+    "payments": {
+      "title": "Pagos"
+    },
+    "inventory": {
+      "title": "Inventario"
+    },
+    "emails": {
+      "title": "Correos Transaccionales",
+      "description": "Gestione las plantillas de correo electrónico y supervise las entregas e intentos de envío.",
+      "tabs": {
+        "logs": "Historial de Envíos",
+        "templates": "Plantillas (Templates)"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar por destinatario...",
+        "allStatuses": "Todos los estados",
+        "pending": "Pendiente",
+        "sent": "Enviado",
+        "failed": "Falló",
+        "refresh": "Actualizar Registros"
+      },
+      "loadingLogs": "Cargando registros de envío...",
+      "errorLogs": "Error al cargar registros: {message}",
+      "notFoundLogs": "No se encontraron registros de envío correspondientes.",
+      "table": {
+        "id": "ID",
+        "recipient": "Destinatario",
+        "template": "Plantilla",
+        "subject": "Asunto",
+        "status": "Estado",
+        "date": "Fecha de Envío",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "view": "Ver",
+        "resend": "Reenviar",
+        "resendNow": "Reenviar Correo Ahora",
+        "close": "Cerrar",
+        "success": "¡Correo reenviado con éxito!",
+        "error": "Error al reenviar correo. Por favor, inténtelo de nuevo."
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} registros",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      },
+      "loadingTemplates": "Cargando plantillas de correo...",
+      "errorTemplates": "Error al cargar plantillas: {message}",
+      "templates": {
+        "defaultSubject": "Asunto predeterminado:",
+        "viewCode": "Ver Código"
+      },
+      "detailsModal": {
+        "title": "Detalles del Registro de Envío #{id}",
+        "recipient": "Destinatario",
+        "template": "Plantilla Utilizada",
+        "createdAt": "Fecha de Creación",
+        "status": "Estado de Entrega",
+        "subject": "Asunto",
+        "sentAt": "Fecha de Envío Realizado",
+        "errorMessage": "Mensaje de Error",
+        "variables": "Parámetros de las Variables (JSON)"
+      },
+      "codeModal": {
+        "title": "Ver Código de la Plantilla: {name}",
+        "defaultSubject": "Asunto Predeterminado",
+        "htmlTemplate": "HTML Template (html.tera)",
+        "textTemplate": "Text Template (text.tera)"
+      }
     }
   }
 }

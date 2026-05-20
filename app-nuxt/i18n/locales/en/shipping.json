@@ -27,6 +27,16 @@
       "delivered": "Delivered",
       "cancelled": "Cancelled"
     },
-    "deliveryTime": "Delivery in 3-5 business days"
+    "deliveryTime": "Delivery in 3-5 business days",
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "address1Required": "Address is required",
+      "cityRequired": "City is required",
+      "stateRequired": "State is required",
+      "zipCodeRequired": "ZIP code is required",
+      "phoneRequired": "Phone is required",
+      "documentRequired": "CPF/CNPJ is required"
+    }
   }
 }

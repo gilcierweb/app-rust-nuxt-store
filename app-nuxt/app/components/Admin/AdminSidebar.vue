@@ -8,11 +8,11 @@
       <div class="text-base-content border-base-content/10 flex flex-col items-center gap-4 border-b px-4 py-8">
         <div class="avatar">
           <div class="size-20 rounded-full border-2 border-primary/20 p-1">
-            <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
+            <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" :alt="$t('admin.sidebar.avatarAlt')" />
           </div>
         </div>
         <div class="text-center">
-          <h3 class="text-base-content text-lg font-bold">{{ user?.name || 'Administrator' }}</h3>
+          <h3 class="text-base-content text-lg font-bold">{{ user?.name || $t('admin.sidebar.admin') }}</h3>
           <p class="text-base-content/60 text-xs truncate max-w-[200px]">{{ user?.email || 'admin@store.com' }}</p>
         </div>
         <div class="flex gap-3 mt-2">
@@ -44,7 +44,7 @@
           <li>
             <NuxtLinkLocale to="/admin/payments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--credit-card] size-5"></i>
-              Payments
+              {{ $t('admin.payments.title') }}
             </NuxtLinkLocale>
           </li>
           <li>
@@ -56,7 +56,7 @@
           <li>
             <NuxtLinkLocale to="/admin/inventory" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--packages] size-5"></i>
-              Inventory
+              {{ $t('admin.inventory.title') }}
             </NuxtLinkLocale>
           </li>
           <li>
@@ -90,7 +90,7 @@
           <li>
             <NuxtLinkLocale to="/admin/addresses" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--address-book] size-5"></i>
-              Addresses
+              {{ $t('admin.addresses.title') }}
             </NuxtLinkLocale>
           </li>
 
@@ -134,7 +134,7 @@
           <li>
             <NuxtLinkLocale to="/admin/emails" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--mail] size-5"></i>
-              Emails
+              {{ $t('admin.emails.title') }}
             </NuxtLinkLocale>
           </li>
           <li>

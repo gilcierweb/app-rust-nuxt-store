@@ -27,6 +27,16 @@
       "delivered": "Entregue",
       "cancelled": "Cancelado"
     },
-    "deliveryTime": "Entrega em 3-5 dias úteis"
+    "deliveryTime": "Entrega em 3-5 dias úteis",
+    "validation": {
+      "firstNameRequired": "Primeiro nome é obrigatório",
+      "lastNameRequired": "Sobrenome é obrigatório",
+      "address1Required": "Endereço é obrigatório",
+      "cityRequired": "Cidade é obrigatória",
+      "stateRequired": "Estado é obrigatório",
+      "zipCodeRequired": "CEP é obrigatório",
+      "phoneRequired": "Telefone é obrigatório",
+      "documentRequired": "CPF/CNPJ é obrigatório"
+    }
   }
 }

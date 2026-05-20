@@ -726,6 +726,76 @@
         "confirmDelete": "Are you sure you want to delete address for \"{name}\"?",
         "errorDelete": "Error deleting address"
       }
+    },
+    "payments": {
+      "title": "Payments"
+    },
+    "inventory": {
+      "title": "Inventory"
+    },
+    "emails": {
+      "title": "Transactional Emails",
+      "description": "Manage email templates and audit dispatch deliveries and attempts.",
+      "tabs": {
+        "logs": "Sent Emails Logs",
+        "templates": "Email Templates"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by recipient...",
+        "allStatuses": "All statuses",
+        "pending": "Pending",
+        "sent": "Sent",
+        "failed": "Failed",
+        "refresh": "Refresh Logs"
+      },
+      "loadingLogs": "Loading dispatch logs...",
+      "errorLogs": "Error loading logs: {message}",
+      "notFoundLogs": "No matching email logs found.",
+      "table": {
+        "id": "ID",
+        "recipient": "Recipient",
+        "template": "Template",
+        "subject": "Subject",
+        "status": "Status",
+        "date": "Sent Date",
+        "actions": "Actions"
+      },
+      "actions": {
+        "view": "View",
+        "resend": "Resend",
+        "resendNow": "Resend Email Now",
+        "close": "Close",
+        "success": "Email resent successfully!",
+        "error": "Failed to resend email. Please try again."
+      },
+      "pagination": {
+        "showing": "Showing {current} of {total} logs",
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "loadingTemplates": "Loading email templates...",
+      "errorTemplates": "Error loading templates: {message}",
+      "templates": {
+        "defaultSubject": "Default subject:",
+        "viewCode": "View Template Code"
+      },
+      "detailsModal": {
+        "title": "Email Dispatch Log Details #{id}",
+        "recipient": "Recipient",
+        "template": "Used Template",
+        "createdAt": "Creation Date",
+        "status": "Delivery Status",
+        "subject": "Subject",
+        "sentAt": "Sent Date",
+        "errorMessage": "Error Message",
+        "variables": "Template Variables Parameters (JSON)"
+      },
+      "codeModal": {
+        "title": "View Template Code: {name}",
+        "defaultSubject": "Default Subject",
+        "htmlTemplate": "HTML Template (html.tera)",
+        "textTemplate": "Text Template (text.tera)"
+      }
     }
   }
 }

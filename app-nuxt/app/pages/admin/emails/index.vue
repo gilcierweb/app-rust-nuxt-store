@@ -2,8 +2,8 @@
   <div>
     <!-- Title -->
     <div class="mb-6">
-      <h1 class="h1">E-mails Transacionais</h1>
-      <p class="text-sm text-gray-500 mt-1">Gerencie os modelos de e-mail e monitore as entregas e tentativas de envio.</p>
+      <h1 class="h1">{{ $t('admin.emails.title') }}</h1>
+      <p class="text-sm text-gray-500 mt-1">{{ $t('admin.emails.description') }}</p>
     </div>
 
     <!-- Tabs Container -->
@@ -16,7 +16,7 @@
       >
         <span class="flex items-center gap-2">
           <i class="icon-[tabler--list-check] size-5"></i>
-          Histórico de Envios
+          {{ $t('admin.emails.tabs.logs') }}
         </span>
       </button>
       <button 
@@ -27,7 +27,7 @@
       >
         <span class="flex items-center gap-2">
           <i class="icon-[tabler--template] size-5"></i>
-          Modelos (Templates)
+          {{ $t('admin.emails.tabs.templates') }}
         </span>
       </button>
     </div>
@@ -41,7 +41,7 @@
           <input
             v-model="recipientSearch"
             type="text"
-            placeholder="Buscar por destinatário..."
+            :placeholder="$t('admin.emails.filters.searchPlaceholder')"
             class="input input-bordered w-full md:w-64"
             @input="handleFilterChange"
           />
@@ -52,33 +52,33 @@
             class="select select-bordered w-full md:w-48"
             @change="handleFilterChange"
           >
-            <option value="">Todos os status</option>
-            <option value="0">Pendente</option>
-            <option value="1">Enviado</option>
-            <option value="2">Falhou</option>
+            <option value="">{{ $t('admin.emails.filters.allStatuses') }}</option>
+            <option value="0">{{ $t('admin.emails.filters.pending') }}</option>
+            <option value="1">{{ $t('admin.emails.filters.sent') }}</option>
+            <option value="2">{{ $t('admin.emails.filters.failed') }}</option>
           </select>
         </div>
 
         <button type="button" class="btn btn-outline gap-2" @click="refreshLogs">
           <i class="icon-[tabler--refresh] size-4"></i>
-          Atualizar Logs
+          {{ $t('admin.emails.filters.refresh') }}
         </button>
       </div>
 
       <!-- Loading State -->
       <div v-if="logsPending" class="flex items-center justify-center py-12">
         <span class="loading loading-spinner text-primary size-12"></span>
-        <span class="ml-3">Carregando logs de envio...</span>
+        <span class="ml-3">{{ $t('admin.emails.loadingLogs') }}</span>
       </div>
 
       <!-- Error State -->
       <div v-else-if="logsError" class="alert alert-error mb-6">
-        <span>Erro ao carregar logs: {{ logsError.message }}</span>
+        <span>{{ $t('admin.emails.errorLogs', { message: logsError.message }) }}</span>
       </div>
 
       <!-- Empty State -->
       <div v-else-if="!logsData || !logsData.items || logsData.items.length === 0" class="text-center py-12 bg-base-100 rounded-box border border-base-200">
-        <p class="text-gray-500 text-lg">Nenhum log de envio correspondente encontrado.</p>
+        <p class="text-gray-500 text-lg">{{ $t('admin.emails.notFoundLogs') }}</p>
       </div>
 
       <!-- Logs Table -->
@@ -87,13 +87,13 @@
           <table class="table w-full">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Destinatário</th>
-                <th>Template</th>
-                <th>Assunto</th>
-                <th>Status</th>
-                <th>Data de Envio</th>
-                <th class="text-right">Ações</th>
+                <th>{{ $t('admin.emails.table.id') }}</th>
+                <th>{{ $t('admin.emails.table.recipient') }}</th>
+                <th>{{ $t('admin.emails.table.template') }}</th>
+                <th>{{ $t('admin.emails.table.subject') }}</th>
+                <th>{{ $t('admin.emails.table.status') }}</th>
+                <th>{{ $t('admin.emails.table.date') }}</th>
+                <th class="text-right">{{ $t('admin.emails.table.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -117,7 +117,7 @@
                     @click="viewLogDetails(log)"
                   >
                     <i class="icon-[tabler--eye] size-4"></i>
-                    Ver
+                    {{ $t('admin.emails.actions.view') }}
                   </button>
                   <button 
                     type="button"
@@ -127,7 +127,7 @@
                   >
                     <span v-if="resendingIds.includes(log.id)" class="loading loading-spinner loading-xs"></span>
                     <i v-else class="icon-[tabler--send] size-4"></i>
-                    Reenviar
+                    {{ $t('admin.emails.actions.resend') }}
                   </button>
                 </td>
               </tr>
@@ -138,7 +138,7 @@
         <!-- Pagination -->
         <div class="flex items-center justify-between px-6 py-4 border-t border-base-200">
           <span class="text-xs text-gray-500">
-            Mostrando {{ logsData.items.length }} de {{ logsData.total }} logs
+            {{ $t('admin.emails.pagination.showing', { current: logsData.items.length, total: logsData.total }) }}
           </span>
           <div class="join">
             <button 
@@ -147,7 +147,7 @@
               :disabled="currentPage <= 1"
               @click="changePage(currentPage - 1)"
             >
-              Anterior
+              {{ $t('admin.emails.pagination.previous') }}
             </button>
             <button type="button" class="join-item btn btn-sm btn-active font-mono">
               {{ currentPage }}
@@ -158,7 +158,7 @@
               :disabled="currentPage * pageSize >= logsData.total"
               @click="changePage(currentPage + 1)"
             >
-              Próximo
+              {{ $t('admin.emails.pagination.next') }}
             </button>
           </div>
         </div>
@@ -170,12 +170,12 @@
       <!-- Loading State -->
       <div v-if="templatesPending" class="flex items-center justify-center py-12">
         <span class="loading loading-spinner text-primary size-12"></span>
-        <span class="ml-3">Carregando modelos de e-mail...</span>
+        <span class="ml-3">{{ $t('admin.emails.loadingTemplates') }}</span>
       </div>
 
       <!-- Error State -->
       <div v-else-if="templatesError" class="alert alert-error mb-6">
-        <span>Erro ao carregar templates: {{ templatesError.message }}</span>
+        <span>{{ $t('admin.emails.errorTemplates', { message: templatesError.message }) }}</span>
       </div>
 
       <!-- Templates Grid -->
@@ -187,10 +187,10 @@
         >
           <div class="card-body">
             <h2 class="card-title capitalize text-lg flex items-center justify-between">
-              {{ tmpl.name.replace('_', ' ') }}
+              {{ (tmpl.name || '').replace('_', ' ') }}
               <span class="badge badge-soft text-xs badge-neutral">Loco Mailer</span>
             </h2>
-            <p class="text-xs text-gray-500 font-mono mt-1">Assunto padrão:</p>
+            <p class="text-xs text-gray-500 font-mono mt-1">{{ $t('admin.emails.templates.defaultSubject') }}</p>
             <p class="font-medium text-sm text-base-content mt-0.5">{{ tmpl.subject }}</p>
             
             <div class="card-actions justify-end mt-6 pt-4 border-t border-base-100">
@@ -200,7 +200,7 @@
                 @click="previewTemplate(tmpl)"
               >
                 <i class="icon-[tabler--eye] size-4"></i>
-                Visualizar Código
+                {{ $t('admin.emails.templates.viewCode') }}
               </button>
             </div>
           </div>
@@ -212,30 +212,30 @@
     <dialog ref="logDetailsModal" class="modal">
       <div class="modal-box w-11/12 max-w-4xl bg-base-100 border border-base-200">
         <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" aria-label="Fechar">✕</button>
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" :aria-label="$t('admin.emails.actions.close')">✕</button>
         </form>
         
         <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
           <i class="icon-[tabler--mail-opened] size-6 text-primary"></i>
-          Detalhes do Log de Envio #{{ selectedLog?.id }}
+          {{ $t('admin.emails.detailsModal.title', { id: selectedLog?.id }) }}
         </h3>
         
         <div v-if="selectedLog" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div class="space-y-3">
             <div>
-              <span class="text-xs text-gray-400 block">Destinatário</span>
+              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.recipient') }}</span>
               <span class="font-medium text-base-content">{{ selectedLog.recipient }}</span>
             </div>
             <div>
-              <span class="text-xs text-gray-400 block">Template Utilizado</span>
+              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.template') }}</span>
               <span class="badge badge-neutral capitalize">{{ selectedLog.template_name }}</span>
             </div>
             <div>
-              <span class="text-xs text-gray-400 block">Data de Criação</span>
+              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.createdAt') }}</span>
               <span>{{ formatDate(selectedLog.created_at) }}</span>
             </div>
             <div>
-              <span class="text-xs text-gray-400 block">Status de Entrega</span>
+              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.status') }}</span>
               <span :class="['badge font-semibold px-2 py-1 rounded text-xs mt-1', getStatusBadgeClass(selectedLog.status)]">
                 {{ getStatusLabel(selectedLog.status) }}
               </span>
@@ -244,22 +244,22 @@
 
           <div class="space-y-3">
             <div>
-              <span class="text-xs text-gray-400 block">Assunto</span>
+              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.subject') }}</span>
               <span class="font-medium text-base-content block mt-0.5">{{ selectedLog.subject }}</span>
             </div>
             <div v-if="selectedLog.sent_at">
-              <span class="text-xs text-gray-400 block">Data de Envio Realizado</span>
+              <span class="text-xs text-gray-400 block">{{ $t('admin.emails.detailsModal.sentAt') }}</span>
               <span>{{ formatDate(selectedLog.sent_at) }}</span>
             </div>
             <div v-if="selectedLog.error_message">
-              <span class="text-xs text-error font-semibold block">Mensagem de Erro</span>
+              <span class="text-xs text-error font-semibold block">{{ $t('admin.emails.detailsModal.errorMessage') }}</span>
               <pre class="bg-error/10 border border-error/20 text-error p-3 rounded-lg text-xs overflow-x-auto font-mono mt-1 whitespace-pre-wrap">{{ selectedLog.error_message }}</pre>
             </div>
           </div>
         </div>
 
         <div v-if="selectedLog" class="mb-6">
-          <span class="text-xs text-gray-400 block mb-2 font-semibold">Parâmetros das Variáveis do Template (JSON)</span>
+          <span class="text-xs text-gray-400 block mb-2 font-semibold">{{ $t('admin.emails.detailsModal.variables') }}</span>
           <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-x-auto max-h-48 text-base-content">{{ formatJson(selectedLog.locals_json) }}</pre>
         </div>
 
@@ -272,10 +272,10 @@
           >
             <span v-if="resendingIds.includes(selectedLog?.id)" class="loading loading-spinner loading-xs"></span>
             <i v-else class="icon-[tabler--send] size-4"></i>
-            Reenviar E-mail Agora
+            {{ $t('admin.emails.actions.resendNow') }}
           </button>
           <form method="dialog">
-            <button class="btn btn-outline">Fechar</button>
+            <button class="btn btn-outline">{{ $t('admin.emails.actions.close') }}</button>
           </form>
         </div>
       </div>
@@ -285,27 +285,27 @@
     <dialog ref="templateModal" class="modal">
       <div class="modal-box w-11/12 max-w-5xl bg-base-100 border border-base-200">
         <form method="dialog">
-          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" aria-label="Fechar">✕</button>
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4" :aria-label="$t('admin.emails.actions.close')">✕</button>
         </form>
         
         <h3 class="font-bold text-lg mb-4 flex items-center gap-2 capitalize">
           <i class="icon-[tabler--code] size-6 text-primary"></i>
-          Visualizar Código do Template: {{ selectedTemplate?.name.replace('_', ' ') }}
+          {{ $t('admin.emails.codeModal.title', { name: (selectedTemplate?.name || '').replace('_', ' ') }) }}
         </h3>
         
         <div v-if="selectedTemplate" class="space-y-4">
           <div>
-            <span class="text-xs text-gray-400 block font-semibold mb-1">Assunto Padrão</span>
+            <span class="text-xs text-gray-400 block font-semibold mb-1">{{ $t('admin.emails.codeModal.defaultSubject') }}</span>
             <span class="font-medium text-base-content border border-base-200 p-2.5 rounded-lg block bg-base-200/50">{{ selectedTemplate.subject }}</span>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <span class="text-xs text-gray-400 block font-semibold mb-2">HTML Template (html.tera)</span>
+              <span class="text-xs text-gray-400 block font-semibold mb-2">{{ $t('admin.emails.codeModal.htmlTemplate') }}</span>
               <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-auto h-96 text-base-content">{{ selectedTemplate.html }}</pre>
             </div>
             <div>
-              <span class="text-xs text-gray-400 block font-semibold mb-2">Text Template (text.tera)</span>
+              <span class="text-xs text-gray-400 block font-semibold mb-2">{{ $t('admin.emails.codeModal.textTemplate') }}</span>
               <pre class="bg-base-200 border border-base-300 p-4 rounded-lg text-xs font-mono overflow-auto h-96 text-base-content">{{ selectedTemplate.text }}</pre>
             </div>
           </div>
@@ -313,7 +313,7 @@
 
         <div class="modal-action pt-4 border-t border-base-200">
           <form method="dialog">
-            <button class="btn btn-outline">Fechar</button>
+            <button class="btn btn-outline">{{ $t('admin.emails.actions.close') }}</button>
           </form>
         </div>
       </div>
@@ -327,6 +327,7 @@ definePageMeta({
 })
 
 const { apiFetch, useApiFetch } = useApi()
+const { t } = useI18n()
 
 const activeTab = ref('logs')
 const recipientSearch = ref('')
@@ -343,19 +344,10 @@ const selectedLog = ref<any>(null)
 const selectedTemplate = ref<any>(null)
 
 // API fetch for templates
-const { 
-  pending: templatesPending, 
-  data: templates, 
-  error: templatesError 
-} = await useApiFetch<any[]>('/api/admin/emails/templates', { key: 'admin-email-templates' })
+const templatesPromise = useApiFetch<any[]>('/api/admin/emails/templates', { key: 'admin-email-templates' })
 
 // API fetch for logs (paginated & filterable)
-const { 
-  pending: logsPending, 
-  data: logsData, 
-  error: logsError, 
-  refresh: refreshLogs 
-} = await useApiFetch<any>('/api/admin/emails/logs', {
+const logsPromise = useApiFetch<any>('/api/admin/emails/logs', {
   key: 'admin-email-logs',
   query: computed(() => ({
     page: currentPage.value,
@@ -363,6 +355,16 @@ const {
     recipient: recipientSearch.value || undefined,
     status: statusFilter.value !== '' ? Number(statusFilter.value) : undefined
   }))
+})
+
+const [
+  { pending: templatesPending, data: templatesRaw, error: templatesError },
+  { pending: logsPending, data: logsData, error: logsError, refresh: refreshLogs }
+] = await Promise.all([templatesPromise, logsPromise])
+
+const templates = computed(() => {
+  const raw = templatesRaw.value
+  return Array.isArray(raw) ? raw : []
 })
 
 // Trigger query parameter refresh
@@ -379,10 +381,10 @@ const changePage = (page: number) => {
 // Helpers
 const getStatusLabel = (status: number) => {
   switch (status) {
-    case 0: return 'Pendente'
-    case 1: return 'Enviado'
-    case 2: return 'Falhou'
-    default: return 'Desconhecido'
+    case 0: return t('admin.emails.filters.pending')
+    case 1: return t('admin.emails.filters.sent')
+    case 2: return t('admin.emails.filters.failed')
+    default: return t('admin.statusLabels.unknown')
   }
 }
 
@@ -437,10 +439,8 @@ const resendLog = async (logId: number) => {
     await apiFetch(`/api/admin/emails/logs/${logId}/resend`, {
       method: 'POST'
     })
-    // Quick notification or feedback
-    alert('Email reenviado com sucesso!')
+    alert(t('admin.emails.actions.success'))
     await refreshLogs()
-    // Update selected log reference if modal is open
     if (selectedLog.value && selectedLog.value.id === logId) {
       const updatedLog = logsData.value?.items.find((item: any) => item.id === logId)
       if (updatedLog) {
@@ -449,7 +449,7 @@ const resendLog = async (logId: number) => {
     }
   } catch (err) {
     console.error('Erro ao reenviar e-mail:', err)
-    alert('Falha ao reenviar e-mail. Por favor, tente novamente.')
+    alert(t('admin.emails.actions.error'))
   } finally {
     resendingIds.value = resendingIds.value.filter(id => id !== logId)
   }

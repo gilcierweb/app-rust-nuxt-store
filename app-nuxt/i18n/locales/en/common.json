@@ -38,7 +38,8 @@
       "submit": "Submit",
       "delete": "Delete",
       "tryAgain": "Try again",
-      "loadMore": "Load more"
+      "loadMore": "Load more",
+      "title": "Actions"
     },
     "table": {
       "actions": "Actions",

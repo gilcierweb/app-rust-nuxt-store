@@ -724,6 +724,76 @@
         "confirmDelete": "Tem certeza que deseja excluir o endereço de \"{name}\"?",
         "errorDelete": "Erro ao excluir endereço"
       }
+    },
+    "payments": {
+      "title": "Pagamentos"
+    },
+    "inventory": {
+      "title": "Estoque"
+    },
+    "emails": {
+      "title": "E-mails Transacionais",
+      "description": "Gerencie os modelos de e-mail e monitore as entregas e tentativas de envio.",
+      "tabs": {
+        "logs": "Histórico de Envios",
+        "templates": "Modelos (Templates)"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar por destinatário...",
+        "allStatuses": "Todos os status",
+        "pending": "Pendente",
+        "sent": "Enviado",
+        "failed": "Falhou",
+        "refresh": "Atualizar Logs"
+      },
+      "loadingLogs": "Carregando logs de envio...",
+      "errorLogs": "Erro ao carregar logs: {message}",
+      "notFoundLogs": "Nenhum log de envio correspondente encontrado.",
+      "table": {
+        "id": "ID",
+        "recipient": "Destinatário",
+        "template": "Template",
+        "subject": "Assunto",
+        "status": "Status",
+        "date": "Data de Envio",
+        "actions": "Ações"
+      },
+      "actions": {
+        "view": "Ver",
+        "resend": "Reenviar",
+        "resendNow": "Reenviar E-mail Agora",
+        "close": "Fechar",
+        "success": "Email reenviado com sucesso!",
+        "error": "Falha ao reenviar e-mail. Por favor, tente novamente."
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} logs",
+        "previous": "Anterior",
+        "next": "Próximo"
+      },
+      "loadingTemplates": "Carregando modelos de e-mail...",
+      "errorTemplates": "Erro ao carregar templates: {message}",
+      "templates": {
+        "defaultSubject": "Assunto padrão:",
+        "viewCode": "Visualizar Código"
+      },
+      "detailsModal": {
+        "title": "Detalhes do Log de Envio #{id}",
+        "recipient": "Destinatário",
+        "template": "Template Utilizado",
+        "createdAt": "Data de Criação",
+        "status": "Status de Entrega",
+        "subject": "Assunto",
+        "sentAt": "Data de Envio Realizado",
+        "errorMessage": "Mensagem de Erro",
+        "variables": "Parâmetros das Variáveis do Template (JSON)"
+      },
+      "codeModal": {
+        "title": "Visualizar Código do Template: {name}",
+        "defaultSubject": "Assunto Padrão",
+        "htmlTemplate": "HTML Template (html.tera)",
+        "textTemplate": "Text Template (text.tera)"
+      }
     }
   }
 }

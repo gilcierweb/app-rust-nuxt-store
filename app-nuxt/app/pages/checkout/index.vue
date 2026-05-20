@@ -341,6 +341,13 @@ function generateUUID(): string {
 
 const idempotencyKey = ref(generateUUID())
 
+const selectedPaymentMethodRecord = computed(() => {
+  if (!selectedPaymentMethod.value) return null
+  return paymentMethods.value.find(method => method.id === selectedPaymentMethod.value) ?? null
+})
+
+const selectedGatewayDriver = computed(() => selectedPaymentMethodRecord.value?.gateway_driver || null)
+
 const schema = computed(() => {
   return toTypedSchema(
     v.object({
@@ -423,13 +430,6 @@ const selectedShippingCost = computed(() => {
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
   return method?.base_price ?? null
 })
-
-const selectedPaymentMethodRecord = computed(() => {
-  if (!selectedPaymentMethod.value) return null
-  return paymentMethods.value.find(method => method.id === selectedPaymentMethod.value) ?? null
-})
-
-const selectedGatewayDriver = computed(() => selectedPaymentMethodRecord.value?.gateway_driver || null)
 
 watch(selectedGatewayDriver, async (driver) => {
   if (driver === 'braintree') {
