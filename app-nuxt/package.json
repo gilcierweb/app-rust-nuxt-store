@@ -21,6 +21,8 @@
     "@vee-validate/i18n": "^4.15.1",
     "@vee-validate/nuxt": "^4.15.1",
     "@vee-validate/rules": "^4.15.1",
+    "@valibot/i18n": "^1.2.0",
+    "@vee-validate/valibot": "^4.15.1",
     "@vite-pwa/nuxt": "^1.0.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -39,6 +41,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.2.3",
     "tw-animate-css": "^1.3.5",
+    "valibot": "^1.4.0",
     "vue": "^3.5.33",
     "vue-router": "^5.0.6"
   },

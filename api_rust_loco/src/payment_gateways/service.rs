@@ -38,7 +38,13 @@ where
     C: ConnectionTrait,
 {
     let now = chrono::Utc::now();
-    let idempotency_key = format!("pay-{}", Uuid::new_v4());
+    let idempotency_key = input
+        .gateway_payload
+        .as_ref()
+        .and_then(|payload| payload.get("idempotency_key"))
+        .and_then(|val| val.as_str())
+        .map(|s| s.to_string())
+        .unwrap_or_else(|| format!("pay-{}", Uuid::new_v4()));
     let number = generate_payment_number();
 
     let payment = payments::ActiveModel {

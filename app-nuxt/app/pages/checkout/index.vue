@@ -40,39 +40,46 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="w-full">
                 <label class="label-text" for="firstName">{{ t('shipping.firstName') }}</label>
-                <input v-model="address.firstName" type="text" class="input" id="firstName" :placeholder="t('shipping.firstName')" />
+                <input v-model="firstName" @blur="firstNameBlur" type="text" class="input" :class="{ 'input-error': firstNameError }" id="firstName" :placeholder="t('shipping.firstName')" />
+                <p v-if="firstNameError" class="text-xs text-error font-semibold mt-1">{{ firstNameError }}</p>
               </div>
               <div class="w-full">
                 <label class="label-text" for="lastName">{{ t('shipping.lastName') }}</label>
-                <input v-model="address.lastName" type="text" class="input" id="lastName" :placeholder="t('shipping.lastName')" />
+                <input v-model="lastName" @blur="lastNameBlur" type="text" class="input" :class="{ 'input-error': lastNameError }" id="lastName" :placeholder="t('shipping.lastName')" />
+                <p v-if="lastNameError" class="text-xs text-error font-semibold mt-1">{{ lastNameError }}</p>
               </div>
             </div>
             <div class="w-full">
               <label class="label-text" for="address1">{{ t('shipping.address1') }}</label>
-              <input v-model="address.address1" type="text" class="input" id="address1" :placeholder="t('shipping.address1')" />
+              <input v-model="address1" @blur="address1Blur" type="text" class="input" :class="{ 'input-error': address1Error }" id="address1" :placeholder="t('shipping.address1')" />
+              <p v-if="address1Error" class="text-xs text-error font-semibold mt-1">{{ address1Error }}</p>
             </div>
             <div class="w-full">
               <label class="label-text" for="address2">{{ t('shipping.address2') }} ({{ t('common.optional') }})</label>
-              <input v-model="address.address2" type="text" class="input" id="address2" :placeholder="t('shipping.address2')" />
+              <input v-model="address2" type="text" class="input" id="address2" :placeholder="t('shipping.address2')" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="w-full">
                 <label class="label-text" for="city">{{ t('shipping.city') }}</label>
-                <input v-model="address.city" type="text" class="input" id="city" :placeholder="t('shipping.city')" />
+                <input v-model="city" @blur="cityBlur" type="text" class="input" :class="{ 'input-error': cityError }" id="city" :placeholder="t('shipping.city')" />
+                <p v-if="cityError" class="text-xs text-error font-semibold mt-1">{{ cityError }}</p>
               </div>
               <div class="w-full">
                 <label class="label-text" for="state">{{ t('shipping.state') }}</label>
-                <input v-model="address.state" type="text" class="input" id="state" :placeholder="t('shipping.state')" />
+                <input v-model="state" @blur="stateBlur" type="text" class="input" :class="{ 'input-error': stateError }" id="state" :placeholder="t('shipping.state')" />
+                <p v-if="stateError" class="text-xs text-error font-semibold mt-1">{{ stateError }}</p>
               </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="w-full">
                 <label class="label-text" for="zipCode">{{ t('shipping.zipCode') }}</label>
-                <input v-model="address.zipCode" type="text" class="input" id="zipCode" :placeholder="t('shipping.zipCode')" />
+                <input v-model="zipCode" @blur="zipCodeBlur" type="text" class="input" :class="{ 'input-error': zipCodeError }" id="zipCode" :placeholder="t('shipping.zipCode')" />
+                <p v-if="zipCodeError" class="text-xs text-error font-semibold mt-1">{{ zipCodeError }}</p>
               </div>
               <div class="w-full">
                 <label class="label-text" for="phone">{{ t('shipping.phone') }}</label>
-                <input v-model="address.phone" type="text" class="input" id="phone" :placeholder="t('shipping.phone')" />
+                <input v-model="phone" @blur="phoneBlur" type="text" class="input" :class="{ 'input-error': phoneError }" id="phone" :placeholder="t('shipping.phone')" />
+                <p v-if="phoneError" class="text-xs text-error font-semibold mt-1">{{ phoneError }}</p>
               </div>
             </div>
           </div>
@@ -148,7 +155,8 @@
                 </div>
                 <div>
                   <label class="label-text" for="getnetDocument">{{ t('shipping.document', 'Document (CPF/CNPJ)') }}</label>
-                  <input v-model="getnetDocument" type="text" class="input mt-1 w-full" id="getnetDocument" placeholder="000.000.000-00" />
+                  <input v-model="getnetDocument" @blur="getnetDocumentBlur" type="text" class="input mt-1 w-full" :class="{ 'input-error': getnetDocumentError }" id="getnetDocument" placeholder="000.000.000-00" />
+                  <p v-if="getnetDocumentError" class="text-xs text-error font-semibold mt-1">{{ getnetDocumentError }}</p>
                 </div>
               </div>
             </div>
@@ -275,6 +283,10 @@
 </template>
 
 <script setup lang="ts">
+import { useForm, useField } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/valibot'
+import * as v from 'valibot'
+
 definePageMeta({
   middleware: 'auth'
 })
@@ -311,22 +323,77 @@ const braintreeLoading = ref(false)
 const braintreeReady = ref(false)
 const braintreePaymentMethodId = ref('')
 let braintreeDropin: any = null
-const getnetDocument = ref('')
 const couponCode = ref('')
 const couponDiscount = ref<number | null>(null)
 const couponMessage = ref('')
 const couponApplied = ref(false)
 const couponChecking = ref(false)
-const address = reactive({
-  firstName: '',
-  lastName: '',
-  address1: '',
-  address2: '',
-  city: '',
-  state: '',
-  zipCode: '',
-  phone: '',
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
+const idempotencyKey = ref(generateUUID())
+
+const schema = computed(() => {
+  return toTypedSchema(
+    v.object({
+      firstName: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.firstNameRequired', 'Primeiro nome é obrigatório'))),
+      lastName: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.lastNameRequired', 'Sobrenome é obrigatório'))),
+      address1: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.address1Required', 'Endereço é obrigatório'))),
+      address2: v.optional(v.string()),
+      city: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.cityRequired', 'Cidade é obrigatória'))),
+      state: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.stateRequired', 'Estado é obrigatório'))),
+      zipCode: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.zipCodeRequired', 'CEP é obrigatório'))),
+      phone: v.pipe(v.string(), v.nonEmpty(t('shipping.validation.phoneRequired', 'Telefone é obrigatório'))),
+      getnetDocument: selectedGatewayDriver.value === 'getnet'
+        ? v.pipe(v.string(), v.nonEmpty(t('shipping.validation.documentRequired', 'CPF/CNPJ é obrigatório')))
+        : v.optional(v.string()),
+    })
+  )
 })
+
+const { handleSubmit, errors, setFieldValue } = useForm({
+  validationSchema: schema,
+  initialValues: {
+    firstName: '',
+    lastName: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    phone: '',
+    getnetDocument: '',
+  }
+})
+
+const { value: firstName, errorMessage: firstNameError, handleBlur: firstNameBlur } = useField<string>('firstName')
+const { value: lastName, errorMessage: lastNameError, handleBlur: lastNameBlur } = useField<string>('lastName')
+const { value: address1, errorMessage: address1Error, handleBlur: address1Blur } = useField<string>('address1')
+const { value: address2 } = useField<string>('address2')
+const { value: city, errorMessage: cityError, handleBlur: cityBlur } = useField<string>('city')
+const { value: state, errorMessage: stateError, handleBlur: stateBlur } = useField<string>('state')
+const { value: zipCode, errorMessage: zipCodeError, handleBlur: zipCodeBlur } = useField<string>('zipCode')
+const { value: phone, errorMessage: phoneError, handleBlur: phoneBlur } = useField<string>('phone')
+const { value: getnetDocument, errorMessage: getnetDocumentError, handleBlur: getnetDocumentBlur } = useField<string>('getnetDocument')
+
+const address = computed(() => ({
+  firstName: firstName.value,
+  lastName: lastName.value,
+  address1: address1.value,
+  address2: address2.value,
+  city: city.value,
+  state: state.value,
+  zipCode: zipCode.value,
+  phone: phone.value,
+}))
 
 // SSR-friendly data fetching with useLazyFetch (cached, deduplicated, JWT via global plugin)
 const { data: paymentMethods } = useLazyFetch<PaymentMethod[]>(
@@ -429,7 +496,7 @@ function removeCoupon() {
   couponMessage.value = ''
 }
 
-async function placeOrder() {
+const placeOrder = handleSubmit(async () => {
   if (cartStore.isEmpty || !selectedPaymentMethod.value) return
   submitting.value = true
   error.value = ''
@@ -454,13 +521,19 @@ async function placeOrder() {
     } else if (selectedGatewayDriver.value === 'getnet' && getnetDocument.value.trim()) {
       paymentGatewayPayload = {
         customer: {
-          name: `${address.firstName} ${address.lastName}`.trim(),
+          name: `${address.value.firstName} ${address.value.lastName}`.trim(),
           document: {
             type: getnetDocument.value.replace(/\D/g, '').length > 11 ? 'CNPJ' : 'CPF',
             number: getnetDocument.value.replace(/\D/g, '')
           }
         }
       }
+    }
+
+    // Embed the client-side idempotency key to prevent double charging
+    paymentGatewayPayload = {
+      ...(paymentGatewayPayload || {}),
+      idempotency_key: idempotencyKey.value,
     }
 
     const data = await apiFetch<any>('/api/account/orders/checkout', {
@@ -476,14 +549,14 @@ async function placeOrder() {
         payment_method_id: selectedPaymentMethod.value,
         payment_gateway_payload: paymentGatewayPayload,
         shipping_method_id: selectedShippingMethod.value,
-        address_first_name: address.firstName || null,
-        address_last_name: address.lastName || null,
-        address1: address.address1 || null,
-        address2: address.address2 || null,
-        address_city: address.city || null,
-        address_state: address.state || null,
-        address_zip_code: address.zipCode || null,
-        address_phone: address.phone || null,
+        address_first_name: address.value.firstName || null,
+        address_last_name: address.value.lastName || null,
+        address1: address.value.address1 || null,
+        address2: address.value.address2 || null,
+        address_city: address.value.city || null,
+        address_state: address.value.state || null,
+        address_zip_code: address.value.zipCode || null,
+        address_phone: address.value.phone || null,
       },
     })
 
@@ -512,10 +585,12 @@ async function placeOrder() {
     router.push(confirmationPath)
   } catch (err: any) {
     error.value = err?.data?.message || err?.message || t('pages.products.edit.error', { message: '' })
+    // Refresh idempotency key to allow retry with new payment attempt
+    idempotencyKey.value = generateUUID()
   } finally {
     submitting.value = false
   }
-}
+})
 
 async function mountStripePaymentElement(clientSecret: string) {
   stripeReady.value = false

@@ -26,6 +26,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.11
         version: 4.1.11(vite@7.3.3(@types/node@24.0.13)(jiti@2.7.0)(lightningcss@1.30.1)(terser@5.43.1)(yaml@2.8.4))
+      '@valibot/i18n':
+        specifier: ^1.2.0
+        version: 1.2.0(valibot@1.4.0(typescript@5.8.3))
       '@vee-validate/i18n':
         specifier: ^4.15.1
         version: 4.15.1
@@ -35,6 +38,9 @@ importers:
       '@vee-validate/rules':
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.34(typescript@5.8.3))
+      '@vee-validate/valibot':
+        specifier: ^4.15.1
+        version: 4.15.1(valibot@1.4.0(typescript@5.8.3))(vue@3.5.34(typescript@5.8.3))
       '@vite-pwa/nuxt':
         specifier: ^1.0.4
         version: 1.0.4(magicast@0.5.2)(vite@7.3.3(@types/node@24.0.13)(jiti@2.7.0)(lightningcss@1.30.1)(terser@5.43.1)(yaml@2.8.4))(workbox-build@7.3.0)(workbox-window@7.3.0)
@@ -89,6 +95,9 @@ importers:
       tw-animate-css:
         specifier: ^1.3.5
         version: 1.3.5
+      valibot:
+        specifier: ^1.4.0
+        version: 1.4.0(typescript@5.8.3)
       vue:
         specifier: ^3.5.33
         version: 3.5.34(typescript@5.8.3)
@@ -3186,6 +3195,11 @@ packages:
       '@unovis/ts': 1.6.5
       vue: ^3
 
+  '@valibot/i18n@1.2.0':
+    resolution: {integrity: sha512-vpSWlLB/or0GjF8dqQlUn9HIO+sBMWj74tw/w85KpkZAKsrdfdXb97EtXXRlEVgdYK8/AoUqe8GIGuqwmxiu1Q==}
+    peerDependencies:
+      valibot: ^1.4.0
+
   '@vee-validate/i18n@4.15.1':
     resolution: {integrity: sha512-6ogEyxkoTr7IZk4EAUT0rD3pr34Nw/YEToez/c0DSlI1/cBeOpunSmGmoYPh32pmd3imxFPEawCB7IyFvRJSAw==}
 
@@ -3194,6 +3208,11 @@ packages:
 
   '@vee-validate/rules@4.15.1':
     resolution: {integrity: sha512-2TGXq2MYt21nT8ysuxyFY/LBVQDcMPKn1hY0w3uIDmG333vzBkOtXAylmvrS93AsJ7N5coHMJjcCGG4JxCO2hQ==}
+
+  '@vee-validate/valibot@4.15.1':
+    resolution: {integrity: sha512-4yXs8jg2UCv6ekGpH/+vsO4a9jPZXbBR6+Tge9HnmKBZReBgqhsRjkH8OuuIIWxT+Mo/bC5120FdWaWLGAVDOw==}
+    peerDependencies:
+      valibot: ^1.0.0-beta.7
 
   '@vercel/nft@1.5.0':
     resolution: {integrity: sha512-IWTDeIoWhQ7ZtRO/JRKH+jhmeQvZYhtGPmzw/QGDY+wDCQqfm25P9yIdoAFagu4fWsK4IwZXDFIjrmp5rRm/sA==}
@@ -6909,6 +6928,14 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  valibot@1.4.0:
+    resolution: {integrity: sha512-iC/x7fVcSyOwlm/VSt7RlHnzNGLGvR9GnxdifUeWoCJo0q4ZZvrVkIHC6faTlkxG47I2Y4UrFquPuVHCrOnrLg==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   vee-validate@4.15.1:
     resolution: {integrity: sha512-DkFsiTwEKau8VIxyZBGdO6tOudD+QoUBPuHj3e6QFqmbfCRj1ArmYWue9lEp6jLSWBIw4XPlDLjFIZNLdRAMSg==}
     peerDependencies:
@@ -10570,6 +10597,10 @@ snapshots:
       '@unovis/ts': 1.6.5
       vue: 3.5.34(typescript@5.8.3)
 
+  '@valibot/i18n@1.2.0(valibot@1.4.0(typescript@5.8.3))':
+    dependencies:
+      valibot: 1.4.0(typescript@5.8.3)
+
   '@vee-validate/i18n@4.15.1': {}
 
   '@vee-validate/nuxt@4.15.1(magicast@0.5.2)(vue@3.5.34(typescript@5.8.3))':
@@ -10583,6 +10614,14 @@ snapshots:
 
   '@vee-validate/rules@4.15.1(vue@3.5.34(typescript@5.8.3))':
     dependencies:
+      vee-validate: 4.15.1(vue@3.5.34(typescript@5.8.3))
+    transitivePeerDependencies:
+      - vue
+
+  '@vee-validate/valibot@4.15.1(valibot@1.4.0(typescript@5.8.3))(vue@3.5.34(typescript@5.8.3))':
+    dependencies:
+      type-fest: 4.41.0
+      valibot: 1.4.0(typescript@5.8.3)
       vee-validate: 4.15.1(vue@3.5.34(typescript@5.8.3))
     transitivePeerDependencies:
       - vue
@@ -15035,6 +15074,10 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  valibot@1.4.0(typescript@5.8.3):
+    optionalDependencies:
+      typescript: 5.8.3
 
   vee-validate@4.15.1(vue@3.5.34(typescript@5.8.3)):
     dependencies:
