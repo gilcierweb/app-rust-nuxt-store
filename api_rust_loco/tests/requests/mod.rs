@@ -23,6 +23,7 @@ pub mod coupon;
 pub mod dashboard;
 pub mod order;
 pub mod payment;
+pub mod admin_payment_refunds;
 pub mod post;
 pub mod product;
 pub mod profile;

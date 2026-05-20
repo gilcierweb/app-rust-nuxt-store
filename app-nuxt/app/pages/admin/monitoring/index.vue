@@ -267,17 +267,17 @@ const { t } = useI18n()
 const { useApiFetch } = useApi()
 
 const { pending: paymentsPending, data: paymentsData, error: paymentsError } = await useApiFetch<AdminPayment[]>(
-  '/api/admin/payments/',
+  '/api/admin/payments',
   { key: 'admin-monitoring-payments' }
 )
 
 const { pending: eventsPending, data: eventsData, error: eventsError } = await useApiFetch<AdminPaymentGatewayEvent[]>(
-  '/api/admin/payment-gateway-events/',
+  '/api/admin/payment-gateway-events',
   { key: 'admin-monitoring-events' }
 )
 
 const { pending: logsPending, data: logsData, error: logsError } = await useApiFetch<AdminPaymentGatewayLog[]>(
-  '/api/admin/payment-gateway-logs/',
+  '/api/admin/payment-gateway-logs',
   { key: 'admin-monitoring-logs' }
 )
 

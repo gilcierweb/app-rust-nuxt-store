@@ -107,6 +107,7 @@ impl Hooks for App {
             .add_route(controllers::admin_payment_gateways::routes())
             .add_route(controllers::admin_payment_methods::routes())
             .add_route(controllers::admin_payments::routes())
+            .add_route(controllers::admin_payment_refunds::routes())
             .add_route(controllers::admin_payments::gateway_event_routes())
             .add_route(controllers::admin_payments::gateway_log_routes())
             .add_route(controllers::admin_rbac::routes())

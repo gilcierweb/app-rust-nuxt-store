@@ -7,6 +7,10 @@
         </NuxtLinkLocale>
         <h1 class="h1">Payment #{{ paymentId }}</h1>
       </div>
+      <NuxtLinkLocale to="/admin/payments/refunds" class="btn btn-outline btn-sm">
+        <i class="icon-[tabler--receipt-refund] size-4"></i>
+        Refunds
+      </NuxtLinkLocale>
     </div>
 
     <!-- Loading State -->
@@ -131,7 +135,9 @@
                 <tbody>
                   <tr v-for="refund in paymentRefunds" :key="refund.id">
                     <td>
-                      <div class="font-mono text-sm">#{{ refund.id }}</div>
+                      <NuxtLinkLocale :to="`/admin/payments/refunds/${refund.id}`" class="font-mono text-sm link link-primary">
+                        #{{ refund.id }}
+                      </NuxtLinkLocale>
                       <div class="mt-1 max-w-56 truncate font-mono text-xs text-base-content/50">
                         {{ refund.external_refund_id || refund.idempotency_key }}
                       </div>

@@ -167,7 +167,7 @@ const {
   data: eventsData,
   error: eventsError
 } = await useApiFetch<AdminPaymentGatewayEvent[]>(
-  '/api/admin/payment-gateway-events/',
+  '/api/admin/payment-gateway-events',
   { key: 'admin-payment-gateway-events-list' }
 )
 

@@ -14,6 +14,10 @@
           <i class="icon-[tabler--list-details] size-4"></i>
           Logs
         </NuxtLinkLocale>
+        <NuxtLinkLocale to="/admin/payments/refunds" class="btn btn-outline btn-sm">
+          <i class="icon-[tabler--receipt-refund] size-4"></i>
+          Refunds
+        </NuxtLinkLocale>
         <NuxtLinkLocale to="/admin/payments/gateways" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--building-bank] size-4"></i>
           Gateways
@@ -213,7 +217,7 @@ const {
   data: paymentsData,
   error: paymentsError
 } = await useApiFetch<AdminPayment[]>(
-  '/api/admin/payments/',
+  '/api/admin/payments',
   { key: 'admin-payments-list' }
 )
 

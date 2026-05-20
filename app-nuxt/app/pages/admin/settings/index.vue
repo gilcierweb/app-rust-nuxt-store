@@ -127,7 +127,7 @@ const settingId = (setting: Pick<AdminSetting, 'namespace' | 'key'>) => {
 }
 
 const { pending, data, error, refresh } = await useApiFetch<AdminSettingsResponse>(
-  '/api/admin/settings/',
+  '/api/admin/settings',
   { key: 'admin-settings' }
 )
 
@@ -186,7 +186,7 @@ const saveSettings = async () => {
       }))
     )
 
-    await apiFetch('/api/admin/settings/', {
+    await apiFetch('/api/admin/settings', {
       method: 'PUT',
       body: { settings }
     })

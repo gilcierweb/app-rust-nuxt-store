@@ -173,7 +173,7 @@ const {
   data: logsData,
   error: logsError
 } = await useApiFetch<AdminPaymentGatewayLog[]>(
-  '/api/admin/payment-gateway-logs/',
+  '/api/admin/payment-gateway-logs',
   { key: 'admin-payment-gateway-logs-list' }
 )
 
