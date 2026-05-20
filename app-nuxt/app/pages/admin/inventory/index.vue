@@ -171,41 +171,6 @@ const lowStockThreshold = ref(5)
 const savingVariantIds = ref<number[]>([])
 const draftQuantities = reactive<Record<number, number>>({})
 
-const { pending, data, error, refresh } = await useApiFetch<InventoryItem[]>(
-  '/api/admin/inventory/',
-  { key: 'admin-inventory-list' }
-)
-
-const inventory = computed(() => data.value || [])
-
-watch(
-  inventory,
-  (items) => {
-    for (const item of items) {
-      draftQuantities[item.variant_id] = stockQuantity(item)
-    }
-  },
-  { immediate: true }
-)
-
-const totalStock = computed(() => inventory.value.reduce((sum, item) => sum + stockQuantity(item), 0))
-const totalReserved = computed(() => inventory.value.reduce((sum, item) => sum + Number(item.reserved_quantity || 0), 0))
-const alertCount = computed(() => inventory.value.filter(item => statusKey(item) === 'out' || statusKey(item) === 'low').length)
-
-const filteredInventory = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase()
-
-  return inventory.value.filter((item) => {
-    const matchesSearch = !query ||
-      (item.product_name || '').toLowerCase().includes(query) ||
-      (item.variant_name || '').toLowerCase().includes(query) ||
-      (item.sku || '').toLowerCase().includes(query)
-
-    const matchesStatus = !selectedStatus.value || statusKey(item) === selectedStatus.value
-    return matchesSearch && matchesStatus
-  })
-})
-
 const stockQuantity = (item: InventoryItem) => Number(item.inventory_quantity || 0)
 
 const availableQuantity = (item: InventoryItem) => {
@@ -241,6 +206,41 @@ const statusBadgeClass = (item: InventoryItem) => {
 }
 
 const isSaving = (item: InventoryItem) => savingVariantIds.value.includes(item.variant_id)
+
+const { pending, data, error, refresh } = await useApiFetch<InventoryItem[]>(
+  '/api/admin/inventory/',
+  { key: 'admin-inventory-list' }
+)
+
+const inventory = computed(() => data.value || [])
+
+watch(
+  inventory,
+  (items) => {
+    for (const item of items) {
+      draftQuantities[item.variant_id] = stockQuantity(item)
+    }
+  },
+  { immediate: true }
+)
+
+const totalStock = computed(() => inventory.value.reduce((sum, item) => sum + stockQuantity(item), 0))
+const totalReserved = computed(() => inventory.value.reduce((sum, item) => sum + Number(item.reserved_quantity || 0), 0))
+const alertCount = computed(() => inventory.value.filter(item => statusKey(item) === 'out' || statusKey(item) === 'low').length)
+
+const filteredInventory = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+
+  return inventory.value.filter((item) => {
+    const matchesSearch = !query ||
+      (item.product_name || '').toLowerCase().includes(query) ||
+      (item.variant_name || '').toLowerCase().includes(query) ||
+      (item.sku || '').toLowerCase().includes(query)
+
+    const matchesStatus = !selectedStatus.value || statusKey(item) === selectedStatus.value
+    return matchesSearch && matchesStatus
+  })
+})
 
 const saveQuantity = async (item: InventoryItem) => {
   const quantity = Number(draftQuantities[item.variant_id] || 0)
