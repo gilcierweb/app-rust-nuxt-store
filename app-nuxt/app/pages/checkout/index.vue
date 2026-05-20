@@ -109,12 +109,11 @@
 
         <!-- Payment Method -->
         <div class="card bg-base-100 shadow-soft border border-base-200">
-          <div class="card-body p-8 md:p-10">
+          <div class="card-body p-8 md:p-10">      
           <div class="flex items-center gap-4 mb-8">
             <div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">3</div>
             <h2 class="h4">{{ t('pages.checkout.step3') }}</h2>
-          </div>
-          
+          </div>          
           <div v-if="paymentMethods.length === 0" class="flex items-center justify-center py-10">
             <div class="loading loading-spinner loading-md"></div>
             <span class="ml-3 text-base-content/60">{{ t('pages.checkout.loadingPayment') }}</span>
@@ -140,9 +139,18 @@
               </div>
             </div>
             <div v-else-if="selectedGatewayDriver === 'getnet'" class="mt-4">
-              <label class="label-text" for="getnetGatewayPayload">Getnet JSON</label>
-              <textarea id="getnetGatewayPayload" v-model="getnetGatewayPayload" rows="5"
-                class="textarea textarea-bordered w-full mt-1 font-mono text-xs" spellcheck="false" />
+              <div class="rounded-box border border-base-200 bg-base-100 p-4 space-y-4">
+                <div class="alert alert-info shadow-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="icon-[tabler--external-link] size-5"></span>
+                    <span class="text-sm text-left">{{ t('pages.checkout.getnetRedirectInfo', 'You will be securely redirected to Getnet Web Checkout to complete your payment.') }}</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="label-text" for="getnetDocument">{{ t('shipping.document', 'Document (CPF/CNPJ)') }}</label>
+                  <input v-model="getnetDocument" type="text" class="input mt-1 w-full" id="getnetDocument" placeholder="000.000.000-00" />
+                </div>
+              </div>
             </div>
           </div>
           </div>
@@ -303,7 +311,7 @@ const braintreeLoading = ref(false)
 const braintreeReady = ref(false)
 const braintreePaymentMethodId = ref('')
 let braintreeDropin: any = null
-const getnetGatewayPayload = ref('')
+const getnetDocument = ref('')
 const couponCode = ref('')
 const couponDiscount = ref<number | null>(null)
 const couponMessage = ref('')
@@ -375,7 +383,7 @@ function paymentMethodIcon(method: PaymentMethod) {
 const canPlaceOrder = computed(() => {
   if (!selectedPaymentMethod.value) return false
   if (selectedGatewayDriver.value === 'braintree') return braintreeReady.value
-  if (selectedGatewayDriver.value === 'getnet') return getnetGatewayPayload.value.trim().length > 0
+  if (selectedGatewayDriver.value === 'getnet') return getnetDocument.value.trim().length > 0
   return true
 })
 
@@ -443,8 +451,16 @@ async function placeOrder() {
       paymentGatewayPayload = {
         payment_method_id: braintreePaymentMethodId.value.trim(),
       }
-    } else if (selectedGatewayDriver.value === 'getnet' && getnetGatewayPayload.value.trim()) {
-      paymentGatewayPayload = JSON.parse(getnetGatewayPayload.value)
+    } else if (selectedGatewayDriver.value === 'getnet' && getnetDocument.value.trim()) {
+      paymentGatewayPayload = {
+        customer: {
+          name: `${address.firstName} ${address.lastName}`.trim(),
+          document: {
+            type: getnetDocument.value.replace(/\D/g, '').length > 11 ? 'CNPJ' : 'CPF',
+            number: getnetDocument.value.replace(/\D/g, '')
+          }
+        }
+      }
     }
 
     const data = await apiFetch<any>('/api/account/orders/checkout', {
