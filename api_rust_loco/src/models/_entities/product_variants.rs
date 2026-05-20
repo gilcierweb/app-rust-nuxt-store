@@ -29,6 +29,8 @@ pub enum Relation {
     CartItems,
     #[sea_orm(has_many = "super::order_items::Entity")]
     OrderItems,
+    #[sea_orm(has_many = "super::product_variant_images::Entity")]
+    ProductVariantImages,
     #[sea_orm(has_many = "super::product_variant_options::Entity")]
     ProductVariantOptions,
     #[sea_orm(
@@ -50,6 +52,12 @@ impl Related<super::cart_items::Entity> for Entity {
 impl Related<super::order_items::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::OrderItems.def()
+    }
+}
+
+impl Related<super::product_variant_images::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::ProductVariantImages.def()
     }
 }
 

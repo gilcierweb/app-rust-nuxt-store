@@ -27,3 +27,5 @@ mod banner_positions;
 mod banners;
 
 mod payment_gateways;
+
+mod product_variant_images;

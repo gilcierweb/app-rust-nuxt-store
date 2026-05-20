@@ -47,6 +47,7 @@ mod m20260519_064107_payment_setup_sessions;
 mod m20260519_064108_payment_refunds;
 mod m20260519_064109_payment_gateway_events;
 mod m20260519_064110_payment_gateway_logs;
+mod m20260520_035158_product_variant_images;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -97,6 +98,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260519_064108_payment_refunds::Migration),
             Box::new(m20260519_064109_payment_gateway_events::Migration),
             Box::new(m20260519_064110_payment_gateway_logs::Migration),
+            Box::new(m20260520_035158_product_variant_images::Migration),
             // inject-above (do not remove this comment)
         ]
     }

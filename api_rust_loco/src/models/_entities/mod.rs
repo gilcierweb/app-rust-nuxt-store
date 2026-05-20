@@ -27,6 +27,7 @@ pub mod payment_sources;
 pub mod payments;
 pub mod posts;
 pub mod product_images;
+pub mod product_variant_images;
 pub mod product_variant_options;
 pub mod product_variants;
 pub mod products;

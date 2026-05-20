@@ -25,6 +25,7 @@ pub use super::payment_sources::Entity as PaymentSources;
 pub use super::payments::Entity as Payments;
 pub use super::posts::Entity as Posts;
 pub use super::product_images::Entity as ProductImages;
+pub use super::product_variant_images::Entity as ProductVariantImages;
 pub use super::product_variant_options::Entity as ProductVariantOptions;
 pub use super::product_variants::Entity as ProductVariants;
 pub use super::products::Entity as Products;

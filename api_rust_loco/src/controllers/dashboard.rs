@@ -10,7 +10,8 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::cache::dashboard_cache;
-use crate::models::_entities::{categories, order_items, orders, products, users};
+use crate::models::_entities::{categories, order_items, orders, products, users, payments, payment_gateway_events};
+use crate::models::payment_gateway_status::{PaymentAttemptStatus, PaymentGatewayEventStatus};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -123,6 +124,23 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .limit(5)
         .all(&ctx.db);
 
+    let total_refunds_fut = payments::Entity::find()
+        .filter(payments::Column::Status.eq(PaymentAttemptStatus::Refunded.to_i16() as i32))
+        .select_only()
+        .column_as(payments::Column::Amount.sum(), "total")
+        .into_tuple::<(Option<Decimal>,)>()
+        .one(&ctx.db);
+
+    let failed_payments_fut = payments::Entity::find()
+        .filter(payments::Column::Status.eq(PaymentAttemptStatus::Failed.to_i16() as i32))
+        .count(&ctx.db);
+
+    let total_payments_fut = payments::Entity::find().count(&ctx.db);
+
+    let webhook_failures_fut = payment_gateway_events::Entity::find()
+        .filter(payment_gateway_events::Column::Status.eq(PaymentGatewayEventStatus::Failed.to_i16()))
+        .count(&ctx.db);
+
     // Execute all queries in parallel
     let (
         total_revenue_res,
@@ -132,6 +150,10 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         all_category_results,
         top_products_results,
         recent_orders_results,
+        total_refunds_res,
+        failed_payments,
+        total_payments,
+        webhook_failures,
     ) = tokio::try_join!(
         total_revenue_fut,
         total_orders_fut,
@@ -140,6 +162,10 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         all_category_results_fut,
         top_products_results_fut,
         recent_orders_results_fut,
+        total_refunds_fut,
+        failed_payments_fut,
+        total_payments_fut,
+        webhook_failures_fut,
     )
     .map_err(|e| {
         tracing::error!(error = ?e, "Failed to execute dashboard queries in parallel");
@@ -185,7 +211,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         },
         KpiStat {
             title: "admin.dashboard.kpis.conversionRate".to_string(),
-            value: format!("{:.2}", conversion_rate),
+            value: format!("{:.2}%", conversion_rate),
             trend: "0.5%".to_string(),
             trend_up: true,
             icon: "icon-[tabler--chart-pie]".to_string(),
@@ -193,6 +219,42 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
             text_class: "text-white".to_string(),
         },
     ];
+
+    let total_refunds = total_refunds_res.and_then(|(total,)| total).unwrap_or_default().to_f64().unwrap_or(0.0);
+    let failed_payment_rate = if total_payments > 0 {
+        (failed_payments as f64 / total_payments as f64) * 100.0
+    } else {
+        0.0
+    };
+
+    let mut kpi_stats = kpi_stats;
+    kpi_stats.push(KpiStat {
+        title: "Refunds".to_string(),
+        value: format!("{:.2}", total_refunds),
+        trend: "".to_string(),
+        trend_up: false,
+        icon: "icon-[tabler--receipt-refund]".to_string(),
+        color_class: "bg-error".to_string(),
+        text_class: "text-white".to_string(),
+    });
+    kpi_stats.push(KpiStat {
+        title: "Failed Payments".to_string(),
+        value: format!("{:.2}%", failed_payment_rate),
+        trend: "".to_string(),
+        trend_up: false,
+        icon: "icon-[tabler--credit-card-off]".to_string(),
+        color_class: "bg-error".to_string(),
+        text_class: "text-white".to_string(),
+    });
+    kpi_stats.push(KpiStat {
+        title: "Webhook Failures".to_string(),
+        value: webhook_failures.to_string(),
+        trend: "".to_string(),
+        trend_up: false,
+        icon: "icon-[tabler--webhook]".to_string(),
+        color_class: "bg-error".to_string(),
+        text_class: "text-white".to_string(),
+    });
 
     // 2. Process Sales Data
     let sales_data = sales_results
