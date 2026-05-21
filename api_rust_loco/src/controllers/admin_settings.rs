@@ -4,11 +4,14 @@
 use std::collections::HashMap;
 
 use axum::debug_handler;
+use axum::extract::Extension;
 use loco_rs::prelude::*;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, QueryOrder};
 use serde::{Deserialize, Serialize};
 
+use crate::middleware::auth::AdminSession;
 use crate::models::_entities::admin_settings;
+use crate::services::admin_audit_logs;
 
 const VALUE_TYPE_STRING: i16 = 1;
 const VALUE_TYPE_BOOLEAN: i16 = 2;
@@ -210,9 +213,19 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
 
 #[debug_handler]
 pub async fn update(
+    admin_session: Extension<AdminSession>,
     State(ctx): State<AppContext>,
     Json(params): Json<UpdateSettingsJson>,
 ) -> Result<Response> {
+    let settings_count = params.settings.len();
+    let namespaces = params
+        .settings
+        .iter()
+        .map(|setting| setting.namespace.clone())
+        .collect::<std::collections::HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+
     for setting in params.settings {
         let Some(definition) = setting_definition(&setting.namespace, &setting.key) else {
             return Err(Error::Message(format!(
@@ -249,6 +262,17 @@ pub async fn update(
             .await?;
         }
     }
+
+    admin_audit_logs::record(
+        &ctx.db,
+        admin_session.current_user_id,
+        "settings.update",
+        "admin_settings",
+        None,
+        Some(namespaces.join(", ")),
+        Some(format!("Updated {settings_count} settings")),
+    )
+    .await?;
 
     format::json(settings_response(&ctx).await?)
 }

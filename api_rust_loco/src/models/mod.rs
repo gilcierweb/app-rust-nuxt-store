@@ -1,5 +1,6 @@
 pub mod _entities;
 pub mod ability;
+pub mod admin_audit_logs;
 pub mod admin_settings;
 pub mod users;
 

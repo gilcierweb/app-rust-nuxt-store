@@ -36,3 +36,5 @@ pub mod wishlist;
 pub mod payment_webhook;
 
 pub mod payment_setup_session;
+
+pub mod admin_audit_logs;

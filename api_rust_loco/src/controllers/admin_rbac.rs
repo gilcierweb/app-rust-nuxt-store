@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::middleware::auth::AdminSession;
 use crate::models::_entities::{roles, users, users_roles};
+use crate::services::admin_audit_logs;
 use crate::utils::pagination::PaginationParams;
 
 #[derive(Clone, Debug, Serialize)]
@@ -241,6 +242,7 @@ pub async fn permissions() -> Result<Response> {
 
 #[debug_handler]
 pub async fn create_role(
+    admin_session: Extension<AdminSession>,
     State(ctx): State<AppContext>,
     Json(params): Json<RoleParams>,
 ) -> Result<Response> {
@@ -281,16 +283,28 @@ pub async fn create_role(
     .insert(&ctx.db)
     .await?;
 
+    admin_audit_logs::record(
+        &ctx.db,
+        admin_session.current_user_id,
+        "role.create",
+        "role",
+        Some(role.id),
+        Some(role.name.clone()),
+        Some("Created RBAC role".to_string()),
+    )
+    .await?;
+
     format::json(to_role_json(&role, 0))
 }
 
 #[debug_handler]
 pub async fn assign_role(
+    admin_session: Extension<AdminSession>,
     State(ctx): State<AppContext>,
     Json(params): Json<AssignmentParams>,
 ) -> Result<Response> {
-    load_user(&ctx.db, params.user_id).await?;
-    load_role(&ctx.db, params.role_id).await?;
+    let user = load_user(&ctx.db, params.user_id).await?;
+    let role = load_role(&ctx.db, params.role_id).await?;
 
     let exists = users_roles::Entity::find()
         .filter(users_roles::Column::UserId.eq(params.user_id))
@@ -305,6 +319,17 @@ pub async fn assign_role(
             role_id: Set(params.role_id),
         }
         .insert(&ctx.db)
+        .await?;
+
+        admin_audit_logs::record(
+            &ctx.db,
+            admin_session.current_user_id,
+            "role.assign",
+            "role_assignment",
+            Some(role.id),
+            Some(format!("{} -> {}", role.name, user.email)),
+            Some("Assigned RBAC role to user".to_string()),
+        )
         .await?;
     }
 
@@ -331,11 +356,26 @@ pub async fn remove_assignment(
         .exec(&ctx.db)
         .await?;
 
+    admin_audit_logs::record(
+        &ctx.db,
+        admin_session.current_user_id,
+        "role.unassign",
+        "role_assignment",
+        Some(role.id),
+        Some(format!("{} -> user:{user_id}", role.name)),
+        Some("Removed RBAC role from user".to_string()),
+    )
+    .await?;
+
     format::empty()
 }
 
 #[debug_handler]
-pub async fn delete_role(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn delete_role(
+    admin_session: Extension<AdminSession>,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
     let role = load_role(&ctx.db, id).await?;
     if is_protected_admin_role(&role) {
         return Err(Error::BadRequest("admin role cannot be deleted".into()));
@@ -350,7 +390,19 @@ pub async fn delete_role(Path(id): Path<i32>, State(ctx): State<AppContext>) -> 
         return Err(Error::BadRequest("role has assignments".into()));
     }
 
+    let role_id = role.id;
+    let role_name = role.name.clone();
     role.delete(&ctx.db).await?;
+    admin_audit_logs::record(
+        &ctx.db,
+        admin_session.current_user_id,
+        "role.delete",
+        "role",
+        Some(role_id),
+        Some(role_name),
+        Some("Deleted RBAC role".to_string()),
+    )
+    .await?;
     format::empty()
 }
 

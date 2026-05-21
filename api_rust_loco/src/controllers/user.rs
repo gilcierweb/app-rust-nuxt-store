@@ -18,6 +18,7 @@ use crate::models::_entities::roles;
 use crate::models::_entities::users::{ActiveModel, Entity, Model};
 use crate::models::_entities::users_roles;
 use crate::models::ability::{Ability, Action, Resource, Subject};
+use crate::services::admin_audit_logs;
 use crate::utils::pagination::PaginationParams;
 
 const ALLOWED_GLOBAL_ROLES: &[&str] = &[
@@ -338,7 +339,8 @@ pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<UserParams>,
 ) -> Result<Response> {
-    let (_, ability) = resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
+    let (current_user_id, ability) =
+        resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
     ability.authorize(Action::Read, Subject::Admin)?;
     ability.authorize(Action::Create, Subject::User)?;
 
@@ -363,6 +365,16 @@ pub async fn add(
 
     let item = active_model.insert(&txn).await?;
     replace_global_role(&txn, item.id, &role).await?;
+    admin_audit_logs::record(
+        &txn,
+        current_user_id,
+        "user.create",
+        "user",
+        Some(item.id),
+        Some(item.email.clone()),
+        Some(format!("Created admin-managed user with role {role}")),
+    )
+    .await?;
     txn.commit().await?;
 
     let roles = item.roles(&ctx.db).await?;
@@ -410,6 +422,16 @@ pub async fn update(
 
     let item = active_model.update(&txn).await?;
     replace_global_role(&txn, item.id, &role).await?;
+    admin_audit_logs::record(
+        &txn,
+        current_user_id,
+        "user.update",
+        "user",
+        Some(item.id),
+        Some(item.email.clone()),
+        Some(format!("Updated admin-managed user role to {role}")),
+    )
+    .await?;
     txn.commit().await?;
 
     let roles = item.roles(&ctx.db).await?;
@@ -423,13 +445,27 @@ pub async fn remove(
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
-    let (_, ability) = resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
+    let (current_user_id, ability) =
+        resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
     ability.authorize(Action::Read, Subject::Admin)?;
 
     let item = load_item(&ctx, id).await?;
     ability.authorize_resource(Action::Destroy, Resource::User { id: item.id })?;
-
-    item.delete(&ctx.db).await?;
+    let resource_id = item.id;
+    let resource_label = item.email.clone();
+    let txn = ctx.db.begin().await?;
+    item.delete(&txn).await?;
+    admin_audit_logs::record(
+        &txn,
+        current_user_id,
+        "user.delete",
+        "user",
+        Some(resource_id),
+        Some(resource_label),
+        Some("Deleted admin-managed user".to_string()),
+    )
+    .await?;
+    txn.commit().await?;
     format::empty()
 }
 

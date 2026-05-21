@@ -56,6 +56,37 @@
       "emptyRoles": "No assigned role.",
       "goSettings": "Go to settings"
     },
+    "audit": {
+      "title": "Audit Logs",
+      "description": "Track administrative changes performed by back-office users.",
+      "loading": "Loading audit logs...",
+      "error": "Failed to load audit logs: {message}",
+      "empty": "No audit entries found.",
+      "actions": {
+        "clear": "Clear",
+        "refresh": "Refresh"
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Actor, action, resource, details...",
+        "action": "Action",
+        "resource": "Resource",
+        "allActions": "All actions",
+        "allResources": "All resources"
+      },
+      "table": {
+        "title": "Recent administrative events",
+        "summary": "{count} visible of {total} total entries",
+        "columns": {
+          "when": "When",
+          "actor": "Actor",
+          "action": "Action",
+          "resource": "Resource",
+          "details": "Details"
+        },
+        "noDetails": "No details recorded."
+      }
+    },
     "sidebar": {
       "closeSidebar": "Close sidebar",
       "close": "Close",

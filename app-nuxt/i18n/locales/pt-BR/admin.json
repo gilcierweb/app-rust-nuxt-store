@@ -56,6 +56,37 @@
       "emptyRoles": "Nenhum papel atribuído.",
       "goSettings": "Ir para configurações"
     },
+    "audit": {
+      "title": "Auditoria",
+      "description": "Acompanhe mudanças administrativas realizadas pelos usuários do back-office.",
+      "loading": "Carregando auditoria...",
+      "error": "Falha ao carregar auditoria: {message}",
+      "empty": "Nenhum evento de auditoria encontrado.",
+      "actions": {
+        "clear": "Limpar",
+        "refresh": "Atualizar"
+      },
+      "filters": {
+        "search": "Buscar",
+        "searchPlaceholder": "Ator, ação, recurso, detalhes...",
+        "action": "Ação",
+        "resource": "Recurso",
+        "allActions": "Todas as ações",
+        "allResources": "Todos os recursos"
+      },
+      "table": {
+        "title": "Eventos administrativos recentes",
+        "summary": "{count} visíveis de {total} registros",
+        "columns": {
+          "when": "Quando",
+          "actor": "Ator",
+          "action": "Ação",
+          "resource": "Recurso",
+          "details": "Detalhes"
+        },
+        "noDetails": "Sem detalhes registrados."
+      }
+    },
     "sidebar": {
       "closeSidebar": "Fechar menu lateral",
       "close": "Fechar",

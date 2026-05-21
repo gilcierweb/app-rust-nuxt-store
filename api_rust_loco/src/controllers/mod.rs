@@ -29,3 +29,5 @@ pub mod admin_payments;
 pub mod admin_payment_refunds;
 pub mod admin_rbac;
 pub mod admin_emails;
+
+pub mod admin_audit_logs;
