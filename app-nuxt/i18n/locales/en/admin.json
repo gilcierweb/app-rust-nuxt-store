@@ -36,11 +36,17 @@
         "myAccount": "My account",
         "settings": "Settings",
         "logout": "Logout",
-        "defaultName": "Admin"
+        "defaultName": "Administrator",
+        "defaultEmail": "admin@store.com"
       },
       "activity": {
-        "title": "Activity"
-      }
+        "title": "Activity",
+        "orderStatusChanged": "The status was changed from pending to paid after gateway confirmation."
+      },
+      "breadcrumb": {
+        "admin": "Admin"
+      },
+      "close": "Close"
     },
     "account": {
       "section": "Account",
@@ -119,7 +125,8 @@
       "category_ecommerce": "E-commerce",
       "category_logistics": "Logistics",
       "category_content": "Content",
-      "category_admin": "Administration"
+      "category_admin": "Administration",
+      "defaultEmail": "admin@store.com"
     },
     "dashboard": {
       "title": "Admin Dashboard",

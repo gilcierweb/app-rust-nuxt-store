@@ -5,11 +5,11 @@
         <NuxtLinkLocale to="/admin/payments" class="btn btn-circle btn-text btn-sm">
           <i class="icon-[tabler--arrow-left] size-5"></i>
         </NuxtLinkLocale>
-        <h1 class="h1">Payment #{{ paymentId }}</h1>
+        <h1 class="h1">{{ $t('admin.payments.detail.title', 'Payment') }} #{{ paymentId }}</h1>
       </div>
       <NuxtLinkLocale to="/admin/payments/refunds" class="btn btn-outline btn-sm">
         <i class="icon-[tabler--receipt-refund] size-4"></i>
-        Refunds
+        {{ $t('admin.payments.detail.refunds', 'Refunds') }}
       </NuxtLinkLocale>
     </div>
 
@@ -30,30 +30,30 @@
         <!-- Overview Card -->
         <div class="card bg-base-100 shadow-sm border border-base-200">
           <div class="card-body">
-            <h2 class="card-title">Overview</h2>
+            <h2 class="card-title">{{ $t('admin.payments.detail.overview', 'Overview') }}</h2>
             <div class="grid grid-cols-2 gap-4 mt-4">
               <div>
-                <p class="text-sm text-gray-500">Amount</p>
+                <p class="text-sm text-gray-500">{{ $t('admin.payments.detail.amount', 'Amount') }}</p>
                 <p class="font-medium text-lg">{{ formatCurrency(detail.payment.amount, detail.payment.currency || 'USD') }}</p>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Status</p>
+                <p class="text-sm text-gray-500">{{ $t('admin.payments.detail.status', 'Status') }}</p>
                 <span :class="['badge', statusBadge(detail.payment.status)]">
                   {{ statusLabel(detail.payment.status) }}
                 </span>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Order ID</p>
+                <p class="text-sm text-gray-500">{{ $t('admin.payments.detail.orderId', 'Order ID') }}</p>
                 <NuxtLinkLocale :to="`/admin/orders/${detail.payment.order_id}`" class="link link-primary">
                   #{{ detail.payment.order_id }}
                 </NuxtLinkLocale>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Transaction ID</p>
+                <p class="text-sm text-gray-500">{{ $t('admin.payments.detail.transactionId', 'Transaction ID') }}</p>
                 <p class="font-mono text-sm">{{ detail.payment.transaction_id || '-' }}</p>
               </div>
               <div>
-                <p class="text-sm text-gray-500">Created At</p>
+                <p class="text-sm text-gray-500">{{ $t('admin.payments.detail.createdAt', 'Created At') }}</p>
                 <p>{{ formatDate(detail.payment.created_at) }}</p>
               </div>
             </div>
@@ -62,13 +62,13 @@
             
             <div class="flex gap-2">
               <button class="btn btn-primary" @click="capturePayment" :disabled="isActionLoading">
-                Capture
+                {{ $t('admin.payments.detail.capture', 'Capture') }}
               </button>
               <button class="btn btn-warning" @click="voidPayment" :disabled="isActionLoading">
-                Void
+                {{ $t('admin.payments.detail.void', 'Void') }}
               </button>
               <button class="btn btn-error" @click="refundPayment" :disabled="isActionLoading">
-                Refund
+                {{ $t('admin.payments.detail.refund', 'Refund') }}
               </button>
             </div>
           </div>

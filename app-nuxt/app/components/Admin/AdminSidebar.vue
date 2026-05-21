@@ -13,7 +13,7 @@
         </div>
         <div class="text-center">
           <h3 class="text-base-content text-lg font-bold">{{ user?.name || $t('admin.sidebar.admin') }}</h3>
-          <p class="text-base-content/60 text-xs truncate max-w-[200px]">{{ user?.email || 'admin@store.com' }}</p>
+          <p class="text-base-content/60 text-xs truncate max-w-[200px]">{{ user?.email || $t('admin.sidebar.defaultEmail') }}</p>
         </div>
         <div class="flex gap-3 mt-2">
            <a href="#" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--brand-github] size-4"></i></a>
@@ -33,7 +33,7 @@
           </li>
           
           <li class="menu-title mt-4 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_ecommerce') || 'E-commerce' }}
+            {{ $t('admin.sidebar.category_ecommerce') }}
           </li>
           <li>
             <NuxtLinkLocale to="/admin/orders" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
@@ -73,7 +73,7 @@
           </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_logistics') || 'Logistics' }}
+            {{ $t('admin.sidebar.category_logistics') }}
           </li>
           <li>
             <NuxtLinkLocale to="/admin/shipments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
@@ -95,7 +95,7 @@
           </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_content') || 'Content' }}
+            {{ $t('admin.sidebar.category_content') }}
           </li>
           <li>
             <NuxtLinkLocale to="/admin/posts" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
@@ -117,7 +117,7 @@
           </li>
 
           <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_admin') || 'Administration' }}
+            {{ $t('admin.sidebar.category_admin') }}
           </li>
           <li>
             <NuxtLinkLocale to="/admin/customers" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">

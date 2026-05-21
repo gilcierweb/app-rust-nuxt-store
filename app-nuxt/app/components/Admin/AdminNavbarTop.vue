@@ -25,7 +25,7 @@
         <!-- Breadcrumbs (Localized) -->
         <div class="hidden xl:flex flex-1 justify-center">
           <div class="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold">
-            <span class="text-base-content/40">Admin</span>
+            <span class="text-base-content/40">{{ $t('admin.navbar.breadcrumb.admin') }}</span>
             <span class="icon-[tabler--chevron-right] text-base-content/20 size-3"></span>
             <span class="text-primary">{{ localizedRouteName }}</span>
           </div>
@@ -59,19 +59,19 @@
           <div class="dropdown relative inline-flex [--offset:15] [--placement:bottom-end]">
             <button id="profile-dropdown" type="button" class="dropdown-toggle avatar" aria-haspopup="menu" aria-expanded="false" aria-label="Dropdown">
               <div class="size-9.5 rounded-full border border-primary/20 p-0.5">
-                <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="User Avatar" />
+                <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" :alt="$t('admin.navbar.profile.avatarAlt')" />
               </div>
             </button>
             <ul class="dropdown-menu dropdown-open:opacity-100 max-w-75 hidden w-full space-y-0.5 shadow-xl border border-base-content/10 mt-2" role="menu">
               <li class="dropdown-header pt-4.5 mb-1 gap-4 px-5 pb-3.5 border-b border-base-content/5">
                 <div class="avatar avatar-online-top">
                   <div class="w-10 rounded-full border border-primary/10 p-0.5">
-                    <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" alt="avatar" />
+                    <img :src="user?.avatar || 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png'" class="rounded-full" :alt="$t('admin.sidebar.avatarAlt')" />
                   </div>
                 </div>
                 <div class="min-w-0">
-                  <h6 class="text-base-content mb-0.5 font-semibold truncate">{{ user?.name || 'Administrator' }}</h6>
-                  <p class="text-base-content/60 text-xs font-medium truncate">{{ user?.email || 'admin@store.com' }}</p>
+                  <h6 class="text-base-content mb-0.5 font-semibold truncate">{{ user?.name || $t('admin.navbar.profile.defaultName') }}</h6>
+                  <p class="text-base-content/60 text-xs font-medium truncate">{{ user?.email || $t('admin.navbar.profile.defaultEmail') }}</p>
                 </div>
               </li>
                <li>
@@ -106,7 +106,7 @@
   <div id="activity-drawer" class="overlay overlay-open:translate-x-0 drawer drawer-end sm:max-w-104 hidden" role="dialog" tabindex="-1">
     <div class="drawer-header border-base-content/20 border-b p-4">
       <h3 class="drawer-title text-base font-semibold">{{ $t('admin.navbar.activity.title') }}</h3>
-      <button type="button" class="btn btn-text btn-circle btn-xs" aria-label="Close" data-overlay="#activity-drawer">
+      <button type="button" class="btn btn-text btn-circle btn-xs" :aria-label="$t('admin.navbar.close')" data-overlay="#activity-drawer">
         <span class="icon-[tabler--x] size-4"></span>
       </button>
     </div>
@@ -160,7 +160,7 @@ const activities = computed(() => [
     message: t('admin.dashboard.activity.messages.orderUpdate', { id: '#1042' }), 
     time: t('admin.dashboard.activity.time.minsAgo', { n: 18 }), 
     avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
-    content: 'O status foi alterado de pendente para pago após confirmação do gateway.'
+    content: t('admin.navbar.activity.orderStatusChanged')
   },
   { 
     id: 2, 

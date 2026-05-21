@@ -269,7 +269,7 @@ interface AdminPaymentGatewayLog {
   created_at?: string | null
 }
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { useApiFetch } = useApi()
 
 const { pending: paymentsPending, data: paymentsData, error: paymentsError } = await useApiFetch<AdminPaymentListResponse>(
@@ -412,7 +412,7 @@ function logLevelBadge(level: number) {
 
 function formatDateTime(dateString?: string | null) {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(locale.value, {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -423,7 +423,7 @@ function formatDateTime(dateString?: string | null) {
 
 function formatCurrency(value?: number | string | null, currency = 'BRL') {
   const amount = Number(value || 0)
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat(locale.value, {
     style: 'currency',
     currency
   }).format(amount)

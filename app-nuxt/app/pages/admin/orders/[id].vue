@@ -113,7 +113,7 @@
                     </div>
                   </div>
                   <NuxtLinkLocale :to="`/admin/customers/${customerProfile.id}`" class="btn btn-xs btn-outline btn-block mt-2">
-                    Ver Perfil Completo
+                    {{ $t('admin.customers.detail.viewProfile', 'Ver Perfil Completo') }}
                   </NuxtLinkLocale>
                 </div>
                 <div v-else class="text-sm text-gray-500 italic">
@@ -179,7 +179,7 @@
                   <span class="uppercase">{{ order.currency }}</span>
                 </div>
                 <div v-if="order.order_number" class="flex justify-between">
-                  <span class="text-base-content/60">Número</span>
+                  <span class="text-base-content/60">{{ $t('admin.orders.table.number', 'Número') }}</span>
                   <span class="font-mono">{{ order.order_number }}</span>
                 </div>
               </div>

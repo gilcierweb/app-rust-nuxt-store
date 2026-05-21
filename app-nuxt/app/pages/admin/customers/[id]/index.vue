@@ -7,7 +7,7 @@
           <i class="icon-[tabler--arrow-left] size-6"></i>
         </NuxtLinkLocale>
         <div>
-          <h1 class="h1">Detalhes do Cliente</h1>
+          <h1 class="h1">{{ $t('admin.customers.detail.title', 'Detalhes do Cliente') }}</h1>
           <p class="text-sm text-gray-500" v-if="profile">ID: {{ profile.id }} (User ID: {{ profile.user_id }})</p>
         </div>
       </div>
@@ -15,11 +15,11 @@
       <div v-if="profile" class="flex gap-2">
         <button @click="deleteProfile" class="btn btn-error btn-outline">
           <i class="icon-[tabler--trash] size-5 mr-2"></i>
-          Excluir
+          {{ $t('common.delete', 'Excluir') }}
         </button>
         <NuxtLinkLocale :to="`/admin/customers/${route.params.id}/edit`" class="btn btn-primary">
           <i class="icon-[tabler--pencil] size-5 mr-2"></i>
-          Editar
+          {{ $t('common.edit', 'Editar') }}
         </NuxtLinkLocale>
       </div>
     </div>
@@ -27,14 +27,14 @@
     <!-- Loading State -->
     <div v-if="pending || pendingAddresses" class="flex flex-col items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="mt-4 text-gray-500">Carregando detalhes do cliente...</span>
+      <span class="mt-4 text-gray-500">{{ $t('admin.customers.loading', 'Carregando detalhes do cliente...') }}</span>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error || errorAddresses" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Erro ao carregar dados do cliente: {{ error?.message || errorAddresses?.message }}</span>
-      <button class="btn btn-sm btn-ghost" @click="refreshAll">Tentar novamente</button>
+      <span>{{ $t('admin.customers.error', { message: error?.message || errorAddresses?.message }) }}</span>
+      <button class="btn btn-sm btn-ghost" @click="refreshAll">{{ $t('common.actions.tryAgain', 'Tentar novamente') }}</button>
     </div>
 
     <!-- Content -->
@@ -59,11 +59,11 @@
 
           <div class="text-xs text-gray-500 space-y-2 w-full">
             <div class="flex justify-between">
-              <span>Criado em:</span>
+              <span>{{ $t('admin.customers.detail.createdAt', 'Criado em:') }}</span>
               <span class="font-medium">{{ formatDate(profile.created_at) }}</span>
             </div>
             <div class="flex justify-between">
-              <span>Atualizado em:</span>
+              <span>{{ $t('admin.customers.detail.updatedAt', 'Atualizado em:') }}</span>
               <span class="font-medium">{{ formatDate(profile.updated_at) }}</span>
             </div>
           </div>
@@ -75,61 +75,61 @@
         <!-- Details Card -->
         <div class="card bg-base-100 shadow-sm border">
           <div class="card-body">
-            <h2 class="card-title mb-4">Informações de Contato</h2>
+            <h2 class="card-title mb-4">{{ $t('admin.customers.detail.personalInfo', 'Informações de Contato') }}</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Primeiro Nome</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.firstName', 'Primeiro Nome') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.first_name || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Sobrenome</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.lastName', 'Sobrenome') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.last_name || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Nome Completo</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.fullName', 'Nome Completo') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.full_name || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Username</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.username', 'Username') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.username || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Apelido</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.nickname', 'Apelido') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.nickname || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Data de Nascimento</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.birthDate', 'Data de Nascimento') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.birth_date || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">Telefone</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.phone', 'Telefone') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.phone || '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
-                  <span class="label-text text-gray-500">WhatsApp</span>
+                  <span class="label-text text-gray-500">{{ $t('admin.customers.detail.whatsapp', 'WhatsApp') }}</span>
                 </label>
                 <div class="font-medium">{{ profile.whatsapp || '-' }}</div>
               </div>
@@ -141,13 +141,13 @@
         <div class="card bg-base-100 shadow-sm border">
           <div class="card-body">
             <div class="flex justify-between items-center mb-4">
-              <h2 class="card-title">Endereços</h2>
+              <h2 class="card-title">{{ $t('admin.customers.detail.addresses', 'Endereços') }}</h2>
               <NuxtLinkLocale 
                 :to="{ path: '/admin/addresses/new', query: { user_id: profile.user_id, return_to: route.path } }" 
                 class="btn btn-sm btn-ghost"
               >
                 <i class="icon-[tabler--plus] size-4 mr-1"></i>
-                Adicionar
+                {{ $t('common.actions.add', 'Adicionar') }}
               </NuxtLinkLocale>
             </div>
 
@@ -167,9 +167,9 @@
                 </div>
                 <div class="flex items-center gap-2 mb-2">
                   <span class="badge badge-sm badge-soft" :class="address.default ? 'badge-primary' : ''">
-                    {{ address.type || 'Principal' }}
+                    {{ address.type || $t('admin.customers.detail.primaryAddress', 'Principal') }}
                   </span>
-                  <span v-if="address.default" class="text-xs text-primary font-bold">Padrão</span>
+                  <span v-if="address.default" class="text-xs text-primary font-bold">{{ $t('admin.customers.detail.defaultAddress', 'Padrão') }}</span>
                 </div>
                 <div class="text-sm font-medium">{{ address.first_name }} {{ address.last_name }}</div>
                 <div class="text-sm text-gray-600">{{ address.address1 }}</div>
@@ -186,8 +186,8 @@
     <!-- Not Found State -->
     <div v-else class="alert alert-warning">
       <i class="icon-[tabler--alert-triangle] size-6"></i>
-      <span>Cliente não encontrado.</span>
-      <NuxtLinkLocale to="/admin/customers" class="btn btn-sm">Voltar para lista</NuxtLinkLocale>
+      <span>{{ $t('admin.customers.notFound', 'Cliente não encontrado.') }}</span>
+      <NuxtLinkLocale to="/admin/customers" class="btn btn-sm">{{ $t('admin.customers.detail.back', 'Voltar para lista') }}</NuxtLinkLocale>
     </div>
   </div>
 </template>

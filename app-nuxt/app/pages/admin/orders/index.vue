@@ -5,7 +5,7 @@
       <div class="flex gap-2">
         <button class="btn btn-outline btn-sm">
           <i class="icon-[tabler--download] size-4 mr-2"></i>
-          Exportar
+          {{ $t('common.export', 'Exportar') }}
         </button>
       </div>
     </div>
@@ -16,14 +16,14 @@
         <div class="flex flex-wrap gap-4 items-end">
           <div class="form-control flex-1 min-w-[240px]">
             <label class="label pt-0">
-              <span class="label-text-alt text-gray-500">Buscar Pedido</span>
+              <span class="label-text-alt text-gray-500">{{ $t('common.search', 'Buscar Pedido') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors"></span>
               <input 
                 v-model="searchQuery" 
                 type="text" 
-                placeholder="Número do pedido..." 
+                :placeholder="$t('admin.orders.searchPlaceholder', 'Número do pedido...')" 
                 class="input input-bordered w-full pl-10" 
               />
             </div>
@@ -31,10 +31,10 @@
 
           <div class="form-control w-48">
             <label class="label pt-0">
-              <span class="label-text-alt text-gray-500">Status</span>
+              <span class="label-text-alt text-gray-500">{{ $t('common.table.status', 'Status') }}</span>
             </label>
             <select v-model="selectedStatus" class="select select-bordered w-full">
-              <option value="">Todos</option>
+              <option value="">{{ $t('common.all', 'Todos') }}</option>
               <option v-for="(val, key) in statusMap" :key="key" :value="key">
                 {{ val.label }}
               </option>
@@ -42,7 +42,7 @@
           </div>
 
           <button class="btn btn-ghost" @click="resetFilters">
-            Limpar
+            {{ $t('common.actions.clear', 'Limpar') }}
           </button>
         </div>
       </div>
@@ -51,7 +51,7 @@
     <!-- Loading State -->
     <div v-if="pending" class="flex flex-col items-center justify-center py-20 bg-base-100 rounded-box border shadow-sm">
       <span class="loading loading-spinner text-info size-12"></span>
-      <p class="mt-4 text-gray-500">Carregando histórico de pedidos...</p>
+      <p class="mt-4 text-gray-500">{{ $t('admin.orders.loading', 'Carregando histórico de pedidos...') }}</p>
     </div>
 
     <!-- Orders Table -->
@@ -61,12 +61,12 @@
           <thead class="bg-base-200/50">
             <tr>
               <th>{{ $t('admin.orders.table.number') }}</th>
-              <th>Data</th>
-              <th>Cliente (ID)</th>
-              <th>Status</th>
-              <th>Pagamento</th>
+              <th>{{ $t('admin.orders.table.date', 'Data') }}</th>
+              <th>{{ $t('admin.orders.table.customer', 'Cliente (ID)') }}</th>
+              <th>{{ $t('admin.orders.table.status', 'Status') }}</th>
+              <th>{{ $t('admin.orders.table.payment', 'Pagamento') }}</th>
               <th class="text-right">{{ $t('admin.orders.table.total') }}</th>
-              <th class="text-right">Ações</th>
+              <th class="text-right">{{ $t('admin.orders.table.actions', 'Ações') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -109,7 +109,7 @@
             </tr>
             <tr v-if="filteredOrders.length === 0">
               <td colspan="7" class="text-center py-20 text-gray-500 italic">
-                Nenhum pedido encontrado.
+                {{ $t('admin.orders.notFound', 'Nenhum pedido encontrado.') }}
               </td>
             </tr>
           </tbody>

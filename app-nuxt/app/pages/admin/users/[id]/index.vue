@@ -58,7 +58,7 @@
 
           <div class="text-xs text-gray-500 space-y-2 w-full">
             <div class="flex justify-between">
-              <span>PID</span>
+              <span>{{ $t('admin.users.detail.pid', 'PID') }}</span>
               <span class="font-mono text-[11px]">{{ user.pid }}</span>
             </div>
             <div class="flex justify-between">
