@@ -69,7 +69,7 @@ Everyone's password: Password123!
 
 ## Deploy on Cloudflare
 
-[![Deploy to Cloudflare Pages](https://cloudflare.com)](https://cloudflare.com)
+[![Deploy to Cloudflare Pages](https://deploy.workers.cloudflare.com/button)](https://cloudflare.com)
 
 ## 📂 Project Structure
 
