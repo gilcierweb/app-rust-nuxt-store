@@ -111,7 +111,10 @@
       </button>
     </div>
     <div class="drawer-body p-0 overflow-y-auto">
-      <ul class="divide-y divide-base-content/10">
+      <div v-if="auditPending" class="flex items-center justify-center py-12">
+        <span class="loading loading-spinner text-primary size-8"></span>
+      </div>
+      <ul v-else-if="activities.length > 0" class="divide-y divide-base-content/10">
         <li v-for="activity in activities" :key="activity.id" class="flex items-start gap-4 p-4 hover:bg-base-200/50 transition-colors">
           <div class="avatar">
             <div class="size-9 rounded-full border border-base-content/10">
@@ -131,6 +134,10 @@
           </div>
         </li>
       </ul>
+      <div v-else class="flex flex-col items-center justify-center py-12 text-center">
+        <span class="icon-[tabler--activity] text-base-content/30 size-12 mb-3"></span>
+        <p class="text-base-content/50 text-sm">{{ t('admin.audit.empty') }}</p>
+      </div>
     </div>
   </div>
   <!-- ---------- END HEADER ---------- -->
@@ -140,6 +147,7 @@
 const { user, logout } = useAuth()
 const route = useRoute()
 const { t, locale, locales, setLocale } = useI18n()
+const { useApiFetch } = useApi()
 
 const localizedRouteName = computed(() => {
   const name = route.name?.toString() || ''
@@ -153,30 +161,101 @@ const localizedRouteName = computed(() => {
   return module.charAt(0).toUpperCase() + module.slice(1).replace(/-/g, ' ')
 })
 
-const activities = computed(() => [
-  { 
-    id: 1, 
-    user: 'Gilcier Junior', 
-    message: t('admin.dashboard.activity.messages.orderUpdate', { id: '#1042' }), 
-    time: t('admin.dashboard.activity.time.minsAgo', { n: 18 }), 
-    avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
-    content: t('admin.navbar.activity.orderStatusChanged')
-  },
-  { 
-    id: 2, 
-    user: 'Maria Silva', 
-    message: t('admin.dashboard.activity.messages.couponAdd'), 
-    time: t('admin.dashboard.activity.time.hourAgo'), 
-    avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-2.png'
-  },
-  { 
-    id: 3, 
-    user: 'Sistema', 
-    message: t('admin.dashboard.activity.messages.backupComplete'), 
-    time: t('admin.dashboard.activity.time.hoursAgo', { n: 3 }), 
-    avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-3.png'
+interface AdminAuditLog {
+  id: number
+  actor_user_id?: number | null
+  actor_name: string
+  actor_email: string
+  action: string
+  resource_type: string
+  resource_id?: number | null
+  resource_label?: string | null
+  message?: string | null
+  created_at: string
+}
+
+interface AdminAuditLogResponse {
+  items: AdminAuditLog[]
+  total: number
+  page: number
+  page_size: number
+}
+
+interface PaymentGatewayEvent {
+  id: number
+  payment_gateway_id: number
+  event_type: string
+  external_event_id: string
+  status: number
+  signature_valid: boolean
+  failure_message?: string | null
+  created_at?: string | null
+}
+
+const { data: auditData, pending: auditPending } = await useApiFetch<AdminAuditLogResponse>(
+  '/api/admin/audit-logs',
+  {
+    query: { page: 1, page_size: 8 }
   }
-])
+)
+
+const { data: eventsData } = await useApiFetch<PaymentGatewayEvent[]>(
+  '/api/admin/payment-gateway-events',
+  {
+    query: { limit: 5 }
+  }
+)
+
+const activities = computed(() => {
+  const auditLogs = auditData.value?.items || []
+  const paymentEvents = eventsData.value || []
+  
+  const auditActivities = auditLogs.map((log) => ({
+    id: log.id,
+    user: log.actor_name,
+    message: log.message || `${log.action} ${log.resource_type}`,
+    time: getTimeAgo(log.created_at),
+    avatar: `https://cdn.flyonui.com/fy-assets/avatar/avatar-${(log.id % 3) + 1}.png`,
+    content: log.resource_label ? `${log.resource_type}: ${log.resource_label}` : undefined,
+    type: 'audit' as const
+  }))
+
+  const eventActivities = paymentEvents
+    .filter(event => event.status === 4 || !event.signature_valid)
+    .slice(0, 3)
+    .map((event) => ({
+      id: event.id + 100000,
+      user: 'Payment Gateway',
+      message: `Webhook ${event.event_type} - ${event.signature_valid ? 'Valid' : 'Invalid signature'}`,
+      time: getTimeAgo(event.created_at || ''),
+      avatar: 'https://cdn.flyonui.com/fy-assets/avatar/avatar-1.png',
+      content: event.failure_message || `Event ID: ${event.external_event_id}`,
+      type: 'operational' as const
+    }))
+
+  return [...auditActivities, ...eventActivities]
+    .sort((a, b) => {
+      const dateA = new Date(a.time.includes('ago') ? new Date().toISOString() : a.time)
+      const dateB = new Date(b.time.includes('ago') ? new Date().toISOString() : b.time)
+      return dateB.getTime() - dateA.getTime()
+    })
+    .slice(0, 10)
+})
+
+function getTimeAgo(dateString: string): string {
+  const now = new Date()
+  const past = new Date(dateString)
+  const diffMs = now.getTime() - past.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return t('admin.dashboard.activity.time.minsAgo', { n: 1 })
+  if (diffMins < 60) return t('admin.dashboard.activity.time.minsAgo', { n: diffMins })
+  if (diffHours === 1) return t('admin.dashboard.activity.time.hourAgo')
+  if (diffHours < 24) return t('admin.dashboard.activity.time.hoursAgo', { n: diffHours })
+  return t('admin.dashboard.activity.time.daysAgo', { n: diffDays })
+}
 
 function handleLogout() {
   logout()
