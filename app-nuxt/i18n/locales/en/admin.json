@@ -85,6 +85,11 @@
           "details": "Details"
         },
         "noDetails": "No details recorded."
+      },
+      "pagination": {
+        "showing": "Showing {current} of {total} entries",
+        "previous": "Previous",
+        "next": "Next"
       }
     },
     "sidebar": {

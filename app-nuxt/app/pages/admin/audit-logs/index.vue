@@ -78,7 +78,7 @@
         <div>
           <h2 class="card-title text-xl">{{ t('admin.audit.table.title') }}</h2>
           <p class="text-sm text-base-content/60">
-            {{ t('admin.audit.table.summary', { count: filteredItems.length, total: data?.total || 0 }) }}
+            {{ t('admin.audit.table.summary', { count: items.length, total: data?.total || 0 }) }}
           </p>
         </div>
       </div>
@@ -96,7 +96,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in filteredItems" :key="item.id" class="hover:bg-base-200/30 transition-colors">
+              <tr v-for="item in items" :key="item.id" class="hover:bg-base-200/30 transition-colors">
                 <td class="whitespace-nowrap">
                   <div class="text-sm font-medium">{{ formatDate(item.created_at) }}</div>
                   <div class="text-xs text-base-content/40">{{ formatTime(item.created_at) }}</div>
@@ -118,13 +118,40 @@
                   <div class="text-sm">{{ item.message || t('admin.audit.table.noDetails') }}</div>
                 </td>
               </tr>
-              <tr v-if="filteredItems.length === 0">
+              <tr v-if="items.length === 0">
                 <td colspan="5" class="py-20 text-center text-base-content/50 italic">
                   {{ t('admin.audit.empty') }}
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="border-base-content/10 flex items-center justify-between px-6 py-4 border-t">
+          <span class="text-xs text-base-content/50">
+            {{ t('admin.audit.pagination.showing', { current: items.length, total: data?.total || 0 }) }}
+          </span>
+          <div class="join">
+            <button
+              type="button"
+              class="join-item btn btn-sm btn-outline"
+              :disabled="currentPage <= 1 || pending"
+              @click="changePage(currentPage - 1)"
+            >
+              {{ t('admin.audit.pagination.previous') }}
+            </button>
+            <button type="button" class="join-item btn btn-sm btn-active font-mono">
+              {{ currentPage }}
+            </button>
+            <button
+              type="button"
+              class="join-item btn btn-sm btn-outline"
+              :disabled="!hasNextPage || pending"
+              @click="changePage(currentPage + 1)"
+            >
+              {{ t('admin.audit.pagination.next') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -160,15 +187,28 @@ const { t } = useI18n()
 const { useApiFetch } = useApi()
 
 const searchQuery = ref('')
+const debouncedSearchQuery = ref('')
 const selectedAction = ref('')
 const selectedResourceType = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
 
 const { pending, data, error, refresh } = await useApiFetch<AdminAuditLogResponse>(
   '/api/admin/audit-logs',
-  { key: 'admin-audit-logs' }
+  {
+    key: 'admin-audit-logs',
+    query: computed(() => ({
+      page: currentPage.value,
+      page_size: pageSize.value,
+      search: debouncedSearchQuery.value || undefined,
+      action: selectedAction.value || undefined,
+      resource_type: selectedResourceType.value || undefined
+    }))
+  }
 )
 
 const items = computed(() => data.value?.items || [])
+const hasNextPage = computed(() => (currentPage.value * pageSize.value) < (data.value?.total || 0))
 
 const availableActions = computed(() => {
   return [...new Set(items.value.map(item => item.action))].sort()
@@ -178,34 +218,34 @@ const availableResourceTypes = computed(() => {
   return [...new Set(items.value.map(item => item.resource_type))].sort()
 })
 
-const filteredItems = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase()
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-  return items.value.filter((item) => {
-    const matchesSearch = !query || [
-      item.actor_name,
-      item.actor_email,
-      item.action,
-      item.resource_type,
-      item.resource_label,
-      item.message
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase()
-      .includes(query)
+watch(searchQuery, (value) => {
+  currentPage.value = 1
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = value.trim()
+  }, 250)
+})
 
-    const matchesAction = !selectedAction.value || item.action === selectedAction.value
-    const matchesResource = !selectedResourceType.value || item.resource_type === selectedResourceType.value
+watch([selectedAction, selectedResourceType], () => {
+  currentPage.value = 1
+})
 
-    return matchesSearch && matchesAction && matchesResource
-  })
+onBeforeUnmount(() => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
 })
 
 function resetFilters() {
   searchQuery.value = ''
+  debouncedSearchQuery.value = ''
   selectedAction.value = ''
   selectedResourceType.value = ''
+  currentPage.value = 1
+}
+
+function changePage(page: number) {
+  currentPage.value = Math.max(1, page)
 }
 
 function formatResourceId(resourceId?: number | null) {

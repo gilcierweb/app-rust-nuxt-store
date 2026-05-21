@@ -85,6 +85,11 @@
           "details": "Detalles"
         },
         "noDetails": "Sin detalles registrados."
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} registros",
+        "previous": "Anterior",
+        "next": "Siguiente"
       }
     },
     "sidebar": {
