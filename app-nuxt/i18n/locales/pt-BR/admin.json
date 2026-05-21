@@ -37,7 +37,7 @@
         "settings": "Configurações",
         "logout": "Sair",
         "defaultName": "Administrador",
-        "defaultEmail": "admin@store.com"
+        "defaultEmail": "seu-email{'@'}exemplo.com"
       },
       "activity": {
         "title": "Atividade",
@@ -126,7 +126,7 @@
       "category_logistics": "Logística",
       "category_content": "Conteúdo",
       "category_admin": "Administração",
-      "defaultEmail": "admin@store.com"
+      "defaultEmail": "seu-email{'@'}exemplo.com"
     },
     "dashboard": {
       "title": "Admin Dashboard",
