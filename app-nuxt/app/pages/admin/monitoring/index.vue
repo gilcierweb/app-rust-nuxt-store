@@ -216,6 +216,8 @@
 </template>
 
 <script setup lang="ts">
+import type { AdminPaginatedResponse } from '~/types'
+
 definePageMeta({
   layout: 'admin'
 })
@@ -234,6 +236,10 @@ interface AdminPayment {
   failure_code?: string | null
   failure_message?: string | null
   created_at?: string | null
+}
+
+interface AdminPaymentListResponse extends AdminPaginatedResponse<AdminPayment> {
+  currencies: string[]
 }
 
 interface AdminPaymentGateway {
@@ -266,7 +272,7 @@ interface AdminPaymentGatewayLog {
 const { t } = useI18n()
 const { useApiFetch } = useApi()
 
-const { pending: paymentsPending, data: paymentsData, error: paymentsError } = await useApiFetch<AdminPayment[]>(
+const { pending: paymentsPending, data: paymentsData, error: paymentsError } = await useApiFetch<AdminPaymentListResponse>(
   '/api/admin/payments',
   { key: 'admin-monitoring-payments' }
 )
@@ -289,7 +295,7 @@ const { pending: gatewaysPending, data: gatewaysData, error: gatewaysError } = a
 const isPending = computed(() => paymentsPending.value || eventsPending.value || logsPending.value || gatewaysPending.value)
 const loadError = computed(() => paymentsError.value || eventsError.value || logsError.value || gatewaysError.value)
 
-const payments = computed(() => paymentsData.value || [])
+const payments = computed(() => paymentsData.value?.items || [])
 const events = computed(() => eventsData.value || [])
 const logs = computed(() => logsData.value || [])
 const gateways = computed(() => gatewaysData.value || [])
