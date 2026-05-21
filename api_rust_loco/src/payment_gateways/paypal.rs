@@ -11,7 +11,7 @@ use crate::payment_gateways::drivers::PAYPAL_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
+    RefundPaymentInput, VoidPaymentInput, WebhookAction, WebhookDecision, WebhookInput,
 };
 
 const PAYPAL_CLIENT_ID_ENV: &str = "PAYPAL_CLIENT_ID";
@@ -164,24 +164,36 @@ impl PaymentGateway for PayPalGateway {
             .unwrap_or(false);
 
         let action = match event_type.as_deref() {
-            Some("CHECKOUT.ORDER.APPROVED") => {
-                parsed.as_ref().and_then(|v| v.pointer("/resource/id")).and_then(Value::as_str).map(|id| WebhookAction::UpdatePaymentStatus {
+            Some("CHECKOUT.ORDER.APPROVED") => parsed
+                .as_ref()
+                .and_then(|v| v.pointer("/resource/id"))
+                .and_then(Value::as_str)
+                .map(|id| WebhookAction::UpdatePaymentStatus {
                     external_payment_id: id.to_string(),
                     status: PaymentAttemptStatus::Authorized,
+                }),
+            Some("PAYMENT.CAPTURE.COMPLETED") => parsed
+                .as_ref()
+                .and_then(|v| {
+                    v.pointer("/resource/supplementary_data/related_ids/order_id")
+                        .or_else(|| v.pointer("/resource/id"))
                 })
-            }
-            Some("PAYMENT.CAPTURE.COMPLETED") => {
-                parsed.as_ref().and_then(|v| v.pointer("/resource/supplementary_data/related_ids/order_id").or_else(|| v.pointer("/resource/id"))).and_then(Value::as_str).map(|id| WebhookAction::UpdatePaymentStatus {
+                .and_then(Value::as_str)
+                .map(|id| WebhookAction::UpdatePaymentStatus {
                     external_payment_id: id.to_string(),
                     status: PaymentAttemptStatus::Captured,
+                }),
+            Some("PAYMENT.CAPTURE.DENIED") => parsed
+                .as_ref()
+                .and_then(|v| {
+                    v.pointer("/resource/supplementary_data/related_ids/order_id")
+                        .or_else(|| v.pointer("/resource/id"))
                 })
-            }
-            Some("PAYMENT.CAPTURE.DENIED") => {
-                parsed.as_ref().and_then(|v| v.pointer("/resource/supplementary_data/related_ids/order_id").or_else(|| v.pointer("/resource/id"))).and_then(Value::as_str).map(|id| WebhookAction::UpdatePaymentStatus {
+                .and_then(Value::as_str)
+                .map(|id| WebhookAction::UpdatePaymentStatus {
                     external_payment_id: id.to_string(),
                     status: PaymentAttemptStatus::Failed,
-                })
-            }
+                }),
             _ => None,
         };
 

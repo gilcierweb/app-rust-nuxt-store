@@ -568,6 +568,11 @@
       "error": "Error loading customers: {message}",
       "notFound": "No customers found.",
       "createFirst": "Create first customer",
+      "pagination": {
+        "showing": "Showing {current} of {total} customers",
+        "previous": "Previous",
+        "next": "Next"
+      },
       "table": {
         "name": "Name",
         "username": "Username",
@@ -597,6 +602,11 @@
       "loading": "Loading users...",
       "error": "Error loading users: {message}",
       "notFound": "No users found.",
+      "pagination": {
+        "showing": "Showing {current} of {total} users",
+        "previous": "Previous",
+        "next": "Next"
+      },
       "detail": {
         "emailVerified": "Email Verified",
         "createdAt": "Created At",
@@ -823,10 +833,105 @@
       }
     },
     "payments": {
-      "title": "Payments"
+      "title": "Payments",
+      "description": "Review payment attempts, gateway references, and operational status.",
+      "loading": "Loading payments...",
+      "error": "Failed to load payments: {message}",
+      "empty": "No payments found.",
+      "actions": {
+        "events": "Events",
+        "logs": "Logs",
+        "refunds": "Refunds",
+        "gateways": "Gateways",
+        "methods": "Methods"
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Payment, order, transaction, idempotency...",
+        "status": "Status",
+        "gateway": "Gateway",
+        "currency": "Currency",
+        "allStatuses": "All statuses",
+        "allGateways": "All gateways",
+        "allCurrencies": "All currencies",
+        "clear": "Clear"
+      },
+      "table": {
+        "payment": "Payment",
+        "order": "Order",
+        "method": "Method",
+        "gateway": "Gateway",
+        "status": "Status",
+        "amount": "Amount",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "status": {
+        "checkout": "Checkout",
+        "pending": "Pending",
+        "processing": "Processing",
+        "authorized": "Authorized",
+        "captured": "Captured",
+        "failed": "Failed",
+        "voided": "Voided",
+        "cancelled": "Cancelled",
+        "refunded": "Refunded",
+        "partiallyRefunded": "Partially refunded",
+        "unknown": "Unknown"
+      },
+      "gateway": {
+        "manual": "Manual"
+      },
+      "pagination": {
+        "showing": "Showing {current} of {total} payments",
+        "previous": "Previous",
+        "next": "Next"
+      }
     },
     "inventory": {
-      "title": "Inventory"
+      "title": "Inventory",
+      "description": "Track variant stock, cart reservations, and low-stock exposure.",
+      "loading": "Loading inventory...",
+      "error": "Failed to load inventory: {message}",
+      "empty": "No inventory items found.",
+      "actions": {
+        "refresh": "Refresh",
+        "editVariant": "Edit variant"
+      },
+      "metrics": {
+        "variants": "Variants",
+        "onHand": "On hand",
+        "reserved": "Reserved",
+        "alerts": "Alerts"
+      },
+      "filters": {
+        "search": "Search",
+        "searchPlaceholder": "Product, variant, SKU...",
+        "status": "Status",
+        "lowThreshold": "Low threshold",
+        "allStatuses": "All statuses",
+        "clear": "Clear"
+      },
+      "status": {
+        "out": "Out of stock",
+        "low": "Low stock",
+        "reserved": "Reserved",
+        "healthy": "Healthy"
+      },
+      "table": {
+        "item": "Item",
+        "sku": "SKU",
+        "status": "Status",
+        "onHand": "On hand",
+        "reserved": "Reserved",
+        "available": "Available",
+        "update": "Update"
+      },
+      "pagination": {
+        "showing": "Showing {current} of {total} variants",
+        "previous": "Previous",
+        "next": "Next"
+      }
     },
     "emails": {
       "title": "Transactional Emails",

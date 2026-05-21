@@ -40,7 +40,10 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
         .all(&ctx.db)
         .await?;
 
-    let method_ids: HashSet<i32> = payments.iter().map(|payment| payment.payment_method_id).collect();
+    let method_ids: HashSet<i32> = payments
+        .iter()
+        .map(|payment| payment.payment_method_id)
+        .collect();
     let methods = payment_methods::Entity::find()
         .filter(payment_methods::Column::Id.is_in(method_ids.iter().copied()))
         .all(&ctx.db)
@@ -55,12 +58,18 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
         .all(&ctx.db)
         .await?;
 
-    let payment_by_id: HashMap<i32, payments::Model> =
-        payments.into_iter().map(|payment| (payment.id, payment)).collect();
-    let method_by_id: HashMap<i32, payment_methods::Model> =
-        methods.into_iter().map(|method| (method.id, method)).collect();
-    let gateway_by_id: HashMap<i32, payment_gateways::Model> =
-        gateways.into_iter().map(|gateway| (gateway.id, gateway)).collect();
+    let payment_by_id: HashMap<i32, payments::Model> = payments
+        .into_iter()
+        .map(|payment| (payment.id, payment))
+        .collect();
+    let method_by_id: HashMap<i32, payment_methods::Model> = methods
+        .into_iter()
+        .map(|method| (method.id, method))
+        .collect();
+    let gateway_by_id: HashMap<i32, payment_gateways::Model> = gateways
+        .into_iter()
+        .map(|gateway| (gateway.id, gateway))
+        .collect();
 
     let items = refunds
         .into_iter()
@@ -97,9 +106,10 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
         .await?
         .ok_or_else(|| Error::NotFound)?;
 
-    let gateway_name = if let Some(method) = payment_methods::Entity::find_by_id(payment.payment_method_id)
-        .one(&ctx.db)
-        .await?
+    let gateway_name = if let Some(method) =
+        payment_methods::Entity::find_by_id(payment.payment_method_id)
+            .one(&ctx.db)
+            .await?
     {
         if let Some(gateway_id) = method.payment_gateway_id {
             payment_gateways::Entity::find_by_id(gateway_id)

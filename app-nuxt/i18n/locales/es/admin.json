@@ -568,6 +568,11 @@
       "error": "Error al cargar clientes: {message}",
       "notFound": "No se encontraron clientes.",
       "createFirst": "Crear primer cliente",
+      "pagination": {
+        "showing": "Mostrando {current} de {total} clientes",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      },
       "table": {
         "name": "Nombre",
         "username": "Username",
@@ -597,6 +602,11 @@
       "loading": "Cargando usuarios...",
       "error": "Error al cargar usuarios: {message}",
       "notFound": "No se encontraron usuarios.",
+      "pagination": {
+        "showing": "Mostrando {current} de {total} usuarios",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      },
       "detail": {
         "emailVerified": "Correo Verificado",
         "createdAt": "Creado En",
@@ -819,10 +829,105 @@
       }
     },
     "payments": {
-      "title": "Pagos"
+      "title": "Pagos",
+      "description": "Revise intentos de pago, referencias del gateway y estado operativo.",
+      "loading": "Cargando pagos...",
+      "error": "Error al cargar pagos: {message}",
+      "empty": "No se encontraron pagos.",
+      "actions": {
+        "events": "Eventos",
+        "logs": "Logs",
+        "refunds": "Reembolsos",
+        "gateways": "Gateways",
+        "methods": "Métodos"
+      },
+      "filters": {
+        "search": "Buscar",
+        "searchPlaceholder": "Pago, pedido, transacción, idempotency...",
+        "status": "Estado",
+        "gateway": "Gateway",
+        "currency": "Moneda",
+        "allStatuses": "Todos los estados",
+        "allGateways": "Todos los gateways",
+        "allCurrencies": "Todas las monedas",
+        "clear": "Limpiar"
+      },
+      "table": {
+        "payment": "Pago",
+        "order": "Pedido",
+        "method": "Método",
+        "gateway": "Gateway",
+        "status": "Estado",
+        "amount": "Importe",
+        "date": "Fecha",
+        "actions": "Acciones"
+      },
+      "status": {
+        "checkout": "Checkout",
+        "pending": "Pendiente",
+        "processing": "Procesando",
+        "authorized": "Autorizado",
+        "captured": "Capturado",
+        "failed": "Falló",
+        "voided": "Anulado",
+        "cancelled": "Cancelado",
+        "refunded": "Reembolsado",
+        "partiallyRefunded": "Reembolso parcial",
+        "unknown": "Desconocido"
+      },
+      "gateway": {
+        "manual": "Manual"
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} pagos",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      }
     },
     "inventory": {
-      "title": "Inventario"
+      "title": "Inventario",
+      "description": "Controle stock por variante, reservas del carrito y exposición a bajo stock.",
+      "loading": "Cargando inventario...",
+      "error": "Error al cargar inventario: {message}",
+      "empty": "No se encontraron elementos de inventario.",
+      "actions": {
+        "refresh": "Actualizar",
+        "editVariant": "Editar variante"
+      },
+      "metrics": {
+        "variants": "Variantes",
+        "onHand": "Disponible",
+        "reserved": "Reservado",
+        "alerts": "Alertas"
+      },
+      "filters": {
+        "search": "Buscar",
+        "searchPlaceholder": "Producto, variante, SKU...",
+        "status": "Estado",
+        "lowThreshold": "Umbral bajo",
+        "allStatuses": "Todos los estados",
+        "clear": "Limpiar"
+      },
+      "status": {
+        "out": "Sin stock",
+        "low": "Stock bajo",
+        "reserved": "Reservado",
+        "healthy": "Saludable"
+      },
+      "table": {
+        "item": "Item",
+        "sku": "SKU",
+        "status": "Estado",
+        "onHand": "Disponible",
+        "reserved": "Reservado",
+        "available": "Disponible neto",
+        "update": "Actualizar"
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} variantes",
+        "previous": "Anterior",
+        "next": "Siguiente"
+      }
     },
     "emails": {
       "title": "Correos Transaccionales",

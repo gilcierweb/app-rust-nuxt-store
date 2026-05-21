@@ -124,18 +124,21 @@ impl AuthMailer {
         ];
 
         for (name, dir) in templates {
-            let subject = dir.get_file("subject.txt")
+            let subject = dir
+                .get_file("subject.txt")
                 .and_then(|f| f.contents_utf8())
                 .unwrap_or("")
                 .trim()
                 .to_string();
 
-            let html = dir.get_file("html.tera")
+            let html = dir
+                .get_file("html.tera")
                 .and_then(|f| f.contents_utf8())
                 .unwrap_or("")
                 .to_string();
 
-            let text = dir.get_file("text.tera")
+            let text = dir
+                .get_file("text.tera")
                 .and_then(|f| f.contents_utf8())
                 .unwrap_or("")
                 .to_string();

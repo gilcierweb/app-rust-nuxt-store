@@ -1,20 +1,27 @@
 use api_rust_loco::app::App;
-use api_rust_loco::models::_entities::{orders, payment_gateways, payment_methods, payments, payment_sessions, payment_refunds};
+use api_rust_loco::models::_entities::{
+    orders, payment_gateways, payment_methods, payment_refunds, payment_sessions, payments,
+};
 use api_rust_loco::models::order_status::OrderStatus;
-use api_rust_loco::models::payment_gateway_status::{PaymentAttemptStatus, PaymentSessionStatus, PaymentRefundStatus};
 use api_rust_loco::models::order_status::PaymentStatus;
+use api_rust_loco::models::payment_gateway_status::{
+    PaymentAttemptStatus, PaymentRefundStatus, PaymentSessionStatus,
+};
 use api_rust_loco::payment_gateways::drivers::MANUAL_DRIVER;
 use loco_rs::app::AppContext;
 use loco_rs::testing::prelude::*;
 use rust_decimal::Decimal;
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait, QueryFilter, ColumnTrait};
-use serial_test::serial;
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, QueryFilter};
 use serde_json::Value;
+use serial_test::serial;
 
-use super::prepare_data::{init_user_login, init_csrf, csrf_header};
+use super::prepare_data::{csrf_header, init_csrf, init_user_login};
 use super::with_api_key;
 
-async fn setup_payment_data(ctx: &AppContext, user_id: i32) -> (orders::Model, payment_methods::Model) {
+async fn setup_payment_data(
+    ctx: &AppContext,
+    user_id: i32,
+) -> (orders::Model, payment_methods::Model) {
     let now = chrono::Utc::now();
     let gateway = payment_gateways::ActiveModel {
         code: Set("manual_test".to_string()),
@@ -67,7 +74,7 @@ async fn can_get_payment_methods_without_n_plus_one() {
         with_api_key(&mut request);
         let logged_in_user = init_user_login(&request, &ctx).await;
         setup_payment_data(&ctx, logged_in_user.user.id).await;
-        
+
         let res = request.get("/api/payments/methods").await;
         assert_eq!(res.status_code(), 200);
 
@@ -100,15 +107,25 @@ async fn can_process_payment_idempotently() {
         assert_eq!(res.status_code(), 200);
 
         let json: Value = serde_json::from_str(&res.text()).unwrap();
-        assert_eq!(json["status"], PaymentAttemptStatus::Captured.to_i16() as i32);
-        
+        assert_eq!(
+            json["status"],
+            PaymentAttemptStatus::Captured.to_i16() as i32
+        );
+
         let payment_id = json["id"].as_i64().unwrap() as i32;
-        let payment = payments::Entity::find_by_id(payment_id).one(&ctx.db).await.unwrap().unwrap();
+        let payment = payments::Entity::find_by_id(payment_id)
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
         assert!(payment.idempotency_key.is_some());
-        
+
         let session = payment_sessions::Entity::find()
             .filter(payment_sessions::Column::PaymentId.eq(payment_id))
-            .one(&ctx.db).await.unwrap().unwrap();
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
         assert_eq!(session.status, PaymentSessionStatus::Completed.to_i16());
     })
     .await;
@@ -139,12 +156,26 @@ async fn can_handle_provider_failure() {
         assert_eq!(json["status"], PaymentAttemptStatus::Failed.to_i16() as i32);
 
         let payment_id = json["id"].as_i64().unwrap() as i32;
-        let payment = payments::Entity::find_by_id(payment_id).one(&ctx.db).await.unwrap().unwrap();
-        assert_eq!(payment.status, Some(PaymentAttemptStatus::Failed.to_i16() as i32));
+        let payment = payments::Entity::find_by_id(payment_id)
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            payment.status,
+            Some(PaymentAttemptStatus::Failed.to_i16() as i32)
+        );
 
         // A failed payment maps the order to PaymentStatus::Unpaid (not the raw Failed attempt status)
-        let updated_order = orders::Entity::find_by_id(order.id).one(&ctx.db).await.unwrap().unwrap();
-        assert_eq!(updated_order.payment_status, Some(PaymentStatus::Unpaid.to_i32()));
+        let updated_order = orders::Entity::find_by_id(order.id)
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            updated_order.payment_status,
+            Some(PaymentStatus::Unpaid.to_i32())
+        );
     })
     .await;
 }
@@ -156,7 +187,7 @@ async fn can_process_refunds() {
         with_api_key(&mut request);
         let logged_in_user = init_user_login(&request, &ctx).await;
         let (order, method) = setup_payment_data(&ctx, logged_in_user.user.id).await;
-        
+
         // Manual setup for refund test since there's no controller endpoint yet,
         // we'll call the service/gateway directly to ensure the logic and models are correct.
         let amount = Decimal::new(1000, 2);

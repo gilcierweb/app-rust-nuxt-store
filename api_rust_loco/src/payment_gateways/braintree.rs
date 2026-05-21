@@ -10,7 +10,7 @@ use crate::payment_gateways::drivers::BRAINTREE_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
+    RefundPaymentInput, VoidPaymentInput, WebhookAction, WebhookDecision, WebhookInput,
 };
 
 const BRAINTREE_VERSION: &str = "2019-01-01";
@@ -251,18 +251,30 @@ impl PaymentGateway for BraintreeGateway {
         });
 
         let action = match event_type.as_deref() {
-            Some("transaction_authorized") => external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
-                external_payment_id: id.to_string(),
-                status: PaymentAttemptStatus::Authorized,
-            }),
-            Some("transaction_settled") => external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
-                external_payment_id: id.to_string(),
-                status: PaymentAttemptStatus::Captured,
-            }),
-            Some("transaction_declined") => external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
-                external_payment_id: id.to_string(),
-                status: PaymentAttemptStatus::Failed,
-            }),
+            Some("transaction_authorized") => {
+                external_event_id
+                    .as_ref()
+                    .map(|id| WebhookAction::UpdatePaymentStatus {
+                        external_payment_id: id.to_string(),
+                        status: PaymentAttemptStatus::Authorized,
+                    })
+            }
+            Some("transaction_settled") => {
+                external_event_id
+                    .as_ref()
+                    .map(|id| WebhookAction::UpdatePaymentStatus {
+                        external_payment_id: id.to_string(),
+                        status: PaymentAttemptStatus::Captured,
+                    })
+            }
+            Some("transaction_declined") => {
+                external_event_id
+                    .as_ref()
+                    .map(|id| WebhookAction::UpdatePaymentStatus {
+                        external_payment_id: id.to_string(),
+                        status: PaymentAttemptStatus::Failed,
+                    })
+            }
             _ => None,
         };
 

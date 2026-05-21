@@ -14,7 +14,7 @@ use crate::payment_gateways::drivers::MERCADO_PAGO_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
+    RefundPaymentInput, VoidPaymentInput, WebhookAction, WebhookDecision, WebhookInput,
 };
 
 const MERCADO_PAGO_BASE: &str = "https://api.mercadopago.com";
@@ -134,7 +134,14 @@ impl PaymentGateway for MercadoPagoGateway {
         if signature_valid {
             if let Some("payment") = event_type.as_deref() {
                 if let Some(id) = &external_event_id {
-                    if let Ok(payment_data) = mercado_pago_request(reqwest::Method::GET, &format!("/v1/payments/{}", id), None, json!({})).await {
+                    if let Ok(payment_data) = mercado_pago_request(
+                        reqwest::Method::GET,
+                        &format!("/v1/payments/{}", id),
+                        None,
+                        json!({}),
+                    )
+                    .await
+                    {
                         let status_str = string_field(&payment_data, "status");
                         action = Some(WebhookAction::UpdatePaymentStatus {
                             external_payment_id: id.to_string(),

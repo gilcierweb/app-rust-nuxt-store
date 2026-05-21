@@ -62,6 +62,54 @@ fn default_per_page() -> i64 {
     20
 }
 
+/// Pagination parameters for admin list endpoints
+#[derive(Debug, Clone, Copy)]
+pub struct AdminPaginationParams {
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
+}
+
+impl AdminPaginationParams {
+    #[must_use]
+    pub fn new(page: Option<u64>, page_size: Option<u64>) -> Self {
+        Self { page, page_size }
+    }
+
+    #[must_use]
+    pub fn page(&self) -> u64 {
+        self.page.unwrap_or(default_admin_page()).max(1)
+    }
+
+    #[must_use]
+    pub fn page_size(&self) -> u64 {
+        self.page_size
+            .unwrap_or(default_admin_page_size())
+            .clamp(1, 100)
+    }
+
+    #[must_use]
+    pub fn page_index(&self) -> u64 {
+        self.page().saturating_sub(1)
+    }
+}
+
+impl Default for AdminPaginationParams {
+    fn default() -> Self {
+        Self {
+            page: Some(default_admin_page()),
+            page_size: Some(default_admin_page_size()),
+        }
+    }
+}
+
+fn default_admin_page() -> u64 {
+    1
+}
+
+fn default_admin_page_size() -> u64 {
+    20
+}
+
 /// Paginated response wrapper
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaginatedResponse<T> {
@@ -95,6 +143,27 @@ pub struct PaginationMeta {
     pub total_pages: i64,
     pub has_next: bool,
     pub has_prev: bool,
+}
+
+/// Flat paginated response used by admin frontend list pages
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AdminPaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub total: u64,
+    pub page: u64,
+    pub page_size: u64,
+}
+
+impl<T> AdminPaginatedResponse<T> {
+    #[must_use]
+    pub fn new(items: Vec<T>, total: u64, pagination: AdminPaginationParams) -> Self {
+        Self {
+            items,
+            total,
+            page: pagination.page(),
+            page_size: pagination.page_size(),
+        }
+    }
 }
 
 /// Cursor-based pagination params

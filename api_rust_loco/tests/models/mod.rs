@@ -28,6 +28,6 @@ mod banners;
 
 mod payment_gateways;
 
-mod product_variant_images;
-mod email_logs;
 mod admin_audit_logs;
+mod email_logs;
+mod product_variant_images;

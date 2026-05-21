@@ -12,7 +12,7 @@ use crate::payment_gateways::drivers::PAGARME_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
+    RefundPaymentInput, VoidPaymentInput, WebhookAction, WebhookDecision, WebhookInput,
 };
 
 const PAGARME_SECRET_KEY_ENV: &str = "PAGARME_SECRET_KEY";
@@ -135,18 +135,24 @@ impl PaymentGateway for PagarmeGateway {
         });
 
         let action = match event_type.as_deref() {
-            Some("order.paid" | "order.payment_failed" | "order.canceled") | Some("charge.paid" | "charge.payment_failed" | "charge.refunded") => {
+            Some("order.paid" | "order.payment_failed" | "order.canceled")
+            | Some("charge.paid" | "charge.payment_failed" | "charge.refunded") => {
                 let status_str = parsed.as_ref().and_then(|v| {
-                    v.pointer("/data/status").and_then(Value::as_str).map(ToString::to_string)
-                });
-                parsed.as_ref().and_then(|v| {
-                    v.pointer("/data/metadata/payment_id")
+                    v.pointer("/data/status")
                         .and_then(Value::as_str)
-                        .and_then(|id| id.parse::<i32>().ok())
-                }).map(|payment_id| WebhookAction::UpdatePaymentStatusById {
-                    payment_id,
-                    status: pagarme_attempt_status(status_str.as_deref()),
-                })
+                        .map(ToString::to_string)
+                });
+                parsed
+                    .as_ref()
+                    .and_then(|v| {
+                        v.pointer("/data/metadata/payment_id")
+                            .and_then(Value::as_str)
+                            .and_then(|id| id.parse::<i32>().ok())
+                    })
+                    .map(|payment_id| WebhookAction::UpdatePaymentStatusById {
+                        payment_id,
+                        status: pagarme_attempt_status(status_str.as_deref()),
+                    })
             }
             _ => None,
         };

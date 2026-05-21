@@ -32,7 +32,7 @@
       <span>{{ $t('admin.users.error', { message: error.message }) }}</span>
     </div>
 
-    <div v-else-if="filteredUsers.length === 0" class="text-center py-12">
+    <div v-else-if="users.length === 0" class="text-center py-12">
       <p class="text-gray-500 text-lg">{{ $t('admin.users.notFound') }}</p>
     </div>
 
@@ -51,7 +51,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in filteredUsers" :key="user.id" class="row-hover">
+              <tr v-for="user in users" :key="user.id" class="row-hover">
                 <td>
                   <div class="flex items-center gap-3">
                     <div class="avatar avatar-placeholder">
@@ -106,12 +106,26 @@
             </tbody>
           </table>
         </div>
+
+        <AdminPagination
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :current-count="users.length"
+          :total="data?.total || 0"
+          :pending="pending"
+          :summary="$t('admin.users.pagination.showing', { current: users.length, total: data?.total || 0 })"
+          :previous-label="$t('admin.users.pagination.previous')"
+          :next-label="$t('admin.users.pagination.next')"
+          @change="changePage"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { AdminPaginatedResponse } from '~/types'
+
 definePageMeta({
   layout: 'admin'
 })
@@ -131,23 +145,23 @@ const toast = useAppToast()
 const dialog = useAppDialog()
 
 const searchQuery = ref('')
+const appliedSearchQuery = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
 
-const { pending, data: users, error, refresh } = await useApiFetch<AdminUser[]>(
+const { pending, data, error, refresh } = await useApiFetch<AdminPaginatedResponse<AdminUser>>(
   '/api/admin/users',
-  { key: 'admin-users-list' }
+  {
+    key: 'admin-users-list',
+    query: computed(() => ({
+      page: currentPage.value,
+      page_size: pageSize.value,
+      search: appliedSearchQuery.value || undefined
+    }))
+  }
 )
 
-const filteredUsers = computed(() => {
-  if (!users.value) return []
-  if (!searchQuery.value.trim()) return users.value
-
-  const query = searchQuery.value.toLowerCase()
-  return users.value.filter(user =>
-    user.email.toLowerCase().includes(query) ||
-    user.name.toLowerCase().includes(query) ||
-    user.role.toLowerCase().includes(query)
-  )
-})
+const users = computed(() => data.value?.items || [])
 
 const formatDate = (dateString: string) => {
   if (!dateString) return '-'
@@ -159,7 +173,12 @@ const formatDate = (dateString: string) => {
 }
 
 const handleSearch = () => {
-  // Search is handled reactively via computed
+  currentPage.value = 1
+  appliedSearchQuery.value = searchQuery.value.trim()
+}
+
+const changePage = (page: number) => {
+  currentPage.value = Math.max(1, page)
 }
 
 const confirmDelete = async (user: AdminUser) => {

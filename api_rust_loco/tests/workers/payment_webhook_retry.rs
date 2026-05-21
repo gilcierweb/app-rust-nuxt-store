@@ -1,12 +1,12 @@
-use loco_rs::{bgworker::BackgroundWorker, testing::prelude::*};
+use api_rust_loco::models::_entities::{payment_gateway_events, payment_gateways};
+use api_rust_loco::models::payment_gateway_status::PaymentGatewayEventStatus;
 use api_rust_loco::{
     app::App,
     workers::payment_webhook_retry::{Worker, WorkerArgs},
 };
-use serial_test::serial;
+use loco_rs::{bgworker::BackgroundWorker, testing::prelude::*};
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait};
-use api_rust_loco::models::_entities::{payment_gateways, payment_gateway_events};
-use api_rust_loco::models::payment_gateway_status::PaymentGatewayEventStatus;
+use serial_test::serial;
 
 #[tokio::test]
 #[serial]
@@ -57,8 +57,12 @@ async fn test_run_payment_webhook_retry_worker() {
 
     let order = api_rust_loco::models::_entities::orders::ActiveModel {
         user_id: Set(user.id),
-        status: Set(Some(api_rust_loco::models::order_status::OrderStatus::Pending.to_i32())),
-        payment_status: Set(Some(api_rust_loco::models::order_status::PaymentStatus::Unpaid.to_i32())),
+        status: Set(Some(
+            api_rust_loco::models::order_status::OrderStatus::Pending.to_i32(),
+        )),
+        payment_status: Set(Some(
+            api_rust_loco::models::order_status::PaymentStatus::Unpaid.to_i32(),
+        )),
         total_amount: Set(Some(rust_decimal::Decimal::new(1000, 2))),
         created_at: Set(now.into()),
         updated_at: Set(now.into()),
@@ -72,8 +76,13 @@ async fn test_run_payment_webhook_retry_worker() {
         order_id: Set(order.id),
         payment_method_id: Set(method.id),
         amount: Set(Some(rust_decimal::Decimal::new(1000, 2))),
-        status: Set(Some(api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Pending.to_i16() as i32)),
-        intent: Set(api_rust_loco::models::payment_gateway_status::PaymentIntent::Purchase.to_i16()),
+        status: Set(Some(
+            api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Pending.to_i16()
+                as i32,
+        )),
+        intent: Set(
+            api_rust_loco::models::payment_gateway_status::PaymentIntent::Purchase.to_i16(),
+        ),
         created_at: Set(now.into()),
         updated_at: Set(now.into()),
         ..Default::default()
@@ -112,11 +121,9 @@ async fn test_run_payment_webhook_retry_worker() {
     .unwrap();
 
     // 3. Run the worker
-    assert!(
-        Worker::perform_later(&boot.app_context, WorkerArgs {})
-            .await
-            .is_ok()
-    );
+    assert!(Worker::perform_later(&boot.app_context, WorkerArgs {})
+        .await
+        .is_ok());
 
     // 4. Validate results
     let updated_event = payment_gateway_events::Entity::find_by_id(event.id)
@@ -124,20 +131,33 @@ async fn test_run_payment_webhook_retry_worker() {
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(updated_event.status, PaymentGatewayEventStatus::Processed.to_i16());
+    assert_eq!(
+        updated_event.status,
+        PaymentGatewayEventStatus::Processed.to_i16()
+    );
     assert!(updated_event.processed_at.is_some());
 
-    let updated_payment = api_rust_loco::models::_entities::payments::Entity::find_by_id(payment.id)
-        .one(&ctx.db)
-        .await
-        .unwrap()
-        .unwrap();
-    assert_eq!(updated_payment.status, Some(api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Captured.to_i16() as i32));
+    let updated_payment =
+        api_rust_loco::models::_entities::payments::Entity::find_by_id(payment.id)
+            .one(&ctx.db)
+            .await
+            .unwrap()
+            .unwrap();
+    assert_eq!(
+        updated_payment.status,
+        Some(
+            api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Captured.to_i16()
+                as i32
+        )
+    );
 
     let updated_order = api_rust_loco::models::_entities::orders::Entity::find_by_id(order.id)
         .one(&ctx.db)
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(updated_order.payment_status, Some(api_rust_loco::models::order_status::PaymentStatus::Paid.to_i32()));
+    assert_eq!(
+        updated_order.payment_status,
+        Some(api_rust_loco::models::order_status::PaymentStatus::Paid.to_i32())
+    );
 }

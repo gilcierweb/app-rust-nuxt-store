@@ -2,46 +2,46 @@
   <div>
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h1 class="h1">Payments</h1>
-        <p class="text-sm text-base-content/60">Review payment attempts, gateway references, and operational status.</p>
+        <h1 class="h1">{{ t('admin.payments.title') }}</h1>
+        <p class="text-sm text-base-content/60">{{ t('admin.payments.description') }}</p>
       </div>
       <div class="flex gap-2">
         <NuxtLinkLocale to="/admin/payments/events" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--inbox] size-4"></i>
-          Events
+          {{ t('admin.payments.actions.events') }}
         </NuxtLinkLocale>
         <NuxtLinkLocale to="/admin/payments/logs" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--list-details] size-4"></i>
-          Logs
+          {{ t('admin.payments.actions.logs') }}
         </NuxtLinkLocale>
         <NuxtLinkLocale to="/admin/payments/refunds" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--receipt-refund] size-4"></i>
-          Refunds
+          {{ t('admin.payments.actions.refunds') }}
         </NuxtLinkLocale>
         <NuxtLinkLocale to="/admin/payments/gateways" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--building-bank] size-4"></i>
-          Gateways
+          {{ t('admin.payments.actions.gateways') }}
         </NuxtLinkLocale>
         <NuxtLinkLocale to="/admin/payments/methods" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--credit-card] size-4"></i>
-          Methods
+          {{ t('admin.payments.actions.methods') }}
         </NuxtLinkLocale>
       </div>
     </div>
 
-    <div class="card bg-base-100 shadow-sm border mb-6">
+    <div class="card shadow-base-300/10 mb-6 shadow-md">
       <div class="card-body p-4">
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(220px,1fr)_180px_180px_180px_auto] lg:items-end">
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Search</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.filters.search') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 group-focus-within:text-primary"></span>
               <input
                 v-model="searchQuery"
                 class="input input-bordered w-full pl-10"
-                placeholder="Payment, order, transaction, idempotency..."
+                :placeholder="t('admin.payments.filters.searchPlaceholder')"
                 type="text"
               />
             </div>
@@ -49,10 +49,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Status</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.filters.status') }}</span>
             </label>
             <select v-model="selectedStatus" class="select select-bordered w-full">
-              <option value="">All statuses</option>
+              <option value="">{{ t('admin.payments.filters.allStatuses') }}</option>
               <option v-for="status in paymentStatuses" :key="status.value" :value="status.value">
                 {{ status.label }}
               </option>
@@ -61,10 +61,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Gateway</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.filters.gateway') }}</span>
             </label>
             <select v-model="selectedGateway" class="select select-bordered w-full">
-              <option value="">All gateways</option>
+              <option value="">{{ t('admin.payments.filters.allGateways') }}</option>
               <option v-for="gateway in gateways" :key="gateway.id" :value="gateway.id">
                 {{ gateway.name }}
               </option>
@@ -73,10 +73,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Currency</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.filters.currency') }}</span>
             </label>
             <select v-model="selectedCurrency" class="select select-bordered w-full">
-              <option value="">All currencies</option>
+              <option value="">{{ t('admin.payments.filters.allCurrencies') }}</option>
               <option v-for="currency in currencies" :key="currency" :value="currency">
                 {{ currency }}
               </option>
@@ -84,39 +84,42 @@
           </div>
 
           <button class="btn btn-ghost" type="button" @click="resetFilters">
-            Clear
+            {{ t('admin.payments.filters.clear') }}
           </button>
         </div>
       </div>
     </div>
 
-    <div v-if="paymentsPending || methodsPending || gatewaysPending" class="flex flex-col items-center justify-center py-20 bg-base-100 rounded-box border shadow-sm">
-      <span class="loading loading-spinner text-primary size-12"></span>
-      <p class="mt-4 text-base-content/60">Loading payments...</p>
+    <div v-if="paymentsPending || methodsPending || gatewaysPending" class="card shadow-base-300/10 shadow-md">
+      <div class="card-body flex flex-col items-center justify-center py-20">
+        <span class="loading loading-spinner text-primary size-12"></span>
+        <p class="mt-4 text-base-content/60">{{ t('admin.payments.loading') }}</p>
+      </div>
     </div>
 
     <div v-else-if="paymentsError" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Failed to load payments: {{ paymentsError.message }}</span>
+      <span>{{ t('admin.payments.error', { message: paymentsError.message }) }}</span>
     </div>
 
-    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
-      <div class="overflow-x-auto">
+    <div v-else class="card shadow-base-300/10 w-full shadow-md overflow-hidden">
+      <div class="card-body p-0">
+        <div class="overflow-x-auto">
         <table class="table table-lg">
           <thead class="bg-base-200/50">
             <tr>
-              <th>Payment</th>
-              <th>Order</th>
-              <th>Method</th>
-              <th>Gateway</th>
-              <th>Status</th>
-              <th class="text-right">Amount</th>
-              <th>Date</th>
-              <th class="text-right">Actions</th>
+              <th>{{ t('admin.payments.table.payment') }}</th>
+              <th>{{ t('admin.payments.table.order') }}</th>
+              <th>{{ t('admin.payments.table.method') }}</th>
+              <th>{{ t('admin.payments.table.gateway') }}</th>
+              <th>{{ t('admin.payments.table.status') }}</th>
+              <th class="text-right">{{ t('admin.payments.table.amount') }}</th>
+              <th>{{ t('admin.payments.table.date') }}</th>
+              <th class="text-right">{{ t('admin.payments.table.actions') }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="payment in filteredPayments" :key="payment.id" class="hover:bg-base-200/30 transition-colors">
+            <tr v-for="payment in payments" :key="payment.id" class="hover:bg-base-200/30 transition-colors">
               <td>
                 <div class="font-mono text-sm font-bold text-primary">{{ payment.number || `#${payment.id}` }}</div>
                 <div class="mt-1 max-w-44 truncate text-xs text-base-content/50">
@@ -153,24 +156,39 @@
                 <div class="text-xs text-base-content/40">{{ formatTime(payment.created_at) }}</div>
               </td>
               <td class="text-right">
-                <NuxtLinkLocale :to="`/admin/payments/${payment.id}`" class="btn btn-circle btn-text btn-sm" aria-label="View payment">
+                <NuxtLinkLocale :to="`/admin/payments/${payment.id}`" class="btn btn-circle btn-text btn-sm" :aria-label="t('common.view')">
                   <i class="icon-[tabler--eye] size-5"></i>
                 </NuxtLinkLocale>
               </td>
             </tr>
-            <tr v-if="filteredPayments.length === 0">
+            <tr v-if="payments.length === 0">
               <td colspan="8" class="py-20 text-center text-base-content/50 italic">
-                No payments found.
+                {{ t('admin.payments.empty') }}
               </td>
             </tr>
           </tbody>
         </table>
+        </div>
+
+        <AdminPagination
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :current-count="payments.length"
+          :total="paymentsData?.total || 0"
+          :pending="paymentsPending"
+          :summary="t('admin.payments.pagination.showing', { current: payments.length, total: paymentsData?.total || 0 })"
+          :previous-label="t('admin.payments.pagination.previous')"
+          :next-label="t('admin.payments.pagination.next')"
+          @change="changePage"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { AdminPaginatedResponse } from '~/types'
+
 definePageMeta({
   layout: 'admin'
 })
@@ -205,20 +223,38 @@ interface AdminPaymentGateway {
   code: string
 }
 
+interface AdminPaymentListResponse extends AdminPaginatedResponse<AdminPayment> {
+  currencies: string[]
+}
+
+const { t } = useI18n()
 const { useApiFetch } = useApi()
 
 const searchQuery = ref('')
+const debouncedSearchQuery = ref('')
 const selectedStatus = ref('')
 const selectedGateway = ref('')
 const selectedCurrency = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
 
 const {
   pending: paymentsPending,
   data: paymentsData,
   error: paymentsError
-} = await useApiFetch<AdminPayment[]>(
+} = await useApiFetch<AdminPaymentListResponse>(
   '/api/admin/payments',
-  { key: 'admin-payments-list' }
+  {
+    key: 'admin-payments-list',
+    query: computed(() => ({
+      page: currentPage.value,
+      page_size: pageSize.value,
+      search: debouncedSearchQuery.value || undefined,
+      status: selectedStatus.value || undefined,
+      gateway_id: selectedGateway.value || undefined,
+      currency: selectedCurrency.value || undefined
+    }))
+  }
 )
 
 const {
@@ -237,7 +273,7 @@ const {
   { key: 'admin-payment-gateways-for-payments' }
 )
 
-const payments = computed(() => paymentsData.value ?? [])
+const payments = computed(() => paymentsData.value?.items ?? [])
 const methods = computed(() => methodsData.value ?? [])
 const gateways = computed(() => gatewaysData.value ?? [])
 
@@ -250,60 +286,49 @@ const gatewayById = computed(() => {
 })
 
 const currencies = computed(() => {
-  return [...new Set(payments.value.map(payment => payment.currency).filter(Boolean) as string[])].sort()
+  return paymentsData.value?.currencies ?? []
 })
 
 const paymentStatuses = [
-  { value: 1, label: 'Checkout', badge: 'badge-neutral' },
-  { value: 2, label: 'Pending', badge: 'badge-warning' },
-  { value: 3, label: 'Processing', badge: 'badge-info' },
-  { value: 4, label: 'Authorized', badge: 'badge-primary' },
-  { value: 5, label: 'Captured', badge: 'badge-success' },
-  { value: 6, label: 'Failed', badge: 'badge-error' },
-  { value: 7, label: 'Voided', badge: 'badge-neutral' },
-  { value: 8, label: 'Cancelled', badge: 'badge-neutral' },
-  { value: 9, label: 'Refunded', badge: 'badge-info' },
-  { value: 10, label: 'Partially refunded', badge: 'badge-warning' }
+  { value: 1, label: t('admin.payments.status.checkout'), badge: 'badge-neutral' },
+  { value: 2, label: t('admin.payments.status.pending'), badge: 'badge-warning' },
+  { value: 3, label: t('admin.payments.status.processing'), badge: 'badge-info' },
+  { value: 4, label: t('admin.payments.status.authorized'), badge: 'badge-primary' },
+  { value: 5, label: t('admin.payments.status.captured'), badge: 'badge-success' },
+  { value: 6, label: t('admin.payments.status.failed'), badge: 'badge-error' },
+  { value: 7, label: t('admin.payments.status.voided'), badge: 'badge-neutral' },
+  { value: 8, label: t('admin.payments.status.cancelled'), badge: 'badge-neutral' },
+  { value: 9, label: t('admin.payments.status.refunded'), badge: 'badge-info' },
+  { value: 10, label: t('admin.payments.status.partiallyRefunded'), badge: 'badge-warning' }
 ]
 
 const statusByValue = new Map(paymentStatuses.map(status => [status.value, status]))
 
-const filteredPayments = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase()
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-  return payments.value
-    .filter(payment => {
-      const method = methodById.value.get(payment.payment_method_id)
-      const gateway = method?.payment_gateway_id ? gatewayById.value.get(method.payment_gateway_id) : null
-      const haystack = [
-        payment.id,
-        payment.number,
-        payment.order_id,
-        payment.transaction_id,
-        payment.external_payment_id,
-        payment.external_status,
-        payment.idempotency_key,
-        method?.name,
-        method?.code,
-        gateway?.name,
-        gateway?.code
-      ].filter(Boolean).join(' ').toLowerCase()
+watch(searchQuery, (value) => {
+  currentPage.value = 1
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = value.trim()
+  }, 250)
+})
 
-      const matchesSearch = !query || haystack.includes(query)
-      const matchesStatus = !selectedStatus.value || Number(payment.status) === Number(selectedStatus.value)
-      const matchesGateway = !selectedGateway.value || method?.payment_gateway_id === Number(selectedGateway.value)
-      const matchesCurrency = !selectedCurrency.value || payment.currency === selectedCurrency.value
-
-      return matchesSearch && matchesStatus && matchesGateway && matchesCurrency
-    })
-    .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+watch([selectedStatus, selectedGateway, selectedCurrency], () => {
+  currentPage.value = 1
 })
 
 function resetFilters() {
   searchQuery.value = ''
+  debouncedSearchQuery.value = ''
   selectedStatus.value = ''
   selectedGateway.value = ''
   selectedCurrency.value = ''
+  currentPage.value = 1
+}
+
+function changePage(page: number) {
+  currentPage.value = Math.max(1, page)
 }
 
 function paymentMethodName(paymentMethodId: number) {
@@ -316,12 +341,12 @@ function paymentMethodCode(paymentMethodId: number) {
 
 function paymentGatewayName(paymentMethodId: number) {
   const method = methodById.value.get(paymentMethodId)
-  if (!method?.payment_gateway_id) return 'Manual'
+  if (!method?.payment_gateway_id) return t('admin.payments.gateway.manual')
   return gatewayById.value.get(method.payment_gateway_id)?.name || `Gateway #${method.payment_gateway_id}`
 }
 
 function statusLabel(status: unknown) {
-  return statusByValue.get(Number(status))?.label || 'Unknown'
+  return statusByValue.get(Number(status))?.label || t('admin.payments.status.unknown')
 }
 
 function statusBadgeClass(status: unknown) {
@@ -341,4 +366,8 @@ function formatTime(dateString?: string | null) {
   if (!dateString) return ''
   return new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }).format(new Date(dateString))
 }
+
+onBeforeUnmount(() => {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+})
 </script>

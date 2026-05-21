@@ -2,8 +2,11 @@
 #![allow(clippy::unnecessary_struct_initialization)]
 #![allow(clippy::unused_async)]
 use axum::debug_handler;
+use axum::extract::Query;
 use loco_rs::prelude::*;
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QueryOrder, QuerySelect};
+use sea_orm::{
+    ColumnTrait, Condition, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::{
@@ -12,6 +15,7 @@ use crate::models::_entities::{
 };
 use crate::payment_gateways::registry::gateway_for_driver;
 use crate::payment_gateways::types::{CapturePaymentInput, RefundPaymentInput, VoidPaymentInput};
+use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams};
 
 #[derive(Serialize)]
 pub struct PaymentDetailJson {
@@ -28,14 +32,121 @@ pub struct RefundParams {
     pub reason: Option<String>,
 }
 
-#[debug_handler]
-pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
-    let items = payments::Entity::find()
-        .order_by_desc(payments::Column::CreatedAt)
-        .all(&ctx.db)
-        .await?;
+#[derive(Debug, Deserialize)]
+pub struct AdminPaymentListParams {
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
+    pub search: Option<String>,
+    pub status: Option<i32>,
+    pub gateway_id: Option<i32>,
+    pub currency: Option<String>,
+}
 
-    format::json(items)
+#[derive(Debug, Serialize)]
+pub struct AdminPaymentListResponse {
+    pub items: Vec<payments::Model>,
+    pub total: u64,
+    pub page: u64,
+    pub page_size: u64,
+    pub currencies: Vec<String>,
+}
+
+#[debug_handler]
+pub async fn list(
+    State(ctx): State<AppContext>,
+    Query(params): Query<AdminPaymentListParams>,
+) -> Result<Response> {
+    let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let mut query = payments::Entity::find()
+        .order_by_desc(payments::Column::CreatedAt)
+        .order_by_desc(payments::Column::Id);
+
+    if let Some(status) = params.status {
+        query = query.filter(payments::Column::Status.eq(status));
+    }
+
+    if let Some(currency) = params
+        .currency
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        query = query.filter(payments::Column::Currency.eq(currency.to_uppercase()));
+    }
+
+    if let Some(gateway_id) = params.gateway_id {
+        let method_ids = payment_methods::Entity::find()
+            .select_only()
+            .column(payment_methods::Column::Id)
+            .filter(payment_methods::Column::PaymentGatewayId.eq(gateway_id))
+            .into_tuple::<i32>()
+            .all(&ctx.db)
+            .await?;
+
+        if method_ids.is_empty() {
+            return format::json(AdminPaymentListResponse {
+                items: Vec::new(),
+                total: 0,
+                page: pagination.page(),
+                page_size: pagination.page_size(),
+                currencies: Vec::new(),
+            });
+        }
+
+        query = query.filter(payments::Column::PaymentMethodId.is_in(method_ids));
+    }
+
+    if let Some(search) = params
+        .search
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        let mut condition = Condition::any()
+            .add(payments::Column::Number.contains(search))
+            .add(payments::Column::TransactionId.contains(search))
+            .add(payments::Column::ExternalPaymentId.contains(search))
+            .add(payments::Column::ExternalStatus.contains(search))
+            .add(payments::Column::IdempotencyKey.contains(search))
+            .add(payments::Column::FailureCode.contains(search))
+            .add(payments::Column::FailureMessage.contains(search));
+
+        if let Ok(identifier) = search.parse::<i32>() {
+            condition = condition
+                .add(payments::Column::Id.eq(identifier))
+                .add(payments::Column::OrderId.eq(identifier))
+                .add(payments::Column::PaymentMethodId.eq(identifier));
+        }
+
+        query = query.filter(condition);
+    }
+
+    let total = query.clone().count(&ctx.db).await?;
+    let currencies = query
+        .clone()
+        .select_only()
+        .column(payments::Column::Currency)
+        .into_tuple::<Option<String>>()
+        .all(&ctx.db)
+        .await?
+        .into_iter()
+        .flatten()
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect::<Vec<_>>();
+    let items = query
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+    let response = AdminPaginatedResponse::new(items, total, pagination);
+
+    format::json(AdminPaymentListResponse {
+        items: response.items,
+        total: response.total,
+        page: response.page,
+        page_size: response.page_size,
+        currencies,
+    })
 }
 
 #[debug_handler]

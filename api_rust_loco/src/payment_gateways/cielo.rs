@@ -12,7 +12,7 @@ use crate::payment_gateways::drivers::CIELO_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
+    RefundPaymentInput, VoidPaymentInput, WebhookAction, WebhookDecision, WebhookInput,
 };
 
 const CIELO_CHECKOUT_BASE: &str = "https://cieloecommerce.cielo.com.br/api/public";
@@ -128,10 +128,12 @@ impl PaymentGateway for CieloGateway {
                 .or_else(|| string_field(value, "OrderNumber"))
         });
 
-        let action = external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
-            external_payment_id: id.to_string(),
-            status: cielo_attempt_status(event_type.as_deref()),
-        });
+        let action = external_event_id
+            .as_ref()
+            .map(|id| WebhookAction::UpdatePaymentStatus {
+                external_payment_id: id.to_string(),
+                status: cielo_attempt_status(event_type.as_deref()),
+            });
 
         Ok(WebhookDecision {
             event_type,

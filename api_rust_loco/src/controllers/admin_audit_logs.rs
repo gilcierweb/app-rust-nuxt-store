@@ -5,9 +5,10 @@ use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
 use sea_orm::{ColumnTrait, Condition, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::models::_entities::admin_audit_logs;
+use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams};
 
 #[derive(Debug, Deserialize)]
 pub struct AuditLogParams {
@@ -19,27 +20,24 @@ pub struct AuditLogParams {
     pub search: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
-pub struct AuditLogsResponse {
-    pub items: Vec<admin_audit_logs::Model>,
-    pub total: u64,
-    pub page: u64,
-    pub page_size: u64,
-}
-
 #[debug_handler]
 pub async fn list(
     State(ctx): State<AppContext>,
     Query(params): Query<AuditLogParams>,
 ) -> Result<Response> {
-    let page = params.page.unwrap_or(1).max(1);
-    let page_size = params.page_size.unwrap_or(25).clamp(1, 100);
+    let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let page_size = pagination.page_size();
 
     let mut query = admin_audit_logs::Entity::find()
         .order_by_desc(admin_audit_logs::Column::CreatedAt)
         .order_by_desc(admin_audit_logs::Column::Id);
 
-    if let Some(action) = params.action.as_deref().map(str::trim).filter(|value| !value.is_empty()) {
+    if let Some(action) = params
+        .action
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
         query = query.filter(admin_audit_logs::Column::Action.eq(action));
     }
 
@@ -56,7 +54,12 @@ pub async fn list(
         query = query.filter(admin_audit_logs::Column::ActorUserId.eq(actor_user_id));
     }
 
-    if let Some(search) = params.search.as_deref().map(str::trim).filter(|value| !value.is_empty()) {
+    if let Some(search) = params
+        .search
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
         query = query.filter(
             Condition::any()
                 .add(admin_audit_logs::Column::ActorName.contains(search))
@@ -69,14 +72,12 @@ pub async fn list(
     }
 
     let total = query.clone().count(&ctx.db).await?;
-    let items = query.paginate(&ctx.db, page_size).fetch_page(page - 1).await?;
+    let items = query
+        .paginate(&ctx.db, page_size)
+        .fetch_page(pagination.page_index())
+        .await?;
 
-    format::json(AuditLogsResponse {
-        items,
-        total,
-        page,
-        page_size,
-    })
+    format::json(AdminPaginatedResponse::new(items, total, pagination))
 }
 
 pub fn routes() -> Routes {

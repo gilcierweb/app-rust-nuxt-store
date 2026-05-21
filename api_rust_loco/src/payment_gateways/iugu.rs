@@ -14,7 +14,7 @@ use crate::payment_gateways::drivers::IUGU_DRIVER;
 use crate::payment_gateways::types::{
     CapturePaymentInput, CreatePaymentSessionInput, CreateSetupSessionInput, PaymentGateway,
     PaymentOperationOutput, PaymentSessionOutput, PaymentSetupSessionOutput, RefundOutput,
-    RefundPaymentInput, VoidPaymentInput, WebhookDecision, WebhookInput, WebhookAction,
+    RefundPaymentInput, VoidPaymentInput, WebhookAction, WebhookDecision, WebhookInput,
 };
 
 const IUGU_BASE: &str = "https://api.iugu.com/v1";
@@ -126,13 +126,18 @@ impl PaymentGateway for IuguGateway {
         let action = match event_type.as_deref() {
             Some("invoice.status_changed" | "invoice.refund") => {
                 let status_str = parsed.as_ref().and_then(|v| {
-                    string_field(v, "status")
-                        .or_else(|| v.pointer("/data/status").and_then(Value::as_str).map(ToString::to_string))
+                    string_field(v, "status").or_else(|| {
+                        v.pointer("/data/status")
+                            .and_then(Value::as_str)
+                            .map(ToString::to_string)
+                    })
                 });
-                external_event_id.as_ref().map(|id| WebhookAction::UpdatePaymentStatus {
-                    external_payment_id: id.to_string(),
-                    status: iugu_attempt_status(status_str.as_deref()),
-                })
+                external_event_id
+                    .as_ref()
+                    .map(|id| WebhookAction::UpdatePaymentStatus {
+                        external_payment_id: id.to_string(),
+                        status: iugu_attempt_status(status_str.as_deref()),
+                    })
             }
             _ => None,
         };

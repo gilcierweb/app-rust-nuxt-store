@@ -4,20 +4,25 @@
       <h1 class="h1">{{ $t('admin.customers.title') }}</h1>
     </div>
 
-    <div class="mb-6 justify-between flex items-center">
-      <form @submit.prevent="handleSearch">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div class="card shadow-base-300/10 mb-6 shadow-md">
+      <div class="card-body">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <div></div>
+          <NuxtLinkLocale to="/admin/customers/new" class="btn btn-success">{{ $t('admin.customers.add') }}</NuxtLinkLocale>
+        </div>
+
+        <form @submit.prevent="handleSearch">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto]">
           <input
             v-model="searchQuery"
             type="text"
             :placeholder="$t('admin.customers.searchPlaceholder')"
-            class="input input-bordered w-full mb-4"
+            class="input input-bordered w-full"
           />
           <button type="submit" class="btn btn-primary">{{ $t('common.search') }}</button>
-        </div>
-      </form>
-
-      <NuxtLinkLocale to="/admin/customers/new" class="btn btn-success">{{ $t('admin.customers.add') }}</NuxtLinkLocale>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -35,14 +40,15 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="filteredProfiles.length === 0" class="text-center py-12">
+    <div v-else-if="profiles.length === 0" class="text-center py-12">
       <p class="text-gray-500 text-lg">{{ $t('admin.customers.notFound') }}</p>
       <NuxtLinkLocale to="/admin/customers/new" class="btn btn-primary mt-4">{{ $t('admin.customers.createFirst') }}</NuxtLinkLocale>
     </div>
 
     <!-- Profiles Table -->
-    <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
-      <div class="overflow-x-auto">
+    <div v-else class="card shadow-base-300/10 w-full shadow-md overflow-hidden">
+      <div class="card-body p-0">
+        <div class="overflow-x-auto">
         <table class="table">
           <thead>
             <tr>
@@ -55,7 +61,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="profile in filteredProfiles" :key="profile.id" class="row-hover">
+            <tr v-for="profile in profiles" :key="profile.id" class="row-hover">
               <td>
                 <div class="flex items-center gap-3">
                   <div v-if="profile.avatar" class="avatar">
@@ -102,13 +108,26 @@
             </tr>
           </tbody>
         </table>
+        </div>
+
+        <AdminPagination
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :current-count="profiles.length"
+          :total="data?.total || 0"
+          :pending="pending"
+          :summary="$t('admin.customers.pagination.showing', { current: profiles.length, total: data?.total || 0 })"
+          :previous-label="$t('admin.customers.pagination.previous')"
+          :next-label="$t('admin.customers.pagination.next')"
+          @change="changePage"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Profile } from '~/types'
+import type { AdminPaginatedResponse, Profile } from '~/types'
 
 definePageMeta({
   layout: 'admin'
@@ -120,25 +139,23 @@ const toast = useAppToast()
 const dialog = useAppDialog()
 
 const searchQuery = ref('')
+const appliedSearchQuery = ref('')
+const currentPage = ref(1)
+const pageSize = ref(20)
 
-const { pending, data: profiles, error, refresh } = await useApiFetch<Profile[]>(
+const { pending, data, error, refresh } = await useApiFetch<AdminPaginatedResponse<Profile>>(
   '/api/admin/profiles',
-  { key: 'admin-customers-list' }
+  {
+    key: 'admin-customers-list',
+    query: computed(() => ({
+      page: currentPage.value,
+      page_size: pageSize.value,
+      search: appliedSearchQuery.value || undefined
+    }))
+  }
 )
 
-// Filtered profiles based on search
-const filteredProfiles = computed(() => {
-  if (!profiles.value) return []
-  if (!searchQuery.value.trim()) return profiles.value
-
-  const query = searchQuery.value.toLowerCase()
-  return profiles.value.filter(profile =>
-    profile.first_name?.toLowerCase().includes(query) ||
-    profile.last_name?.toLowerCase().includes(query) ||
-    profile.full_name?.toLowerCase().includes(query) ||
-    profile.username?.toLowerCase().includes(query)
-  )
-})
+const profiles = computed(() => data.value?.items || [])
 
 // Get initials from name
 const getInitials = (name?: string) => {
@@ -156,12 +173,15 @@ const formatDate = (dateString: string) => {
   }).format(new Date(dateString))
 }
 
-// Search handler
 const handleSearch = () => {
-  // Search is handled reactively via computed
+  currentPage.value = 1
+  appliedSearchQuery.value = searchQuery.value.trim()
 }
 
-// Delete confirmation
+const changePage = (page: number) => {
+  currentPage.value = Math.max(1, page)
+}
+
 const confirmDelete = async (profile: Profile) => {
   const name = profile.full_name || `${profile.first_name} ${profile.last_name}`
   const confirmed = await dialog.confirm({

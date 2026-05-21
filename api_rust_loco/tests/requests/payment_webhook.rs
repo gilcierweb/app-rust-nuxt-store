@@ -1,12 +1,12 @@
 use api_rust_loco::app::App;
-use api_rust_loco::models::_entities::{payment_gateways, payment_gateway_events};
+use api_rust_loco::models::_entities::{payment_gateway_events, payment_gateways};
 use api_rust_loco::models::payment_gateway_status::PaymentGatewayEventStatus;
 use api_rust_loco::payment_gateways::drivers::MANUAL_DRIVER;
 use loco_rs::app::AppContext;
 use loco_rs::testing::prelude::*;
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, EntityTrait, QueryFilter, ColumnTrait};
-use serial_test::serial;
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, QueryFilter};
 use serde_json::Value;
+use serial_test::serial;
 
 async fn setup_webhook_gateway(ctx: &AppContext, driver: &str) -> payment_gateways::Model {
     let now = chrono::Utc::now();
@@ -111,11 +111,14 @@ async fn webhook_invalid_signature_fails() {
             // Missing stripe signature header
             .json(&payload)
             .await;
-        
+
         assert_eq!(res.status_code(), 200);
         let json: Value = serde_json::from_str(&res.text()).unwrap();
         assert_eq!(json["signature_valid"], false);
-        assert_eq!(json["status"], PaymentGatewayEventStatus::Failed.to_i16() as i32);
+        assert_eq!(
+            json["status"],
+            PaymentGatewayEventStatus::Failed.to_i16() as i32
+        );
 
         let events = payment_gateway_events::Entity::find()
             .filter(payment_gateway_events::Column::PaymentGatewayId.eq(gateway.id))
@@ -164,8 +167,12 @@ async fn webhook_state_transition_works() {
 
         let order = api_rust_loco::models::_entities::orders::ActiveModel {
             user_id: Set(user.id),
-            status: Set(Some(api_rust_loco::models::order_status::OrderStatus::Pending.to_i32())),
-            payment_status: Set(Some(api_rust_loco::models::order_status::PaymentStatus::Unpaid.to_i32())),
+            status: Set(Some(
+                api_rust_loco::models::order_status::OrderStatus::Pending.to_i32(),
+            )),
+            payment_status: Set(Some(
+                api_rust_loco::models::order_status::PaymentStatus::Unpaid.to_i32(),
+            )),
             total_amount: Set(Some(rust_decimal::Decimal::new(1000, 2))),
             created_at: Set(now.into()),
             updated_at: Set(now.into()),
@@ -179,8 +186,13 @@ async fn webhook_state_transition_works() {
             order_id: Set(order.id),
             payment_method_id: Set(method.id),
             amount: Set(Some(rust_decimal::Decimal::new(1000, 2))),
-            status: Set(Some(api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Pending.to_i16() as i32)),
-            intent: Set(api_rust_loco::models::payment_gateway_status::PaymentIntent::Purchase.to_i16()),
+            status: Set(Some(
+                api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Pending
+                    .to_i16() as i32,
+            )),
+            intent: Set(
+                api_rust_loco::models::payment_gateway_status::PaymentIntent::Purchase.to_i16(),
+            ),
             created_at: Set(now.into()),
             updated_at: Set(now.into()),
             ..Default::default()
@@ -204,20 +216,30 @@ async fn webhook_state_transition_works() {
             .post(&format!("/api/webhooks/payments/{}", gateway.code))
             .json(&payload)
             .await;
-        
+
         assert_eq!(res.status_code(), 200);
         let json: Value = serde_json::from_str(&res.text()).unwrap();
         assert_eq!(json["signature_valid"], true);
         assert_eq!(json["processed"], true);
-        assert_eq!(json["status"], PaymentGatewayEventStatus::Processed.to_i16() as i32);
+        assert_eq!(
+            json["status"],
+            PaymentGatewayEventStatus::Processed.to_i16() as i32
+        );
 
         // Verify the payment status was updated to Captured
-        let updated_payment = api_rust_loco::models::_entities::payments::Entity::find_by_id(payment.id)
-            .one(&ctx.db)
-            .await
-            .unwrap()
-            .unwrap();
-        assert_eq!(updated_payment.status, Some(api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Captured.to_i16() as i32));
+        let updated_payment =
+            api_rust_loco::models::_entities::payments::Entity::find_by_id(payment.id)
+                .one(&ctx.db)
+                .await
+                .unwrap()
+                .unwrap();
+        assert_eq!(
+            updated_payment.status,
+            Some(
+                api_rust_loco::models::payment_gateway_status::PaymentAttemptStatus::Captured
+                    .to_i16() as i32
+            )
+        );
 
         // Verify the order payment status was updated to Paid
         let updated_order = api_rust_loco::models::_entities::orders::Entity::find_by_id(order.id)
@@ -225,7 +247,10 @@ async fn webhook_state_transition_works() {
             .await
             .unwrap()
             .unwrap();
-        assert_eq!(updated_order.payment_status, Some(api_rust_loco::models::order_status::PaymentStatus::Paid.to_i32()));
+        assert_eq!(
+            updated_order.payment_status,
+            Some(api_rust_loco::models::order_status::PaymentStatus::Paid.to_i32())
+        );
     })
     .await;
 }

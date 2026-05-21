@@ -17,13 +17,15 @@ pub fn with_api_key(request: &mut TestServer) {
 }
 
 pub mod address;
+pub mod admin_inventory;
+pub mod admin_payment_refunds;
+pub mod admin_payments;
 pub mod cart;
 pub mod category;
 pub mod coupon;
 pub mod dashboard;
 pub mod order;
 pub mod payment;
-pub mod admin_payment_refunds;
 pub mod post;
 pub mod product;
 pub mod profile;

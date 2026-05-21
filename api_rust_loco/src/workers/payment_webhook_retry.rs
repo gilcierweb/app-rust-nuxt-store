@@ -26,7 +26,10 @@ impl BackgroundWorker<WorkerArgs> for Worker {
 
         // Find failed events that have valid signatures and haven't been processed
         let failed_events = payment_gateway_events::Entity::find()
-            .filter(payment_gateway_events::Column::Status.eq(PaymentGatewayEventStatus::Failed.to_i16()))
+            .filter(
+                payment_gateway_events::Column::Status
+                    .eq(PaymentGatewayEventStatus::Failed.to_i16()),
+            )
             .filter(payment_gateway_events::Column::SignatureValid.eq(true))
             .filter(payment_gateway_events::Column::ProcessedAt.is_null())
             .all(db)
@@ -35,7 +38,11 @@ impl BackgroundWorker<WorkerArgs> for Worker {
         for event in failed_events {
             println!("Retrying webhook event {}...", event.id);
             let event_id = event.id;
-            if let Ok(Some(gateway)) = payment_gateways::Entity::find_by_id(event.payment_gateway_id).one(db).await {
+            if let Ok(Some(gateway)) =
+                payment_gateways::Entity::find_by_id(event.payment_gateway_id)
+                    .one(db)
+                    .await
+            {
                 if let Ok(gateway_driver) = gateway_for_driver(&gateway.driver) {
                     // Re-parse the payload by calling handle_webhook with empty headers.
                     // This will fail signature validation, but will still extract the action.
@@ -49,26 +56,40 @@ impl BackgroundWorker<WorkerArgs> for Worker {
                         if let Some(action) = &decision.action {
                             match apply_webhook_action(db, gateway.id, action).await {
                                 Ok(_) => {
-                                    let mut active_event: payment_gateway_events::ActiveModel = event.into();
-                                    active_event.status = Set(PaymentGatewayEventStatus::Processed.to_i16());
-                                    active_event.processed_at = Set(Some(chrono::Utc::now().naive_utc()));
+                                    let mut active_event: payment_gateway_events::ActiveModel =
+                                        event.into();
+                                    active_event.status =
+                                        Set(PaymentGatewayEventStatus::Processed.to_i16());
+                                    active_event.processed_at =
+                                        Set(Some(chrono::Utc::now().naive_utc()));
                                     active_event.failure_message = Set(None);
                                     active_event.updated_at = Set(chrono::Utc::now().into());
                                     if let Err(e) = active_event.update(db).await {
-                                        tracing::error!("Failed to update event {} status after retry: {}", event_id, e);
+                                        tracing::error!(
+                                            "Failed to update event {} status after retry: {}",
+                                            event_id,
+                                            e
+                                        );
                                     }
                                 }
                                 Err(e) => {
-                                    tracing::error!("Retry for event {} failed to apply action: {}", event_id, e);
-                                    let mut active_event: payment_gateway_events::ActiveModel = event.into();
-                                    active_event.failure_message = Set(Some(format!("Retry failed: {}", e)));
+                                    tracing::error!(
+                                        "Retry for event {} failed to apply action: {}",
+                                        event_id,
+                                        e
+                                    );
+                                    let mut active_event: payment_gateway_events::ActiveModel =
+                                        event.into();
+                                    active_event.failure_message =
+                                        Set(Some(format!("Retry failed: {}", e)));
                                     active_event.updated_at = Set(chrono::Utc::now().into());
                                     let _ = active_event.update(db).await;
                                 }
                             }
                         } else {
                             // No action, mark ignored
-                            let mut active_event: payment_gateway_events::ActiveModel = event.into();
+                            let mut active_event: payment_gateway_events::ActiveModel =
+                                event.into();
                             active_event.status = Set(PaymentGatewayEventStatus::Ignored.to_i16());
                             active_event.processed_at = Set(Some(chrono::Utc::now().naive_utc()));
                             active_event.updated_at = Set(chrono::Utc::now().into());

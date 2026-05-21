@@ -20,6 +20,13 @@ export interface ProductResponse {
   limit: number;
 }
 
+export interface AdminPaginatedResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  page_size: number
+}
+
 export interface CreateProductPayload extends Omit<Product, 'id'> {}
 export interface UpdateProductPayload extends Partial<Omit<Product, 'id'>> {}
 

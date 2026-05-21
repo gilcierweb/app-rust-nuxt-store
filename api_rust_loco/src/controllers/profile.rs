@@ -4,13 +4,13 @@
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
-use sea_orm::{PaginatorTrait, QueryOrder};
+use sea_orm::{ColumnTrait, Condition, PaginatorTrait, QueryFilter, QueryOrder};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::cache::{invalidate_profiles_cache, profile_detail_cache, profiles_cache};
 use crate::models::_entities::profiles::{ActiveModel, Entity, Model};
-use crate::utils::pagination::PaginationParams;
+use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams, PaginationParams};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -24,6 +24,13 @@ pub struct Params {
     pub avatar: Option<String>,
     pub bio: Option<String>,
     pub whatsapp: Option<i64>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AdminProfileListParams {
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
+    pub search: Option<String>,
 }
 
 impl Params {
@@ -72,6 +79,46 @@ pub async fn list(
 }
 
 #[debug_handler]
+pub async fn admin_list(
+    State(ctx): State<AppContext>,
+    Query(params): Query<AdminProfileListParams>,
+) -> Result<Response> {
+    let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let mut query = Entity::find()
+        .order_by_desc(crate::models::_entities::profiles::Column::CreatedAt)
+        .order_by_desc(crate::models::_entities::profiles::Column::Id);
+
+    if let Some(search) = params
+        .search
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        let mut condition = Condition::any()
+            .add(crate::models::_entities::profiles::Column::FirstName.contains(search))
+            .add(crate::models::_entities::profiles::Column::LastName.contains(search))
+            .add(crate::models::_entities::profiles::Column::FullName.contains(search))
+            .add(crate::models::_entities::profiles::Column::Username.contains(search));
+
+        if let Ok(identifier) = search.parse::<i32>() {
+            condition = condition
+                .add(crate::models::_entities::profiles::Column::Id.eq(identifier))
+                .add(crate::models::_entities::profiles::Column::UserId.eq(identifier));
+        }
+
+        query = query.filter(condition);
+    }
+
+    let total = query.clone().count(&ctx.db).await?;
+    let items = query
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+
+    format::json(AdminPaginatedResponse::new(items, total, pagination))
+}
+
+#[debug_handler]
 pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
     let mut item = ActiveModel {
         ..Default::default()
@@ -116,17 +163,20 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/profiles/")
+    Routes::new()
+        .prefix("api/profiles/")
+        .add("/", get(list))
+        .add("/", post(add))
+        .add("{id}", get(get_one))
+        .add("{id}", delete(remove))
+        .add("{id}", put(update))
+        .add("{id}", patch(update))
 }
 
 pub fn admin_routes() -> Routes {
-    routes_with_prefix("api/admin/profiles/")
-}
-
-fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix(prefix)
-        .add("/", get(list))
+        .prefix("api/admin/profiles/")
+        .add("/", get(admin_list))
         .add("/", post(add))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))

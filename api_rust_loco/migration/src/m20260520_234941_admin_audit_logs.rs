@@ -13,12 +13,28 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk(AdminAuditLogs::Id))
                     .col(ColumnDef::new(AdminAuditLogs::ActorUserId).integer().null())
-                    .col(ColumnDef::new(AdminAuditLogs::ActorName).string().not_null())
-                    .col(ColumnDef::new(AdminAuditLogs::ActorEmail).string().not_null())
+                    .col(
+                        ColumnDef::new(AdminAuditLogs::ActorName)
+                            .string()
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(AdminAuditLogs::ActorEmail)
+                            .string()
+                            .not_null(),
+                    )
                     .col(ColumnDef::new(AdminAuditLogs::Action).string().not_null())
-                    .col(ColumnDef::new(AdminAuditLogs::ResourceType).string().not_null())
+                    .col(
+                        ColumnDef::new(AdminAuditLogs::ResourceType)
+                            .string()
+                            .not_null(),
+                    )
                     .col(ColumnDef::new(AdminAuditLogs::ResourceId).integer().null())
-                    .col(ColumnDef::new(AdminAuditLogs::ResourceLabel).string().null())
+                    .col(
+                        ColumnDef::new(AdminAuditLogs::ResourceLabel)
+                            .string()
+                            .null(),
+                    )
                     .col(ColumnDef::new(AdminAuditLogs::Message).text().null())
                     .col(timestamptz(AdminAuditLogs::CreatedAt))
                     .foreign_key(

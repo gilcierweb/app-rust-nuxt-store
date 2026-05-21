@@ -8,8 +8,8 @@ use axum::extract::{Extension, Query};
 use loco_rs::hash;
 use loco_rs::prelude::*;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, IntoActiveModel, PaginatorTrait, QueryFilter,
-    QueryOrder, Set, TransactionTrait,
+    ActiveModelTrait, ColumnTrait, Condition, EntityTrait, IntoActiveModel, PaginatorTrait,
+    QueryFilter, QueryOrder, Set, TransactionTrait,
 };
 use serde::{Deserialize, Serialize};
 
@@ -19,7 +19,7 @@ use crate::models::_entities::users::{ActiveModel, Entity, Model};
 use crate::models::_entities::users_roles;
 use crate::models::ability::{Ability, Action, Resource, Subject};
 use crate::services::admin_audit_logs;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams, PaginationParams};
 
 const ALLOWED_GLOBAL_ROLES: &[&str] = &[
     "admin",
@@ -63,6 +63,13 @@ pub struct UserParams {
     pub password: Option<String>,
     pub role: Option<String>,
     pub active: Option<bool>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct AdminUserListParams {
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
+    pub search: Option<String>,
 }
 
 impl UserParams {
@@ -156,6 +163,41 @@ fn to_detail(user: Model, roles: Vec<String>) -> UserDetail {
         created_at: user.created_at,
         updated_at: user.updated_at,
     }
+}
+
+async fn build_list_items(ctx: &AppContext, items: Vec<Model>) -> Result<Vec<UserListItem>> {
+    if items.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let user_ids: Vec<i32> = items.iter().map(|user| user.id).collect();
+
+    use crate::models::_entities::roles::Entity as RoleEntity;
+    use crate::models::_entities::users_roles::Entity as UserRoleEntity;
+
+    let all_users_roles = UserRoleEntity::find()
+        .filter(crate::models::_entities::users_roles::Column::UserId.is_in(user_ids))
+        .find_also_related(RoleEntity)
+        .all(&ctx.db)
+        .await?;
+
+    let mut roles_by_user: HashMap<i32, Vec<String>> = HashMap::new();
+    for (user_role, role) in all_users_roles {
+        if let Some(role) = role {
+            roles_by_user
+                .entry(user_role.user_id)
+                .or_default()
+                .push(role.name);
+        }
+    }
+
+    let mut response = Vec::with_capacity(items.len());
+    for item in items {
+        let roles = roles_by_user.remove(&item.id).unwrap_or_default();
+        response.push(to_list_item(item, roles));
+    }
+
+    Ok(response)
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
@@ -281,38 +323,52 @@ pub async fn list(
         .fetch_page(pagination.page_index())
         .await?;
 
-    if items.is_empty() {
-        return format::json(Vec::<UserListItem>::new());
-    }
-
-    // Optimization: Fetch all roles for all displayed users in one go
-    let user_ids: Vec<i32> = items.iter().map(|u| u.id).collect();
-
-    use crate::models::_entities::roles::Entity as RoleEntity;
-    use crate::models::_entities::users_roles::Entity as UserRoleEntity;
-
-    let all_users_roles = UserRoleEntity::find()
-        .filter(crate::models::_entities::users_roles::Column::UserId.is_in(user_ids))
-        .find_also_related(RoleEntity)
-        .all(&ctx.db)
-        .await?;
-
-    let mut roles_by_user: HashMap<i32, Vec<String>> = HashMap::new();
-    for (user_role, role) in all_users_roles {
-        if let Some(role) = role {
-            roles_by_user
-                .entry(user_role.user_id)
-                .or_default()
-                .push(role.name);
-        }
-    }
-
-    let mut response = Vec::with_capacity(items.len());
-    for item in items {
-        let roles = roles_by_user.remove(&item.id).unwrap_or_default();
-        response.push(to_list_item(item, roles));
-    }
+    let response = build_list_items(&ctx, items).await?;
     format::json(response)
+}
+
+#[debug_handler]
+pub async fn admin_list(
+    auth: CookieJWT,
+    admin_session: Option<Extension<AdminSession>>,
+    State(ctx): State<AppContext>,
+    Query(params): Query<AdminUserListParams>,
+) -> Result<Response> {
+    let (current_user_id, ability) =
+        resolve_user_and_ability(&ctx, &auth.claims.pid, admin_session).await?;
+    ability.authorize(Action::Read, Subject::Admin)?;
+
+    let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let mut query = ability
+        .accessible_users_query(Action::Read, current_user_id)
+        .order_by_desc(crate::models::_entities::users::Column::CreatedAt)
+        .order_by_desc(crate::models::_entities::users::Column::Id);
+
+    if let Some(search) = params
+        .search
+        .as_deref()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+    {
+        let mut condition = Condition::any()
+            .add(crate::models::_entities::users::Column::Email.contains(search))
+            .add(crate::models::_entities::users::Column::Name.contains(search));
+
+        if let Ok(user_id) = search.parse::<i32>() {
+            condition = condition.add(crate::models::_entities::users::Column::Id.eq(user_id));
+        }
+
+        query = query.filter(condition);
+    }
+
+    let total = query.clone().count(&ctx.db).await?;
+    let items = query
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+    let response = build_list_items(&ctx, items).await?;
+
+    format::json(AdminPaginatedResponse::new(response, total, pagination))
 }
 
 #[debug_handler]
@@ -480,7 +536,7 @@ pub fn routes() -> Routes {
 pub fn admin_routes() -> Routes {
     Routes::new()
         .prefix("api/admin/users/")
-        .add("/", get(list))
+        .add("/", get(admin_list))
         .add("/", post(add))
         .add("{id}", get(get_one))
         .add("{id}", put(update))

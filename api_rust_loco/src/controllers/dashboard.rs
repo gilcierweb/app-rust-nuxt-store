@@ -10,7 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::cache::dashboard_cache;
-use crate::models::_entities::{categories, order_items, orders, products, users, payments, payment_gateway_events};
+use crate::models::_entities::{
+    categories, order_items, orders, payment_gateway_events, payments, products, users,
+};
 use crate::models::payment_gateway_status::{PaymentAttemptStatus, PaymentGatewayEventStatus};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -138,7 +140,9 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
     let total_payments_fut = payments::Entity::find().count(&ctx.db);
 
     let webhook_failures_fut = payment_gateway_events::Entity::find()
-        .filter(payment_gateway_events::Column::Status.eq(PaymentGatewayEventStatus::Failed.to_i16()))
+        .filter(
+            payment_gateway_events::Column::Status.eq(PaymentGatewayEventStatus::Failed.to_i16()),
+        )
         .count(&ctx.db);
 
     // Execute all queries in parallel
@@ -220,7 +224,11 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         },
     ];
 
-    let total_refunds = total_refunds_res.and_then(|(total,)| total).unwrap_or_default().to_f64().unwrap_or(0.0);
+    let total_refunds = total_refunds_res
+        .and_then(|(total,)| total)
+        .unwrap_or_default()
+        .to_f64()
+        .unwrap_or(0.0);
     let failed_payment_rate = if total_payments > 0 {
         (failed_payments as f64 / total_payments as f64) * 100.0
     } else {

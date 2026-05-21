@@ -1,5 +1,5 @@
+pub use super::_entities::email_logs::{ActiveModel, Column, Entity, Model};
 use sea_orm::entity::prelude::*;
-pub use super::_entities::email_logs::{ActiveModel, Model, Entity, Column};
 pub type EmailLogs = Entity;
 
 #[async_trait::async_trait]

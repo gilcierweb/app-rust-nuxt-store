@@ -20,14 +20,14 @@ pub mod wishlist;
 
 pub mod payment_webhook;
 
-pub mod payment_setup_session;
+pub mod admin_emails;
 pub mod admin_inventory;
-pub mod admin_settings;
 pub mod admin_payment_gateways;
 pub mod admin_payment_methods;
-pub mod admin_payments;
 pub mod admin_payment_refunds;
+pub mod admin_payments;
 pub mod admin_rbac;
-pub mod admin_emails;
+pub mod admin_settings;
+pub mod payment_setup_session;
 
 pub mod admin_audit_logs;

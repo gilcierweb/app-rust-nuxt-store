@@ -568,6 +568,11 @@
       "error": "Erro ao carregar clientes: {message}",
       "notFound": "Nenhum cliente encontrado.",
       "createFirst": "Criar primeiro cliente",
+      "pagination": {
+        "showing": "Mostrando {current} de {total} clientes",
+        "previous": "Anterior",
+        "next": "Próximo"
+      },
       "table": {
         "name": "Nome",
         "username": "Username",
@@ -597,6 +602,11 @@
       "loading": "Carregando usuários...",
       "error": "Erro ao carregar usuários: {message}",
       "notFound": "Nenhum usuário encontrado.",
+      "pagination": {
+        "showing": "Mostrando {current} de {total} usuários",
+        "previous": "Anterior",
+        "next": "Próximo"
+      },
       "detail": {
         "emailVerified": "E-mail Verificado",
         "createdAt": "Criado Em",
@@ -821,10 +831,105 @@
       }
     },
     "payments": {
-      "title": "Pagamentos"
+      "title": "Pagamentos",
+      "description": "Revise tentativas de pagamento, referências do gateway e status operacional.",
+      "loading": "Carregando pagamentos...",
+      "error": "Erro ao carregar pagamentos: {message}",
+      "empty": "Nenhum pagamento encontrado.",
+      "actions": {
+        "events": "Eventos",
+        "logs": "Logs",
+        "refunds": "Reembolsos",
+        "gateways": "Gateways",
+        "methods": "Métodos"
+      },
+      "filters": {
+        "search": "Busca",
+        "searchPlaceholder": "Pagamento, pedido, transação, idempotency...",
+        "status": "Status",
+        "gateway": "Gateway",
+        "currency": "Moeda",
+        "allStatuses": "Todos os status",
+        "allGateways": "Todos os gateways",
+        "allCurrencies": "Todas as moedas",
+        "clear": "Limpar"
+      },
+      "table": {
+        "payment": "Pagamento",
+        "order": "Pedido",
+        "method": "Método",
+        "gateway": "Gateway",
+        "status": "Status",
+        "amount": "Valor",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "status": {
+        "checkout": "Checkout",
+        "pending": "Pendente",
+        "processing": "Processando",
+        "authorized": "Autorizado",
+        "captured": "Capturado",
+        "failed": "Falhou",
+        "voided": "Cancelado",
+        "cancelled": "Cancelado",
+        "refunded": "Reembolsado",
+        "partiallyRefunded": "Parcialmente reembolsado",
+        "unknown": "Desconhecido"
+      },
+      "gateway": {
+        "manual": "Manual"
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} pagamentos",
+        "previous": "Anterior",
+        "next": "Próximo"
+      }
     },
     "inventory": {
-      "title": "Estoque"
+      "title": "Estoque",
+      "description": "Acompanhe estoque por variante, reservas em carrinho e exposição de baixo estoque.",
+      "loading": "Carregando estoque...",
+      "error": "Erro ao carregar estoque: {message}",
+      "empty": "Nenhum item de estoque encontrado.",
+      "actions": {
+        "refresh": "Atualizar",
+        "editVariant": "Editar variante"
+      },
+      "metrics": {
+        "variants": "Variantes",
+        "onHand": "Em estoque",
+        "reserved": "Reservado",
+        "alerts": "Alertas"
+      },
+      "filters": {
+        "search": "Busca",
+        "searchPlaceholder": "Produto, variante, SKU...",
+        "status": "Status",
+        "lowThreshold": "Limite baixo",
+        "allStatuses": "Todos os status",
+        "clear": "Limpar"
+      },
+      "status": {
+        "out": "Sem estoque",
+        "low": "Estoque baixo",
+        "reserved": "Reservado",
+        "healthy": "Saudável"
+      },
+      "table": {
+        "item": "Item",
+        "sku": "SKU",
+        "status": "Status",
+        "onHand": "Em estoque",
+        "reserved": "Reservado",
+        "available": "Disponível",
+        "update": "Atualizar"
+      },
+      "pagination": {
+        "showing": "Mostrando {current} de {total} variantes",
+        "previous": "Anterior",
+        "next": "Próximo"
+      }
     },
     "emails": {
       "title": "E-mails Transacionais",

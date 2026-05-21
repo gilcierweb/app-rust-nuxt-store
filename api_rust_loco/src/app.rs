@@ -136,7 +136,9 @@ impl Hooks for App {
             .layer(middleware::from_fn(api_key_guard)))
     }
     async fn connect_workers(ctx: &AppContext, queue: &Queue) -> Result<()> {
-        queue.register(crate::workers::payment_webhook_retry::Worker::build(ctx)).await?;
+        queue
+            .register(crate::workers::payment_webhook_retry::Worker::build(ctx))
+            .await?;
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())
     }

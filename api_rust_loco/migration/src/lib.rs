@@ -48,8 +48,8 @@ mod m20260519_064108_payment_refunds;
 mod m20260519_064109_payment_gateway_events;
 mod m20260519_064110_payment_gateway_logs;
 mod m20260520_035158_product_variant_images;
-mod m20260520_120000_admin_settings;
 mod m20260520_065417_create_email_logs;
+mod m20260520_120000_admin_settings;
 mod m20260520_234941_admin_audit_logs;
 pub struct Migrator;
 

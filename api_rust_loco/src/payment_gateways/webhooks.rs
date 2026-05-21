@@ -112,7 +112,8 @@ where
                     }
                     Err(e) => {
                         decision.processed = false;
-                        decision.failure_message = Some(format!("failed to apply webhook action: {}", e));
+                        decision.failure_message =
+                            Some(format!("failed to apply webhook action: {}", e));
                     }
                 }
             } else {
@@ -236,7 +237,10 @@ where
     C: ConnectionTrait,
 {
     match action {
-        WebhookAction::UpdatePaymentStatus { external_payment_id, status } => {
+        WebhookAction::UpdatePaymentStatus {
+            external_payment_id,
+            status,
+        } => {
             let payment_opt = payments::Entity::find()
                 .filter(payments::Column::ExternalPaymentId.eq(external_payment_id.clone()))
                 .inner_join(payment_methods::Entity)
@@ -252,14 +256,23 @@ where
                 active_payment.updated_at = Set(now);
                 active_payment.update(db).await.map_err(|e| e.to_string())?;
 
-                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
+                if let Some(order) = orders::Entity::find_by_id(payment.order_id)
+                    .one(db)
+                    .await
+                    .map_err(|e| e.to_string())?
+                {
                     let mut active_order: orders::ActiveModel = order.into();
-                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
+                    active_order.payment_status = Set(Some(
+                        order_payment_status(Some(status.to_i16() as i32)).to_i32(),
+                    ));
                     active_order.updated_at = Set(now);
                     active_order.update(db).await.map_err(|e| e.to_string())?;
                 }
             } else {
-                return Err(format!("payment with external id {} not found", external_payment_id));
+                return Err(format!(
+                    "payment with external id {} not found",
+                    external_payment_id
+                ));
             }
             Ok(())
         }
@@ -278,9 +291,15 @@ where
                 active_payment.updated_at = Set(now);
                 active_payment.update(db).await.map_err(|e| e.to_string())?;
 
-                if let Some(order) = orders::Entity::find_by_id(payment.order_id).one(db).await.map_err(|e| e.to_string())? {
+                if let Some(order) = orders::Entity::find_by_id(payment.order_id)
+                    .one(db)
+                    .await
+                    .map_err(|e| e.to_string())?
+                {
                     let mut active_order: orders::ActiveModel = order.into();
-                    active_order.payment_status = Set(Some(order_payment_status(Some(status.to_i16() as i32)).to_i32()));
+                    active_order.payment_status = Set(Some(
+                        order_payment_status(Some(status.to_i16() as i32)).to_i32(),
+                    ));
                     active_order.updated_at = Set(now);
                     active_order.update(db).await.map_err(|e| e.to_string())?;
                 }

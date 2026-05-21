@@ -9,8 +9,8 @@ use api_rust_loco::{
 use loco_rs::testing::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::{ActiveModelTrait, ActiveValue::Set};
-use serial_test::serial;
 use serde_json::Value;
+use serial_test::serial;
 
 use super::prepare_data;
 use super::with_api_key;

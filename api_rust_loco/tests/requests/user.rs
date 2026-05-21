@@ -122,3 +122,47 @@ async fn admin_cannot_remove_own_admin_role() {
     })
     .await;
 }
+
+#[tokio::test]
+#[serial]
+async fn admin_can_list_users_with_search_and_pagination() {
+    request::<App, _, _>(|mut request, ctx| async move {
+        with_api_key(&mut request);
+        seed::<App>(&ctx).await.unwrap();
+        let csrf = login_admin(&request).await;
+        let (csrf_key, csrf_value) = prepare_data::csrf_header(&csrf);
+
+        for index in 0..3 {
+            let response = request
+                .post("/api/admin/users")
+                .add_header(csrf_key.clone(), csrf_value.clone())
+                .json(&serde_json::json!({
+                    "name": format!("Paged User {index}"),
+                    "email": format!("paged-user-{index}@example.com"),
+                    "password": "Password123!",
+                    "role": "support",
+                    "active": true
+                }))
+                .await;
+            assert_eq!(response.status_code(), 200);
+        }
+
+        let paged = request.get("/api/admin/users?page=1&page_size=2").await;
+        assert_eq!(paged.status_code(), 200);
+        let paged_payload: Value = serde_json::from_str(&paged.text()).unwrap();
+        assert_eq!(paged_payload["page"], 1);
+        assert_eq!(paged_payload["page_size"], 2);
+        assert_eq!(paged_payload["items"].as_array().unwrap().len(), 2);
+        assert!(paged_payload["total"].as_u64().unwrap() >= 3);
+
+        let filtered = request
+            .get("/api/admin/users?search=paged-user-1@example.com")
+            .await;
+        assert_eq!(filtered.status_code(), 200);
+        let filtered_payload: Value = serde_json::from_str(&filtered.text()).unwrap();
+        let items = filtered_payload["items"].as_array().unwrap();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0]["email"], "paged-user-1@example.com");
+    })
+    .await;
+}

@@ -25,9 +25,15 @@ where
     }
 
     let actor = users::Entity::find_by_id(actor_user_id).one(db).await?;
-    let (actor_name, actor_email) = actor
-        .map(|user| (user.name, user.email))
-        .unwrap_or_else(|| ("Unknown Admin".to_string(), "unknown@example.com".to_string()));
+    let (actor_name, actor_email) =
+        actor
+            .map(|user| (user.name, user.email))
+            .unwrap_or_else(|| {
+                (
+                    "Unknown Admin".to_string(),
+                    "unknown@example.com".to_string(),
+                )
+            });
 
     let now = chrono::Utc::now().into();
     Ok(admin_audit_logs::ActiveModel {

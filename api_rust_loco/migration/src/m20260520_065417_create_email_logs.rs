@@ -29,4 +29,3 @@ impl MigrationTrait for Migration {
         drop_table(m, "email_logs").await
     }
 }
-
