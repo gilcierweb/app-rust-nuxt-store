@@ -117,74 +117,13 @@
 
     <div v-else class="card shadow-base-300/10 w-full shadow-md overflow-hidden">
       <div class="card-body p-0">
-        <div class="overflow-x-auto">
-        <table class="table table-lg">
-          <thead class="bg-base-200/50">
-            <tr>
-              <th>{{ t('admin.inventory.table.item') }}</th>
-              <th>{{ t('admin.inventory.table.sku') }}</th>
-              <th>{{ t('admin.inventory.table.status') }}</th>
-              <th class="text-right">{{ t('admin.inventory.table.onHand') }}</th>
-              <th class="text-right">{{ t('admin.inventory.table.reserved') }}</th>
-              <th class="text-right">{{ t('admin.inventory.table.available') }}</th>
-              <th class="text-right">{{ t('admin.inventory.table.update') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in inventory" :key="item.variant_id" class="hover:bg-base-200/30 transition-colors">
-              <td>
-                <div class="font-bold">{{ item.product_name || `Product #${item.product_id}` }}</div>
-                <div class="mt-1 text-sm text-base-content/60">{{ item.variant_name || `Variant #${item.variant_id}` }}</div>
-                <NuxtLinkLocale :to="`/admin/products/${item.product_id}/variants/${item.variant_id}/edit`" class="link link-primary text-xs">
-                  {{ t('admin.inventory.actions.editVariant') }}
-                </NuxtLinkLocale>
-              </td>
-              <td class="font-mono text-sm">{{ item.sku || '-' }}</td>
-              <td>
-                <span :class="['badge badge-soft badge-sm', statusBadgeClass(item)]">
-                  {{ statusLabel(item) }}
-                </span>
-                <div v-if="item.active === false" class="mt-1 text-xs text-base-content/50">{{ t('common.status.inactive') }}</div>
-              </td>
-              <td class="text-right font-bold">{{ stockQuantity(item) }}</td>
-              <td class="text-right">{{ item.reserved_quantity }}</td>
-              <td class="text-right" :class="availableQuantity(item) <= lowStockThreshold ? 'text-warning font-bold' : 'font-medium'">
-                {{ availableQuantity(item) }}
-              </td>
-              <td class="text-right">
-                <div class="flex justify-end gap-2">
-                  <input
-                    v-model.number="draftQuantities[item.variant_id]"
-                    class="input input-bordered input-sm w-24 text-right"
-                    min="0"
-                    type="number"
-                  />
-                  <button class="btn btn-primary btn-sm" type="button" :disabled="isSaving(item)" @click="saveQuantity(item)">
-                    <span v-if="isSaving(item)" class="loading loading-spinner loading-xs"></span>
-                    <i v-else class="icon-[tabler--device-floppy] size-4"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr v-if="inventory.length === 0">
-              <td colspan="7" class="py-20 text-center text-base-content/50 italic">
-                {{ t('admin.inventory.empty') }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-
-        <AdminPagination
-          :current-page="currentPage"
-          :page-size="pageSize"
-          :current-count="inventory.length"
+        <AdminDataTable
+          :data="inventory"
+          :columns="columns"
           :total="data?.total || 0"
-          :pending="pending"
-          :summary="t('admin.inventory.pagination.showing', { current: inventory.length, total: data?.total || 0 })"
-          :previous-label="t('admin.inventory.pagination.previous')"
-          :next-label="t('admin.inventory.pagination.next')"
-          @change="changePage"
+          :page-index="currentPage - 1"
+          :page-size="pageSize"
+          @update:page-index="currentPage = $event + 1"
         />
       </div>
     </div>
@@ -193,6 +132,8 @@
 
 <script setup lang="ts">
 import type { AdminPaginatedResponse } from '~/types'
+import { createColumnHelper } from '@tanstack/vue-table'
+import { h, resolveComponent } from 'vue'
 
 definePageMeta({
   layout: 'admin'
@@ -219,6 +160,8 @@ interface InventorySummary {
 interface InventoryListResponse extends AdminPaginatedResponse<InventoryItem> {
   summary: InventorySummary
 }
+
+const NuxtLinkLocale = resolveComponent('NuxtLinkLocale')
 
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
@@ -340,11 +283,91 @@ const resetFilters = () => {
   currentPage.value = 1
 }
 
-const changePage = (page: number) => {
-  currentPage.value = Math.max(1, page)
-}
-
 onBeforeUnmount(() => {
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
 })
+
+const columnHelper = createColumnHelper<InventoryItem>()
+
+const columns = computed(() => {
+  lowStockThreshold.value
+  return [
+  columnHelper.accessor('product_name', {
+    header: () => t('admin.inventory.table.item'),
+    cell: (info) => {
+      const item = info.row.original
+      return h('div', [
+        h('div', { class: 'font-bold' }, item.product_name || `Product #${item.product_id}`),
+        h('div', { class: 'mt-1 text-sm text-base-content/60' }, item.variant_name || `Variant #${item.variant_id}`),
+        h(NuxtLinkLocale, {
+          to: `/admin/products/${item.product_id}/variants/${item.variant_id}/edit`,
+          class: 'link link-primary text-xs'
+        }, () => t('admin.inventory.actions.editVariant'))
+      ])
+    }
+  }),
+  columnHelper.accessor('sku', {
+    header: () => t('admin.inventory.table.sku'),
+    cell: (info) => h('span', { class: 'font-mono text-sm' }, info.getValue() || '-')
+  }),
+  columnHelper.display({
+    id: 'status',
+    header: () => t('admin.inventory.table.status'),
+    cell: (info) => {
+      const item = info.row.original
+      const children = [
+        h('span', { class: ['badge badge-soft badge-sm', statusBadgeClass(item)] }, statusLabel(item))
+      ]
+      if (item.active === false) {
+        children.push(h('div', { class: 'mt-1 text-xs text-base-content/50' }, t('common.status.inactive')))
+      }
+      return h('div', children)
+    }
+  }),
+  columnHelper.accessor('inventory_quantity', {
+    header: () => h('div', { class: 'text-right' }, t('admin.inventory.table.onHand')),
+    cell: (info) => h('div', { class: 'text-right font-bold' }, String(stockQuantity(info.row.original)))
+  }),
+  columnHelper.accessor('reserved_quantity', {
+    header: () => h('div', { class: 'text-right' }, t('admin.inventory.table.reserved')),
+    cell: (info) => h('div', { class: 'text-right' }, String(info.getValue()))
+  }),
+  columnHelper.display({
+    id: 'available',
+    header: () => h('div', { class: 'text-right' }, t('admin.inventory.table.available')),
+    cell: (info) => {
+      const item = info.row.original
+      const qty = availableQuantity(item)
+      return h('div', {
+        class: ['text-right', qty <= lowStockThreshold.value ? 'text-warning font-bold' : 'font-medium']
+      }, String(qty))
+    }
+  }),
+  columnHelper.display({
+    id: 'update',
+    header: () => h('div', { class: 'text-right' }, t('admin.inventory.table.update')),
+    cell: (info) => {
+      const item = info.row.original
+      return h('div', { class: 'flex gap-2 justify-end' }, [
+        h('input', {
+          value: draftQuantities[item.variant_id] ?? stockQuantity(item),
+          type: 'number',
+          min: 0,
+          class: 'input input-bordered input-sm w-24 text-right',
+          onInput: (e: Event) => {
+            draftQuantities[item.variant_id] = Number((e.target as HTMLInputElement).value)
+          }
+        }),
+        h('button', {
+          class: 'btn btn-primary btn-sm',
+          type: 'button',
+          disabled: isSaving(item),
+          onClick: () => saveQuantity(item)
+        }, isSaving(item)
+          ? h('span', { class: 'loading loading-spinner loading-xs' })
+          : h('i', { class: 'icon-[tabler--device-floppy] size-4' }))
+      ])
+    }
+  })
+]})
 </script>

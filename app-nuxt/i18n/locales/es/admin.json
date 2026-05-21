@@ -1072,6 +1072,13 @@
           "createdAt": "Creado en"
         }
       }
+    },
+    "pagination": {
+      "pageOf": "Página {page} de {total}",
+      "goTo": "Ir a página",
+      "show": "Mostrar {size}",
+      "empty": "Sin filas",
+      "showing": "Mostrando {start}-{end} de {total}"
     }
   }
 }

@@ -39,18 +39,13 @@
     <!-- Users Table -->
     <div v-else class="card shadow-base-300/10 w-full shadow-md overflow-hidden">
       <div class="card-body p-0">
-        <AdminDataTable :data="users" :columns="columns" />
-
-        <AdminPagination
-          :current-page="currentPage"
-          :page-size="pageSize"
-          :current-count="users.length"
+        <AdminDataTable
+          :data="users"
+          :columns="columns"
           :total="data?.total || 0"
-          :pending="pending"
-          :summary="$t('admin.users.pagination.showing', { current: users.length, total: data?.total || 0 })"
-          :previous-label="$t('admin.users.pagination.previous')"
-          :next-label="$t('admin.users.pagination.next')"
-          @change="changePage"
+          :page-index="currentPage - 1"
+          :page-size="pageSize"
+          @update:page-index="currentPage = $event + 1"
         />
       </div>
     </div>
@@ -59,7 +54,7 @@
 
 <script setup lang="ts">
 import type { AdminPaginatedResponse } from '~/types'
-import { createColumnHelper, FlexRender } from '@tanstack/vue-table'
+import { createColumnHelper } from '@tanstack/vue-table'
 import { h } from 'vue'
 
 definePageMeta({
@@ -182,10 +177,6 @@ const columns = [
 const handleSearch = () => {
   currentPage.value = 1
   appliedSearchQuery.value = searchQuery.value.trim()
-}
-
-const changePage = (page: number) => {
-  currentPage.value = Math.max(1, page)
 }
 
 const confirmDelete = async (user: AdminUser) => {

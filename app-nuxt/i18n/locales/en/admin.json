@@ -1076,6 +1076,13 @@
           "createdAt": "Created at"
         }
       }
+    },
+    "pagination": {
+      "pageOf": "Page {page} of {total}",
+      "goTo": "Go to page",
+      "show": "Show {size}",
+      "empty": "No rows",
+      "showing": "Showing {start}-{end} of {total}"
     }
   }
 }
