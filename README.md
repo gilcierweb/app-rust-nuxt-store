@@ -408,6 +408,7 @@ Key backend auth env vars:
 * [ ] Email marketing integration (Mailchimp, SendGrid)
 * [ ] Analytics integration (Google Analytics, Plausible)
 * [ ] Chat support (LiveChat / Tawk.to)
+* [ ] OpenTelemetry
 
 ### Admin & Analytics
 * [ ] Advanced analytics dashboard (conversion funnels, CLV, revenue by category)
