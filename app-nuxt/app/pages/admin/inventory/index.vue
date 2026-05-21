@@ -12,28 +12,48 @@
     </div>
 
     <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-      <div class="card shadow-base-300/10 shadow-md">
-        <div class="card-body p-4">
-          <p class="text-xs uppercase text-base-content/50">{{ t('admin.inventory.metrics.variants') }}</p>
-          <p class="mt-2 text-2xl font-bold">{{ totalVariants }}</p>
+      <div class="card bg-base-100 shadow-sm border">
+        <div class="card-body p-4 flex flex-row items-center gap-4">
+          <div class="size-12 rounded-full flex items-center justify-center bg-primary/10 text-primary">
+            <i class="icon-[tabler--box] size-6"></i>
+          </div>
+          <div>
+            <p class="text-sm text-base-content/60">{{ t('admin.inventory.metrics.variants') }}</p>
+            <h3 class="text-2xl font-bold">{{ totalVariants }}</h3>
+          </div>
         </div>
       </div>
-      <div class="card shadow-base-300/10 shadow-md">
-        <div class="card-body p-4">
-          <p class="text-xs uppercase text-base-content/50">{{ t('admin.inventory.metrics.onHand') }}</p>
-        <p class="mt-2 text-2xl font-bold">{{ totalStock }}</p>
+      <div class="card bg-base-100 shadow-sm border">
+        <div class="card-body p-4 flex flex-row items-center gap-4">
+          <div class="size-12 rounded-full flex items-center justify-center bg-success/10 text-success">
+            <i class="icon-[tabler--package] size-6"></i>
+          </div>
+          <div>
+            <p class="text-sm text-base-content/60">{{ t('admin.inventory.metrics.onHand') }}</p>
+            <h3 class="text-2xl font-bold">{{ totalStock }}</h3>
+          </div>
         </div>
       </div>
-      <div class="card shadow-base-300/10 shadow-md">
-        <div class="card-body p-4">
-          <p class="text-xs uppercase text-base-content/50">{{ t('admin.inventory.metrics.reserved') }}</p>
-        <p class="mt-2 text-2xl font-bold">{{ totalReserved }}</p>
+      <div class="card bg-base-100 shadow-sm border">
+        <div class="card-body p-4 flex flex-row items-center gap-4">
+          <div class="size-12 rounded-full flex items-center justify-center bg-info/10 text-info">
+            <i class="icon-[tabler--lock] size-6"></i>
+          </div>
+          <div>
+            <p class="text-sm text-base-content/60">{{ t('admin.inventory.metrics.reserved') }}</p>
+            <h3 class="text-2xl font-bold">{{ totalReserved }}</h3>
+          </div>
         </div>
       </div>
-      <div class="card shadow-base-300/10 shadow-md">
-        <div class="card-body p-4">
-          <p class="text-xs uppercase text-base-content/50">{{ t('admin.inventory.metrics.alerts') }}</p>
-        <p class="mt-2 text-2xl font-bold text-warning">{{ alertCount }}</p>
+      <div class="card bg-base-100 shadow-sm border">
+        <div class="card-body p-4 flex flex-row items-center gap-4">
+          <div class="size-12 rounded-full flex items-center justify-center bg-warning/10 text-warning">
+            <i class="icon-[tabler--alert-triangle] size-6"></i>
+          </div>
+          <div>
+            <p class="text-sm text-base-content/60">{{ t('admin.inventory.metrics.alerts') }}</p>
+            <h3 class="text-2xl font-bold text-warning">{{ alertCount }}</h3>
+          </div>
         </div>
       </div>
     </div>

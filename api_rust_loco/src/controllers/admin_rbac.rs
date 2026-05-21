@@ -408,7 +408,7 @@ pub async fn delete_role(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/rbac/")
+        .prefix("api/admin/rbac")
         .add("summary", get(summary))
         .add("permissions", get(permissions))
         .add("roles", post(create_role))

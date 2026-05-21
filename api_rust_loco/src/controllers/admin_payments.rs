@@ -346,7 +346,7 @@ pub async fn refund(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/payments/")
+        .prefix("api/admin/payments")
         .add("/", get(list))
         .add("{id}", get(get_one))
         .add("{id}/capture", post(capture))
@@ -356,12 +356,12 @@ pub fn routes() -> Routes {
 
 pub fn gateway_event_routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/payment-gateway-events/")
+        .prefix("api/admin/payment-gateway-events")
         .add("/", get(list_gateway_events))
 }
 
 pub fn gateway_log_routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/payment-gateway-logs/")
+        .prefix("api/admin/payment-gateway-logs")
         .add("/", get(list_gateway_logs))
 }

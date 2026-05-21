@@ -63,7 +63,7 @@ pub async fn resend_log(Path(id): Path<i32>, State(ctx): State<AppContext>) -> R
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/emails/")
+        .prefix("api/admin/emails")
         .add("templates", get(list_templates))
         .add("logs", get(list_logs))
         .add("logs/{id}/resend", post(resend_log))

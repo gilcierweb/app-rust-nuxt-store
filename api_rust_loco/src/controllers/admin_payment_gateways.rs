@@ -65,7 +65,7 @@ pub async fn update(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/payment-gateways/")
+        .prefix("api/admin/payment-gateways")
         .add("/", get(list))
         .add("{id}", get(get_one))
         .add("{id}", put(update))

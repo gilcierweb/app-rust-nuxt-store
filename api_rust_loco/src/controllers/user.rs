@@ -527,7 +527,7 @@ pub async fn remove(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/users/")
+        .prefix("api/users")
         .add("/", get(list))
         .add("{id}", get(get_one))
         .add("{id}", delete(remove))
@@ -535,7 +535,7 @@ pub fn routes() -> Routes {
 
 pub fn admin_routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/users/")
+        .prefix("api/admin/users")
         .add("/", get(admin_list))
         .add("/", post(add))
         .add("{id}", get(get_one))

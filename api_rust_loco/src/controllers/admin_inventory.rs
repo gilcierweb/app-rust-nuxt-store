@@ -121,7 +121,7 @@ pub async fn update(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/inventory/")
+        .prefix("api/admin/inventory")
         .add("/", get(list))
         .add("{id}", put(update))
         .add("{id}", patch(update))

@@ -279,7 +279,7 @@ pub async fn update(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/settings/")
+        .prefix("api/admin/settings")
         .add("/", get(list))
         .add("/", put(update))
         .add("/", patch(update))

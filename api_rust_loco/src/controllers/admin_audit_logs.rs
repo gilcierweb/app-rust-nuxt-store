@@ -82,6 +82,6 @@ pub async fn list(
 
 pub fn routes() -> Routes {
     Routes::new()
-        .prefix("api/admin/audit-logs/")
+        .prefix("api/admin/audit-logs")
         .add("/", get(list))
 }
