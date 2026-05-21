@@ -149,15 +149,17 @@ const appliedSearchQuery = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 
+const apiQuery = reactive({
+  page: currentPage,
+  page_size: pageSize,
+  search: computed(() => appliedSearchQuery.value || undefined)
+})
+
 const { pending, data, error, refresh } = await useApiFetch<AdminPaginatedResponse<AdminUser>>(
   '/api/admin/users',
   {
     key: 'admin-users-list',
-    query: computed(() => ({
-      page: currentPage.value,
-      page_size: pageSize.value,
-      search: appliedSearchQuery.value || undefined
-    }))
+    query: apiQuery
   }
 )
 

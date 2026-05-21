@@ -248,17 +248,19 @@ const statusBadgeClass = (item: InventoryItem) => {
 
 const isSaving = (item: InventoryItem) => savingVariantIds.value.includes(item.variant_id)
 
+const apiQuery = reactive({
+  page: currentPage,
+  page_size: pageSize,
+  search: computed(() => debouncedSearchQuery.value || undefined),
+  status: computed(() => selectedStatus.value || undefined),
+  low_stock_threshold: lowStockThreshold
+})
+
 const { pending, data, error, refresh } = await useApiFetch<InventoryListResponse>(
   '/api/admin/inventory',
   {
     key: 'admin-inventory-list',
-    query: computed(() => ({
-      page: currentPage.value,
-      page_size: pageSize.value,
-      search: debouncedSearchQuery.value || undefined,
-      status: selectedStatus.value || undefined,
-      low_stock_threshold: lowStockThreshold.value
-    }))
+    query: apiQuery
   }
 )
 

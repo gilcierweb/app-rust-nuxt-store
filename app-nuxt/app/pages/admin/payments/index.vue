@@ -238,22 +238,25 @@ const selectedCurrency = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 
+const apiQuery = reactive({
+  page: currentPage,
+  page_size: pageSize,
+  search: computed(() => debouncedSearchQuery.value || undefined),
+  status: computed(() => selectedStatus.value || undefined),
+  gateway_id: computed(() => selectedGateway.value || undefined),
+  currency: computed(() => selectedCurrency.value || undefined)
+})
+
 const {
   pending: paymentsPending,
   data: paymentsData,
-  error: paymentsError
+  error: paymentsError,
+  refresh
 } = await useApiFetch<AdminPaymentListResponse>(
   '/api/admin/payments',
   {
     key: 'admin-payments-list',
-    query: computed(() => ({
-      page: currentPage.value,
-      page_size: pageSize.value,
-      search: debouncedSearchQuery.value || undefined,
-      status: selectedStatus.value || undefined,
-      gateway_id: selectedGateway.value || undefined,
-      currency: selectedCurrency.value || undefined
-    }))
+    query: apiQuery
   }
 )
 

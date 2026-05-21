@@ -178,17 +178,19 @@ const selectedResourceType = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 
+const apiQuery = reactive({
+  page: currentPage,
+  page_size: pageSize,
+  search: computed(() => debouncedSearchQuery.value || undefined),
+  action: computed(() => selectedAction.value || undefined),
+  resource_type: computed(() => selectedResourceType.value || undefined)
+})
+
 const { pending, data, error, refresh } = await useApiFetch<AdminAuditLogResponse>(
   '/api/admin/audit-logs',
   {
     key: 'admin-audit-logs',
-    query: computed(() => ({
-      page: currentPage.value,
-      page_size: pageSize.value,
-      search: debouncedSearchQuery.value || undefined,
-      action: selectedAction.value || undefined,
-      resource_type: selectedResourceType.value || undefined
-    }))
+    query: apiQuery
   }
 )
 

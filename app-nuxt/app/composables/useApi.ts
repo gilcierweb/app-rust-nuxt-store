@@ -37,7 +37,10 @@ export function useApi() {
       $fetch: nuxtApp.$api as typeof $fetch,
       getCachedData(key) {
         if (options.getCachedData) return options.getCachedData(key)
-        return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
+        if (nuxtApp.isHydrating) {
+          return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
+        }
+        return undefined
       }
     })
   }
@@ -50,7 +53,10 @@ export function useApi() {
       $fetch: nuxtApp.$api as typeof $fetch,
       getCachedData(key) {
         if (options.getCachedData) return options.getCachedData(key)
-        return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
+        if (nuxtApp.isHydrating) {
+          return nuxtApp.payload.data[key] || nuxtApp.static?.data[key]
+        }
+        return undefined
       }
     })
   }
