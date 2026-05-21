@@ -127,32 +127,17 @@
           </table>
         </div>
 
-        <div class="border-base-content/10 flex items-center justify-between px-6 py-4 border-t">
-          <span class="text-xs text-base-content/50">
-            {{ t('admin.audit.pagination.showing', { current: items.length, total: data?.total || 0 }) }}
-          </span>
-          <div class="join">
-            <button
-              type="button"
-              class="join-item btn btn-sm btn-outline"
-              :disabled="currentPage <= 1 || pending"
-              @click="changePage(currentPage - 1)"
-            >
-              {{ t('admin.audit.pagination.previous') }}
-            </button>
-            <button type="button" class="join-item btn btn-sm btn-active font-mono">
-              {{ currentPage }}
-            </button>
-            <button
-              type="button"
-              class="join-item btn btn-sm btn-outline"
-              :disabled="!hasNextPage || pending"
-              @click="changePage(currentPage + 1)"
-            >
-              {{ t('admin.audit.pagination.next') }}
-            </button>
-          </div>
-        </div>
+        <AdminPagination
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :current-count="items.length"
+          :total="data?.total || 0"
+          :pending="pending"
+          :summary="t('admin.audit.pagination.showing', { current: items.length, total: data?.total || 0 })"
+          :previous-label="t('admin.audit.pagination.previous')"
+          :next-label="t('admin.audit.pagination.next')"
+          @change="changePage"
+        />
       </div>
     </div>
   </div>
@@ -208,8 +193,6 @@ const { pending, data, error, refresh } = await useApiFetch<AdminAuditLogRespons
 )
 
 const items = computed(() => data.value?.items || [])
-const hasNextPage = computed(() => (currentPage.value * pageSize.value) < (data.value?.total || 0))
-
 const availableActions = computed(() => {
   return [...new Set(items.value.map(item => item.action))].sort()
 })

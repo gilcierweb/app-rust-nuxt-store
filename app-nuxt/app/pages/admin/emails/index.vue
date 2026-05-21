@@ -137,33 +137,17 @@
           </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex items-center justify-between px-6 py-4 border-t border-base-200">
-          <span class="text-xs text-gray-500">
-            {{ $t('admin.emails.pagination.showing', { current: logsData.items.length, total: logsData.total }) }}
-          </span>
-          <div class="join">
-            <button 
-              type="button"
-              class="join-item btn btn-sm btn-outline" 
-              :disabled="currentPage <= 1"
-              @click="changePage(currentPage - 1)"
-            >
-              {{ $t('admin.emails.pagination.previous') }}
-            </button>
-            <button type="button" class="join-item btn btn-sm btn-active font-mono">
-              {{ currentPage }}
-            </button>
-            <button 
-              type="button"
-              class="join-item btn btn-sm btn-outline" 
-              :disabled="currentPage * pageSize >= logsData.total"
-              @click="changePage(currentPage + 1)"
-            >
-              {{ $t('admin.emails.pagination.next') }}
-            </button>
-          </div>
-        </div>
+        <AdminPagination
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :current-count="logsData.items.length"
+          :total="logsData.total"
+          :pending="logsPending"
+          :summary="$t('admin.emails.pagination.showing', { current: logsData.items.length, total: logsData.total })"
+          :previous-label="$t('admin.emails.pagination.previous')"
+          :next-label="$t('admin.emails.pagination.next')"
+          @change="changePage"
+        />
       </div>
 
       <!-- Modal: View Log Details (FlyonUI overlay) -->
