@@ -37,7 +37,7 @@
         "settings": "Settings",
         "logout": "Logout",
         "defaultName": "Administrator",
-        "defaultEmail": "your-email@example.com"
+        "defaultEmail": "your-email{'@'}example.com"
       },
       "activity": {
         "title": "Activity",
@@ -126,7 +126,7 @@
       "category_logistics": "Logistics",
       "category_content": "Content",
       "category_admin": "Administration",
-      "defaultEmail": "your-email@example.com"
+      "defaultEmail": "your-email{'@'}example.com"
     },
     "dashboard": {
       "title": "Admin Dashboard",
