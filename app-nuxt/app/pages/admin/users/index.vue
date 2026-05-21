@@ -39,73 +39,7 @@
     <!-- Users Table -->
     <div v-else class="card shadow-base-300/10 w-full shadow-md overflow-hidden">
       <div class="card-body p-0">
-        <div class="overflow-x-auto">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>{{ $t('admin.users.table.email') }}</th>
-                <th>{{ $t('admin.users.table.role') }}</th>
-                <th>{{ $t('admin.users.table.status') }}</th>
-                <th>{{ $t('admin.users.table.date') }}</th>
-                <th class="text-right">{{ $t('admin.users.table.actions') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in users" :key="user.id" class="row-hover">
-                <td>
-                  <div class="flex items-center gap-3">
-                    <div class="avatar avatar-placeholder">
-                      <div class="bg-neutral text-neutral-content rounded-full size-10">
-                        <span class="text-lg">{{ (user.email.at(0) || '?').toUpperCase() }}</span>
-                      </div>
-                    </div>
-                    <div>
-                      <div class="font-medium">{{ user.email }}</div>
-                      <div class="text-xs text-gray-500">{{ user.name }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge badge-soft" :class="user.role === 'Admin' ? 'badge-primary' : 'badge-secondary'">
-                    {{ user.role }}
-                  </span>
-                </td>
-                <td>
-                  <span class="badge badge-soft text-xs" :class="user.active ? 'badge-success' : 'badge-error'">
-                    {{ user.active ? $t('common.status.active') : $t('common.status.inactive') }}
-                  </span>
-                </td>
-                <td>{{ formatDate(user.createdAt) }}</td>
-                <td class="text-right">
-                  <div class="flex justify-end gap-1">
-                    <NuxtLinkLocale
-                      :to="`/admin/users/${user.id}`"
-                      class="btn btn-circle btn-text btn-sm"
-                      :aria-label="$t('common.view')"
-                    >
-                      <i class="icon-[tabler--eye] size-5"></i>
-                    </NuxtLinkLocale>
-                    <NuxtLinkLocale
-                      :to="`/admin/users/${user.id}/edit`"
-                      class="btn btn-circle btn-text btn-sm"
-                      :aria-label="$t('common.edit')"
-                    >
-                      <i class="icon-[tabler--pencil] size-5"></i>
-                    </NuxtLinkLocale>
-                    <button
-                      class="btn btn-circle btn-text btn-sm text-error"
-                      type="button"
-                      :aria-label="$t('common.delete')"
-                      @click="confirmDelete(user)"
-                    >
-                      <i class="icon-[tabler--trash] size-5"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <AdminDataTable :data="users" :columns="columns" />
 
         <AdminPagination
           :current-page="currentPage"
@@ -125,6 +59,8 @@
 
 <script setup lang="ts">
 import type { AdminPaginatedResponse } from '~/types'
+import { createColumnHelper, FlexRender } from '@tanstack/vue-table'
+import { h } from 'vue'
 
 definePageMeta({
   layout: 'admin'
@@ -165,14 +101,83 @@ const { pending, data, error, refresh } = await useApiFetch<AdminPaginatedRespon
 
 const users = computed(() => data.value?.items || [])
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date(dateString))
-}
+const columnHelper = createColumnHelper<AdminUser>()
+
+const columns = [
+  columnHelper.accessor('email', {
+    header: () => t('admin.users.table.email'),
+    cell: (info) => {
+      const user = info.row.original
+      return h('div', { class: 'flex items-center gap-3' }, [
+        h('div', { class: 'avatar avatar-placeholder' }, [
+          h('div', { class: 'bg-neutral text-neutral-content rounded-full size-10' }, [
+            h('span', { class: 'text-lg' }, (user.email.at(0) || '?').toUpperCase())
+          ])
+        ]),
+        h('div', [
+          h('div', { class: 'font-medium' }, user.email),
+          h('div', { class: 'text-xs text-gray-500' }, user.name)
+        ])
+      ])
+    }
+  }),
+  columnHelper.accessor('role', {
+    header: () => t('admin.users.table.role'),
+    cell: (info) => {
+      const role = info.getValue()
+      return h('span', {
+        class: `badge badge-soft ${role === 'Admin' ? 'badge-primary' : 'badge-secondary'}`
+      }, role)
+    }
+  }),
+  columnHelper.accessor('active', {
+    header: () => t('admin.users.table.status'),
+    cell: (info) => {
+      const active = info.getValue()
+      return h('span', {
+        class: `badge badge-soft text-xs ${active ? 'badge-success' : 'badge-error'}`
+      }, active ? t('common.status.active') : t('common.status.inactive'))
+    }
+  }),
+  columnHelper.accessor('createdAt', {
+    header: () => t('admin.users.table.date'),
+    cell: (info) => {
+      const dateString = info.getValue()
+      if (!dateString) return '-'
+      return new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      }).format(new Date(dateString))
+    }
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: () => t('admin.users.table.actions'),
+    cell: (info) => {
+      const user = info.row.original
+      const NuxtLinkLocale = resolveComponent('NuxtLinkLocale')
+      return h('div', { class: 'flex justify-end gap-1' }, [
+        h(NuxtLinkLocale, {
+          to: `/admin/users/${user.id}`,
+          class: 'btn btn-circle btn-text btn-sm',
+          'aria-label': t('common.view')
+        }, () => h('i', { class: 'icon-[tabler--eye] size-5' })),
+        h(NuxtLinkLocale, {
+          to: `/admin/users/${user.id}/edit`,
+          class: 'btn btn-circle btn-text btn-sm',
+          'aria-label': t('common.edit')
+        }, () => h('i', { class: 'icon-[tabler--pencil] size-5' })),
+        h('button', {
+          class: 'btn btn-circle btn-text btn-sm text-error',
+          type: 'button',
+          'aria-label': t('common.delete'),
+          onClick: () => confirmDelete(user)
+        }, () => h('i', { class: 'icon-[tabler--trash] size-5' }))
+      ])
+    }
+  })
+]
 
 const handleSearch = () => {
   currentPage.value = 1
