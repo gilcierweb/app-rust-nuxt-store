@@ -141,6 +141,8 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const [
   { pending, data: banner, error, refresh },
@@ -204,13 +206,18 @@ function formatDate(dateString?: string) {
 
 async function deleteBanner() {
   if (!banner.value) return
-  if (!confirm(t('admin.banners.detail.confirmDelete', { name: banner.value.title }))) return
+  const confirmed = await dialog.confirm({
+    message: t('admin.banners.detail.confirmDelete', { name: banner.value.title }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
 
   try {
     await apiFetch(`/api/admin/banners/${banner.value.id}`, { method: 'DELETE' })
     router.push('/admin/banners')
   } catch (err) {
-    alert(t('admin.banners.detail.errorDelete'))
+    toast.error(t('admin.banners.detail.errorDelete'))
     console.error(err)
   }
 }

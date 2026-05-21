@@ -69,6 +69,7 @@ definePageMeta({
 })
 
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
 
 const { pending, data: gateways, error, refresh } = await useApiFetch<any[]>(
   '/api/admin/payment-gateways',
@@ -84,7 +85,7 @@ const toggleStatus = async (gateway: any) => {
     })
     gateway.status = newStatus
   } catch (err) {
-    alert('Failed to update status')
+    toast.error('Failed to update status')
     gateway.status = gateway.status === 1 ? 1 : 0 // revert
   }
 }
@@ -96,7 +97,7 @@ const updateGateway = async (gateway: any) => {
       body: { environment: gateway.environment }
     })
   } catch (err) {
-    alert('Failed to update environment')
+    toast.error('Failed to update environment')
     await refresh()
   }
 }

@@ -307,6 +307,8 @@ definePageMeta({
 
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const activeTab = ref<'banners' | 'positions' | 'analytics'>('banners')
 const searchQuery = ref('')
@@ -423,14 +425,19 @@ function formatDate(dateString?: string) {
 }
 
 async function confirmDelete(banner: Banner) {
-  if (!confirm(t('admin.banners.detail.confirmDelete', { name: banner.title }))) return
+  const confirmed = await dialog.confirm({
+    message: t('admin.banners.detail.confirmDelete', { name: banner.title }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
 
   try {
     await apiFetch(`/api/admin/banners/${banner.id}`, { method: 'DELETE' })
     await refresh()
     await refreshAnalytics()
   } catch (err) {
-    alert(t('admin.banners.detail.errorDelete'))
+    toast.error(t('admin.banners.detail.errorDelete'))
     console.error(err)
   }
 }
@@ -468,7 +475,7 @@ async function savePosition() {
     resetPositionForm()
     await refreshPositions()
   } catch (err) {
-    alert(t('admin.banners.positions.errorSave'))
+    toast.error(t('admin.banners.positions.errorSave'))
     console.error(err)
   } finally {
     positionSaving.value = false
@@ -476,13 +483,18 @@ async function savePosition() {
 }
 
 async function deletePosition(position: BannerPosition) {
-  if (!confirm(t('admin.banners.positions.confirmDelete', { name: position.name }))) return
+  const confirmed = await dialog.confirm({
+    message: t('admin.banners.positions.confirmDelete', { name: position.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
 
   try {
     await apiFetch(`/api/admin/banners/positions/${position.id}`, { method: 'DELETE' })
     await refreshPositions()
   } catch (err) {
-    alert(t('admin.banners.positions.errorDelete'))
+    toast.error(t('admin.banners.positions.errorDelete'))
     console.error(err)
   }
 }

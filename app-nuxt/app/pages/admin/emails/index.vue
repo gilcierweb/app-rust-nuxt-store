@@ -340,6 +340,7 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
+const toast = useAppToast()
 
 const activeTab = ref('logs')
 const recipientSearch = ref('')
@@ -441,7 +442,7 @@ const resendLog = async (logId: number) => {
     await apiFetch(`/api/admin/emails/logs/${logId}/resend`, {
       method: 'POST'
     })
-    alert(t('admin.emails.actions.success'))
+    toast.success(t('admin.emails.actions.success'))
     await refreshLogs()
     if (selectedLog.value && selectedLog.value.id === logId) {
       const updatedLog = logsData.value?.items.find((item: any) => item.id === logId)
@@ -451,7 +452,7 @@ const resendLog = async (logId: number) => {
     }
   } catch (err) {
     console.error('Erro ao reenviar e-mail:', err)
-    alert(t('admin.emails.actions.error'))
+    toast.error(t('admin.emails.actions.error'))
   } finally {
     resendingIds.value = resendingIds.value.filter(id => id !== logId)
   }

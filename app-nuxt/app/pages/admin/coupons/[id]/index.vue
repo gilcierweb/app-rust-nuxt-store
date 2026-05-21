@@ -155,6 +155,8 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: coupon, error, refresh } = await useApiFetch<Coupon>(
   `/api/admin/coupons/${route.params.id}`
@@ -203,16 +205,21 @@ const formatDate = (dateString?: string) => {
 const deleteCoupon = async () => {
   if (!coupon.value) return
 
-  if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.value.code }))) {
-    try {
-      await apiFetch(`/api/admin/coupons/${coupon.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/coupons')
-    } catch (err) {
-      alert(t('admin.coupons.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.coupons.detail.confirmDelete', { name: coupon.value.code }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/coupons/${coupon.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/coupons')
+  } catch (err) {
+    toast.error(t('admin.coupons.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

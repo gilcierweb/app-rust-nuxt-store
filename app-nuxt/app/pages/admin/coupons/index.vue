@@ -123,6 +123,8 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const searchQuery = ref('')
 
@@ -191,16 +193,21 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (coupon: Coupon) => {
-  if (confirm(t('admin.coupons.detail.confirmDelete', { name: coupon.code }))) {
-    try {
-      await apiFetch(`/api/admin/coupons/${coupon.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.coupons.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.coupons.detail.confirmDelete', { name: coupon.code }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/coupons/${coupon.id}`, {
+      method: 'DELETE'
+    })
+    await refresh()
+  } catch (err) {
+    toast.error(t('admin.coupons.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

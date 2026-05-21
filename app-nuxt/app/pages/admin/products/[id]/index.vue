@@ -151,6 +151,8 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const config = useRuntimeConfig()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { data: product, pending, error } = await useApiFetch<ProductApi>(
   `/api/admin/products/${route.params.id}`
@@ -193,17 +195,22 @@ const formatCurrency = (value: number | undefined) => {
 // Delete confirmation
 const confirmDelete = async () => {
   if (!product.value) return
-  
-  if (confirm(t('admin.products.confirmDelete', { name: product.value.name }))) {
-    try {
-      await apiFetch(`/api/admin/products/${product.value.id}`, {
-        method: 'DELETE'
-      })
-      navigateTo('/admin/products')
-    } catch (err) {
-      alert(t('admin.products.errorDelete'))
-      console.error(err)
-    }
+
+  const confirmed = await dialog.confirm({
+    message: t('admin.products.confirmDelete', { name: product.value.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/products/${product.value.id}`, {
+      method: 'DELETE'
+    })
+    navigateTo('/admin/products')
+  } catch (err) {
+    toast.error(t('admin.products.errorDelete'))
+    console.error(err)
   }
 }
 </script>

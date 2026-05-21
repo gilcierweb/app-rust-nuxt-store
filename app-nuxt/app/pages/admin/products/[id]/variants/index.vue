@@ -66,6 +66,8 @@ const { t } = useI18n()
 const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const productId = route.params.id
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { data: variants, pending, refresh } = await useApiFetch<ProductVariant[]>(
   `/api/admin/variants/list?product_id=${productId}`,
@@ -73,11 +75,17 @@ const { data: variants, pending, refresh } = await useApiFetch<ProductVariant[]>
 )
 
 async function handleDelete(variantId: number) {
-  if (!confirm(t('variant.deleteConfirm'))) return
+  const confirmed = await dialog.confirm({
+    message: t('variant.deleteConfirm'),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
   try {
     await apiFetch(`/api/admin/variants/${variantId}`, { method: 'DELETE' })
     refresh()
   } catch (e) {
+    toast.error(t('common.errorDelete', { resource: t('variant.title').toLowerCase() }))
     console.error(e)
   }
 }

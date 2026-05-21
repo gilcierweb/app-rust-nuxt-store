@@ -143,6 +143,8 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 // Filters state
 const searchQuery = ref('')
@@ -182,13 +184,19 @@ const formatNumberBR = (num: number | undefined) => {
 }
 
 const confirmDelete = async (product: ProductApi) => {
-  if (confirm(t('admin.products.confirmDelete', { name: product.name }))) {
-    try {
-      await apiFetch(`/api/admin/products/${product.id}`, { method: 'DELETE' })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.products.errorDelete'))
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.products.confirmDelete', { name: product.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/products/${product.id}`, { method: 'DELETE' })
+    await refresh()
+  } catch (err) {
+    toast.error(t('admin.products.errorDelete'))
+    console.error(err)
   }
 }
 </script>

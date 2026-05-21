@@ -78,6 +78,7 @@ definePageMeta({
 })
 
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
 
 const { pending, data: methods, error, refresh } = await useApiFetch<any[]>(
   '/api/admin/payment-methods',
@@ -102,7 +103,7 @@ const toggleActive = async (method: any) => {
     })
     method.active = newStatus
   } catch (err) {
-    alert('Failed to update status')
+    toast.error('Failed to update status')
     method.active = !newStatus
   }
 }
@@ -116,7 +117,7 @@ const toggleAutoCapture = async (method: any) => {
     })
     method.auto_capture = newValue
   } catch (err) {
-    alert('Failed to update auto_capture')
+    toast.error('Failed to update auto capture')
     method.auto_capture = !newValue
   }
 }
@@ -128,7 +129,7 @@ const updateMethod = async (method: any) => {
       body: { position: method.position }
     })
   } catch (err) {
-    alert('Failed to update position')
+    toast.error('Failed to update position')
     await refresh()
   }
 }

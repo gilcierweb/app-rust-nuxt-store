@@ -127,6 +127,8 @@ interface AdminUser {
 
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const searchQuery = ref('')
 
@@ -161,16 +163,21 @@ const handleSearch = () => {
 }
 
 const confirmDelete = async (user: AdminUser) => {
-  if (confirm(t('common.confirmDelete', { name: user.email }))) {
-    try {
-      await apiFetch(`/api/admin/users/${user.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('common.errorDelete', { resource: t('admin.users.title').toLowerCase() }))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('common.confirmDelete', { name: user.email }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/users/${user.id}`, {
+      method: 'DELETE'
+    })
+    await refresh()
+  } catch (err) {
+    toast.error(t('common.errorDelete', { resource: t('admin.users.title').toLowerCase() }))
+    console.error(err)
   }
 }
 </script>

@@ -128,6 +128,8 @@ definePageMeta({
 const config = useRuntimeConfig()
 const { t, locale } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const searchQuery = ref('')
 
@@ -174,16 +176,21 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (shipping: ShippingMethod) => {
-  if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.name }))) {
-    try {
-      await apiFetch(`/api/admin/shippings/${shipping.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.shippings.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.shippings.detail.confirmDelete', { name: shipping.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/shippings/${shipping.id}`, {
+      method: 'DELETE'
+    })
+    await refresh()
+  } catch (err) {
+    toast.error(t('admin.shippings.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

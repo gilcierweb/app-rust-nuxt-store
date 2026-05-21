@@ -155,6 +155,9 @@ definePageMeta({
 const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
+const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: review, error, refresh } = await useApiFetch<Review>(
   `/api/admin/reviews/${route.params.id}`
@@ -174,16 +177,21 @@ const formatDate = (dateString?: string) => {
 const deleteReview = async () => {
   if (!review.value) return
 
-  if (confirm(`Tem certeza que deseja excluir a avaliação #${review.value.id}?`)) {
-    try {
-      await apiFetch(`/api/admin/reviews/${review.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/reviews')
-    } catch (err) {
-      alert('Erro ao excluir avaliação')
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.reviews.detail.confirmDelete', { id: review.value.id }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/reviews/${review.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/reviews')
+  } catch (err) {
+    toast.error(t('admin.reviews.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

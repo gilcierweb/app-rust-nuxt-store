@@ -301,46 +301,73 @@ const { pending, data: detail, error, refresh } = await useApiFetch<AdminPayment
 )
 
 const isActionLoading = ref(false)
+const toast = useAppToast()
+const dialog = useAppDialog()
 const paymentSessions = computed(() => detail.value?.sessions || [])
 const paymentRefunds = computed(() => detail.value?.refunds || [])
 const paymentLogs = computed(() => detail.value?.logs || [])
 const paymentEvents = computed(() => detail.value?.events || [])
 
 const capturePayment = async () => {
-  if (!confirm('Are you sure you want to capture this payment?')) return
+  const confirmed = await dialog.confirm({
+    title: 'Capture payment',
+    message: 'Are you sure you want to capture this payment?',
+    confirmLabel: 'Capture'
+  })
+  if (!confirmed) return
   isActionLoading.value = true
   try {
     await apiFetch(`/api/admin/payments/${paymentId}/capture`, { method: 'POST' })
+    toast.success('Payment captured successfully.')
     await refresh()
   } catch (e: any) {
-    alert(`Capture failed: ${e.message}`)
+    toast.error(`Capture failed: ${e.message}`)
   } finally {
     isActionLoading.value = false
   }
 }
 
 const voidPayment = async () => {
-  if (!confirm('Are you sure you want to void this payment?')) return
+  const confirmed = await dialog.confirm({
+    title: 'Void payment',
+    message: 'Are you sure you want to void this payment?',
+    confirmLabel: 'Void',
+    tone: 'danger'
+  })
+  if (!confirmed) return
   isActionLoading.value = true
   try {
     await apiFetch(`/api/admin/payments/${paymentId}/void`, { method: 'POST' })
+    toast.success('Payment voided successfully.')
     await refresh()
   } catch (e: any) {
-    alert(`Void failed: ${e.message}`)
+    toast.error(`Void failed: ${e.message}`)
   } finally {
     isActionLoading.value = false
   }
 }
 
 const refundPayment = async () => {
-  const amountStr = prompt('Enter amount to refund (leave empty for full amount):')
-  if (amountStr === null) return // Cancelled
-  
+  const amountStr = await dialog.prompt({
+    title: 'Refund payment',
+    message: 'Enter an amount to refund or leave the field empty to issue a full refund.',
+    confirmLabel: 'Refund',
+    tone: 'danger',
+    input: {
+      label: 'Amount',
+      placeholder: 'Leave empty for full refund',
+      type: 'number',
+      min: 0.01,
+      step: '0.01'
+    }
+  })
+  if (amountStr === null) return
+
   let amount = null
   if (amountStr.trim() !== '') {
     amount = parseFloat(amountStr)
     if (isNaN(amount) || amount <= 0) {
-      alert('Invalid amount')
+      toast.error('Invalid amount')
       return
     }
   }
@@ -351,9 +378,10 @@ const refundPayment = async () => {
       method: 'POST',
       body: { amount }
     })
+    toast.success('Refund requested successfully.')
     await refresh()
   } catch (e: any) {
-    alert(`Refund failed: ${e.message}`)
+    toast.error(`Refund failed: ${e.message}`)
   } finally {
     isActionLoading.value = false
   }

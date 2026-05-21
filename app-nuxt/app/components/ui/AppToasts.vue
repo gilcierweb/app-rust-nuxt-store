@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-const { toasts, dismiss } = useToast()
+const { toasts, dismiss } = useAppToast()
 
 const toastIcons: Record<string, string> = {
   success: 'icon-[tabler--circle-check]',

@@ -202,6 +202,9 @@ definePageMeta({
 const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
+const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const [
   { pending, data: profile, error, refresh: refreshProfile },
@@ -247,16 +250,21 @@ const formatDate = (dateString?: string) => {
 const deleteProfile = async () => {
   if (!profile.value) return
 
-  if (confirm(`Tem certeza que deseja excluir o perfil de "${profileName.value}"?`)) {
-    try {
-      await apiFetch(`/api/admin/profiles/${profile.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/customers')
-    } catch (err) {
-      alert('Erro ao excluir perfil')
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.customers.detail.confirmDelete', { name: profileName.value }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/profiles/${profile.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/customers')
+  } catch (err) {
+    toast.error(t('admin.customers.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

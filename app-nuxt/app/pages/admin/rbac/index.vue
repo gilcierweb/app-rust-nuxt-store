@@ -245,6 +245,7 @@ interface PermissionsResponse {
 
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const dialog = useAppDialog()
 
 const activeTab = ref<'roles' | 'assignments' | 'permissions'>('roles')
 const actionError = ref('')
@@ -313,7 +314,12 @@ async function createRole() {
 }
 
 async function deleteRole(role: RoleItem) {
-  if (!confirm(t('common.confirmDelete', { name: role.name }))) return
+  const confirmed = await dialog.confirm({
+    message: t('common.confirmDelete', { name: role.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
 
   actionError.value = ''
   try {

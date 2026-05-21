@@ -130,6 +130,8 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const searchQuery = ref('')
 
@@ -197,16 +199,21 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (post: Post) => {
-  if (confirm(t('admin.posts.detail.confirmDelete', { name: post.title || t('admin.posts.noTitle') }))) {
-    try {
-      await apiFetch(`/api/admin/posts/${post.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.posts.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.posts.detail.confirmDelete', { name: post.title || t('admin.posts.noTitle') }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/posts/${post.id}`, {
+      method: 'DELETE'
+    })
+    await refresh()
+  } catch (err) {
+    toast.error(t('admin.posts.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

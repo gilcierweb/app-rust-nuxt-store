@@ -130,6 +130,8 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const searchQuery = ref('')
 
@@ -167,16 +169,21 @@ const handleSearch = () => {
 
 // Delete confirmation
 const confirmDelete = async (review: Review) => {
-  if (confirm(t('admin.reviews.detail.confirmDelete', { id: review.id }))) {
-    try {
-      await apiFetch(`/api/admin/reviews/${review.id}`, {
-        method: 'DELETE'
-      })
-      await refresh()
-    } catch (err) {
-      alert(t('admin.reviews.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.reviews.detail.confirmDelete', { id: review.id }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/reviews/${review.id}`, {
+      method: 'DELETE'
+    })
+    await refresh()
+  } catch (err) {
+    toast.error(t('admin.reviews.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

@@ -136,6 +136,8 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: category, error, refresh } = await useApiFetch<Category>(
   `/api/admin/categories/${route.params.id}`
@@ -154,17 +156,22 @@ const formatDate = (dateString?: string) => {
 
 const deleteCategory = async () => {
   if (!category.value) return
-  
-  if (confirm(t('admin.categories.detail.confirmDelete', { name: category.value.name }))) {
-    try {
-      await apiFetch(`/api/admin/categories/${category.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/categories')
-    } catch (err) {
-      alert(t('admin.categories.detail.errorDelete'))
-      console.error(err)
-    }
+
+  const confirmed = await dialog.confirm({
+    message: t('admin.categories.detail.confirmDelete', { name: category.value.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/categories/${category.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/categories')
+  } catch (err) {
+    toast.error(t('admin.categories.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

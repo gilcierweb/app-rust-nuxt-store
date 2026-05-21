@@ -155,6 +155,8 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: user, error, refresh } = await useApiFetch<AdminUserDetail>(`/api/admin/users/${route.params.id}`)
 
@@ -172,16 +174,21 @@ const formatDate = (dateString?: string) => {
 const deleteUser = async () => {
   if (!user.value) return
 
-  if (confirm(t('common.confirmDelete', { name: user.value.email }))) {
-    try {
-      await apiFetch(`/api/admin/users/${user.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/users')
-    } catch (err) {
-      alert(t('common.errorDelete', { resource: t('admin.users.title').toLowerCase() }))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('common.confirmDelete', { name: user.value.email }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/users/${user.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/users')
+  } catch (err) {
+    toast.error(t('common.errorDelete', { resource: t('admin.users.title').toLowerCase() }))
+    console.error(err)
   }
 }
 </script>

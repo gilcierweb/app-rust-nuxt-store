@@ -84,6 +84,8 @@ definePageMeta({ layout: 'admin' })
 
 const { apiFetch, useApiFetch } = useApi()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: shipments, error, refresh } = await useApiFetch<Shipment[]>(
   '/api/admin/shipments',
@@ -113,13 +115,19 @@ const formatDate = (dateString: string) => {
 }
 
 const confirmDelete = async (shipment: Shipment) => {
-  if (confirm(t('admin.shipments.detail.confirmDelete', { id: shipment.id }))) {
-    try {
-      await apiFetch(`/api/admin/shipments/${shipment.id}`, { method: 'DELETE' })
-      await refresh()
-    } catch {
-      alert(t('admin.shipments.detail.errorDelete'))
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.shipments.detail.confirmDelete', { id: shipment.id }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/shipments/${shipment.id}`, { method: 'DELETE' })
+    await refresh()
+  } catch (err) {
+    toast.error(t('admin.shipments.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

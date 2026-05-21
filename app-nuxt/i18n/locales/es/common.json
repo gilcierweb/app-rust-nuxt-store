@@ -70,6 +70,11 @@
     },
     "confirmDelete": "¿Está seguro de que desea eliminar \"{name}\"?",
     "errorLoad": "Error al cargar {resource}",
-    "errorDelete": "Error al eliminar {resource}"
+    "errorDelete": "Error al eliminar {resource}",
+    "validation": {
+      "required": "Este campo es obligatorio.",
+      "invalidNumber": "Ingrese un número válido.",
+      "minNumber": "Ingrese un valor mayor o igual a {min}."
+    }
   }
 }

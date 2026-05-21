@@ -156,6 +156,9 @@ definePageMeta({
 const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
+const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: address, error, refresh } = await useApiFetch<Address>(
   `/api/admin/addresses/${route.params.id}`
@@ -185,16 +188,21 @@ const deleteAddress = async () => {
   if (!address.value) return
 
   const name = `${address.value.first_name} ${address.value.last_name}`
-  if (confirm(`Tem certeza que deseja excluir o endereço de "${name}"?`)) {
-    try {
-      await apiFetch(`/api/admin/addresses/${address.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/addresses')
-    } catch (err) {
-      alert('Erro ao excluir endereço')
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.addresses.detail.confirmDelete', { name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/addresses/${address.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/addresses')
+  } catch (err) {
+    toast.error(t('admin.addresses.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

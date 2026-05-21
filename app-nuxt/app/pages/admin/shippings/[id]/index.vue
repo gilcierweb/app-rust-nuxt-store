@@ -137,6 +137,8 @@ const { t, locale } = useI18n()
 const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: shipping, error, refresh } = await useApiFetch<ShippingMethod>(
   `/api/admin/shippings/${route.params.id}`
@@ -164,16 +166,21 @@ const formatDate = (dateString?: string) => {
 const deleteShipping = async () => {
   if (!shipping.value) return
 
-  if (confirm(t('admin.shippings.detail.confirmDelete', { name: shipping.value.name }))) {
-    try {
-      await apiFetch(`/api/admin/shippings/${shipping.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/shippings')
-    } catch (err) {
-      alert(t('admin.shippings.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.shippings.detail.confirmDelete', { name: shipping.value.name }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/shippings/${shipping.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/shippings')
+  } catch (err) {
+    toast.error(t('admin.shippings.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>

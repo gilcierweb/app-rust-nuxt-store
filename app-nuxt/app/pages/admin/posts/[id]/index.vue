@@ -127,6 +127,8 @@ const route = useRoute()
 const { apiFetch, useApiFetch } = useApi()
 const router = useRouter()
 const { t } = useI18n()
+const toast = useAppToast()
+const dialog = useAppDialog()
 
 const { pending, data: post, error, refresh } = await useApiFetch<Post>(
   `/api/admin/posts/${route.params.id}`
@@ -175,16 +177,21 @@ const formatDate = (dateString?: string) => {
 const deletePost = async () => {
   if (!post.value) return
 
-  if (confirm(t('admin.posts.detail.confirmDelete', { name: post.value.title || t('admin.posts.noTitle') }))) {
-    try {
-      await apiFetch(`/api/admin/posts/${post.value.id}`, {
-        method: 'DELETE'
-      })
-      router.push('/admin/posts')
-    } catch (err) {
-      alert(t('admin.posts.detail.errorDelete'))
-      console.error(err)
-    }
+  const confirmed = await dialog.confirm({
+    message: t('admin.posts.detail.confirmDelete', { name: post.value.title || t('admin.posts.noTitle') }),
+    confirmLabel: t('common.delete'),
+    tone: 'danger'
+  })
+  if (!confirmed) return
+
+  try {
+    await apiFetch(`/api/admin/posts/${post.value.id}`, {
+      method: 'DELETE'
+    })
+    router.push('/admin/posts')
+  } catch (err) {
+    toast.error(t('admin.posts.detail.errorDelete'))
+    console.error(err)
   }
 }
 </script>
