@@ -63,6 +63,13 @@ viewer: viewer@example.com
 
 Everyone's password: Password123!
 
+## Deploy on Railway
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/directus-official?referralCode=b2RDZT&utm_medium=integration&utm_source=template&utm_campaign=generic)
+
+## Deploy on Cloudflare
+
+[![Deploy to Cloudflare Pages](https://cloudflare.com)](https://cloudflare.com)
 
 ## 📂 Project Structure
 
