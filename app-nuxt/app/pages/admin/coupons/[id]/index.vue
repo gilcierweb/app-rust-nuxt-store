@@ -69,14 +69,14 @@
                 <label class="label">
                   <span class="label-text text-gray-500">{{ $t('admin.coupons.detail.minAmount') }}</span>
                 </label>
-                <div class="font-medium">{{ coupon.minimum_amount ? `R$ ${coupon.minimum_amount.toFixed(2)}` : '-' }}</div>
+                <div class="font-medium">{{ coupon.minimum_amount ? formatMoney(coupon.minimum_amount) : '-' }}</div>
               </div>
 
               <div class="form-control">
                 <label class="label">
                   <span class="label-text text-gray-500">{{ $t('admin.coupons.detail.maxDiscount') }}</span>
                 </label>
-                <div class="font-medium">{{ coupon.maximum_discount ? `R$ ${coupon.maximum_discount.toFixed(2)}` : '-' }}</div>
+                <div class="font-medium">{{ coupon.maximum_discount ? formatMoney(coupon.maximum_discount) : '-' }}</div>
               </div>
             </div>
           </div>
@@ -171,13 +171,22 @@ const discountTypeLabel = (type?: number) => {
   }
 }
 
+const toFiniteNumber = (value?: string | number | null) => {
+  const numericValue = Number(value ?? 0)
+  return Number.isFinite(numericValue) ? numericValue : 0
+}
+
 const formatDiscountValue = (coupon: Coupon) => {
   if (coupon.discount_type === 1) {
-    return `${coupon.discount_value}%`
+    return `${toFiniteNumber(coupon.discount_value)}%`
   } else if (coupon.discount_type === 2) {
-    return `R$ ${coupon.discount_value?.toFixed(2) || '0.00'}`
+    return formatMoney(coupon.discount_value)
   }
   return '-'
+}
+
+const formatMoney = (value?: string | number | null) => {
+  return `R$ ${toFiniteNumber(value).toFixed(2)}`
 }
 
 const usagePercentage = computed(() => {

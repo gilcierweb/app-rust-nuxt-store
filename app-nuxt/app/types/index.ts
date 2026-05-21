@@ -275,9 +275,9 @@ export interface Coupon {
   id: number
   code?: string
   discount_type?: number
-  discount_value?: number
-  minimum_amount?: number
-  maximum_discount?: number
+  discount_value?: number | string
+  minimum_amount?: number | string
+  maximum_discount?: number | string
   usage_limit?: number
   used_count?: number
   expires_at?: string

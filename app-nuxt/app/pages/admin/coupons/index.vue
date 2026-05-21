@@ -154,12 +154,17 @@ const discountTypeLabel = (type?: number) => {
   }
 }
 
+const toFiniteNumber = (value?: string | number | null) => {
+  const numericValue = Number(value ?? 0)
+  return Number.isFinite(numericValue) ? numericValue : 0
+}
+
 // Format discount value
 const formatDiscountValue = (coupon: Coupon) => {
   if (coupon.discount_type === 1) {
-    return `${coupon.discount_value}%`
+    return `${toFiniteNumber(coupon.discount_value)}%`
   } else if (coupon.discount_type === 2) {
-    return `R$ ${coupon.discount_value?.toFixed(2) || '0.00'}`
+    return `R$ ${toFiniteNumber(coupon.discount_value).toFixed(2)}`
   }
   return '-'
 }
