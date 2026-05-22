@@ -6,10 +6,10 @@ A production-ready e-commerce application featuring a high-performance REST API 
 
 ## ⚙️ Built with
 
-[![Rust](https://img.shields.io/badge/Rust-f74b00?style=for-the-badge&logo=rust&logoColor=black)](https://www.rust.com/)
+[![Rust](https://img.shields.io/badge/Rust-f74b00?style=for-the-badge&logo=rust&logoColor=black)](https://rust-lang.org)
 [![Loco.rs](https://img.shields.io/badge/Loco.rs-ba1f0f?style=for-the-badge&logo=loco.rs&logoColor=black)](https://www.loco.rs/)
 [![Nuxt](https://img.shields.io/badge/Nuxt-00dc82?style=for-the-badge&logo=nuxt&logoColor=black)](https://www.nuxt.com/)
-[![Vue](https://img.shields.io/badge/Vue-35465b?style=for-the-badge&logo=Vue.js&logoColor=42b883)](https://www.vue.com/)
+[![Vue](https://img.shields.io/badge/Vue-35465b?style=for-the-badge&logo=Vue.js&logoColor=42b883)](https://vuejs.org/)
 
 
 ![App Nuxt](app-nuxt/app/assets/images/app-rust-nuxt-store.webp) 
