@@ -4,6 +4,14 @@
 
 A production-ready e-commerce application featuring a high-performance REST API built with [Loco.rs](https://loco.rs/) (Rust) and a modern, responsive storefront powered by [Nuxt.js](https://nuxt.com/) (Vue.js). Loco.rs is like [Ruby on Rails](https://rubyonrails.org/), but for [Rust Lang](https://www.rust-lang.org/).
 
+## ⚙️ Built with
+
+[![Rust](https://img.shields.io/badge/Rust-f74b00?style=for-the-badge&logo=rust&logoColor=black)](https://www.rust.com/)
+[![Loco.rs](https://img.shields.io/badge/Loco.rs-ba1f0f?style=for-the-badge&logo=loco.rs&logoColor=black)](https://www.loco.rs/)
+[![Nuxt](https://img.shields.io/badge/Nuxt-00dc82?style=for-the-badge&logo=nuxt&logoColor=black)](https://www.nuxt.com/)
+[![Vue](https://img.shields.io/badge/Vue-35465b?style=for-the-badge&logo=Vue.js&logoColor=42b883)](https://www.vue.com/)
+
+
 ![App Nuxt](app-nuxt/app/assets/images/app-rust-nuxt-store.webp) 
 
 ![App Nuxt Admin](app-nuxt/app/assets/images/app-rust-nuxt-store-admin.webp)
