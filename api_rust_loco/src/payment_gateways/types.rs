@@ -13,6 +13,7 @@ pub struct CreatePaymentSessionInput {
     pub payment_id: i32,
     pub order_id: i32,
     pub payment_method_id: i32,
+    #[serde(with = "crate::utils::decimal")]
     pub amount: Decimal,
     pub currency: String,
     pub idempotency_key: String,
@@ -33,6 +34,7 @@ pub struct PaymentSessionOutput {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CapturePaymentInput {
     pub payment_id: i32,
+    #[serde(with = "crate::utils::decimal")]
     pub amount: Decimal,
     pub currency: String,
     pub external_payment_id: String,
@@ -49,6 +51,7 @@ pub struct VoidPaymentInput {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RefundPaymentInput {
     pub payment_id: i32,
+    #[serde(with = "crate::utils::decimal")]
     pub amount: Decimal,
     pub currency: String,
     pub external_payment_id: String,

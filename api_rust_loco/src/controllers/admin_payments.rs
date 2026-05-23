@@ -28,6 +28,7 @@ pub struct PaymentDetailJson {
 
 #[derive(Deserialize)]
 pub struct RefundParams {
+    #[serde(with = "crate::utils::decimal")]
     pub amount: Option<rust_decimal::Decimal>,
     pub reason: Option<String>,
 }

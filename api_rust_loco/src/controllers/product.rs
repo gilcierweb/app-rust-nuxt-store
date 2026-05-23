@@ -176,8 +176,11 @@ pub struct Params {
     pub sku: Option<String>,
     pub short_description: Option<String>,
     pub description: Option<String>,
+    #[serde(with = "crate::utils::decimal")]
     pub price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub cost_price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub compare_price: Option<Decimal>,
     pub featured: Option<bool>,
     pub active: Option<bool>,

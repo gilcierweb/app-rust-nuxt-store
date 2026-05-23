@@ -7,9 +7,13 @@ pub type Orders = Entity;
 #[derive(Debug, Deserialize)]
 pub struct CreateOrderParams {
     pub items: Vec<OrderItemParam>,
+    #[serde(with = "crate::utils::decimal")]
     pub subtotal: Decimal,
+    #[serde(with = "crate::utils::decimal")]
     pub total_amount: Decimal,
+    #[serde(with = "crate::utils::decimal")]
     pub shipping_amount: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub discount_amount: Option<Decimal>,
     pub notes: Option<String>,
     pub payment_method_id: Option<i32>,
@@ -32,6 +36,7 @@ pub struct CreateOrderParams {
 pub struct OrderItemParam {
     pub product_id: i32,
     pub quantity: i32,
+    #[serde(with = "crate::utils::decimal")]
     pub price: Decimal,
 }
 

@@ -156,10 +156,14 @@ fn variants_all_select_sql() -> String {
 pub struct Params {
     pub name: Option<String>,
     pub sku: Option<String>,
+    #[serde(with = "crate::utils::decimal")]
     pub price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub cost_price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub compare_price: Option<Decimal>,
     pub inventory_quantity: Option<i32>,
+    #[serde(with = "crate::utils::decimal")]
     pub weight: Option<Decimal>,
     pub barcode: Option<String>,
     pub position: Option<i32>,

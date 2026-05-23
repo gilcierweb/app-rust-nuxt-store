@@ -14,8 +14,11 @@ use crate::utils::pagination::PaginationParams;
 pub struct Params {
     pub code: Option<String>,
     pub discount_type: Option<i32>,
+    #[serde(with = "crate::utils::decimal")]
     pub discount_value: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub minimum_amount: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub maximum_discount: Option<Decimal>,
     pub usage_limit: Option<i32>,
     pub used_count: Option<i32>,
@@ -40,6 +43,7 @@ impl Params {
 #[derive(Debug, Deserialize)]
 pub struct ValidateParams {
     pub code: String,
+    #[serde(with = "crate::utils::decimal")]
     pub total_amount: Decimal,
 }
 

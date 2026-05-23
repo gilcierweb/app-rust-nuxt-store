@@ -14,7 +14,9 @@ use crate::utils::pagination::PaginationParams;
 pub struct Params {
     pub name: Option<String>,
     pub code: Option<String>,
+    #[serde(with = "crate::utils::decimal")]
     pub base_price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal")]
     pub free_shipping_threshold: Option<Decimal>,
     pub active: Option<bool>,
 }

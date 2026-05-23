@@ -20,6 +20,7 @@ use crate::payment_gateways::{
 pub struct ProcessPaymentParams {
     pub order_id: i32,
     pub payment_method_id: i32,
+    #[serde(with = "crate::utils::decimal")]
     pub amount: Decimal,
     pub payment_gateway_payload: Option<Value>,
 }
