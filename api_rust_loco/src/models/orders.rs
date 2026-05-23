@@ -11,9 +11,9 @@ pub struct CreateOrderParams {
     pub subtotal: Decimal,
     #[serde(with = "crate::utils::decimal")]
     pub total_amount: Decimal,
-    #[serde(with = "crate::utils::decimal")]
+    #[serde(with = "crate::utils::decimal::opt")]
     pub shipping_amount: Option<Decimal>,
-    #[serde(with = "crate::utils::decimal")]
+    #[serde(with = "crate::utils::decimal::opt")]
     pub discount_amount: Option<Decimal>,
     pub notes: Option<String>,
     pub payment_method_id: Option<i32>,

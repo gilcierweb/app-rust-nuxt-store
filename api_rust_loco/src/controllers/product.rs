@@ -176,11 +176,11 @@ pub struct Params {
     pub sku: Option<String>,
     pub short_description: Option<String>,
     pub description: Option<String>,
-    #[serde(with = "crate::utils::decimal")]
+    #[serde(with = "crate::utils::decimal::opt")]
     pub price: Option<Decimal>,
-    #[serde(with = "crate::utils::decimal")]
+    #[serde(with = "crate::utils::decimal::opt")]
     pub cost_price: Option<Decimal>,
-    #[serde(with = "crate::utils::decimal")]
+    #[serde(with = "crate::utils::decimal::opt")]
     pub compare_price: Option<Decimal>,
     pub featured: Option<bool>,
     pub active: Option<bool>,
