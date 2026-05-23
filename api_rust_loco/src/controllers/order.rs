@@ -56,8 +56,18 @@ pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
 pub async fn checkout(
     auth: CookieJWT,
     State(ctx): State<AppContext>,
-    Json(params): Json<CreateOrderParams>,
+    body: axum::body::Bytes,
 ) -> Result<Response> {
+    let params: CreateOrderParams = serde_json::from_slice(&body).map_err(|e| {
+        let body_str = String::from_utf8_lossy(&body);
+        tracing::error!(
+            body = %body_str,
+            error = %e,
+            "checkout body deserialization failed"
+        );
+        Error::BadRequest(format!("invalid request body: {e}"))
+    })?;
+
     let current_user_id = current_user_id(&ctx, &auth).await?;
 
     if params.items.is_empty() {

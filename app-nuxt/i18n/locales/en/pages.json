@@ -278,7 +278,8 @@
       "step3": "Payment Method",
       "securePayment": "Secure Payment with 256-bit SSL Encryption",
       "promoCode": "Promo Code",
-      "apply": "Apply"
+      "apply": "Apply",
+      "invalidCart": "Your cart contains invalid or corrupted data. Please try adding the items again."
     },
     "confirmation": {
       "title": "Order Confirmed",

@@ -278,7 +278,8 @@
       "step3": "Forma de Pago",
       "securePayment": "Pago Seguro con Criptografía SSL de 256 bits",
       "promoCode": "Cupón de Descuento",
-      "apply": "Aplicar"
+      "apply": "Aplicar",
+      "invalidCart": "Tu carrito contiene datos inválidos o corruptos. Intenta agregar los productos nuevamente."
     },
     "confirmation": {
       "title": "Pedido Confirmado",

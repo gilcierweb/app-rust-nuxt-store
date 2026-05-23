@@ -507,6 +507,12 @@ function removeCoupon() {
 
 const placeOrder = handleSubmit(async () => {
   if (cartStore.isEmpty || !selectedPaymentMethod.value) return
+
+  if (cartStore.items.some(item => item.price === null || item.price === undefined || !isFinite(item.price)) || !isFinite(cartStore.totalPrice)) {
+    error.value = t('pages.checkout.invalidCart')
+    return
+  }
+
   submitting.value = true
   error.value = ''
 

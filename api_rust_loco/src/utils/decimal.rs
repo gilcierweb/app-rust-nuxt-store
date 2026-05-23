@@ -1,19 +1,40 @@
 use rust_decimal::Decimal;
-use serde::de::{self, Deserialize, Deserializer};
+use serde::de::{self, Deserializer, Visitor};
 use serde::ser::Serializer;
-use serde_json::value::Number;
+use std::fmt;
 
-fn number_to_decimal(num: Number) -> Result<Decimal, String> {
-    let s = num.to_string();
-    s.parse::<Decimal>().map_err(|_| format!("invalid decimal: {s}"))
+struct DecimalVisitor;
+
+impl<'de> Visitor<'de> for DecimalVisitor {
+    type Value = Decimal;
+
+    fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str("a JSON number or decimal string")
+    }
+
+    fn visit_f64<E: de::Error>(self, v: f64) -> Result<Decimal, E> {
+        let s = v.to_string();
+        s.parse::<Decimal>().map_err(de::Error::custom)
+    }
+
+    fn visit_i64<E: de::Error>(self, v: i64) -> Result<Decimal, E> {
+        Ok(Decimal::from(v))
+    }
+
+    fn visit_u64<E: de::Error>(self, v: u64) -> Result<Decimal, E> {
+        Ok(Decimal::from(v))
+    }
+
+    fn visit_str<E: de::Error>(self, v: &str) -> Result<Decimal, E> {
+        v.parse::<Decimal>().map_err(de::Error::custom)
+    }
 }
 
 pub fn deserialize<'de, D>(deserializer: D) -> Result<Decimal, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let num = Number::deserialize(deserializer)?;
-    number_to_decimal(num).map_err(de::Error::custom)
+    deserializer.deserialize_any(DecimalVisitor)
 }
 
 pub fn serialize<S>(value: &Decimal, serializer: S) -> Result<S::Ok, S::Error>
@@ -26,14 +47,46 @@ where
 pub mod opt {
     use super::*;
 
+    struct OptDecimalVisitor;
+
+    impl<'de> Visitor<'de> for OptDecimalVisitor {
+        type Value = Option<Decimal>;
+
+        fn expecting(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            f.write_str("a JSON number, decimal string, or null")
+        }
+
+        fn visit_none<E: de::Error>(self) -> Result<Option<Decimal>, E> {
+            Ok(None)
+        }
+
+        fn visit_unit<E: de::Error>(self) -> Result<Option<Decimal>, E> {
+            Ok(None)
+        }
+
+        fn visit_f64<E: de::Error>(self, v: f64) -> Result<Option<Decimal>, E> {
+            let s = v.to_string();
+            s.parse::<Decimal>().map(Some).map_err(de::Error::custom)
+        }
+
+        fn visit_i64<E: de::Error>(self, v: i64) -> Result<Option<Decimal>, E> {
+            Ok(Some(Decimal::from(v)))
+        }
+
+        fn visit_u64<E: de::Error>(self, v: u64) -> Result<Option<Decimal>, E> {
+            Ok(Some(Decimal::from(v)))
+        }
+
+        fn visit_str<E: de::Error>(self, v: &str) -> Result<Option<Decimal>, E> {
+            v.parse::<Decimal>().map(Some).map_err(de::Error::custom)
+        }
+    }
+
     pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Decimal>, D::Error>
     where
         D: Deserializer<'de>,
     {
-        match Option::<Number>::deserialize(deserializer)? {
-            Some(num) => number_to_decimal(num).map(Some).map_err(de::Error::custom),
-            None => Ok(None),
-        }
+        deserializer.deserialize_any(OptDecimalVisitor)
     }
 
     pub fn serialize<S>(value: &Option<Decimal>, serializer: S) -> Result<S::Ok, S::Error>
