@@ -12,7 +12,7 @@ use crate::models::_entities::{orders, payment_methods, payments};
 use crate::models::payment_gateway_status::PaymentGatewayEventStatus;
 use crate::payment_gateways::registry::gateway_for_driver;
 use crate::payment_gateways::session_response::order_payment_status;
-use crate::payment_gateways::types::{WebhookAction, WebhookDecision, WebhookInput};
+use crate::payment_gateways::types::{WebhookAction, WebhookInput};
 
 const LOG_DIRECTION_WEBHOOK: i16 = 3;
 const LOG_LEVEL_INFO: i16 = 1;
