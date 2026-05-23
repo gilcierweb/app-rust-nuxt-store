@@ -17,8 +17,11 @@ pub struct Model {
     pub short_description: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub cost_price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub compare_price: Option<Decimal>,
     pub featured: Option<bool>,
     pub active: Option<bool>,

@@ -437,7 +437,8 @@ if (shippingMethods.value.length > 0) {
 const selectedShippingCost = computed(() => {
   if (!selectedShippingMethod.value) return null
   const method = shippingMethods.value.find(m => m.id === selectedShippingMethod.value)
-  return method?.base_price ?? null
+  const price = method?.base_price
+  return price != null ? Number(price) : null
 })
 
 watch(selectedGatewayDriver, async (driver) => {
@@ -519,11 +520,11 @@ const placeOrder = handleSubmit(async () => {
   const items = cartStore.items.map(item => ({
     product_id: item.productId,
     quantity: item.quantity,
-    price: item.price,
+    price: Number(item.price),
   }))
 
-  const shippingCost = selectedShippingCost.value || 0
-  const discount = couponDiscount.value || 0
+  const shippingCost = Number(selectedShippingCost.value) || 0
+  const discount = Number(couponDiscount.value) || 0
 
   try {
     let paymentGatewayPayload: Record<string, unknown> | null = null
@@ -551,13 +552,14 @@ const placeOrder = handleSubmit(async () => {
       idempotency_key: idempotencyKey.value,
     }
 
+    const subtotal = Number(cartStore.totalPrice)
     const data = await apiFetch<any>('/api/account/orders/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: {
         items,
-        subtotal: cartStore.totalPrice,
-        total_amount: cartStore.totalPrice + shippingCost - discount,
+        subtotal,
+        total_amount: subtotal + shippingCost - discount,
         shipping_amount: shippingCost,
         discount_amount: discount || null,
         coupon_code: couponApplied.value ? couponCode.value.trim().toUpperCase() : null,

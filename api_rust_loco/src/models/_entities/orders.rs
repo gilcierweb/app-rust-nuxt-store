@@ -12,10 +12,15 @@ pub struct Model {
     pub id: i32,
     pub order_number: Option<String>,
     pub status: Option<i32>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub total_amount: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub subtotal: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub tax_amount: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub shipping_amount: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub discount_amount: Option<Decimal>,
     pub currency: Option<String>,
     pub payment_status: Option<i32>,

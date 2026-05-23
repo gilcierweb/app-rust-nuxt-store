@@ -11,7 +11,9 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub quantity: Option<i32>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub total: Option<Decimal>,
     pub order_id: i32,
     pub product_id: i32,

@@ -20,7 +20,7 @@ export const useCartStore = defineStore('cart', {
           id: Date.now().toString(),
           productId: item.productId,
           name: item.name,
-          price: item.price,
+          price: Number(item.price),
           quantity: item.quantity || 1,
           image: item.image,
           slug: item.slug,

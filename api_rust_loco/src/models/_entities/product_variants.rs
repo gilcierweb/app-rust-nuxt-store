@@ -12,10 +12,14 @@ pub struct Model {
     pub id: i32,
     pub name: Option<String>,
     pub sku: Option<String>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub cost_price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub compare_price: Option<Decimal>,
     pub inventory_quantity: Option<i32>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub weight: Option<Decimal>,
     pub barcode: Option<String>,
     pub position: Option<i32>,

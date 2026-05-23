@@ -10,6 +10,7 @@ pub struct Model {
     pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key)]
     pub id: i32,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub amount: Option<Decimal>,
     pub currency: Option<String>,
     pub status: Option<i32>,

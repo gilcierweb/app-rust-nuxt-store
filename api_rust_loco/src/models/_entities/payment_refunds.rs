@@ -9,6 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub payment_id: i32,
+    #[serde(with = "crate::utils::decimal")]
     pub amount: Decimal,
     pub currency: String,
     pub status: i16,

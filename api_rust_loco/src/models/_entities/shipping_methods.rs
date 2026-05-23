@@ -12,7 +12,9 @@ pub struct Model {
     pub id: i32,
     pub name: Option<String>,
     pub code: Option<String>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub base_price: Option<Decimal>,
+    #[serde(with = "crate::utils::decimal::opt")]
     pub free_shipping_threshold: Option<Decimal>,
     pub active: Option<bool>,
 }
