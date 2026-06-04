@@ -300,6 +300,7 @@ definePageMeta({
 const { t } = useI18n()
 const config = useRuntimeConfig()
 const cartStore = useCartStore()
+const { clearCartSync } = useCartSync()
 const router = useRouter()
 const { apiFetch, useApiFetch } = useApi()
 import type { PaymentMethod, PaymentSetupSession, ShippingMethod } from '~/types'
@@ -578,7 +579,7 @@ const placeOrder = handleSubmit(async () => {
     })
 
     if (data.payment_session?.action_url) {
-      cartStore.clearCart()
+      await clearCartSync()
       await navigateTo(data.payment_session.action_url, { external: true })
       return
     }
@@ -590,7 +591,7 @@ const placeOrder = handleSubmit(async () => {
     ) {
       pendingStripeOrderId.value = data.id
       stripeClientSecret.value = data.payment_session.external_client_secret
-      cartStore.clearCart()
+      await clearCartSync()
       await mountStripePaymentElement(stripeClientSecret.value)
       return
     }
@@ -598,7 +599,7 @@ const placeOrder = handleSubmit(async () => {
     const confirmationPath = data.payment_session?.requires_action
       ? `/orders/confirmation/${data.id}?payment_action=required`
       : `/orders/confirmation/${data.id}`
-    cartStore.clearCart()
+    await clearCartSync()
     router.push(confirmationPath)
   } catch (err: any) {
     error.value = err?.data?.message || err?.message || t('pages.products.edit.error', { message: '' })

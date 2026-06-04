@@ -61,7 +61,7 @@
                   <td class="py-4">
                     <div class="join border border-primary/20 rounded-xl overflow-hidden shadow-md bg-base-100">
                       <button class="btn btn-sm btn-primary join-item px-3 disabled:bg-primary/50 disabled:text-primary-content/50" 
-                        @click="cartStore.updateQuantity(item.productId, item.quantity - 1)"
+                        @click="updateQuantitySync(item.productId, item.quantity - 1)"
                         :disabled="item.quantity <= 1">
                         <span class="icon-[tabler--minus] size-4" />
                       </button>
@@ -69,7 +69,7 @@
                         {{ item.quantity }}
                       </div>
                       <button class="btn btn-sm btn-primary join-item px-3" 
-                        @click="cartStore.updateQuantity(item.productId, item.quantity + 1)">
+                        @click="updateQuantitySync(item.productId, item.quantity + 1)">
                         <span class="icon-[tabler--plus] size-4" />
                       </button>
                     </div>
@@ -78,7 +78,7 @@
                     {{ formatNumberBR(item.price * item.quantity) }}
                   </td>
                   <td class="py-4 pr-6 text-right">
-                    <button @click="cartStore.removeItem(item.productId)" class="btn btn-circle btn-error btn-sm shadow-sm hover:scale-110 transition-transform" :aria-label="t('cart.remove')">
+                    <button @click="removeItemSync(item.productId)" class="btn btn-circle btn-error btn-sm shadow-sm hover:scale-110 transition-transform" :aria-label="t('cart.remove')">
                       <span class="icon-[tabler--trash] size-5" />
                     </button>
                   </td>
@@ -94,7 +94,7 @@
               <span class="icon-[tabler--arrow-left] size-5" />
               {{ t('cart.continueShopping') }}
             </NuxtLinkLocale>
-            <button class="btn btn-outline btn-error gap-2 rounded-xl px-8 hover:bg-error hover:text-error-content shadow-sm" @click="cartStore.clearCart()">
+            <button class="btn btn-outline btn-error gap-2 rounded-xl px-8 hover:bg-error hover:text-error-content shadow-sm" @click="clearCartSync()">
               <span class="icon-[tabler--trash-x] size-5" />
               {{ t('cart.clearCart') }}
             </button>
@@ -162,5 +162,5 @@ useSeoMeta({
   ogTitle: t('pages.cart.title'),
 })
 const cartStore = useCartStore()
+const { removeItemSync, updateQuantitySync, clearCartSync } = useCartSync()
 </script>
-

@@ -119,7 +119,7 @@ async fn admin_can_list_inventory_with_filters_and_pagination() {
         cart_items::ActiveModel {
             cart_id: Set(cart.id),
             product_id: Set(product.id),
-            product_variant_id: Set(reserved_variant.id),
+            product_variant_id: Set(Some(reserved_variant.id)),
             quantity: Set(Some(2)),
             price: Set(Some(Decimal::new(1000, 2))),
             created_at: Set(now.into()),

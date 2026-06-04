@@ -15,7 +15,7 @@ pub struct Model {
     pub price: Option<Decimal>,
     pub cart_id: i32,
     pub product_id: i32,
-    pub product_variant_id: i32,
+    pub product_variant_id: Option<i32>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

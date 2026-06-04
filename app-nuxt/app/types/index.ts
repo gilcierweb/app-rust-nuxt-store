@@ -221,6 +221,23 @@ export interface CartItem {
   variantId?: number
 }
 
+export interface CartApiItem {
+  id: number
+  cart_id: number
+  product_id: number
+  product_variant_id: number | null
+  quantity: number
+  price: string
+  product_name: string | null
+  product_slug: string | null
+  product_image: string | null
+}
+
+export interface CartApiResponse {
+  id: number
+  items: CartApiItem[]
+}
+
 export interface PaymentMethod {
   id: number
   name?: string

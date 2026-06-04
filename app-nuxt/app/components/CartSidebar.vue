@@ -26,15 +26,15 @@
                 <p class="text-sm text-base-content/60">{{ formatNumberBR(item.price) }}</p>
               </div>
               <div class="flex items-center gap-1">
-                <button class="btn btn-ghost btn-square btn-xs" @click="cartStore.updateQuantity(item.productId, item.quantity - 1)">
+                <button class="btn btn-ghost btn-square btn-xs" @click="updateQuantitySync(item.productId, item.quantity - 1)">
                   <span class="icon-[tabler--minus] size-4" />
                 </button>
                 <span class="w-8 text-center text-sm">{{ item.quantity }}</span>
-                <button class="btn btn-ghost btn-square btn-xs" @click="cartStore.updateQuantity(item.productId, item.quantity + 1)">
+                <button class="btn btn-ghost btn-square btn-xs" @click="updateQuantitySync(item.productId, item.quantity + 1)">
                   <span class="icon-[tabler--plus] size-4" />
                 </button>
               </div>
-              <button class="btn btn-ghost btn-square btn-xs text-error" @click="cartStore.removeItem(item.productId)">
+              <button class="btn btn-ghost btn-square btn-xs text-error" @click="removeItemSync(item.productId)">
                 <span class="icon-[tabler--trash] size-4" />
               </button>
             </div>
@@ -59,6 +59,7 @@
 const { t } = useI18n()
 const cartStore = useCartStore()
 const { isCartOpen, closeCart } = useCartUI()
+const { removeItemSync, updateQuantitySync } = useCartSync()
 </script>
 
 <style scoped>

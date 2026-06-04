@@ -51,6 +51,7 @@ mod m20260520_035158_product_variant_images;
 mod m20260520_065417_create_email_logs;
 mod m20260520_120000_admin_settings;
 mod m20260520_234941_admin_audit_logs;
+mod m20260604_000001_alter_cart_items_product_variant_nullable;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -105,6 +106,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260520_120000_admin_settings::Migration),
             Box::new(m20260520_065417_create_email_logs::Migration),
             Box::new(m20260520_234941_admin_audit_logs::Migration),
+            Box::new(m20260604_000001_alter_cart_items_product_variant_nullable::Migration),
             // inject-above (do not remove this comment)
         ]
     }

@@ -30,7 +30,16 @@
     "self_parent": "Una categoría no puede ser su propio padre"
   },
   "cart": {
-    "empty": "El carrito está vacío"
+    "empty": "El carrito está vacío",
+    "not_found": "Carrito no encontrado",
+    "item_not_found": "Elemento del carrito no encontrado",
+    "item_added": "Producto añadido al carrito",
+    "item_removed": "Producto eliminado del carrito",
+    "item_updated": "Elemento del carrito actualizado",
+    "cart_cleared": "Carrito vaciado",
+    "quantity_required": "La cantidad es obligatoria",
+    "price_required": "El precio es obligatorio",
+    "variant_not_found": "Variante del producto no encontrada"
   },
   "coupon": {
     "not_found": "Cupón no encontrado",

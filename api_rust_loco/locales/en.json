@@ -30,7 +30,16 @@
     "self_parent": "A category cannot be its own parent"
   },
   "cart": {
-    "empty": "Cart is empty"
+    "empty": "Cart is empty",
+    "not_found": "Cart not found",
+    "item_not_found": "Cart item not found",
+    "item_added": "Item added to cart",
+    "item_removed": "Item removed from cart",
+    "item_updated": "Cart item updated",
+    "cart_cleared": "Cart cleared",
+    "quantity_required": "Quantity is required",
+    "price_required": "Price is required",
+    "variant_not_found": "Product variant not found"
   },
   "coupon": {
     "not_found": "Coupon not found",

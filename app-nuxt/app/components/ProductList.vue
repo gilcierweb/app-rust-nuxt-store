@@ -93,18 +93,17 @@ import type { ProductApi } from '~/types'
 const { t } = useI18n()
 const { openCart } = useCartUI()
 const cartStore = useCartStore()
+const { addItemSync } = useCartSync()
 const { fetchWishlist, toggleWishlist, isInWishlist } = useWishlist()
 
-// Unified Product Type
-interface UnifiedProduct {
-  id: number | string
-  name: string
-  description: string
-  price: number
-  image: string
-  category: string
-  isNew?: boolean
-  source: 'api' | 'dummy'
+function handleAddToCart(product: UnifiedProduct) {
+  addItemSync({
+    productId: product.id as number,
+    name: product.name,
+    price: product.price,
+    image: product.image,
+  })
+  openCart()
 }
 
 // Data Fetching (non-blocking: page renders instantly with skeleton loaders)
@@ -139,16 +138,6 @@ const allProducts = computed<UnifiedProduct[]>(() => {
 
   return [...apiItems, ...dummyItems]
 })
-
-function handleAddToCart(product: UnifiedProduct) {
-  cartStore.addItem({
-    productId: product.id as number,
-    name: product.name,
-    price: product.price,
-    image: product.image,
-  })
-  openCart()
-}
 
 onMounted(() => {
   fetchWishlist()

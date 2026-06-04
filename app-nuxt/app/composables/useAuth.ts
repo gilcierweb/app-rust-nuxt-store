@@ -25,6 +25,10 @@ export const useAuth = () => {
         roles: data.roles,
         can_manage_admin: data.can_manage_admin
       }
+
+      const { mergeCartOnLogin } = useCartSync()
+      await mergeCartOnLogin()
+
       return data
     } catch (err: any) {
       const message = err?.data?.message || err?.message || 'Erro ao fazer login'

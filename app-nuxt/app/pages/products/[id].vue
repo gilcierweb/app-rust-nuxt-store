@@ -248,10 +248,12 @@ watch(variants, (newVariants) => {
 }, { immediate: true })
 
 // Cart & Wishlist
+const { addItemSync } = useCartSync()
+
 function addToCartApi(product: ProductApi) {
   if (!product.id) return
   
-  cartStore.addItem({
+  addItemSync({
     productId: product.id,
     name: product.name ?? 'Unknown Product',
     price: selectedPrice.value,

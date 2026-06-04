@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { CartItem } from '~/types'
+import type { CartApiItem, CartItem } from '~/types'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
@@ -12,7 +12,7 @@ export const useCartStore = defineStore('cart', {
   },
   actions: {
     addItem(item: { productId: number; name: string; price: number; image?: string; slug?: string; quantity?: number; variantId?: number }) {
-      const existing = this.items.find(i => i.productId === item.productId)
+      const existing = this.items.find(i => i.productId === item.productId && i.variantId === item.variantId)
       if (existing) {
         existing.quantity += item.quantity || 1
       } else {
@@ -24,6 +24,7 @@ export const useCartStore = defineStore('cart', {
           quantity: item.quantity || 1,
           image: item.image,
           slug: item.slug,
+          variantId: item.variantId,
         })
       }
     },
@@ -43,6 +44,25 @@ export const useCartStore = defineStore('cart', {
     clearCart() {
       this.items = []
     },
+    setItems(items: CartItem[]) {
+      this.items = items
+    },
+    hasItem(productId: number, variantId?: number): boolean {
+      return this.items.some(i => i.productId === productId && i.variantId === (variantId ?? i.variantId))
+    },
   },
   persist: true,
 })
+
+export function mapCartApiItem(item: CartApiItem): CartItem {
+  return {
+    id: String(item.id),
+    productId: item.product_id,
+    name: item.product_name ?? 'Product',
+    price: Number(item.price),
+    quantity: item.quantity,
+    image: item.product_image ?? undefined,
+    slug: item.product_slug ?? undefined,
+    variantId: item.product_variant_id ?? undefined,
+  }
+}

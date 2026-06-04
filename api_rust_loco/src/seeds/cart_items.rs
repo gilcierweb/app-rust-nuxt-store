@@ -38,11 +38,11 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
                 .collect();
 
             let variant_id = if !product_variants.is_empty() && rand::rng().random_bool(0.7) {
-                product_variants[rand::rng().random_range(0..product_variants.len())].id
+                Some(product_variants[rand::rng().random_range(0..product_variants.len())].id)
             } else if !variants.is_empty() {
-                variants[rand::rng().random_range(0..variants.len())].id
+                Some(variants[rand::rng().random_range(0..variants.len())].id)
             } else {
-                continue;
+                None
             };
 
             let quantity = rand::rng().random_range(1..=5);
