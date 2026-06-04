@@ -6,8 +6,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "email_logs")]
 pub struct Model {
-    pub created_at: DateTimeWithTimeZone,
-    pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key)]
     pub id: i32,
     pub recipient: String,
@@ -19,6 +17,8 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub error_message: Option<String>,
     pub sent_at: Option<DateTime>,
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

@@ -6,8 +6,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "shipping_methods")]
 pub struct Model {
-    pub created_at: DateTimeWithTimeZone,
-    pub updated_at: DateTimeWithTimeZone,
     #[sea_orm(primary_key)]
     pub id: i32,
     pub name: Option<String>,
@@ -17,6 +15,8 @@ pub struct Model {
     #[serde(with = "crate::utils::decimal::opt")]
     pub free_shipping_threshold: Option<Decimal>,
     pub active: Option<bool>,
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
