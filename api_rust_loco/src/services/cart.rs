@@ -59,6 +59,81 @@ where
     Ok(saved)
 }
 
+pub async fn get_cart_with_items_for_user<C>(db: &C, user_id: i32) -> Result<CartWithItems>
+where
+    C: ConnectionTrait,
+{
+    #[derive(Debug, FromQueryResult)]
+    struct CartItemRow {
+        id: i32,
+        cart_id: i32,
+        product_id: i32,
+        product_variant_id: Option<i32>,
+        quantity: Option<i32>,
+        price: Option<Decimal>,
+        product_name: Option<String>,
+        product_slug: Option<String>,
+        product_image: Option<String>,
+    }
+
+    let backend = db.get_database_backend();
+
+    // Single roundtrip: resolve the user's cart_id via subquery and LEFT JOIN
+    // it with the items. Replaces the previous 2 sequential roundtrips
+    // (get_or_create_cart + get_cart_with_items).
+    let items_sql = r#"
+        SELECT
+            ci.id              AS id,
+            ci.cart_id         AS cart_id,
+            ci.product_id      AS product_id,
+            ci.product_variant_id AS product_variant_id,
+            ci.quantity        AS quantity,
+            ci.price           AS price,
+            p.name             AS product_name,
+            p.slug             AS product_slug,
+            cover.image        AS product_image
+        FROM cart_items ci
+        INNER JOIN (
+            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
+        ) c ON c.id = ci.cart_id
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN LATERAL (
+            SELECT image
+            FROM product_images
+            WHERE product_id = p.id AND cover = TRUE
+            ORDER BY position
+            LIMIT 1
+        ) cover ON TRUE
+        ORDER BY ci.id
+    "#;
+
+    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        items_sql,
+        vec![user_id.into()],
+    ))
+    .all(db)
+    .await?;
+
+    let cart_id = raw_items.first().map(|row| row.cart_id).unwrap_or(0);
+    let items = raw_items
+        .into_iter()
+        .map(|row| CartItemWithProduct {
+            id: row.id,
+            cart_id: row.cart_id,
+            product_id: row.product_id,
+            product_variant_id: row.product_variant_id,
+            quantity: row.quantity.unwrap_or(1),
+            price: row.price.unwrap_or(Decimal::ZERO),
+            product_name: row.product_name,
+            product_slug: row.product_slug,
+            product_image: row.product_image,
+        })
+        .collect();
+
+    Ok(CartWithItems { id: cart_id, items })
+}
+
 pub async fn get_cart_with_items<C>(db: &C, cart_id: i32) -> Result<CartWithItems>
 where
     C: ConnectionTrait,

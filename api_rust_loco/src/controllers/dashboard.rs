@@ -11,7 +11,7 @@ use std::sync::Arc;
 
 use crate::cache::dashboard_cache;
 use crate::models::_entities::{
-    categories, order_items, orders, payment_gateway_events, payments, products, users,
+    categories, order_items, orders, payment_gateway_events, products, users,
 };
 use crate::models::payment_gateway_status::{PaymentAttemptStatus, PaymentGatewayEventStatus};
 
@@ -77,13 +77,21 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
     }
 
     // Define all futures for parallel execution
-    let total_revenue_fut = orders::Entity::find()
-        .select_only()
-        .column_as(orders::Column::TotalAmount.sum(), "total")
-        .into_tuple::<(Option<Decimal>,)>()
-        .one(&ctx.db);
 
-    let total_orders_fut = orders::Entity::find().count(&ctx.db);
+    // Combined order aggregates: COUNT(*) and SUM(total_amount) in a single
+    // table scan (replaces the previous 2 separate full scans).
+    #[derive(Debug, FromQueryResult)]
+    struct OrderAggregates {
+        total_orders: i64,
+        total_revenue: Option<Decimal>,
+    }
+    let order_aggregates_fut = OrderAggregates::find_by_statement(Statement::from_sql_and_values(
+        ctx.db.get_database_backend(),
+        "SELECT COUNT(*)::BIGINT AS total_orders, \
+                SUM(total_amount) AS total_revenue FROM orders",
+        vec![],
+    ))
+    .one(&ctx.db);
 
     let seven_days_ago = chrono::Utc::now() - chrono::Duration::days(7);
     let sales_results_fut = orders::Entity::find()
@@ -145,18 +153,28 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .limit(5)
         .all(&ctx.db);
 
-    let total_refunds_fut = payments::Entity::find()
-        .filter(payments::Column::Status.eq(PaymentAttemptStatus::Refunded.to_i16() as i32))
-        .select_only()
-        .column_as(payments::Column::Amount.sum(), "total")
-        .into_tuple::<(Option<Decimal>,)>()
-        .one(&ctx.db);
-
-    let failed_payments_fut = payments::Entity::find()
-        .filter(payments::Column::Status.eq(PaymentAttemptStatus::Failed.to_i16() as i32))
-        .count(&ctx.db);
-
-    let total_payments_fut = payments::Entity::find().count(&ctx.db);
+    // Combined payment aggregates: total / failed / refunds in a single scan
+    // using PostgreSQL FILTER (replaces 3 separate queries).
+    #[derive(Debug, FromQueryResult)]
+    struct PaymentAggregates {
+        total_payments: i64,
+        failed_payments: i64,
+        total_refunds: Option<Decimal>,
+    }
+    let refunded_status = PaymentAttemptStatus::Refunded.to_i16() as i32;
+    let failed_status = PaymentAttemptStatus::Failed.to_i16() as i32;
+    let payment_aggregates_sql = format!(
+        "SELECT COUNT(*)::BIGINT AS total_payments, \
+                COUNT(*) FILTER (WHERE status = {failed_status})::BIGINT AS failed_payments, \
+                SUM(amount) FILTER (WHERE status = {refunded_status}) AS total_refunds \
+         FROM payments"
+    );
+    let payment_aggregates_fut = PaymentAggregates::find_by_statement(Statement::from_sql_and_values(
+        ctx.db.get_database_backend(),
+        &payment_aggregates_sql,
+        vec![],
+    ))
+    .one(&ctx.db);
 
     let webhook_failures_fut = payment_gateway_events::Entity::find()
         .filter(
@@ -166,28 +184,22 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
 
     // Execute all queries in parallel
     let (
-        total_revenue_res,
-        total_orders,
+        order_aggregates_res,
         total_customers,
         sales_results,
         all_category_results,
         top_products_results,
         recent_orders_results,
-        total_refunds_res,
-        failed_payments,
-        total_payments,
+        payment_aggregates_res,
         webhook_failures,
     ) = tokio::try_join!(
-        total_revenue_fut,
-        total_orders_fut,
+        order_aggregates_fut,
         total_customers_fut,
         sales_results_fut,
         all_category_results_fut,
         top_products_results_fut,
         recent_orders_results_fut,
-        total_refunds_fut,
-        failed_payments_fut,
-        total_payments_fut,
+        payment_aggregates_fut,
         webhook_failures_fut,
     )
     .map_err(|e| {
@@ -195,8 +207,22 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         Error::InternalServerError
     })?;
 
+    let order_aggregates = order_aggregates_res.unwrap_or(OrderAggregates {
+        total_orders: 0,
+        total_revenue: None,
+    });
+    let payment_aggregates = payment_aggregates_res.unwrap_or(PaymentAggregates {
+        total_payments: 0,
+        failed_payments: 0,
+        total_refunds: None,
+    });
+    let total_orders = order_aggregates.total_orders as u64;
+    let total_revenue = order_aggregates.total_revenue;
+    let total_payments = payment_aggregates.total_payments as u64;
+    let failed_payments = payment_aggregates.failed_payments as u64;
+    let total_refunds = payment_aggregates.total_refunds;
+
     // 1. Process KPI Stats
-    let total_revenue = total_revenue_res.and_then(|(total,)| total);
     let revenue_f64 = total_revenue.unwrap_or_default().to_f64().unwrap_or(0.0);
     let conversion_rate = if total_customers > 0 {
         (total_orders as f64 / total_customers as f64) * 100.0
@@ -243,8 +269,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         },
     ];
 
-    let total_refunds = total_refunds_res
-        .and_then(|(total,)| total)
+    let total_refunds_f64 = total_refunds
         .unwrap_or_default()
         .to_f64()
         .unwrap_or(0.0);
@@ -257,7 +282,7 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
     let mut kpi_stats = kpi_stats;
     kpi_stats.push(KpiStat {
         title: "Refunds".to_string(),
-        value: format!("{:.2}", total_refunds),
+        value: format!("{:.2}", total_refunds_f64),
         trend: "".to_string(),
         trend_up: false,
         icon: "icon-[tabler--receipt-refund]".to_string(),

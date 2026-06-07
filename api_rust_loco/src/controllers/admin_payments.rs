@@ -34,6 +34,11 @@ pub struct RefundParams {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct GatewayEventsParams {
+    pub limit: Option<u64>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct AdminPaymentListParams {
     pub page: Option<u64>,
     pub page_size: Option<u64>,
@@ -212,10 +217,14 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 }
 
 #[debug_handler]
-pub async fn list_gateway_events(State(ctx): State<AppContext>) -> Result<Response> {
+pub async fn list_gateway_events(
+    State(ctx): State<AppContext>,
+    Query(params): Query<GatewayEventsParams>,
+) -> Result<Response> {
+    let limit = params.limit.unwrap_or(200).clamp(1, 500);
     let items = payment_gateway_events::Entity::find()
         .order_by_desc(payment_gateway_events::Column::CreatedAt)
-        .limit(200)
+        .limit(limit)
         .all(&ctx.db)
         .await?;
 

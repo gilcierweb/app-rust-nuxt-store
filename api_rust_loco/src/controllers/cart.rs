@@ -47,8 +47,7 @@ pub async fn list(
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     let user_id = current_user_id(&ctx, &auth).await?;
-    let user_cart = cart::get_or_create_cart(&ctx.db, user_id).await?;
-    let result = cart::get_cart_with_items(&ctx.db, user_cart.id).await?;
+    let result = cart::get_cart_with_items_for_user(&ctx.db, user_id).await?;
     format::json(result)
 }
 
