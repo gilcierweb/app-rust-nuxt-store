@@ -71,11 +71,14 @@ pub async fn list(
         );
     }
 
-    let total = query.clone().count(&ctx.db).await?;
-    let items = query
-        .paginate(&ctx.db, page_size)
-        .fetch_page(pagination.page_index())
-        .await?;
+    let total_fut = query.clone().count(&ctx.db);
+    let paginator = query.paginate(&ctx.db, page_size);
+    let items_fut = paginator.fetch_page(pagination.page_index());
+
+    let (total, items) = tokio::try_join!(total_fut, items_fut).map_err(|e| {
+        tracing::error!(error = ?e, "failed to load admin audit logs in parallel");
+        Error::InternalServerError
+    })?;
 
     format::json(AdminPaginatedResponse::new(items, total, pagination))
 }

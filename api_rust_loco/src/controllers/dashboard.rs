@@ -5,7 +5,7 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
-use sea_orm::{entity::*, query::*, sea_query::Expr};
+use sea_orm::{entity::*, query::*, sea_query::Expr, FromQueryResult};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -121,15 +121,23 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
 
     // "Customers" should only count users that have actually placed an order,
     // otherwise admin users are incorrectly bucketed as customers.
-    let total_customers_fut = users::Entity::find()
-        .filter(users::Column::Id.in_subquery(
-            orders::Entity::find()
-                .select_only()
-                .column(orders::Column::UserId)
-                .distinct()
-                .into_query(),
+    // Single aggregate query (uses idx_orders_user_id_created_at), replacing
+    // the previous IN_SUBQUERY + COUNT pattern that ran as 2 sequential queries.
+    #[derive(Debug, FromQueryResult)]
+    struct CustomerCount {
+        cnt: i64,
+    }
+    let total_customers_sql = "SELECT COUNT(DISTINCT user_id)::BIGINT AS cnt FROM orders";
+    let total_customers_fut = async {
+        CustomerCount::find_by_statement(Statement::from_sql_and_values(
+            ctx.db.get_database_backend(),
+            total_customers_sql,
+            vec![],
         ))
-        .count(&ctx.db);
+        .one(&ctx.db)
+        .await
+        .map(|opt| opt.map(|row| row.cnt as u64).unwrap_or(0))
+    };
 
     let recent_orders_results_fut = orders::Entity::find()
         .find_also_related(users::Entity)

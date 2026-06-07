@@ -47,10 +47,14 @@ pub async fn list_logs(
     // Order by newest logs first
     query = query.order_by_desc(email_logs::Column::Id);
 
-    let total = query.clone().count(&ctx.db).await?;
-
+    let total_fut = query.clone().count(&ctx.db);
     let paginator = query.paginate(&ctx.db, page_size);
-    let items = paginator.fetch_page(pagination.page_index()).await?;
+    let items_fut = paginator.fetch_page(pagination.page_index());
+
+    let (total, items) = tokio::try_join!(total_fut, items_fut).map_err(|e| {
+        tracing::error!(error = ?e, "failed to load admin email logs in parallel");
+        Error::InternalServerError
+    })?;
 
     format::json(AdminPaginatedResponse::new(items, total, pagination))
 }

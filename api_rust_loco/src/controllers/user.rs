@@ -361,11 +361,15 @@ pub async fn admin_list(
         query = query.filter(condition);
     }
 
-    let total = query.clone().count(&ctx.db).await?;
-    let items = query
-        .paginate(&ctx.db, pagination.page_size())
-        .fetch_page(pagination.page_index())
-        .await?;
+    let total_fut = query.clone().count(&ctx.db);
+    let paginator = query.paginate(&ctx.db, pagination.page_size());
+    let items_fut = paginator.fetch_page(pagination.page_index());
+
+    let (total, items) = tokio::try_join!(total_fut, items_fut).map_err(|e| {
+        tracing::error!(error = ?e, "failed to load admin users list in parallel");
+        Error::InternalServerError
+    })?;
+
     let response = build_list_items(&ctx, items).await?;
 
     format::json(AdminPaginatedResponse::new(response, total, pagination))

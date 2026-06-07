@@ -8,8 +8,8 @@ use axum::debug_handler;
 use axum::extract::{Extension, Query};
 use loco_rs::prelude::*;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder,
-    QuerySelect, Set,
+    ActiveModelTrait, ColumnTrait, EntityTrait, FromQueryResult, PaginatorTrait, QueryFilter,
+    QueryOrder, QuerySelect, Set, Statement,
 };
 use serde::{Deserialize, Serialize};
 
@@ -136,28 +136,81 @@ pub async fn summary(
     let page_size = pagination.page_size().min(100);
     let page_index = pagination.page_index();
 
-    let roles = roles::Entity::find()
+    let roles_fut = roles::Entity::find()
         .order_by_asc(roles::Column::Name)
         .order_by_asc(roles::Column::ResourceType)
         .order_by_asc(roles::Column::ResourceId)
-        .all(&ctx.db)
-        .await?;
+        .all(&ctx.db);
 
+    let users_query = users::Entity::find().order_by_asc(users::Column::Email);
+    let total_users_fut = users_query.clone().count(&ctx.db);
+    let paginator = users_query.paginate(&ctx.db, page_size);
+    let users_fut = paginator.fetch_page(page_index);
+
+    let (roles_res, total_users, users) = tokio::try_join!(roles_fut, total_users_fut, users_fut)
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to load rbac summary in parallel");
+            Error::InternalServerError
+        })?;
+
+    let roles = roles_res;
     let role_ids: Vec<i32> = roles.iter().map(|role| role.id).collect();
-    let mut assignment_counts = HashMap::<i32, usize>::new();
+    let paginated_user_ids: Vec<i32> = users.iter().map(|u| u.id).collect();
 
-    if !role_ids.is_empty() {
-        let assignment_rows = users_roles::Entity::find()
+    // Round 2 (parallel): both queries are now independent of each other
+    // and run concurrently with a single roundtrip.
+    let role_counts_fut = async {
+        if role_ids.is_empty() {
+            return Ok::<_, Error>(Vec::new());
+        }
+        #[derive(Debug, FromQueryResult)]
+        struct RoleAssignmentCount {
+            role_id: i32,
+            cnt: i64,
+        }
+        let counts_sql = "SELECT role_id, COUNT(*)::BIGINT AS cnt FROM users_roles \
+                          WHERE role_id = ANY($1) GROUP BY role_id";
+        RoleAssignmentCount::find_by_statement(Statement::from_sql_and_values(
+            ctx.db.get_database_backend(),
+            counts_sql,
+            vec![role_ids.clone().into()],
+        ))
+        .all(&ctx.db)
+        .await
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to count role assignments");
+            Error::InternalServerError
+        })
+    };
+
+    let user_role_rows_fut = async {
+        if paginated_user_ids.is_empty() || role_ids.is_empty() {
+            return Ok::<_, Error>(Vec::new());
+        }
+        users_roles::Entity::find()
+            .filter(users_roles::Column::UserId.is_in(paginated_user_ids.clone()))
             .filter(users_roles::Column::RoleId.is_in(role_ids.clone()))
             .select_only()
-            .column(users_roles::Column::RoleId)
             .column(users_roles::Column::UserId)
+            .column(users_roles::Column::RoleId)
             .into_tuple::<(i32, i32)>()
             .all(&ctx.db)
-            .await?;
-        for (role_id, _) in assignment_rows {
-            *assignment_counts.entry(role_id).or_default() += 1;
-        }
+            .await
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to load user role rows");
+                Error::InternalServerError
+            })
+    };
+
+    let (role_counts, user_role_rows) =
+        tokio::try_join!(role_counts_fut, user_role_rows_fut).map_err(|e| {
+            tracing::error!(error = ?e, "failed to load rbac summary second wave");
+            Error::InternalServerError
+        })?;
+
+    let mut assignment_counts = HashMap::<i32, usize>::new();
+    for row in role_counts {
+        assignment_counts.insert(row.role_id, row.cnt as usize);
     }
 
     let role_lookup = roles
@@ -175,28 +228,9 @@ pub async fn summary(
         .map(|role| to_role_json(role, assignment_counts.get(&role.id).copied().unwrap_or(0)))
         .collect::<Vec<_>>();
 
-    let users_query = users::Entity::find().order_by_asc(users::Column::Email);
-    let total_users = users_query.clone().count(&ctx.db).await?;
-    let users = users_query
-        .paginate(&ctx.db, page_size)
-        .fetch_page(page_index)
-        .await?;
-
-    let paginated_user_ids: Vec<i32> = users.iter().map(|u| u.id).collect();
     let mut role_ids_by_user = HashMap::<i32, Vec<i32>>::new();
-    if !paginated_user_ids.is_empty() && !role_ids.is_empty() {
-        let user_role_rows = users_roles::Entity::find()
-            .filter(users_roles::Column::UserId.is_in(paginated_user_ids))
-            .filter(users_roles::Column::RoleId.is_in(role_ids))
-            .select_only()
-            .column(users_roles::Column::UserId)
-            .column(users_roles::Column::RoleId)
-            .into_tuple::<(i32, i32)>()
-            .all(&ctx.db)
-            .await?;
-        for (user_id, role_id) in user_role_rows {
-            role_ids_by_user.entry(user_id).or_default().push(role_id);
-        }
+    for (user_id, role_id) in user_role_rows {
+        role_ids_by_user.entry(user_id).or_default().push(role_id);
     }
 
     let user_items = users
