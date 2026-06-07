@@ -411,6 +411,45 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
+        // -- orders ----------------------------------------------------------------
+        // Composite for `my_orders`: WHERE user_id = ? ORDER BY created_at DESC
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_orders_user_id_created_at")
+                    .table(Orders::Table)
+                    .col(Orders::UserId)
+                    .col(Orders::CreatedAt)
+                    .to_owned(),
+            )
+            .await?;
+
+        // Composite for admin list filtered by status with date sort
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_orders_status_created_at")
+                    .table(Orders::Table)
+                    .col(Orders::Status)
+                    .col(Orders::CreatedAt)
+                    .to_owned(),
+            )
+            .await?;
+
+        // Single-column lookup for order_number (admin order details)
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_orders_order_number")
+                    .table(Orders::Table)
+                    .col(Orders::OrderNumber)
+                    .to_owned(),
+            )
+            .await?;
+
         // -- coupons ---------------------------------------------------------------
         manager
             .create_index(
@@ -633,6 +672,9 @@ impl MigrationTrait for Migration {
             ("idx_coupon_usages_coupon_id", "coupon_usages"),
             ("idx_coupons_active_expires_at", "coupons"),
             ("idx_order_items_product_variant_id", "order_items"),
+            ("idx_orders_user_id_created_at", "orders"),
+            ("idx_orders_status_created_at", "orders"),
+            ("idx_orders_order_number", "orders"),
             (
                 "idx_gateway_customers_payment_gateway_id",
                 "gateway_customers",
@@ -843,6 +885,15 @@ enum GatewayCustomers {
 enum OrderItems {
     Table,
     ProductVariantId,
+}
+
+#[derive(Iden)]
+enum Orders {
+    Table,
+    UserId,
+    Status,
+    CreatedAt,
+    OrderNumber,
 }
 
 #[derive(Iden)]
