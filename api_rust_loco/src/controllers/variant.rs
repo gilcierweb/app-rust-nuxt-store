@@ -14,10 +14,12 @@ use sea_orm::{ColumnTrait, FromQueryResult, QueryFilter, Statement};
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::product_variant_options::{
-    Column as PivotColumn, Entity as PivotEntity,
+    Column as PivotColumn, Entity as PivotEntity, Model as PivotModel,
 };
 use crate::models::_entities::product_variants::{ActiveModel, Entity, Model};
-use crate::models::_entities::variant_options::Entity as OptionTypeEntity;
+use crate::models::_entities::variant_options::{
+    Entity as OptionTypeEntity, Model as OptionTypeModel,
+};
 use crate::utils::pagination::PaginationParams;
 
 static VARIANTS_CACHE: OnceLock<Cache<String, Arc<Vec<VariantWithOptions>>>> = OnceLock::new();
@@ -224,23 +226,20 @@ async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
 }
 
 async fn load_variant_options(ctx: &AppContext, variant_id: i32) -> Result<Vec<VariantOptionJson>> {
-    let pivots = PivotEntity::find()
+    let rows: Vec<(PivotModel, Option<OptionTypeModel>)> = PivotEntity::find()
+        .find_also_related(OptionTypeEntity)
         .filter(PivotColumn::ProductVariantId.eq(variant_id))
         .all(&ctx.db)
         .await?;
 
-    let mut result = Vec::new();
-    for p in pivots {
-        let opt = OptionTypeEntity::find_by_id(p.variant_option_id)
-            .one(&ctx.db)
-            .await?;
-        result.push(VariantOptionJson {
-            id: p.id,
+    Ok(rows
+        .into_iter()
+        .map(|(pivot, opt)| VariantOptionJson {
+            id: pivot.id,
             option_name: opt.as_ref().and_then(|o| o.name.clone()),
-            value: p.value.clone(),
-        });
-    }
-    Ok(result)
+            value: pivot.value,
+        })
+        .collect())
 }
 
 #[debug_handler]

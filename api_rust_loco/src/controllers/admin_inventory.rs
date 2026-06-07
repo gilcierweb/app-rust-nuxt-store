@@ -24,6 +24,14 @@ pub struct InventoryItemJson {
 }
 
 #[derive(Debug, Default, FromQueryResult, Serialize)]
+pub struct InventorySummaryRow {
+    pub total_variants: i64,
+    pub total_stock: i64,
+    pub total_reserved: i64,
+    pub alert_count: i64,
+}
+
+#[derive(Debug, Default, Serialize)]
 pub struct InventorySummaryJson {
     pub total_variants: i64,
     pub total_stock: i64,
@@ -62,36 +70,94 @@ pub async fn list(
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
     let low_stock_threshold = params.low_stock_threshold.unwrap_or(5).max(0);
     let backend = ctx.db.get_database_backend();
+    let page_size = pagination.page_size();
+    let offset = pagination.page_index() * page_size;
 
-    let (filters_sql, filter_values) = build_inventory_filters(&params, low_stock_threshold, 1);
-    let base_sql = inventory_base_sql();
+    // Filter values start at placeholder $1. We append the page_size / offset
+    // after the filter values so they always land at the end of the SQL.
+    let (filters_sql, mut filter_values) = build_inventory_filters(&params, low_stock_threshold, 1);
+    filter_values.push((page_size as i64).into());
+    let limit_placeholder = filter_values.len();
+    filter_values.push((offset as i64).into());
+    let offset_placeholder = filter_values.len();
 
-    let rows_sql = format!(
-        "WITH inventory_rows AS ({base_sql})
+    let items_sql = format!(
+        "WITH inventory_rows AS ({base})
         SELECT *
         FROM inventory_rows
-        WHERE 1=1{filters_sql}
-        ORDER BY product_name ASC, variant_id ASC"
+        WHERE 1=1{filters}
+        ORDER BY product_name ASC, variant_id ASC
+        LIMIT ${limit_placeholder} OFFSET ${offset_placeholder}",
+        base = inventory_base_sql(),
+        filters = filters_sql,
     );
-    let rows = InventoryItemJson::find_by_statement(Statement::from_sql_and_values(
+    let items = InventoryItemJson::find_by_statement(Statement::from_sql_and_values(
         backend,
-        &rows_sql,
-        filter_values,
+        &items_sql,
+        filter_values.clone(),
     ))
     .all(&ctx.db)
     .await?;
-    let total = rows.len() as u64;
-    let summary = summarize_inventory(&rows, low_stock_threshold);
-    let offset = pagination.page_index() as usize * pagination.page_size() as usize;
-    let items = rows
-        .into_iter()
-        .skip(offset)
-        .take(pagination.page_size() as usize)
-        .collect::<Vec<_>>();
 
-    let mut response = AdminPaginatedResponse::new(items, total, pagination);
+    let count_sql = format!(
+        "WITH inventory_rows AS ({base})
+        SELECT COUNT(*) AS total FROM inventory_rows
+        WHERE 1=1{filters}",
+        base = inventory_base_sql(),
+        filters = filters_sql,
+    );
+    let total_row = InventoryCountRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        &count_sql,
+        filter_values,
+    ))
+    .one(&ctx.db)
+    .await?
+    .unwrap_or(InventoryCountRow { total: 0 });
+    let total = total_row.total.max(0) as u64;
+
+    let summary_sql = format!(
+        "WITH inventory_rows AS ({base}),
+        filtered AS (
+            SELECT * FROM inventory_rows WHERE 1=1{filters}
+        )
+        SELECT
+            COUNT(*) AS total_variants,
+            COALESCE(SUM(inventory_quantity), 0)::BIGINT AS total_stock,
+            COALESCE(SUM(reserved_quantity), 0)::BIGINT AS total_reserved,
+            COALESCE(SUM(
+                CASE WHEN
+                    COALESCE(inventory_quantity, 0) <= 0
+                    OR (COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)) <= 0
+                    OR (
+                        COALESCE(reserved_quantity, 0) = 0
+                        AND (COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)) > 0
+                        AND (COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)) <= {low_stock_threshold}
+                    )
+                THEN 1 ELSE 0 END
+            ), 0)::BIGINT AS alert_count
+        FROM filtered",
+        base = inventory_base_sql(),
+        filters = filters_sql,
+    );
+    let summary_row = InventorySummaryRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        &summary_sql,
+        vec![low_stock_threshold.into()],
+    ))
+    .one(&ctx.db)
+    .await?
+    .unwrap_or_default();
+    let summary = InventorySummaryJson {
+        total_variants: summary_row.total_variants,
+        total_stock: summary_row.total_stock,
+        total_reserved: summary_row.total_reserved,
+        alert_count: summary_row.alert_count,
+    };
+
+    let response = AdminPaginatedResponse::new(items, total, pagination);
     format::json(InventoryListResponse {
-        items: response.items.drain(..).collect(),
+        items: response.items,
         total: response.total,
         page: response.page,
         page_size: response.page_size,
@@ -125,6 +191,11 @@ pub fn routes() -> Routes {
         .add("/", get(list))
         .add("{id}", put(update))
         .add("{id}", patch(update))
+}
+
+#[derive(Debug, FromQueryResult)]
+struct InventoryCountRow {
+    total: i64,
 }
 
 fn inventory_base_sql() -> &'static str {
@@ -213,37 +284,10 @@ fn build_inventory_filters(
             conditions.push_str(&condition);
             if matches!(status, "low" | "healthy") {
                 values.push(low_stock_threshold.into());
+                let _ = &mut placeholder;
             }
         }
     }
 
     (conditions, values)
-}
-
-fn summarize_inventory(
-    items: &[InventoryItemJson],
-    low_stock_threshold: i64,
-) -> InventorySummaryJson {
-    let mut summary = InventorySummaryJson::default();
-
-    for item in items {
-        let inventory_quantity = i64::from(item.inventory_quantity.unwrap_or(0));
-        let reserved_quantity = item.reserved_quantity;
-        let available_quantity = inventory_quantity - reserved_quantity;
-
-        summary.total_variants += 1;
-        summary.total_stock += inventory_quantity;
-        summary.total_reserved += reserved_quantity;
-
-        if inventory_quantity <= 0
-            || available_quantity <= 0
-            || (reserved_quantity == 0
-                && available_quantity > 0
-                && available_quantity <= low_stock_threshold)
-        {
-            summary.alert_count += 1;
-        }
-    }
-
-    summary
 }

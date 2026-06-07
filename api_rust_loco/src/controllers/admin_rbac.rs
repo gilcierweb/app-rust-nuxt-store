@@ -8,7 +8,8 @@ use axum::debug_handler;
 use axum::extract::{Extension, Query};
 use loco_rs::prelude::*;
 use sea_orm::{
-    ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder, Set,
+    ActiveModelTrait, ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder,
+    QuerySelect, Set,
 };
 use serde::{Deserialize, Serialize};
 
@@ -142,24 +143,21 @@ pub async fn summary(
         .all(&ctx.db)
         .await?;
 
-    let role_ids = roles.iter().map(|role| role.id).collect::<Vec<_>>();
-    let user_roles = if role_ids.is_empty() {
-        Vec::new()
-    } else {
-        users_roles::Entity::find()
-            .filter(users_roles::Column::RoleId.is_in(role_ids))
-            .all(&ctx.db)
-            .await?
-    };
-
+    let role_ids: Vec<i32> = roles.iter().map(|role| role.id).collect();
     let mut assignment_counts = HashMap::<i32, usize>::new();
-    let mut role_ids_by_user = HashMap::<i32, Vec<i32>>::new();
-    for assignment in &user_roles {
-        *assignment_counts.entry(assignment.role_id).or_default() += 1;
-        role_ids_by_user
-            .entry(assignment.user_id)
-            .or_default()
-            .push(assignment.role_id);
+
+    if !role_ids.is_empty() {
+        let assignment_rows = users_roles::Entity::find()
+            .filter(users_roles::Column::RoleId.is_in(role_ids.clone()))
+            .select_only()
+            .column(users_roles::Column::RoleId)
+            .column(users_roles::Column::UserId)
+            .into_tuple::<(i32, i32)>()
+            .all(&ctx.db)
+            .await?;
+        for (role_id, _) in assignment_rows {
+            *assignment_counts.entry(role_id).or_default() += 1;
+        }
     }
 
     let role_lookup = roles
@@ -184,10 +182,27 @@ pub async fn summary(
         .fetch_page(page_index)
         .await?;
 
+    let paginated_user_ids: Vec<i32> = users.iter().map(|u| u.id).collect();
+    let mut role_ids_by_user = HashMap::<i32, Vec<i32>>::new();
+    if !paginated_user_ids.is_empty() && !role_ids.is_empty() {
+        let user_role_rows = users_roles::Entity::find()
+            .filter(users_roles::Column::UserId.is_in(paginated_user_ids))
+            .filter(users_roles::Column::RoleId.is_in(role_ids))
+            .select_only()
+            .column(users_roles::Column::UserId)
+            .column(users_roles::Column::RoleId)
+            .into_tuple::<(i32, i32)>()
+            .all(&ctx.db)
+            .await?;
+        for (user_id, role_id) in user_role_rows {
+            role_ids_by_user.entry(user_id).or_default().push(role_id);
+        }
+    }
+
     let user_items = users
         .into_iter()
         .map(|user| {
-            let roles = role_ids_by_user
+            let user_roles = role_ids_by_user
                 .remove(&user.id)
                 .unwrap_or_default()
                 .into_iter()
@@ -198,7 +213,7 @@ pub async fn summary(
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                roles,
+                roles: user_roles,
             }
         })
         .collect();

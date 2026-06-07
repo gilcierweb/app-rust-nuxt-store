@@ -84,7 +84,6 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .one(&ctx.db);
 
     let total_orders_fut = orders::Entity::find().count(&ctx.db);
-    let total_customers_fut = users::Entity::find().count(&ctx.db);
 
     let seven_days_ago = chrono::Utc::now() - chrono::Duration::days(7);
     let sales_results_fut = orders::Entity::find()
@@ -119,6 +118,18 @@ pub async fn stats(State(ctx): State<AppContext>) -> Result<Response> {
         .limit(5)
         .into_tuple::<(Option<String>, Option<i64>)>()
         .all(&ctx.db);
+
+    // "Customers" should only count users that have actually placed an order,
+    // otherwise admin users are incorrectly bucketed as customers.
+    let total_customers_fut = users::Entity::find()
+        .filter(users::Column::Id.in_subquery(
+            orders::Entity::find()
+                .select_only()
+                .column(orders::Column::UserId)
+                .distinct()
+                .into_query(),
+        ))
+        .count(&ctx.db);
 
     let recent_orders_results_fut = orders::Entity::find()
         .find_also_related(users::Entity)

@@ -157,39 +157,42 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
         .await?
         .ok_or_else(|| Error::NotFound)?;
 
-    let logs = payment_gateway_logs::Entity::find()
+    let logs_fut = payment_gateway_logs::Entity::find()
         .filter(payment_gateway_logs::Column::PaymentId.eq(id))
         .order_by_desc(payment_gateway_logs::Column::CreatedAt)
-        .all(&ctx.db)
-        .await?;
+        .all(&ctx.db);
 
-    let sessions = payment_sessions::Entity::find()
+    let sessions_fut = payment_sessions::Entity::find()
         .filter(payment_sessions::Column::PaymentId.eq(id))
         .order_by_desc(payment_sessions::Column::CreatedAt)
-        .all(&ctx.db)
-        .await?;
+        .all(&ctx.db);
 
-    let refunds = payment_refunds::Entity::find()
+    let refunds_fut = payment_refunds::Entity::find()
         .filter(payment_refunds::Column::PaymentId.eq(id))
         .order_by_desc(payment_refunds::Column::CreatedAt)
-        .all(&ctx.db)
-        .await?;
+        .all(&ctx.db);
 
-    // To get events we find the payment's gateway id
-    let method = payment_methods::Entity::find_by_id(payment.payment_method_id)
-        .one(&ctx.db)
-        .await?
-        .ok_or_else(|| Error::NotFound)?;
+    let method_fut = payment_methods::Entity::find_by_id(payment.payment_method_id).one(&ctx.db);
 
-    let mut events = Vec::new();
-    if let Some(gateway_id) = method.payment_gateway_id {
-        events = payment_gateway_events::Entity::find()
+    let (logs, sessions, refunds, method) =
+        tokio::try_join!(logs_fut, sessions_fut, refunds_fut, method_fut)
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to load payment detail in parallel");
+                Error::InternalServerError
+            })?;
+
+    let method = method.ok_or_else(|| Error::NotFound)?;
+
+    let events = if let Some(gateway_id) = method.payment_gateway_id {
+        payment_gateway_events::Entity::find()
             .filter(payment_gateway_events::Column::PaymentGatewayId.eq(gateway_id))
             .order_by_desc(payment_gateway_events::Column::CreatedAt)
-            .limit(50) // Assuming we only want recent events or we'd filter by external_payment_id if we parsed the payload
+            .limit(50)
             .all(&ctx.db)
-            .await?;
-    }
+            .await?
+    } else {
+        Vec::new()
+    };
 
     format::json(PaymentDetailJson {
         payment,

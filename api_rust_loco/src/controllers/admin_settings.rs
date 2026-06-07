@@ -226,6 +226,7 @@ pub async fn update(
         .into_iter()
         .collect::<Vec<_>>();
 
+    let now = chrono::Utc::now().into();
     for setting in params.settings {
         let Some(definition) = setting_definition(&setting.namespace, &setting.key) else {
             return Err(Error::Message(format!(
@@ -234,32 +235,70 @@ pub async fn update(
             )));
         };
 
-        let value = normalize_value(definition, setting.value)?;
-        let existing = admin_settings::Entity::find()
-            .filter(admin_settings::Column::Namespace.eq(definition.namespace))
-            .filter(admin_settings::Column::Key.eq(definition.key))
-            .one(&ctx.db)
-            .await?;
+        let value = normalize_value(definition, setting.value.clone())?;
+        let value_for_fallback = value.clone();
 
-        if let Some(existing) = existing {
-            let mut active_model: admin_settings::ActiveModel = existing.into();
-            active_model.value = Set(Some(value));
-            active_model.value_type = Set(definition.value_type);
-            active_model.updated_at = Set(chrono::Utc::now().into());
-            active_model.update(&ctx.db).await?;
-        } else {
-            let now = chrono::Utc::now().into();
-            admin_settings::ActiveModel {
-                namespace: Set(definition.namespace.to_string()),
-                key: Set(definition.key.to_string()),
-                value: Set(Some(value)),
-                value_type: Set(definition.value_type),
-                created_at: Set(now),
-                updated_at: Set(now),
-                ..Default::default()
+        let active_model = admin_settings::ActiveModel {
+            id: sea_orm::ActiveValue::NotSet,
+            namespace: Set(definition.namespace.to_string()),
+            key: Set(definition.key.to_string()),
+            value: Set(Some(value)),
+            value_type: Set(definition.value_type),
+            created_at: Set(now),
+            updated_at: Set(now),
+        };
+
+        // Use UPSERT (PostgreSQL/SQLite) to avoid the find-then-insert-or-update roundtrip.
+        let res = admin_settings::Entity::insert(active_model)
+            .on_conflict(
+                sea_orm::sea_query::OnConflict::columns([
+                    admin_settings::Column::Namespace,
+                    admin_settings::Column::Key,
+                ])
+                .update_columns([
+                    admin_settings::Column::Value,
+                    admin_settings::Column::ValueType,
+                    admin_settings::Column::UpdatedAt,
+                ])
+                .to_owned(),
+            )
+            .exec(&ctx.db)
+            .await;
+
+        if let Err(err) = res {
+            // Some backends (e.g. older SQLite) may not support ON CONFLICT with
+            // UPDATE columns in this form. Fall back to a single SELECT + branch.
+            tracing::warn!(
+                error = ?err,
+                "upsert of admin_settings failed, falling back to find/update"
+            );
+
+            let existing = admin_settings::Entity::find()
+                .filter(admin_settings::Column::Namespace.eq(definition.namespace))
+                .filter(admin_settings::Column::Key.eq(definition.key))
+                .one(&ctx.db)
+                .await?;
+
+            if let Some(existing) = existing {
+                let mut active_model: admin_settings::ActiveModel = existing.into();
+                active_model.value = Set(Some(value_for_fallback.clone()));
+                active_model.value_type = Set(definition.value_type);
+                active_model.updated_at = Set(chrono::Utc::now().into());
+                active_model.update(&ctx.db).await?;
+            } else {
+                let now = chrono::Utc::now().into();
+                admin_settings::ActiveModel {
+                    namespace: Set(definition.namespace.to_string()),
+                    key: Set(definition.key.to_string()),
+                    value: Set(Some(value_for_fallback.clone())),
+                    value_type: Set(definition.value_type),
+                    created_at: Set(now),
+                    updated_at: Set(now),
+                    ..Default::default()
+                }
+                .insert(&ctx.db)
+                .await?;
             }
-            .insert(&ctx.db)
-            .await?;
         }
     }
 

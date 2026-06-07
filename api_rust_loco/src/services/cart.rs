@@ -1,7 +1,11 @@
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, ConnectionTrait, EntityTrait, QueryFilter, QueryOrder};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue::Set, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter,
+    QueryOrder,
+};
 use serde::Serialize;
+use std::collections::HashMap;
 
 use crate::models::_entities::cart_items;
 use crate::models::_entities::carts;
@@ -69,19 +73,34 @@ where
         .all(db)
         .await?;
 
-    let mut items = Vec::new();
+    let product_ids: Vec<i32> = raw_items
+        .iter()
+        .filter_map(|(_, product)| product.as_ref().map(|p| p.id))
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect();
+
+    let mut cover_images: HashMap<i32, Option<String>> = HashMap::new();
+    if !product_ids.is_empty() {
+        let cover_rows = product_images::Entity::find()
+            .filter(product_images::Column::ProductId.is_in(product_ids.clone()))
+            .filter(product_images::Column::Cover.eq(Some(true)))
+            .all(db)
+            .await?;
+
+        for img in cover_rows {
+            if let Some(path) = img.image.clone() {
+                cover_images.entry(img.product_id).or_insert(Some(path));
+            }
+        }
+    }
+
+    let mut items = Vec::with_capacity(raw_items.len());
 
     for (item, product) in &raw_items {
-        let product_image = if let Some(product) = product {
-            product_images::Entity::find()
-                .filter(product_images::Column::ProductId.eq(product.id))
-                .filter(product_images::Column::Cover.eq(Some(true)))
-                .one(db)
-                .await?
-                .and_then(|img| img.image)
-        } else {
-            None
-        };
+        let product_image = product
+            .as_ref()
+            .and_then(|p| cover_images.get(&p.id).and_then(|v| v.clone()));
 
         items.push(CartItemWithProduct {
             id: item.id,
