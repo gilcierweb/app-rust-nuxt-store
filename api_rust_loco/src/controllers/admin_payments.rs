@@ -122,23 +122,32 @@ pub async fn list(
         query = query.filter(condition);
     }
 
-    let total = query.clone().count(&ctx.db).await?;
-    let currencies = query
+    let total_fut = query.clone().count(&ctx.db);
+    let currencies_fut = query
         .clone()
         .select_only()
         .column(payments::Column::Currency)
+        .distinct()
         .into_tuple::<Option<String>>()
-        .all(&ctx.db)
-        .await?
+        .all(&ctx.db);
+    let paginator = query.paginate(&ctx.db, pagination.page_size());
+    let items_fut = paginator.fetch_page(pagination.page_index());
+
+    let (total_res, currencies_res, items_res) =
+        tokio::try_join!(total_fut, currencies_fut, items_fut).map_err(|e| {
+            tracing::error!(error = ?e, "failed to load admin payments list in parallel");
+            Error::InternalServerError
+        })?;
+
+    let total = total_res;
+    let currencies = currencies_res
         .into_iter()
         .flatten()
         .collect::<std::collections::BTreeSet<_>>()
         .into_iter()
         .collect::<Vec<_>>();
-    let items = query
-        .paginate(&ctx.db, pagination.page_size())
-        .fetch_page(pagination.page_index())
-        .await?;
+    let items = items_res;
+
     let response = AdminPaginatedResponse::new(items, total, pagination);
 
     format::json(AdminPaymentListResponse {

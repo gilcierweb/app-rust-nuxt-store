@@ -548,6 +548,21 @@ impl MigrationTrait for Migration {
             )
             .await?;
 
+        // Composite for the default `ORDER BY created_at DESC, id DESC` listing
+        // (no filters applied); also helps the `SELECT COUNT(*)` use a cheap
+        // index-only walk.
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_admin_audit_logs_created_at_id")
+                    .table(AdminAuditLogs::Table)
+                    .col(AdminAuditLogs::CreatedAt)
+                    .col(AdminAuditLogs::Id)
+                    .to_owned(),
+            )
+            .await?;
+
         // -- admin_settings --------------------------------------------------------
         manager
             .create_index(
@@ -653,6 +668,10 @@ impl MigrationTrait for Migration {
             ("idx_admin_settings_namespace_key", "admin_settings"),
             (
                 "idx_admin_audit_logs_actor_user_id_created_at",
+                "admin_audit_logs",
+            ),
+            (
+                "idx_admin_audit_logs_created_at_id",
                 "admin_audit_logs",
             ),
             (
@@ -926,6 +945,7 @@ enum AdminAuditLogs {
     ResourceType,
     ActorUserId,
     CreatedAt,
+    Id,
 }
 
 #[derive(Iden)]

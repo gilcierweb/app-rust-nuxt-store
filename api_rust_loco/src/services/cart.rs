@@ -115,16 +115,12 @@ where
         });
     }
 
-    let cart = carts::Entity::find_by_id(cart_id)
-        .one(db)
-        .await?
-        .ok_or_else(|| Error::NotFound)?;
-
     Ok(CartWithItems {
-        id: cart.id,
+        id: cart_id,
         items,
     })
 }
+
 
 pub async fn add_item<C>(
     db: &C,
