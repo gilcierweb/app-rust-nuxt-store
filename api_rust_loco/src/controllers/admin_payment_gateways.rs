@@ -6,7 +6,9 @@ use loco_rs::prelude::*;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{ActiveModelTrait, EntityTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
+use crate::cache::{invalidate_json_cache, json_cache};
 use crate::models::_entities::payment_gateways;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -17,12 +19,20 @@ pub struct UpdateGatewayParams {
 
 #[debug_handler]
 pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
+    const CACHE_KEY: &str = "payment-gateways:list";
+    if let Some(value) = json_cache().get(CACHE_KEY) {
+        return format::json(value);
+    }
     let gateways = payment_gateways::Entity::find()
         .order_by_asc(payment_gateways::Column::Name)
         .all(&ctx.db)
         .await?;
-
-    format::json(gateways)
+    let value = Arc::new(serde_json::to_value(&gateways).map_err(|e| {
+        tracing::error!(error = ?e, "failed to serialize payment gateways");
+        Error::InternalServerError
+    })?);
+    json_cache().insert(CACHE_KEY.to_string(), Arc::clone(&value));
+    format::json(value)
 }
 
 #[debug_handler]
@@ -60,6 +70,7 @@ pub async fn update(
 
     let updated = active_model.update(&ctx.db).await?;
 
+    invalidate_json_cache("payment-gateways:list");
     format::json(updated)
 }
 

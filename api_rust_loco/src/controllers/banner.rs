@@ -5,12 +5,14 @@
 use axum::{debug_handler, extract::Query};
 use ipnetwork::IpNetwork;
 use loco_rs::prelude::*;
+use std::sync::Arc;
 use sea_orm::{
     ColumnTrait, Condition, EntityTrait, FromQueryResult, JoinType, PaginatorTrait, QueryFilter,
     QueryOrder, QuerySelect, RelationTrait, Statement,
 };
 use serde::{Deserialize, Serialize};
 
+use crate::cache::{invalidate_json_cache, json_cache};
 use crate::models::_entities::banner_events::{
     ActiveModel as BannerEventActiveModel, Column as BannerEventColumn, Entity as BannerEventEntity,
 };
@@ -264,12 +266,20 @@ pub async fn record_event(
 
 #[debug_handler]
 pub async fn list_positions(State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(
-        BannerPositionEntity::find()
-            .order_by_asc(BannerPositionColumn::Code)
-            .all(&ctx.db)
-            .await?,
-    )
+    const CACHE_KEY: &str = "banners:positions";
+    if let Some(value) = json_cache().get(CACHE_KEY) {
+        return format::json(value);
+    }
+    let items = BannerPositionEntity::find()
+        .order_by_asc(BannerPositionColumn::Code)
+        .all(&ctx.db)
+        .await?;
+    let value = Arc::new(serde_json::to_value(&items).map_err(|e| {
+        tracing::error!(error = ?e, "failed to serialize banner positions");
+        Error::InternalServerError
+    })?);
+    json_cache().insert(CACHE_KEY.to_string(), Arc::clone(&value));
+    format::json(value)
 }
 
 #[debug_handler]
@@ -288,6 +298,7 @@ pub async fn add_position(
     .insert(&ctx.db)
     .await?;
 
+    invalidate_json_cache("banners:positions");
     format::json(item)
 }
 
@@ -317,6 +328,7 @@ pub async fn update_position(
         item.is_active = Set(value);
     }
 
+    invalidate_json_cache("banners:positions");
     format::json(item.update(&ctx.db).await?)
 }
 
@@ -325,6 +337,7 @@ pub async fn remove_position(
     Path(id): Path<i64>,
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
+    invalidate_json_cache("banners:positions");
     load_position(&ctx, id).await?.delete(&ctx.db).await?;
     format::empty()
 }
@@ -447,6 +460,11 @@ pub async fn analytics(
         return Err(bad_request("to must be greater than from"));
     }
 
+    let cache_key = format!("banners:analytics:{}:{}", query.from, query.to);
+    if let Some(value) = json_cache().get(&cache_key) {
+        return format::json(value);
+    }
+
     let rows = BannerAnalytics::find_by_statement(Statement::from_sql_and_values(
         ctx.db.get_database_backend(),
         r#"
@@ -475,7 +493,12 @@ pub async fn analytics(
     .all(&ctx.db)
     .await?;
 
-    format::json(rows)
+    let value = Arc::new(serde_json::to_value(&rows).map_err(|e| {
+        tracing::error!(error = ?e, "failed to serialize banner analytics");
+        Error::InternalServerError
+    })?);
+    json_cache().insert(cache_key, Arc::clone(&value));
+    format::json(value)
 }
 
 pub fn routes() -> Routes {

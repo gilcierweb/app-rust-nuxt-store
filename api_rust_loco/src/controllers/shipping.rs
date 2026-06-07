@@ -6,7 +6,9 @@ use axum::extract::Query;
 use loco_rs::prelude::*;
 use sea_orm::{PaginatorTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
+use crate::cache::{invalidate_json_cache_with_prefix, json_cache};
 use crate::models::_entities::shipping_methods::{ActiveModel, Entity, Model};
 use crate::utils::pagination::PaginationParams;
 
@@ -41,13 +43,21 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
+    let cache_key = format!("shippings:list:{}:{}", pagination.page_index(), pagination.page_size());
+    if let Some(value) = json_cache().get(&cache_key) {
+        return format::json(value);
+    }
     let items = Entity::find()
         .order_by_asc(crate::models::_entities::shipping_methods::Column::Name)
         .paginate(&ctx.db, pagination.page_size())
         .fetch_page(pagination.page_index())
         .await?;
-
-    format::json(items)
+    let value = Arc::new(serde_json::to_value(&items).map_err(|e| {
+        tracing::error!(error = ?e, "failed to serialize shippings");
+        Error::InternalServerError
+    })?);
+    json_cache().insert(cache_key, Arc::clone(&value));
+    format::json(value)
 }
 
 #[debug_handler]
@@ -57,6 +67,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
     };
     params.update(&mut item);
     let item = item.insert(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("shippings:list:");
     format::json(item)
 }
 
@@ -70,12 +81,14 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("shippings:list:");
     format::json(item)
 }
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("shippings:list:");
     format::empty()
 }
 

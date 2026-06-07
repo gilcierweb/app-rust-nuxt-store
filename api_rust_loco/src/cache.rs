@@ -2,6 +2,7 @@ use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 
 use moka::sync::Cache;
+use serde_json::Value;
 
 use crate::controllers::dashboard::DashboardResponse;
 use crate::models::_entities::{categories, posts, profiles};
@@ -18,6 +19,7 @@ static PROFILE_DETAIL_CACHE: OnceLock<Cache<String, Arc<profiles::Model>>> = Onc
 static CATEGORIES_CACHE: OnceLock<Cache<&'static str, Arc<Vec<categories::Model>>>> =
     OnceLock::new();
 static DASHBOARD_CACHE: OnceLock<Cache<&'static str, Arc<DashboardResponse>>> = OnceLock::new();
+static JSON_CACHE: OnceLock<Cache<String, Arc<Value>>> = OnceLock::new();
 
 pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
     CURRENT_CACHE.get_or_init(|| {
@@ -98,6 +100,24 @@ pub fn dashboard_cache() -> &'static Cache<&'static str, Arc<DashboardResponse>>
             .max_capacity(16)
             .build()
     })
+}
+
+pub fn json_cache() -> &'static Cache<String, Arc<Value>> {
+    JSON_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(10))
+            .max_capacity(512)
+            .build()
+    })
+}
+
+pub fn invalidate_json_cache(key: &str) {
+    json_cache().invalidate(key);
+}
+
+pub fn invalidate_json_cache_with_prefix(prefix: &str) {
+    let prefix = prefix.to_string();
+    let _ = json_cache().invalidate_entries_if(move |k, _| k.starts_with(&prefix));
 }
 
 pub fn invalidate_products_cache() {

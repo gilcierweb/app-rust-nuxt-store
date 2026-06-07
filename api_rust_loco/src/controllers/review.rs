@@ -4,9 +4,11 @@
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
-use sea_orm::{PaginatorTrait, QueryOrder};
+use sea_orm::{PaginatorTrait, QueryFilter, QueryOrder};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
+use crate::cache::{invalidate_json_cache_with_prefix, json_cache};
 use crate::models::_entities::reviews::{ActiveModel, Entity, Model};
 use crate::utils::pagination::PaginationParams;
 
@@ -54,6 +56,15 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Query(query): Query<ListQuery>,
 ) -> Result<Response> {
+    let cache_key = format!(
+        "reviews:list:{:?}:{}:{}",
+        query.product_id,
+        query.pagination.page_index(),
+        query.pagination.page_size()
+    );
+    if let Some(value) = json_cache().get(&cache_key) {
+        return format::json(value);
+    }
     let mut query_builder = Entity::find();
     if let Some(product_id) = query.product_id {
         query_builder = query_builder
@@ -64,8 +75,12 @@ pub async fn list(
         .paginate(&ctx.db, query.pagination.page_size())
         .fetch_page(query.pagination.page_index())
         .await?;
-
-    format::json(items)
+    let value = Arc::new(serde_json::to_value(&items).map_err(|e| {
+        tracing::error!(error = ?e, "failed to serialize reviews");
+        Error::InternalServerError
+    })?);
+    json_cache().insert(cache_key, Arc::clone(&value));
+    format::json(value)
 }
 
 #[debug_handler]
@@ -75,6 +90,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
     };
     params.update(&mut item);
     let item = item.insert(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("reviews:list:");
     format::json(item)
 }
 
@@ -88,12 +104,14 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("reviews:list:");
     format::json(item)
 }
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("reviews:list:");
     format::empty()
 }
 
