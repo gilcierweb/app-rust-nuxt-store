@@ -1,17 +1,14 @@
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::{
-    ActiveModelTrait, ActiveValue::Set, ColumnTrait, ConnectionTrait, EntityTrait, QueryFilter,
-    QueryOrder,
+    ActiveModelTrait, ActiveValue::Set, ColumnTrait, ConnectionTrait, EntityTrait, FromQueryResult,
+    QueryFilter, Statement,
 };
 use serde::Serialize;
-use std::collections::HashMap;
 
 use crate::models::_entities::cart_items;
 use crate::models::_entities::carts;
-use crate::models::_entities::product_images;
 use crate::models::_entities::product_variants;
-use crate::models::_entities::products;
 
 #[derive(Debug, Serialize)]
 pub struct CartItemWithProduct {
@@ -66,59 +63,68 @@ pub async fn get_cart_with_items<C>(db: &C, cart_id: i32) -> Result<CartWithItem
 where
     C: ConnectionTrait,
 {
-    let raw_items = cart_items::Entity::find()
-        .filter(cart_items::Column::CartId.eq(cart_id))
-        .order_by_asc(cart_items::Column::Id)
-        .find_also_related(products::Entity)
-        .all(db)
-        .await?;
+    #[derive(Debug, FromQueryResult)]
+    struct CartItemRow {
+        id: i32,
+        cart_id: i32,
+        product_id: i32,
+        product_variant_id: Option<i32>,
+        quantity: Option<i32>,
+        price: Option<Decimal>,
+        product_name: Option<String>,
+        product_slug: Option<String>,
+        product_image: Option<String>,
+    }
 
-    let product_ids: Vec<i32> = raw_items
-        .iter()
-        .filter_map(|(_, product)| product.as_ref().map(|p| p.id))
-        .collect::<std::collections::BTreeSet<_>>()
+    let backend = db.get_database_backend();
+    let sql = r#"
+        SELECT
+            ci.id              AS id,
+            ci.cart_id         AS cart_id,
+            ci.product_id      AS product_id,
+            ci.product_variant_id AS product_variant_id,
+            ci.quantity        AS quantity,
+            ci.price           AS price,
+            p.name             AS product_name,
+            p.slug             AS product_slug,
+            cover.image        AS product_image
+        FROM cart_items ci
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN LATERAL (
+            SELECT image
+            FROM product_images
+            WHERE product_id = p.id AND cover = TRUE
+            ORDER BY position
+            LIMIT 1
+        ) cover ON TRUE
+        WHERE ci.cart_id = $1
+        ORDER BY ci.id
+    "#;
+
+    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        sql,
+        vec![cart_id.into()],
+    ))
+    .all(db)
+    .await?;
+
+    let items = raw_items
         .into_iter()
+        .map(|row| CartItemWithProduct {
+            id: row.id,
+            cart_id: row.cart_id,
+            product_id: row.product_id,
+            product_variant_id: row.product_variant_id,
+            quantity: row.quantity.unwrap_or(1),
+            price: row.price.unwrap_or(Decimal::ZERO),
+            product_name: row.product_name,
+            product_slug: row.product_slug,
+            product_image: row.product_image,
+        })
         .collect();
 
-    let mut cover_images: HashMap<i32, Option<String>> = HashMap::new();
-    if !product_ids.is_empty() {
-        let cover_rows = product_images::Entity::find()
-            .filter(product_images::Column::ProductId.is_in(product_ids.clone()))
-            .filter(product_images::Column::Cover.eq(Some(true)))
-            .all(db)
-            .await?;
-
-        for img in cover_rows {
-            if let Some(path) = img.image.clone() {
-                cover_images.entry(img.product_id).or_insert(Some(path));
-            }
-        }
-    }
-
-    let mut items = Vec::with_capacity(raw_items.len());
-
-    for (item, product) in &raw_items {
-        let product_image = product
-            .as_ref()
-            .and_then(|p| cover_images.get(&p.id).and_then(|v| v.clone()));
-
-        items.push(CartItemWithProduct {
-            id: item.id,
-            cart_id: item.cart_id,
-            product_id: item.product_id,
-            product_variant_id: item.product_variant_id,
-            quantity: item.quantity.unwrap_or(1),
-            price: item.price.unwrap_or(Decimal::ZERO),
-            product_name: product.as_ref().and_then(|p| p.name.clone()),
-            product_slug: product.as_ref().and_then(|p| p.slug.clone()),
-            product_image,
-        });
-    }
-
-    Ok(CartWithItems {
-        id: cart_id,
-        items,
-    })
+    Ok(CartWithItems { id: cart_id, items })
 }
 
 

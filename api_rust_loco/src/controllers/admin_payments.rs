@@ -127,7 +127,6 @@ pub async fn list(
         .clone()
         .select_only()
         .column(payments::Column::Currency)
-        .distinct()
         .into_tuple::<Option<String>>()
         .all(&ctx.db);
     let paginator = query.paginate(&ctx.db, pagination.page_size());

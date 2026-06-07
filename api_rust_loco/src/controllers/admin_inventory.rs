@@ -91,14 +91,6 @@ pub async fn list(
         base = inventory_base_sql(),
         filters = filters_sql,
     );
-    let items = InventoryItemJson::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        &items_sql,
-        filter_values.clone(),
-    ))
-    .all(&ctx.db)
-    .await?;
-
     let count_sql = format!(
         "WITH inventory_rows AS ({base})
         SELECT COUNT(*) AS total FROM inventory_rows
@@ -106,16 +98,6 @@ pub async fn list(
         base = inventory_base_sql(),
         filters = filters_sql,
     );
-    let total_row = InventoryCountRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        &count_sql,
-        filter_values,
-    ))
-    .one(&ctx.db)
-    .await?
-    .unwrap_or(InventoryCountRow { total: 0 });
-    let total = total_row.total.max(0) as u64;
-
     let summary_sql = format!(
         "WITH inventory_rows AS ({base}),
         filtered AS (
@@ -140,14 +122,37 @@ pub async fn list(
         base = inventory_base_sql(),
         filters = filters_sql,
     );
-    let summary_row = InventorySummaryRow::find_by_statement(Statement::from_sql_and_values(
+
+    let items_fut = InventoryItemJson::find_by_statement(Statement::from_sql_and_values(
         backend,
-        &summary_sql,
-        vec![low_stock_threshold.into()],
+        &items_sql,
+        filter_values.clone(),
     ))
-    .one(&ctx.db)
-    .await?
-    .unwrap_or_default();
+    .all(&ctx.db);
+    let count_fut = InventoryCountRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        &count_sql,
+        filter_values,
+    ))
+    .one(&ctx.db);
+    let summary_fut =
+        InventorySummaryRow::find_by_statement(Statement::from_sql_and_values(
+            backend,
+            &summary_sql,
+            vec![low_stock_threshold.into()],
+        ))
+        .one(&ctx.db);
+
+    let (items_res, count_res, summary_res) =
+        tokio::try_join!(items_fut, count_fut, summary_fut).map_err(|e| {
+            tracing::error!(error = ?e, "failed to load admin inventory in parallel");
+            Error::InternalServerError
+        })?;
+
+    let items = items_res;
+    let total_row = count_res.unwrap_or(InventoryCountRow { total: 0 });
+    let total = total_row.total.max(0) as u64;
+    let summary_row = summary_res.unwrap_or_default();
     let summary = InventorySummaryJson {
         total_variants: summary_row.total_variants,
         total_stock: summary_row.total_stock,
