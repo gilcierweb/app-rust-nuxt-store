@@ -28,6 +28,8 @@ use crate::payment_gateways::{
 };
 use crate::services::cart;
 use crate::utils::pagination::PaginationParams;
+use crate::mailers::order::OrderMailer;
+use crate::mailers::email_service::EmailService;
 
 fn generate_order_number() -> String {
     let ts = chrono::Utc::now().timestamp();
@@ -335,6 +337,32 @@ pub async fn checkout(
 
     txn.commit().await?;
 
+    // Send order confirmation email (non-blocking, logged)
+    if let Ok(user) = users::Entity::find_by_id(current_user_id)
+        .one(&ctx.db)
+        .await
+    {
+        if let Some(u) = user {
+            let order_number = saved.order_number.clone();
+            let _ = EmailService::send_logged(
+                &ctx,
+                u.email.clone(),
+                "order_confirmation".to_string(),
+                format!("Order Confirmation - {}", order_number.as_deref().unwrap_or("")),
+                serde_json::json!({
+                    "user_id": u.id,
+                    "order_id": saved.id,
+                    "order_number": saved.order_number,
+                }),
+                || async {
+                    let order_clone = saved.clone();
+                    OrderMailer::send_order_confirmation(&ctx, &u, &order_clone).await
+                },
+            )
+            .await;
+        }
+    }
+
     format::json(serde_json::json!({
         "id": saved.id,
         "order_number": saved.order_number,
@@ -515,7 +543,85 @@ pub async fn update_status(
     let mut active: crate::models::_entities::orders::ActiveModel = order.into();
     active.status = Set(Some(new_status.to_i32()));
     active.updated_at = Set(chrono::Utc::now().into());
-    active.update(&ctx.db).await?;
+    let updated_order = active.update(&ctx.db).await?;
+
+    // Send notification emails based on status transition
+    if let Ok(user) = users::Entity::find_by_id(updated_order.user_id)
+        .one(&ctx.db)
+        .await
+    {
+        if let Some(u) = user {
+            match new_status {
+                OrderStatus::Shipped => {
+                    let shipment = shipments::Entity::find()
+                        .filter(crate::models::_entities::shipments::Column::OrderId.eq(updated_order.id))
+                        .one(&ctx.db)
+                        .await
+                        .ok()
+                        .flatten();
+                    let order_number = updated_order.order_number.clone();
+                    let _ = EmailService::send_logged(
+                        &ctx,
+                        u.email.clone(),
+                        "shipping_update".to_string(),
+                        format!("Your order {} has shipped!", order_number.as_deref().unwrap_or("")),
+                        serde_json::json!({
+                            "user_id": u.id,
+                            "order_id": updated_order.id,
+                            "order_number": updated_order.order_number,
+                        }),
+                        || async {
+                            let order_clone = updated_order.clone();
+                            OrderMailer::send_shipping_update(
+                                &ctx,
+                                &u,
+                                &order_clone,
+                                shipment.as_ref().and_then(|s| s.tracking_number.as_deref()),
+                                shipment.as_ref().and_then(|s| s.carrier.as_deref()),
+                                shipment.as_ref().and_then(|s| s.shipped_at.map(|d| d.format("%B %d, %Y").to_string())),
+                            )
+                            .await
+                        },
+                    )
+                    .await;
+                }
+                OrderStatus::Delivered => {
+                    let shipment = shipments::Entity::find()
+                        .filter(crate::models::_entities::shipments::Column::OrderId.eq(updated_order.id))
+                        .one(&ctx.db)
+                        .await
+                        .ok()
+                        .flatten();
+                    let order_number = updated_order.order_number.clone();
+                    let _ = EmailService::send_logged(
+                        &ctx,
+                        u.email.clone(),
+                        "delivery_confirmation".to_string(),
+                        format!("Your order {} has been delivered!", order_number.as_deref().unwrap_or("")),
+                        serde_json::json!({
+                            "user_id": u.id,
+                            "order_id": updated_order.id,
+                            "order_number": updated_order.order_number,
+                        }),
+                        || async {
+                            let order_clone = updated_order.clone();
+                            OrderMailer::send_delivery_confirmation(
+                                &ctx,
+                                &u,
+                                &order_clone,
+                                shipment.as_ref().and_then(|s| s.delivered_at.map(|d| d.format("%B %d, %Y").to_string())),
+                                shipment.as_ref().and_then(|s| s.carrier.as_deref()),
+                                shipment.as_ref().and_then(|s| s.tracking_number.as_deref()),
+                            )
+                            .await
+                        },
+                    )
+                    .await;
+                }
+                _ => {}
+            }
+        }
+    }
 
     format::json(serde_json::json!({ "status": new_status.to_i32() }))
 }

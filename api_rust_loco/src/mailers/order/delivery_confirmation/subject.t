@@ -1,0 +1,1 @@
+Your order {{order_number}} has been delivered!

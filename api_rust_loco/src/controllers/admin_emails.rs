@@ -5,6 +5,7 @@ use sea_orm::{ColumnTrait, EntityTrait, PaginatorTrait, QueryFilter, QueryOrder}
 use serde::Deserialize;
 
 use crate::mailers::auth::AuthMailer;
+use crate::mailers::order::OrderMailer;
 use crate::mailers::email_service::EmailService;
 use crate::models::email_logs;
 use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams};
@@ -19,7 +20,8 @@ pub struct LogsParams {
 
 #[debug_handler]
 pub async fn list_templates(State(_ctx): State<AppContext>) -> Result<Response> {
-    let templates = AuthMailer::get_all_templates();
+    let mut templates = AuthMailer::get_all_templates();
+    templates.extend(OrderMailer::get_all_templates());
     format::json(templates)
 }
 

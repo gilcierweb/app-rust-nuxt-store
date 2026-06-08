@@ -5,6 +5,7 @@ pub mod prelude;
 pub mod addresses;
 pub mod admin_audit_logs;
 pub mod admin_settings;
+pub mod back_in_stock_notifications;
 pub mod banner_events;
 pub mod banner_positions;
 pub mod banners;
