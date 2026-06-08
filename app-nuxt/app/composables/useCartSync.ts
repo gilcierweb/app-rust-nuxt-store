@@ -1,4 +1,4 @@
-import type { CartApiResponse, CartItem } from '~/types'
+import type { CartApiResponse, CartItem, ProductVariant } from '~/types'
 import { mapCartApiItem } from '~/stores/cart'
 
 function findKey(item: CartItem): string {
@@ -32,7 +32,38 @@ export function useCartSync() {
     }
   }
 
+  async function checkStock(productId: number, variantId?: number): Promise<{ available: boolean; maxQuantity: number }> {
+    try {
+      const variants = await apiFetch<ProductVariant[]>(`/api/variants/list?product_id=${productId}`)
+      const variant = variantId
+        ? variants.find(v => v.id === variantId)
+        : variants[0]
+      if (!variant) return { available: true, maxQuantity: 999 }
+      if (variant.track_inventory === false) return { available: true, maxQuantity: 999 }
+      if (variant.allow_backorder) return { available: true, maxQuantity: 999 }
+      const qty = variant.inventory_quantity ?? 0
+      const reserved = variant.reserved_quantity ?? 0
+      const available = qty - reserved
+      return { available: available > 0, maxQuantity: Math.max(0, available) }
+    } catch {
+      return { available: true, maxQuantity: 999 }
+    }
+  }
+
   async function addItemSync(item: { productId: number; name: string; price: number; image?: string; slug?: string; quantity?: number; variantId?: number }) {
+    const quantity = item.quantity || 1
+
+    const { available, maxQuantity } = await checkStock(item.productId, item.variantId)
+    if (!available) {
+      throw new Error('out_of_stock')
+    }
+
+    const existingItem = cartStore.items.find(i => i.productId === item.productId && i.variantId === (item.variantId ?? i.variantId))
+    const existingQty = existingItem?.quantity ?? 0
+    if (existingQty + quantity > maxQuantity) {
+      throw new Error('insufficient_stock')
+    }
+
     cartStore.addItem(item)
 
     if (!isAuthenticated.value) return
@@ -44,7 +75,7 @@ export function useCartSync() {
         body: {
           product_id: item.productId,
           product_variant_id: item.variantId ?? null,
-          quantity: item.quantity || 1,
+          quantity: quantity,
           price: String(Number(item.price)),
         },
       })
@@ -80,6 +111,11 @@ export function useCartSync() {
   async function updateQuantitySync(productId: number, quantity: number) {
     const item = cartStore.items.find(i => i.productId === productId)
     if (!item) return
+
+    const { available, maxQuantity } = await checkStock(productId, item.variantId)
+    if (!available || quantity > maxQuantity) {
+      throw new Error('insufficient_stock')
+    }
 
     cartStore.updateQuantity(productId, quantity)
 
@@ -174,5 +210,6 @@ export function useCartSync() {
     updateQuantitySync,
     clearCartSync,
     mergeCartOnLogin,
+    checkStock,
   }
 }

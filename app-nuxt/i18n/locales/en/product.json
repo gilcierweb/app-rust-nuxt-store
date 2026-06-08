@@ -52,6 +52,9 @@
     "reviewComment": "Comment",
     "submitReview": "Submit Review",
     "reviewSuccess": "Review submitted successfully!",
-    "reviewError": "Error submitting review"
+    "reviewError": "Error submitting review",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Only {count} left in stock",
+    "inStock": "In Stock"
   }
 }

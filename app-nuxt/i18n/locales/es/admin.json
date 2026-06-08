@@ -899,7 +899,10 @@
       "empty": "No se encontraron elementos de inventario.",
       "actions": {
         "refresh": "Actualizar",
-        "editVariant": "Editar variante"
+        "editVariant": "Editar variante",
+        "logs": "Registros",
+        "reservations": "Reservas",
+        "adjust": "Ajustar inventario"
       },
       "metrics": {
         "variants": "Variantes",
@@ -934,6 +937,62 @@
         "showing": "Mostrando {current} de {total} variantes",
         "previous": "Anterior",
         "next": "Siguiente"
+      },
+      "adjust": {
+        "title": "Ajustar Inventario",
+        "type": "Tipo de ajuste",
+        "types": {
+          "restock": "Reposicion",
+          "sale": "Venta",
+          "return": "Devolucion",
+          "damage": "Dano",
+          "correction": "Correccion"
+        },
+        "quantity": "Cantidad",
+        "quantityPlaceholder": "Ingrese cantidad (positivo para agregar, negativo para quitar)",
+        "quantityHelp": "Valores positivos aumentan inventario, negativos lo disminuyen.",
+        "reason": "Motivo",
+        "reasonPlaceholder": "Explique el motivo de este ajuste...",
+        "currentStock": "Stock actual",
+        "reserved": "Reservado",
+        "newStock": "Stock nuevo (despues del ajuste)",
+        "save": "Guardar ajuste",
+        "error": "Error al guardar ajuste. Intente de nuevo."
+      },
+      "logs": {
+        "title": "Registros de Ajustes de Inventario",
+        "empty": "No hay ajustes de inventario registrados.",
+        "date": "Fecha",
+        "item": "Item",
+        "type": "Tipo",
+        "quantity": "Cant",
+        "before": "Antes",
+        "after": "Despues",
+        "reason": "Motivo",
+        "types": {
+          "restock": "Reposicion",
+          "sale": "Venta",
+          "return": "Devolucion",
+          "damage": "Dano",
+          "correction": "Correccion"
+        }
+      },
+      "reservations": {
+        "title": "Reservas de Carrito",
+        "empty": "No hay reservas activas.",
+        "expireAll": "Expirar todas",
+        "date": "Fecha",
+        "item": "Item",
+        "quantity": "Cant",
+        "status": "Estado",
+        "expires": "Expira",
+        "context": "Contexto",
+        "statuses": {
+          "active": "Activa",
+          "expired": "Expirada",
+          "released": "Liberada",
+          "converted": "Convertida"
+        }
       }
     },
     "emails": {

@@ -903,7 +903,10 @@
       "empty": "No inventory items found.",
       "actions": {
         "refresh": "Refresh",
-        "editVariant": "Edit variant"
+        "editVariant": "Edit variant",
+        "logs": "Logs",
+        "reservations": "Reservations",
+        "adjust": "Adjust stock"
       },
       "metrics": {
         "variants": "Variants",
@@ -938,6 +941,62 @@
         "showing": "Showing {current} of {total} variants",
         "previous": "Previous",
         "next": "Next"
+      },
+      "adjust": {
+        "title": "Adjust Stock",
+        "type": "Adjustment type",
+        "types": {
+          "restock": "Restock",
+          "sale": "Sale",
+          "return": "Return",
+          "damage": "Damage",
+          "correction": "Correction"
+        },
+        "quantity": "Quantity",
+        "quantityPlaceholder": "Enter quantity (positive to add, negative to remove)",
+        "quantityHelp": "Positive values increase stock, negative values decrease it.",
+        "reason": "Reason",
+        "reasonPlaceholder": "Explain why this adjustment is being made...",
+        "currentStock": "Current stock",
+        "reserved": "Reserved",
+        "newStock": "New stock (after adjustment)",
+        "save": "Save adjustment",
+        "error": "Error saving adjustment. Please try again."
+      },
+      "logs": {
+        "title": "Stock Adjustment Logs",
+        "empty": "No stock adjustments recorded yet.",
+        "date": "Date",
+        "item": "Item",
+        "type": "Type",
+        "quantity": "Qty",
+        "before": "Before",
+        "after": "After",
+        "reason": "Reason",
+        "types": {
+          "restock": "Restock",
+          "sale": "Sale",
+          "return": "Return",
+          "damage": "Damage",
+          "correction": "Correction"
+        }
+      },
+      "reservations": {
+        "title": "Cart Reservations",
+        "empty": "No active reservations.",
+        "expireAll": "Expire all",
+        "date": "Date",
+        "item": "Item",
+        "quantity": "Qty",
+        "status": "Status",
+        "expires": "Expires",
+        "context": "Context",
+        "statuses": {
+          "active": "Active",
+          "expired": "Expired",
+          "released": "Released",
+          "converted": "Converted"
+        }
       }
     },
     "emails": {

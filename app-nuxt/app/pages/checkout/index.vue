@@ -520,6 +520,7 @@ const placeOrder = handleSubmit(async () => {
 
   const items = cartStore.items.map(item => ({
     product_id: item.productId,
+    product_variant_id: item.variantId ?? null,
     quantity: item.quantity,
     price: Number(item.price),
   }))

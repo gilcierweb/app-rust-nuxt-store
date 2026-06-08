@@ -83,14 +83,31 @@
             </div>
           </div>
 
+          <!-- Stock Status -->
+          <div v-if="selectedVariant" class="mb-6">
+            <div v-if="!isInStock" class="alert alert-error">
+              <span class="icon-[tabler--alert-circle] size-5"></span>
+              <span>{{ t('product.outOfStock') }}</span>
+            </div>
+            <div v-else-if="isLowStock" class="alert alert-warning">
+              <span class="icon-[tabler--alert-triangle] size-5"></span>
+              <span>{{ t('product.lowStock', { count: selectedVariant.inventory_quantity }) }}</span>
+            </div>
+            <div v-else class="flex items-center gap-2 text-sm text-success">
+              <span class="icon-[tabler--check-circle] size-4"></span>
+              <span>{{ t('product.inStock') }}</span>
+            </div>
+          </div>
+
           <!-- Actions -->
           <div class="mt-auto flex flex-col sm:flex-row gap-4">
             <button 
               class="btn btn-primary btn-lg grow h-16 rounded-[1.5rem] shadow-xl shadow-primary/20 text-lg transition-transform hover:scale-[1.02]" 
+              :disabled="!isInStock"
               @click="addToCartApi(productApi)"
             >
               <span class="icon-[tabler--shopping-cart-plus] size-6 mr-2"></span>
-              {{ t('product.addToCart') }}
+              {{ isInStock ? t('product.addToCart') : t('product.outOfStock') }}
             </button>
             <button 
               class="btn btn-square btn-lg h-16 w-16 rounded-[1.5rem] border-2 border-base-200 hover:border-error/20 hover:bg-error/5 hover:text-error group transition-all"
@@ -239,6 +256,30 @@ const selectedPrice = computed(() => {
   if (selectedVariant.value?.price) return selectedVariant.value.price
   if (!productApi.value) return 0
   return productApi.value.price ?? 0
+})
+
+const selectedStock = computed(() => {
+  if (!selectedVariant.value) return null
+  return selectedVariant.value.inventory_quantity ?? null
+})
+
+const isInStock = computed(() => {
+  if (!selectedVariant.value) return true
+  if (selectedVariant.value.track_inventory === false) return true
+  if (selectedVariant.value.allow_backorder) return true
+  const qty = selectedVariant.value.inventory_quantity ?? 0
+  const reserved = selectedVariant.value.reserved_quantity ?? 0
+  return (qty - reserved) > 0
+})
+
+const isLowStock = computed(() => {
+  if (!selectedVariant.value) return false
+  if (selectedVariant.value.track_inventory === false) return false
+  const qty = selectedVariant.value.inventory_quantity ?? 0
+  const reserved = selectedVariant.value.reserved_quantity ?? 0
+  const available = qty - reserved
+  const threshold = selectedVariant.value.low_stock_threshold ?? 5
+  return available > 0 && available <= threshold
 })
 
 watch(variants, (newVariants) => {

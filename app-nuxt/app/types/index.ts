@@ -196,6 +196,10 @@ export interface ProductVariant {
   cost_price?: number
   compare_price?: number
   inventory_quantity?: number
+  reserved_quantity?: number
+  track_inventory?: boolean
+  allow_backorder?: boolean
+  low_stock_threshold?: number
   weight?: number
   barcode?: string
   position?: number
@@ -413,4 +417,60 @@ export interface BannerAnalytics {
   impressions: number
   clicks: number
   ctr_percent: number
+}
+
+export interface InventoryItem {
+  variant_id: number
+  product_id: number
+  product_name?: string | null
+  variant_name?: string | null
+  sku?: string | null
+  active?: boolean | null
+  inventory_quantity?: number | null
+  reserved_quantity: number
+  track_inventory?: boolean | null
+  allow_backorder?: boolean | null
+  low_stock_threshold?: number | null
+}
+
+export interface InventorySummary {
+  total_variants: number
+  total_stock: number
+  total_reserved: number
+  alert_count: number
+  out_of_stock_count: number
+}
+
+export interface InventoryListResponse extends AdminPaginatedResponse<InventoryItem> {
+  summary: InventorySummary
+}
+
+export interface StockAdjustment {
+  id: number
+  variant_id: number
+  product_name?: string
+  variant_name?: string
+  sku?: string
+  type: string
+  quantity_before: number
+  quantity_after: number
+  quantity: number
+  reason?: string
+  reference?: string
+  user_name?: string
+  created_at: string
+}
+
+export interface StockReservation {
+  id: number
+  variant_id: number
+  product_name?: string
+  variant_name?: string
+  sku?: string
+  cart_id?: number | null
+  order_id?: number | null
+  quantity: number
+  status: string
+  expires_at?: string | null
+  created_at: string
 }

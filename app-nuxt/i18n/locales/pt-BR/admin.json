@@ -901,7 +901,10 @@
       "empty": "Nenhum item de estoque encontrado.",
       "actions": {
         "refresh": "Atualizar",
-        "editVariant": "Editar variante"
+        "editVariant": "Editar variante",
+        "logs": "Registros",
+        "reservations": "Reservas",
+        "adjust": "Ajustar estoque"
       },
       "metrics": {
         "variants": "Variantes",
@@ -936,6 +939,62 @@
         "showing": "Mostrando {current} de {total} variantes",
         "previous": "Anterior",
         "next": "Próximo"
+      },
+      "adjust": {
+        "title": "Ajustar Estoque",
+        "type": "Tipo de ajuste",
+        "types": {
+          "restock": "Reposicao",
+          "sale": "Venda",
+          "return": "Devolucao",
+          "damage": "Avaria",
+          "correction": "Correcao"
+        },
+        "quantity": "Quantidade",
+        "quantityPlaceholder": "Digite a quantidade (positivo para adicionar, negativo para remover)",
+        "quantityHelp": "Valores positivos aumentam estoque, negativos diminuem.",
+        "reason": "Motivo",
+        "reasonPlaceholder": "Explique o motivo deste ajuste...",
+        "currentStock": "Estoque atual",
+        "reserved": "Reservado",
+        "newStock": "Novo estoque (apos ajuste)",
+        "save": "Salvar ajuste",
+        "error": "Erro ao salvar ajuste. Tente novamente."
+      },
+      "logs": {
+        "title": "Registros de Ajuste de Estoque",
+        "empty": "Nenhum ajuste de estoque registrado.",
+        "date": "Data",
+        "item": "Item",
+        "type": "Tipo",
+        "quantity": "Qtd",
+        "before": "Antes",
+        "after": "Depois",
+        "reason": "Motivo",
+        "types": {
+          "restock": "Reposicao",
+          "sale": "Venda",
+          "return": "Devolucao",
+          "damage": "Avaria",
+          "correction": "Correcao"
+        }
+      },
+      "reservations": {
+        "title": "Reservas de Carrinho",
+        "empty": "Nenhuma reserva ativa.",
+        "expireAll": "Expirar todas",
+        "date": "Data",
+        "item": "Item",
+        "quantity": "Qtd",
+        "status": "Status",
+        "expires": "Expira",
+        "context": "Contexto",
+        "statuses": {
+          "active": "Ativa",
+          "expired": "Expirada",
+          "released": "Liberada",
+          "converted": "Convertida"
+        }
       }
     },
     "emails": {

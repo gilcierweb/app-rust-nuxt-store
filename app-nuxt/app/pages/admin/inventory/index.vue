@@ -5,10 +5,30 @@
         <h1 class="h1">{{ t('admin.inventory.title') }}</h1>
         <p class="text-sm text-base-content/60">{{ t('admin.inventory.description') }}</p>
       </div>
-      <button class="btn btn-outline btn-sm" type="button" :disabled="pending" @click="refresh">
-        <i class="icon-[tabler--refresh] size-4"></i>
-        {{ t('admin.inventory.actions.refresh') }}
-      </button>
+      <div class="flex gap-2">
+        <button class="btn btn-outline btn-sm" type="button" :disabled="pending" @click="refresh">
+          <i class="icon-[tabler--refresh] size-4"></i>
+          {{ t('admin.inventory.actions.refresh') }}
+        </button>
+        <button
+          class="btn btn-outline btn-sm"
+          type="button"
+          :class="activeTab === 'logs' ? 'btn-active' : ''"
+          @click="activeTab = activeTab === 'logs' ? null : 'logs'"
+        >
+          <i class="icon-[tabler--history] size-4"></i>
+          {{ t('admin.inventory.actions.logs') }}
+        </button>
+        <button
+          class="btn btn-outline btn-sm"
+          type="button"
+          :class="activeTab === 'reservations' ? 'btn-active' : ''"
+          @click="activeTab = activeTab === 'reservations' ? null : 'reservations'"
+        >
+          <i class="icon-[tabler--lock] size-4"></i>
+          {{ t('admin.inventory.actions.reservations') }}
+        </button>
+      </div>
     </div>
 
     <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
@@ -56,6 +76,16 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Logs Panel -->
+    <div v-if="activeTab === 'logs'" class="mb-6">
+      <AdminInventoryStockAdjustmentLog />
+    </div>
+
+    <!-- Reservations Panel -->
+    <div v-if="activeTab === 'reservations'" class="mb-6">
+      <AdminInventoryReservationManager />
     </div>
 
     <div class="card shadow-base-300/10 mb-6 shadow-md">
@@ -127,28 +157,24 @@
         />
       </div>
     </div>
+
+    <AdminInventoryAdjustStockModal
+      :visible="showAdjustModal"
+      :item="adjustingItem"
+      @close="showAdjustModal = false"
+      @saved="handleAdjustSaved"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { AdminPaginatedResponse } from '~/types'
+import type { AdminPaginatedResponse, InventoryItem } from '~/types'
 import { createColumnHelper } from '@tanstack/vue-table'
 import { h, resolveComponent } from 'vue'
 
 definePageMeta({
   layout: 'admin'
 })
-
-interface InventoryItem {
-  variant_id: number
-  product_id: number
-  product_name?: string | null
-  variant_name?: string | null
-  sku?: string | null
-  active?: boolean | null
-  inventory_quantity?: number | null
-  reserved_quantity: number
-}
 
 interface InventorySummary {
   total_variants: number
@@ -174,6 +200,9 @@ const currentPage = ref(1)
 const pageSize = ref(20)
 const savingVariantIds = ref<number[]>([])
 const draftQuantities = reactive<Record<number, number>>({})
+const activeTab = ref<string | null>(null)
+const showAdjustModal = ref(false)
+const adjustingItem = ref<InventoryItem | null>(null)
 
 const stockQuantity = (item: InventoryItem) => Number(item.inventory_quantity || 0)
 
@@ -275,6 +304,17 @@ const saveQuantity = async (item: InventoryItem) => {
   }
 }
 
+const openAdjustModal = (item: InventoryItem) => {
+  adjustingItem.value = item
+  showAdjustModal.value = true
+}
+
+const handleAdjustSaved = () => {
+  showAdjustModal.value = false
+  adjustingItem.value = null
+  refresh()
+}
+
 const resetFilters = () => {
   searchQuery.value = ''
   debouncedSearchQuery.value = ''
@@ -349,6 +389,12 @@ const columns = computed(() => {
     cell: (info) => {
       const item = info.row.original
       return h('div', { class: 'flex gap-2 justify-end' }, [
+        h('button', {
+          class: 'btn btn-ghost btn-xs',
+          type: 'button',
+          title: t('admin.inventory.actions.adjust'),
+          onClick: () => openAdjustModal(item)
+        }, h('i', { class: 'icon-[tabler--adjustments] size-4' })),
         h('input', {
           value: draftQuantities[item.variant_id] ?? stockQuantity(item),
           type: 'number',

@@ -52,6 +52,9 @@
     "reviewComment": "Comentario",
     "submitReview": "Enviar Evaluación",
     "reviewSuccess": "¡Evaluación enviada con éxito!",
-    "reviewError": "Error al enviar la evaluación"
+    "reviewError": "Error al enviar la evaluación",
+    "outOfStock": "Agotado",
+    "lowStock": "Solo quedan {count} unidades",
+    "inStock": "En Stock"
   }
 }
