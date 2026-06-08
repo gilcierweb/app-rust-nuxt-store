@@ -165,6 +165,10 @@ pub struct Params {
     #[serde(with = "crate::utils::decimal::opt")]
     pub compare_price: Option<Decimal>,
     pub inventory_quantity: Option<i32>,
+    pub reserved_quantity: Option<i32>,
+    pub track_inventory: Option<bool>,
+    pub allow_backorder: Option<bool>,
+    pub low_stock_threshold: Option<i32>,
     #[serde(with = "crate::utils::decimal::opt")]
     pub weight: Option<Decimal>,
     pub barcode: Option<String>,
@@ -187,7 +191,19 @@ impl Params {
         item.price = Set(self.price);
         item.cost_price = Set(self.cost_price);
         item.compare_price = Set(self.compare_price);
-        item.inventory_quantity = Set(self.inventory_quantity);
+        item.inventory_quantity = Set(self.inventory_quantity.unwrap_or(0));
+        if let Some(reserved) = self.reserved_quantity {
+            item.reserved_quantity = Set(reserved);
+        }
+        if let Some(track) = self.track_inventory {
+            item.track_inventory = Set(track);
+        }
+        if let Some(backorder) = self.allow_backorder {
+            item.allow_backorder = Set(backorder);
+        }
+        if let Some(threshold) = self.low_stock_threshold {
+            item.low_stock_threshold = Set(threshold);
+        }
         item.weight = Set(self.weight);
         item.barcode = Set(self.barcode.clone());
         item.position = Set(self.position);
@@ -326,7 +342,7 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
         price: v.price,
         cost_price: v.cost_price,
         compare_price: v.compare_price,
-        inventory_quantity: v.inventory_quantity,
+        inventory_quantity: Some(v.inventory_quantity),
         weight: v.weight,
         barcode: v.barcode,
         position: v.position,

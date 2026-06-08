@@ -16,7 +16,11 @@ pub struct Model {
     pub cost_price: Option<Decimal>,
     #[serde(with = "crate::utils::decimal::opt")]
     pub compare_price: Option<Decimal>,
-    pub inventory_quantity: Option<i32>,
+    pub inventory_quantity: i32,
+    pub reserved_quantity: i32,
+    pub track_inventory: bool,
+    pub allow_backorder: bool,
+    pub low_stock_threshold: i32,
     #[serde(with = "crate::utils::decimal::opt")]
     pub weight: Option<Decimal>,
     pub barcode: Option<String>,
@@ -37,6 +41,10 @@ pub enum Relation {
     ProductVariantImages,
     #[sea_orm(has_many = "super::product_variant_options::Entity")]
     ProductVariantOptions,
+    #[sea_orm(has_many = "super::stock_reservations::Entity")]
+    StockReservations,
+    #[sea_orm(has_many = "super::stock_movements::Entity")]
+    StockMovements,
     #[sea_orm(
         belongs_to = "super::products::Entity",
         from = "Column::ProductId",
@@ -48,31 +56,23 @@ pub enum Relation {
 }
 
 impl Related<super::cart_items::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::CartItems.def()
-    }
+    fn to() -> RelationDef { Relation::CartItems.def() }
 }
-
 impl Related<super::order_items::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::OrderItems.def()
-    }
+    fn to() -> RelationDef { Relation::OrderItems.def() }
 }
-
 impl Related<super::product_variant_images::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::ProductVariantImages.def()
-    }
+    fn to() -> RelationDef { Relation::ProductVariantImages.def() }
 }
-
 impl Related<super::product_variant_options::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::ProductVariantOptions.def()
-    }
+    fn to() -> RelationDef { Relation::ProductVariantOptions.def() }
 }
-
+impl Related<super::stock_reservations::Entity> for Entity {
+    fn to() -> RelationDef { Relation::StockReservations.def() }
+}
+impl Related<super::stock_movements::Entity> for Entity {
+    fn to() -> RelationDef { Relation::StockMovements.def() }
+}
 impl Related<super::products::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Products.def()
-    }
+    fn to() -> RelationDef { Relation::Products.def() }
 }

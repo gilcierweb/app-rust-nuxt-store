@@ -53,6 +53,9 @@ mod m20260520_120000_admin_settings;
 mod m20260520_234941_admin_audit_logs;
 mod m20260604_000001_alter_cart_items_product_variant_nullable;
 mod m20260606_000001_add_query_optimization_indexes;
+mod m20260607_000001_add_inventory_hardening_columns;
+mod m20260607_000002_create_stock_reservations;
+mod m20260607_000003_create_stock_movements;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -109,6 +112,9 @@ impl MigratorTrait for Migrator {
             Box::new(m20260520_234941_admin_audit_logs::Migration),
             Box::new(m20260604_000001_alter_cart_items_product_variant_nullable::Migration),
             Box::new(m20260606_000001_add_query_optimization_indexes::Migration),
+            Box::new(m20260607_000001_add_inventory_hardening_columns::Migration),
+            Box::new(m20260607_000002_create_stock_reservations::Migration),
+            Box::new(m20260607_000003_create_stock_movements::Migration),
             // inject-above (do not remove this comment)
         ]
     }

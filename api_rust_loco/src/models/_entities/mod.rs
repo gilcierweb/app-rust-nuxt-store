@@ -39,6 +39,8 @@ pub mod reviews;
 pub mod roles;
 pub mod shipments;
 pub mod shipping_methods;
+pub mod stock_movements;
+pub mod stock_reservations;
 pub mod users;
 pub mod users_roles;
 pub mod variant_options;

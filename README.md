@@ -85,32 +85,33 @@ Everyone's password: Password123!
 app-rust-nuxt-store/
 ├── api_rust_loco/          # Rust backend (Loco.rs REST API)
 │   ├── src/
-│   │   ├── controllers/    # 18 API controllers (includes admin/banner surfaces)
-│   │   ├── models/         # SeaORM entities + business logic
+│   │   ├── controllers/    # 30 API controllers (auth, CRUD, admin, payments)
+│   │   ├── models/         # SeaORM entities + business logic (47 files)
 │   │   ├── views/          # Response serialization
 │   │   ├── mailers/        # Email templates (welcome, reset, magic-link)
-│   │   ├── workers/        # Background jobs
+│   │   ├── workers/        # Background jobs (payment webhook retry)
 │   │   ├── seeds/          # Dependency-aware seeders (22 entities)
+│   │   ├── payment_gateways/ # 10 payment provider drivers
 │   │   ├── openapi.rs      # OpenAPI/Swagger configuration
 │   │   └── app.rs          # App hooks + route registration
 │   ├── config/             # Environment configs (dev, test, prod)
-│   ├── migration/          # SeaORM database migrations
+│   ├── migration/          # SeaORM database migrations (51 files)
 │   └── tests/              # 89 unit + integration tests
 ├── app-nuxt/               # Nuxt 4 frontend (Vue.js storefront)
 │   ├── app/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── composables/    # Vue composables (useAuth, useCartUI, useWishlist)
-│   │   ├── layouts/        # Page layouts (default, auth, admin)
-│   │   ├── middleware/      # Route guards (auth, admin)
-│   │   ├── pages/          # File-based routing (15+ page groups)
-│   │   ├── plugins/        # Nuxt plugins (auth, flyonui, veevalidate)
+│   │   ├── components/     # Reusable UI components (Admin, Account, UI)
+│   │   ├── composables/    # Vue composables (useAuth, useCartUI, useWishlist, useApi, etc.)
+│   │   ├── layouts/        # Page layouts (default, auth, admin, account)
+│   │   ├── middleware/      # Route guards (auth, admin, admin-layout)
+│   │   ├── pages/          # File-based routing (17+ page groups, 20 admin sections)
+│   │   ├── plugins/        # Nuxt plugins (auth, api-auth, flyonui, veevalidate, filters)
 │   │   └── stores/         # Pinia stores (cart, users)
 │   ├── tests/
 │   │   ├── unit/           # Vitest component tests
 │   │   └── e2e/            # Playwright E2E tests
-│   └── locales/            # i18n translations (pt-BR, en, es)
-├── docs/                   # Project documentation
-└── docker-compose.yml      # Container orchestration
+│   └── i18n/locales/       # i18n translations (pt-BR, en, es - 18 files each)
+├── docs/                   # Project documentation (17 .md files)
+└── docker-compose.yml      # Container orchestration (3 services)
 ```
 
 ## 🚀 Getting Started
@@ -207,17 +208,19 @@ Read-heavy catalog/content endpoints use short-lived in-memory caches, product a
 Current API namespaces:
 
 - `/api/auth/*` - shared authentication surface (customer + admin login/session)
-- `/api/account/*` - authenticated customer-owned resources (orders, wishlist, checkout)
+- `/api/account/*` - authenticated customer-owned resources (orders, wishlist, checkout, payments)
 - `/api/admin/*` - administrative resources protected by admin namespace guard
+- `/api/webhooks/*` - provider webhook receivers with inbox persistence
 - Public read APIs remain under `/api/*` for catalog/content delivery
 
 Implemented namespaced endpoints (current state):
 
 | Namespace | Endpoints | Auth |
 |---|---|---|
-| **Account** | `/api/account/orders`, `/api/account/orders/:id`, `/api/account/orders/checkout`, `/api/account/wishlist/*` | JWT |
-| **Admin** | `/api/admin/dashboards/stats`, `/api/admin/{users,products,categories,orders,profiles,addresses,posts,reviews,banners,coupons,shippings,shipments,variants,payments}` | JWT + admin ability |
+| **Account** | `/api/account/orders`, `/api/account/orders/:id`, `/api/account/orders/checkout`, `/api/account/wishlist/*`, `/api/account/payments/*`, `/api/account/payment-setup-sessions/*` | JWT |
+| **Admin** | `/api/admin/dashboards/stats`, `/api/admin/{users,products,categories,orders,profiles,addresses,posts,reviews,banners,coupons,shippings,shipments,variants,payments,payment-gateways,payment-methods,payment-refunds,payment-gateway-events,payment-gateway-logs,audit-logs,settings,emails,inventory,rbac}` | JWT + admin ability |
 | **Banners Public** | `/api/banners/active`, `/api/banners/events` | Public |
+| **Webhooks** | `/api/webhooks/payments/:provider` | Provider signature |
 
 | Module | Prefix | Endpoints | Auth |
 |---|---|---|---|
@@ -236,9 +239,7 @@ Implemented namespaced endpoints (current state):
 | **Posts** | `/api/posts/` | CRUD | JWT (write) |
 | **Profiles** | `/api/profiles/` | CRUD | JWT (write) |
 
-Legacy endpoints such as `/api/orders/*`, `/api/wishlists/*`, and `/api/users/*` remain available for compatibility while frontend migration to namespaces continues.
-
-## 📊 Database Entities (22 tables)
+## 📊 Database Entities (32 tables)
 
 | Entity | Description | Status |
 |---|---|---|
@@ -251,12 +252,23 @@ Legacy endpoints such as `/api/orders/*`, `/api/wishlists/*`, and `/api/users/*`
 | `product_variants` | Size/color/material product variants | ✅ Done |
 | `variant_options` | Option types (e.g., Color, Size) | ✅ Done |
 | `product_variant_options` | Variant-option mapping | ✅ Done |
+| `product_variant_images` | Variant-specific images | ✅ Done |
 | `carts` | Shopping cart sessions | ✅ Done |
 | `cart_items` | Cart line items | ✅ Done |
 | `orders` | Customer orders | ✅ Done |
 | `order_items` | Order line items | ✅ Done |
-| `payment_methods` | Payment gateway configurations | ✅ Done |
+| `payment_methods` | Checkout-facing payment methods | ✅ Done |
 | `payments` | Payment transactions | ✅ Done |
+| `payment_gateways` | Provider registry and credential env-var references | ✅ Done |
+| `payment_method_countries` | Country eligibility for payment methods | ✅ Done |
+| `payment_method_currencies` | Currency eligibility for payment methods | ✅ Done |
+| `gateway_customers` | User-to-provider customer profile mapping | ✅ Done |
+| `payment_sources` | Tokenized saved payment sources | ✅ Done |
+| `payment_sessions` | Gateway-side checkout/payment sessions | ✅ Done |
+| `payment_setup_sessions` | Sessions for saving payment sources | ✅ Done |
+| `payment_refunds` | Normalized refund records | ✅ Done |
+| `payment_gateway_events` | Webhook inbox with provider event deduplication | ✅ Done |
+| `payment_gateway_logs` | Sanitized gateway request/response/webhook logs | ✅ Done |
 | `addresses` | Customer addresses (billing/shipping) | ✅ Done |
 | `shipping_methods` | Shipping carriers and methods | ✅ Done |
 | `shipments` | Package tracking | ✅ Done |
@@ -264,6 +276,14 @@ Legacy endpoints such as `/api/orders/*`, `/api/wishlists/*`, and `/api/users/*`
 | `coupon_usages` | Coupon redemption tracking | ✅ Done |
 | `reviews` | Product reviews and ratings | ✅ Done |
 | `wishlists` | User wishlists | ✅ Done |
+| `banners` | Banner management | ✅ Done |
+| `banner_positions` | Banner position definitions | ✅ Done |
+| `banner_events` | Banner view/click analytics | ✅ Done |
+| `admin_settings` | Backend-backed admin settings | ✅ Done |
+| `admin_audit_logs` | Admin action tracking | ✅ Done |
+| `email_logs` | Transactional email delivery tracking | ✅ Done |
+| `roles` | RBAC role definitions | ✅ Done |
+| `users_roles` | User-role assignments | ✅ Done |
 
 ## ⚡ Performance & Security Status
 
@@ -275,6 +295,8 @@ Highlights from performance and authentication:
 - Additional indexes were added on auth, catalog, orders, and banner analytics paths.
 - Read-heavy endpoints use short-lived in-memory caches with invalidation on writes.
 - API protection now layers: `x-api-key` guard -> rate limiting -> CSRF/JWT handling.
+- Single-query joins for product/variant reads on cold cache.
+- Atomic checkout with transactional writes.
 
 Key backend auth env vars:
 
@@ -295,22 +317,33 @@ Key backend auth env vars:
 - **Categories** - Category listing and detail pages with product grids
 - **Posts** - Blog-style content listing and detail
 - **Cart** - Shopping cart with quantity management
-- **Checkout** - Multi-step checkout flow
+- **Checkout** - Multi-step checkout flow with payment gateway integration
 - **Wishlist** - Saved products
+- **Account** - Order history, wishlist, settings
 - **Static Pages** - About, Contact, Privacy, Terms, Stores
 
 ### Admin Panel
 - **Dashboard** - Statistics cards (orders, revenue, traffic, signups, retention)
-- **Products** - Full CRUD with image upload and drag-drop
+- **Products** - Full CRUD with image upload, drag-drop, and variant management
 - **Categories** - Full CRUD with hierarchy management
 - **Orders** - Order management and status tracking
+- **Payments** - Gateway management, methods, details, events, logs, refunds
+- **Inventory** - Variant stock, reservation estimates, quick updates, low-stock alerts
 - **Posts** - Content management
 - **Profiles** - User profile management
 - **Reviews** - Review moderation
 - **Coupons** - Coupon management
 - **Addresses** - Address management
 - **Shipments** - Shipping and tracking management
-- **Banners** - Banner management
+- **Shipping Methods** - Shipping carrier configuration
+- **Customers** - Customer management
+- **Users** - User administration
+- **RBAC** - Role-based access control
+- **Banners** - Banner management with events/analytics
+- **Emails** - Transactional email templates and delivery logs
+- **Monitoring** - Webhook failures, gateway errors, risky payments
+- **Audit Logs** - Admin action tracking
+- **Settings** - Backend-backed store, SEO, API, notification, security
 
 ---
 
@@ -332,6 +365,9 @@ Key backend auth env vars:
 * [X] Orders Items (product/variant references)
 * [X] Payments Methods (configurable payment gateways)
 * [X] Payments (transaction tracking, status management)
+* [X] Payment Gateways (Stripe, PayPal, Braintree, Mercado Pago, Pagar.me, Iugu, AbacatePay, Cielo, Getnet, Manual)
+* [X] Payment Gateway Domain (normalized gateways, sessions, tokenized sources, refunds, webhook inbox, gateway logs)
+* [X] Frontend Checkout (hosted checkout URLs, Stripe Payment Element, Braintree Drop-in, Mercado Pago Bricks, Pagar.me, Pix QR Code, Boleto)
 * [X] Addresses (billing/shipping, default flag)
 * [X] Shipping Methods (carriers, pricing, free shipping threshold)
 * [X] Shipments (tracking number, carrier, status timeline)
@@ -339,8 +375,17 @@ Key backend auth env vars:
 * [X] Coupons Usages (per-user/per-order tracking)
 * [X] Reviews (1-5 stars, verified purchase, moderation)
 * [X] Wishlist (per user, toggle on product cards)
+* [X] Banners (public active banners API + admin CRUD/events/analytics)
 * [X] Admin Dashboard (stats: orders, revenue, traffic, signups, retention)
-* [X] Admin CRUD (products, categories, orders, posts, profiles, reviews, coupons, addresses, shipments, shippings)
+* [X] Admin CRUD (products, categories, orders, posts, profiles, reviews, coupons, addresses, shipments, shippings, customers, users, banners)
+* [X] Admin Payments (gateway management, payment methods, payment details, gateway events/logs, refunds, capture/void actions, metrics)
+* [X] Admin Inventory (variant stock, cart reservation estimate, quick stock updates, low-stock alerts)
+* [X] Admin RBAC (roles, permissions, resource-scoped assignments)
+* [X] Admin Audit Logs (admin action tracking)
+* [X] Admin Email Management (templates, delivery status, resend actions)
+* [X] Admin Settings (backend-backed store, SEO, API, notification, security settings)
+* [X] Admin Monitoring (webhook failures, gateway errors, risky payments)
+* [X] Customer Account Dashboard (order history, wishlist, settings)
 * [X] i18n (pt-BR, en, es)
 * [X] SEO (SSR, meta tags, sitemap, Open Graph)
 * [X] PWA (offline caching, Workbox)
@@ -349,15 +394,20 @@ Key backend auth env vars:
 * [X] Frontend component tests (Vitest)
 * [X] E2E tests (Playwright)
 * [X] Docker + Docker Compose
+* [X] API rate limiting (per IP + per user)
+* [X] CSRF protection
+* [X] Cookies HttpOnly
+* [X] API protection API key, error 401, 403, 422
+* [X] JWT
+* [X] Performance optimization (auth dedup, admin context reuse, pagination, indexes, in-memory caching)
 
 ## 📌 ToDo - Pending
 
-### Core Commerce
-* [ ] Payment gateway integration (Stripe, PayPal, Braintree, Mercado Pago, Pagar.me, Iugu, AbacatePay, Cielo, Getnet)
-* [ ] Inventory management (stock tracking per product/variant)
-* [ ] Low-stock alerts and automatic out-of-stock handling
+### Core Commerce — Production Hardening
+* [ ] Inventory management hardening (normalized stock reservations, stock movements, automatic out-of-stock handling)
+* [ ] Transactional order emails (order confirmation, shipping updates, delivery confirmation, abandoned cart, back-in-stock)
+* [ ] Payment production hardening (expired-session cleanup, provider failure alerts, PCI/security review)
 * [ ] Order invoice generation (PDF)
-* [ ] Refund and return management
 * [ ] Tax calculation by region
 * [ ] Multi-currency support with exchange rates
 * [ ] Subscription products (recurring billing)
@@ -365,79 +415,57 @@ Key backend auth env vars:
 * [ ] Gift cards and store credit
 * [ ] Loyalty points / rewards program
 * [ ] Product bundles and kits
-* [ ] Research and select APIs for USA (e.g., UPS, FedEx, or USPS).
-* [ ] Research and select APIs for Brazil (e.g., Correios, Melhor Envio, or Jadlog).
-* [ ] Implement a conditional checkout logic based on the user's country.
-* [ ] Map weight and dimension units (Metric vs. Imperial).
-* [ ] Add currency support for shipping costs (USD, BRL and more).
-* [ ] Set up error handling for unsupported zip codes.
-
-
-
-
+* [ ] Shipping carrier API integration (USA: UPS/FedEx/USPS, Brazil: Correios/Melhor Envio/Jadlog)
+* [ ] Conditional checkout logic based on user's country
+* [ ] Weight/dimension unit mapping (Metric vs. Imperial)
+* [ ] Multi-currency shipping cost support
 
 ### Search & Discovery
 * [ ] Full-text product search (PostgreSQL tsvector or Meilisearch)
 * [ ] Product filtering (price range, category, rating, availability)
 * [ ] Product sorting (price, newest, best-selling, rating)
+* [ ] Cursor-based API pagination
+* [ ] Infinite scroll on product listings
 * [ ] Product recommendations ("Customers also bought", "Similar products")
 * [ ] Recently viewed products
 * [ ] Product comparison (side-by-side specs)
-* [ ] Search autocomplete / suggestions
-* [ ] Trending products / popular searches
 
 ### Infrastructure & Performance
 * [ ] Redis cache layer (product listings, categories, sessions)
 * [ ] S3-compatible image storage (AWS S3 / MinIO)
 * [ ] CDN for static assets and images
-* [ ] Cursor-based API pagination
-* [ ] Database query optimization and indexing
 * [ ] API response compression and caching (ETags)
 * [ ] Background job queue (email sending, image processing)
 * [ ] Health checks and readiness probes
 
 ### Customer Experience
-* [x] Customer account dashboard (order history, saved addresses, settings)
-* [ ] Order status email notifications (confirmation, shipped, delivered)
-* [ ] Abandoned cart recovery emails
-* [ ] Back-in-stock notifications
 * [ ] Social login (Google, Facebook, GitHub, Apple)
 * [ ] Notification center (in-app alerts for orders, promotions)
-* [ ] Product Q&A section
-* [ ] Infinite scroll on product listings
 * [ ] Dark mode toggle
 * [ ] Breadcrumb navigation
 
 ### Integrations & APIs
-* [ ] Webhook system (order events, payment events)
+* [ ] Webhook system (order events, payment events beyond provider webhooks)
 * [ ] GraphQL API (alternative to REST)
 * [ ] Real-time notifications (WebSocket / SSE)
-* [ ] Shipping carrier API integration (tracking, rates)
 * [ ] Email marketing integration (Mailchimp, SendGrid)
 * [ ] Analytics integration (Google Analytics, Plausible)
-* [ ] Chat support (LiveChat / Tawk.to)
-* [ ] OpenTelemetry
 
 ### Admin & Analytics
+* [ ] Granular RBAC hardening (Super Admin, Store Manager, Content Editor, Customer Support, Viewer)
+* [ ] Database-backed permission rules (beyond code-defined Ability)
 * [ ] Advanced analytics dashboard (conversion funnels, CLV, revenue by category)
 * [ ] Customer segmentation (VIP, new, inactive)
 * [ ] Bulk import/export (CSV/Excel for products, categories, customers)
 * [ ] A/B testing framework
-* [ ] Audit log (admin action tracking)
-* [ ] RBAC (granular role-based access: Super Admin, Manager, Editor)
+* [ ] Broader audit coverage across additional admin modules
 
 ### Security & DevOps
-* [x] API rate limiting (per IP + per user)
-* [x] CSRF protection
-* [x] Cookies HttpOnly
-* [x] API protection API key, error 401, 403, 422
-* [x] JWT
-* [ ] OAuth 2.0
+* [ ] OAuth 2.0 (social login)
 * [ ] Two-factor authentication (2FA/TOTP)
 * [ ] CI/CD pipeline (GitHub Actions)
 * [ ] Error monitoring (Sentry integration)
 * [ ] Automated database backups
-* [ ] SSL/TLS certificate management
 * [ ] Container orchestration (Kubernetes / Docker Swarm)
 
 ### Future Vision
@@ -445,8 +473,6 @@ Key backend auth env vars:
 * [ ] Mobile app (Flutter / React Native)
 * [ ] AI-powered product descriptions (LLM integration)
 * [ ] Headless CMS integration (Strapi / Directus)
-* [ ] Progressive image loading (blur-up technique)
-* [ ] Product variant images CRUD finalization (currently in progress in backlog)
 
 
 ---

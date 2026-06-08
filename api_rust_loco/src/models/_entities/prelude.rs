@@ -37,6 +37,8 @@ pub use super::reviews::Entity as Reviews;
 pub use super::roles::Entity as Roles;
 pub use super::shipments::Entity as Shipments;
 pub use super::shipping_methods::Entity as ShippingMethods;
+pub use super::stock_movements::Entity as StockMovements;
+pub use super::stock_reservations::Entity as StockReservations;
 pub use super::users::Entity as Users;
 pub use super::users_roles::Entity as UsersRoles;
 pub use super::variant_options::Entity as VariantOptions;

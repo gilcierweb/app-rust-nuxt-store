@@ -19,8 +19,13 @@ pub struct InventoryItemJson {
     pub variant_name: Option<String>,
     pub sku: Option<String>,
     pub active: Option<bool>,
-    pub inventory_quantity: Option<i32>,
-    pub reserved_quantity: i64,
+    pub inventory_quantity: i32,
+    pub reserved_quantity: i32,
+    pub available_quantity: i32,
+    pub track_inventory: bool,
+    pub allow_backorder: bool,
+    pub low_stock_threshold: i32,
+    pub stock_status: String,
 }
 
 #[derive(Debug, Default, FromQueryResult, Serialize)]
@@ -28,7 +33,9 @@ pub struct InventorySummaryRow {
     pub total_variants: i64,
     pub total_stock: i64,
     pub total_reserved: i64,
+    pub total_available: i64,
     pub alert_count: i64,
+    pub out_of_stock_count: i64,
 }
 
 #[derive(Debug, Default, Serialize)]
@@ -36,7 +43,9 @@ pub struct InventorySummaryJson {
     pub total_variants: i64,
     pub total_stock: i64,
     pub total_reserved: i64,
+    pub total_available: i64,
     pub alert_count: i64,
+    pub out_of_stock_count: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -60,6 +69,9 @@ pub struct InventoryListResponse {
 #[derive(Debug, Deserialize)]
 pub struct UpdateInventoryParams {
     pub inventory_quantity: Option<i32>,
+    pub track_inventory: Option<bool>,
+    pub allow_backorder: Option<bool>,
+    pub low_stock_threshold: Option<i32>,
 }
 
 #[debug_handler]
@@ -73,8 +85,6 @@ pub async fn list(
     let page_size = pagination.page_size();
     let offset = pagination.page_index() * page_size;
 
-    // Filter values start at placeholder $1. We append the page_size / offset
-    // after the filter values so they always land at the end of the SQL.
     let (filters_sql, mut filter_values) = build_inventory_filters(&params, low_stock_threshold, 1);
     filter_values.push((page_size as i64).into());
     let limit_placeholder = filter_values.len();
@@ -107,17 +117,21 @@ pub async fn list(
             COUNT(*) AS total_variants,
             COALESCE(SUM(inventory_quantity), 0)::BIGINT AS total_stock,
             COALESCE(SUM(reserved_quantity), 0)::BIGINT AS total_reserved,
+            COALESCE(SUM(available_quantity), 0)::BIGINT AS total_available,
             COALESCE(SUM(
                 CASE WHEN
-                    COALESCE(inventory_quantity, 0) <= 0
-                    OR (COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)) <= 0
-                    OR (
-                        COALESCE(reserved_quantity, 0) = 0
-                        AND (COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)) > 0
-                        AND (COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)) <= {low_stock_threshold}
-                    )
+                    track_inventory = true
+                    AND available_quantity > 0
+                    AND available_quantity <= low_stock_threshold
                 THEN 1 ELSE 0 END
-            ), 0)::BIGINT AS alert_count
+            ), 0)::BIGINT AS alert_count,
+            COALESCE(SUM(
+                CASE WHEN
+                    track_inventory = true
+                    AND available_quantity <= 0
+                    AND allow_backorder = false
+                THEN 1 ELSE 0 END
+            ), 0)::BIGINT AS out_of_stock_count
         FROM filtered",
         base = inventory_base_sql(),
         filters = filters_sql,
@@ -157,7 +171,9 @@ pub async fn list(
         total_variants: summary_row.total_variants,
         total_stock: summary_row.total_stock,
         total_reserved: summary_row.total_reserved,
+        total_available: summary_row.total_available,
         alert_count: summary_row.alert_count,
+        out_of_stock_count: summary_row.out_of_stock_count,
     };
 
     let response = AdminPaginatedResponse::new(items, total, pagination);
@@ -182,7 +198,18 @@ pub async fn update(
         .ok_or_else(|| Error::NotFound)?;
 
     let mut active_model: product_variants::ActiveModel = variant.into();
-    active_model.inventory_quantity = Set(params.inventory_quantity);
+    if let Some(qty) = params.inventory_quantity {
+        active_model.inventory_quantity = Set(qty);
+    }
+    if let Some(track) = params.track_inventory {
+        active_model.track_inventory = Set(track);
+    }
+    if let Some(backorder) = params.allow_backorder {
+        active_model.allow_backorder = Set(backorder);
+    }
+    if let Some(threshold) = params.low_stock_threshold {
+        active_model.low_stock_threshold = Set(threshold);
+    }
     active_model.updated_at = Set(chrono::Utc::now().into());
     let updated = active_model.update(&ctx.db).await?;
     invalidate_variants_cache();
@@ -213,31 +240,32 @@ fn inventory_base_sql() -> &'static str {
         COALESCE(pv.sku, p.sku) AS sku,
         COALESCE(pv.active, p.active) AS active,
         pv.inventory_quantity,
-        COALESCE(SUM(ci.quantity), 0) AS reserved_quantity
+        pv.reserved_quantity,
+        (pv.inventory_quantity - pv.reserved_quantity) AS available_quantity,
+        pv.track_inventory,
+        pv.allow_backorder,
+        pv.low_stock_threshold,
+        CASE
+            WHEN pv.track_inventory = false THEN 'not_tracked'
+            WHEN (pv.inventory_quantity - pv.reserved_quantity) <= 0 AND pv.allow_backorder = false THEN 'out_of_stock'
+            WHEN (pv.inventory_quantity - pv.reserved_quantity) <= 0 AND pv.allow_backorder = true THEN 'backorder'
+            WHEN pv.track_inventory = true AND (pv.inventory_quantity - pv.reserved_quantity) > 0
+                 AND (pv.inventory_quantity - pv.reserved_quantity) <= pv.low_stock_threshold THEN 'low'
+            ELSE 'healthy'
+        END AS stock_status
     FROM product_variants pv
     INNER JOIN products p ON p.id = pv.product_id
-    LEFT JOIN cart_items ci ON ci.product_variant_id = pv.id
-    GROUP BY
-        pv.id,
-        pv.product_id,
-        p.name,
-        pv.name,
-        pv.sku,
-        p.sku,
-        pv.active,
-        p.active,
-        pv.inventory_quantity
     "#
 }
 
 fn build_inventory_filters(
     params: &AdminInventoryListParams,
-    low_stock_threshold: i64,
+    _low_stock_threshold: i64,
     starting_placeholder: usize,
 ) -> (String, Vec<Value>) {
     let mut conditions = String::new();
     let mut values: Vec<Value> = Vec::new();
-    let mut placeholder = starting_placeholder;
+    let placeholder = starting_placeholder;
 
     if let Some(search) = params
         .search
@@ -253,7 +281,7 @@ fn build_inventory_filters(
             )"
         ));
         values.push(format!("%{search}%").into());
-        placeholder += 1;
+        let _ = placeholder;
     }
 
     if let Some(status) = params
@@ -262,35 +290,19 @@ fn build_inventory_filters(
         .map(str::trim)
         .filter(|value| !value.is_empty())
     {
-        let available_expr = "COALESCE(inventory_quantity, 0) - COALESCE(reserved_quantity, 0)";
         let condition = match status {
-            "out" => format!(
-                "({inventory} <= 0 OR {available} <= 0)",
-                inventory = "COALESCE(inventory_quantity, 0)",
-                available = available_expr,
-            ),
-            "reserved" => format!(
-                "(COALESCE(reserved_quantity, 0) > 0 AND {available} > 0)",
-                available = available_expr,
-            ),
-            "low" => format!(
-                "(COALESCE(reserved_quantity, 0) = 0 AND {available} > 0 AND {available} <= ${placeholder})",
-                available = available_expr,
-            ),
-            "healthy" => format!(
-                "(COALESCE(reserved_quantity, 0) = 0 AND {available} > ${placeholder})",
-                available = available_expr,
-            ),
+            "out" => "(stock_status = 'out_of_stock')".to_string(),
+            "backorder" => "(stock_status = 'backorder')".to_string(),
+            "reserved" => "(reserved_quantity > 0 AND available_quantity > 0)".to_string(),
+            "low" => "(stock_status = 'low')".to_string(),
+            "healthy" => "(stock_status = 'healthy')".to_string(),
+            "not_tracked" => "(stock_status = 'not_tracked')".to_string(),
             _ => String::new(),
         };
 
         if !condition.is_empty() {
             conditions.push_str(" AND ");
             conditions.push_str(&condition);
-            if matches!(status, "low" | "healthy") {
-                values.push(low_stock_threshold.into());
-                let _ = &mut placeholder;
-            }
         }
     }
 

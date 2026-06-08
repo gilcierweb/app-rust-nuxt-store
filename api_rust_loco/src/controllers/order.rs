@@ -15,7 +15,10 @@ use crate::models::_entities::coupons;
 use crate::models::_entities::order_items;
 use crate::models::_entities::orders::{ActiveModel, Entity};
 use crate::models::_entities::payment_methods;
+use crate::models::_entities::product_variants;
 use crate::models::_entities::shipments;
+use crate::models::_entities::stock_movements;
+use crate::models::_entities::stock_reservations;
 use crate::models::order_status::OrderStatus;
 use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
 use crate::models::users;
@@ -23,6 +26,7 @@ use crate::payment_gateways::{
     create_payment_attempt, latest_payment_session_json, order_payment_status,
     CreatePaymentAttemptInput,
 };
+use crate::services::cart;
 use crate::utils::pagination::PaginationParams;
 
 fn generate_order_number() -> String {
@@ -108,9 +112,38 @@ pub async fn checkout(
         None
     };
 
-    let order_number = generate_order_number();
-    let now = chrono::Utc::now().into();
     let txn = ctx.db.begin().await?;
+
+    for item in &params.items {
+        if let Some(variant_id) = item.product_variant_id {
+            let variant = product_variants::Entity::find_by_id(variant_id)
+                .one(&txn)
+                .await?
+                .ok_or_else(|| {
+                    Error::BadRequest(
+                        t!("order.variant_not_found", id = variant_id).into(),
+                    )
+                })?;
+
+            if variant.track_inventory {
+                let available = variant.inventory_quantity - variant.reserved_quantity;
+                if available < item.quantity && !variant.allow_backorder {
+                    return Err(Error::BadRequest(
+                        t!(
+                            "order.insufficient_stock",
+                            sku = variant.sku.unwrap_or_default(),
+                            available = available
+                        )
+                        .into(),
+                    ));
+                }
+            }
+        }
+    }
+
+    let order_number = generate_order_number();
+    let order_number_clone = order_number.clone();
+    let now = chrono::Utc::now().into();
 
     let order = ActiveModel {
         order_number: Set(Some(order_number)),
@@ -140,7 +173,7 @@ pub async fn checkout(
         let order_item = order_items::ActiveModel {
             order_id: Set(saved.id),
             product_id: Set(item.product_id),
-            product_variant_id: Set(None),
+            product_variant_id: Set(item.product_variant_id),
             quantity: Set(Some(item.quantity)),
             price: Set(Some(item.price)),
             total: Set(Some(item_total)),
@@ -152,7 +185,41 @@ pub async fn checkout(
             tracing::error!(error = ?e, "failed to create order item");
             Error::InternalServerError
         })?;
+
+        if let Some(variant_id) = item.product_variant_id {
+            let variant = product_variants::Entity::find_by_id(variant_id)
+                .one(&txn)
+                .await?
+                .ok_or_else(|| Error::InternalServerError)?;
+
+            let quantity_before = variant.inventory_quantity;
+            let new_inventory = quantity_before - item.quantity;
+
+            let mut pv_active: product_variants::ActiveModel = variant.into();
+            pv_active.inventory_quantity = Set(new_inventory);
+            pv_active.updated_at = Set(now);
+            pv_active.update(&txn).await?;
+
+            let movement = stock_movements::ActiveModel {
+                product_variant_id: Set(variant_id),
+                order_id: Set(Some(saved.id)),
+                user_id: Set(Some(current_user_id)),
+                r#type: Set("checkout".to_string()),
+                quantity: Set(-item.quantity),
+                quantity_before: Set(quantity_before),
+                quantity_after: Set(new_inventory),
+                reference: Set(Some(format!("order:{}", saved.id))),
+                notes: Set(Some(format!("Order {} checkout", order_number_clone))),
+                created_at: Set(now),
+                ..Default::default()
+            };
+            movement.insert(&txn).await?;
+        }
     }
+
+    let cart = cart::get_or_create_cart(&txn, current_user_id).await?;
+    cart::release_cart_reservations(&txn, cart.id).await?;
+    cart::clear_cart(&txn, cart.id).await?;
 
     if let Some(coupon) = coupon {
         let usage = coupon_usages::ActiveModel {
@@ -259,6 +326,12 @@ pub async fn checkout(
         })?;
         shipment_id = Some(saved_ship.id);
     }
+
+    stock_reservations::Entity::delete_many()
+        .filter(stock_reservations::Column::CartId.eq(cart.id))
+        .filter(stock_reservations::Column::Status.eq("active"))
+        .exec(&txn)
+        .await?;
 
     txn.commit().await?;
 
@@ -397,6 +470,46 @@ pub async fn update_status(
             )
             .into(),
         ));
+    }
+
+    if new_status == OrderStatus::Cancelled {
+        let order_items = order_items::Entity::find()
+            .filter(crate::models::_entities::order_items::Column::OrderId.eq(order.id))
+            .all(&ctx.db)
+            .await?;
+
+        for item in &order_items {
+            if let Some(variant_id) = item.product_variant_id {
+                let variant = product_variants::Entity::find_by_id(variant_id)
+                    .one(&ctx.db)
+                    .await?;
+                if let Some(v) = variant {
+                    let quantity_before = v.inventory_quantity;
+                    let restored_qty = item.quantity.unwrap_or(0);
+                    let new_inventory = quantity_before + restored_qty;
+
+                    let mut pv_active: product_variants::ActiveModel = v.into();
+                    pv_active.inventory_quantity = Set(new_inventory);
+                    pv_active.updated_at = Set(chrono::Utc::now().into());
+                    pv_active.update(&ctx.db).await?;
+
+                    let movement = stock_movements::ActiveModel {
+                        product_variant_id: Set(variant_id),
+                        order_id: Set(Some(order.id)),
+                        user_id: Set(None),
+                        r#type: Set("cancellation".to_string()),
+                        quantity: Set(restored_qty),
+                        quantity_before: Set(quantity_before),
+                        quantity_after: Set(new_inventory),
+                        reference: Set(Some(format!("order:{}", order.id))),
+                        notes: Set(Some(format!("Order {} cancelled", order.order_number.as_deref().unwrap_or("UNKNOWN")))),
+                        created_at: Set(chrono::Utc::now().into()),
+                        ..Default::default()
+                    };
+                    movement.insert(&ctx.db).await?;
+                }
+            }
+        }
     }
 
     let mut active: crate::models::_entities::orders::ActiveModel = order.into();

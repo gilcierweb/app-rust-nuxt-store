@@ -9,6 +9,7 @@ use serde::Serialize;
 use crate::models::_entities::cart_items;
 use crate::models::_entities::carts;
 use crate::models::_entities::product_variants;
+use crate::models::_entities::stock_reservations;
 
 #[derive(Debug, Serialize)]
 pub struct CartItemWithProduct {
@@ -22,6 +23,8 @@ pub struct CartItemWithProduct {
     pub product_name: Option<String>,
     pub product_slug: Option<String>,
     pub product_image: Option<String>,
+    pub in_stock: bool,
+    pub available_quantity: i32,
 }
 
 #[derive(Debug, Serialize)]
@@ -74,13 +77,14 @@ where
         product_name: Option<String>,
         product_slug: Option<String>,
         product_image: Option<String>,
+        inventory_quantity: Option<i32>,
+        reserved_quantity: Option<i32>,
+        track_inventory: Option<bool>,
+        allow_backorder: Option<bool>,
     }
 
     let backend = db.get_database_backend();
 
-    // Single roundtrip: resolve the user's cart_id via subquery and LEFT JOIN
-    // it with the items. Replaces the previous 2 sequential roundtrips
-    // (get_or_create_cart + get_cart_with_items).
     let items_sql = r#"
         SELECT
             ci.id              AS id,
@@ -91,12 +95,17 @@ where
             ci.price           AS price,
             p.name             AS product_name,
             p.slug             AS product_slug,
-            cover.image        AS product_image
+            cover.image        AS product_image,
+            pv.inventory_quantity AS inventory_quantity,
+            pv.reserved_quantity AS reserved_quantity,
+            pv.track_inventory AS track_inventory,
+            pv.allow_backorder AS allow_backorder
         FROM cart_items ci
         INNER JOIN (
             SELECT id FROM carts WHERE user_id = $1 LIMIT 1
         ) c ON c.id = ci.cart_id
         INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
         LEFT JOIN LATERAL (
             SELECT image
             FROM product_images
@@ -118,16 +127,27 @@ where
     let cart_id = raw_items.first().map(|row| row.cart_id).unwrap_or(0);
     let items = raw_items
         .into_iter()
-        .map(|row| CartItemWithProduct {
-            id: row.id,
-            cart_id: row.cart_id,
-            product_id: row.product_id,
-            product_variant_id: row.product_variant_id,
-            quantity: row.quantity.unwrap_or(1),
-            price: row.price.unwrap_or(Decimal::ZERO),
-            product_name: row.product_name,
-            product_slug: row.product_slug,
-            product_image: row.product_image,
+        .map(|row| {
+            let inventory_qty = row.inventory_quantity.unwrap_or(0);
+            let reserved_qty = row.reserved_quantity.unwrap_or(0);
+            let track = row.track_inventory.unwrap_or(true);
+            let allow_backorder = row.allow_backorder.unwrap_or(false);
+            let available = inventory_qty - reserved_qty;
+            let in_stock = !track || available > 0 || allow_backorder;
+
+            CartItemWithProduct {
+                id: row.id,
+                cart_id: row.cart_id,
+                product_id: row.product_id,
+                product_variant_id: row.product_variant_id,
+                quantity: row.quantity.unwrap_or(1),
+                price: row.price.unwrap_or(Decimal::ZERO),
+                product_name: row.product_name,
+                product_slug: row.product_slug,
+                product_image: row.product_image,
+                in_stock,
+                available_quantity: available,
+            }
         })
         .collect();
 
@@ -149,6 +169,10 @@ where
         product_name: Option<String>,
         product_slug: Option<String>,
         product_image: Option<String>,
+        inventory_quantity: Option<i32>,
+        reserved_quantity: Option<i32>,
+        track_inventory: Option<bool>,
+        allow_backorder: Option<bool>,
     }
 
     let backend = db.get_database_backend();
@@ -162,9 +186,14 @@ where
             ci.price           AS price,
             p.name             AS product_name,
             p.slug             AS product_slug,
-            cover.image        AS product_image
+            cover.image        AS product_image,
+            pv.inventory_quantity AS inventory_quantity,
+            pv.reserved_quantity AS reserved_quantity,
+            pv.track_inventory AS track_inventory,
+            pv.allow_backorder AS allow_backorder
         FROM cart_items ci
         INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
         LEFT JOIN LATERAL (
             SELECT image
             FROM product_images
@@ -186,22 +215,32 @@ where
 
     let items = raw_items
         .into_iter()
-        .map(|row| CartItemWithProduct {
-            id: row.id,
-            cart_id: row.cart_id,
-            product_id: row.product_id,
-            product_variant_id: row.product_variant_id,
-            quantity: row.quantity.unwrap_or(1),
-            price: row.price.unwrap_or(Decimal::ZERO),
-            product_name: row.product_name,
-            product_slug: row.product_slug,
-            product_image: row.product_image,
+        .map(|row| {
+            let inventory_qty = row.inventory_quantity.unwrap_or(0);
+            let reserved_qty = row.reserved_quantity.unwrap_or(0);
+            let track = row.track_inventory.unwrap_or(true);
+            let allow_backorder = row.allow_backorder.unwrap_or(false);
+            let available = inventory_qty - reserved_qty;
+            let in_stock = !track || available > 0 || allow_backorder;
+
+            CartItemWithProduct {
+                id: row.id,
+                cart_id: row.cart_id,
+                product_id: row.product_id,
+                product_variant_id: row.product_variant_id,
+                quantity: row.quantity.unwrap_or(1),
+                price: row.price.unwrap_or(Decimal::ZERO),
+                product_name: row.product_name,
+                product_slug: row.product_slug,
+                product_image: row.product_image,
+                in_stock,
+                available_quantity: available,
+            }
         })
         .collect();
 
     Ok(CartWithItems { id: cart_id, items })
 }
-
 
 pub async fn add_item<C>(
     db: &C,
@@ -217,9 +256,16 @@ where
     if let Some(variant_id) = product_variant_id {
         let variant = product_variants::Entity::find_by_id(variant_id)
             .one(db)
-            .await?;
-        if variant.is_none() {
-            return Err(Error::BadRequest(t!("cart.variant_not_found").into()));
+            .await?
+            .ok_or_else(|| Error::BadRequest(t!("cart.variant_not_found").into()))?;
+
+        if variant.track_inventory {
+            let available = variant.inventory_quantity - variant.reserved_quantity;
+            if available < quantity && !variant.allow_backorder {
+                return Err(Error::BadRequest(
+                    t!("cart.insufficient_stock", available = available).into(),
+                ));
+            }
         }
     }
 
@@ -234,6 +280,23 @@ where
 
     if let Some(existing_item) = existing {
         let new_qty = existing_item.quantity.unwrap_or(0) + quantity;
+
+        if let Some(variant_id) = product_variant_id {
+            let variant = product_variants::Entity::find_by_id(variant_id)
+                .one(db)
+                .await?;
+            if let Some(v) = variant {
+                if v.track_inventory {
+                    let available = v.inventory_quantity - v.reserved_quantity;
+                    if available < new_qty && !v.allow_backorder {
+                        return Err(Error::BadRequest(
+                            t!("cart.insufficient_stock", available = available).into(),
+                        ));
+                    }
+                }
+            }
+        }
+
         let mut active: cart_items::ActiveModel = existing_item.into();
         active.quantity = Set(Some(new_qty));
         active.price = Set(Some(price));
@@ -286,6 +349,22 @@ where
             Error::InternalServerError
         })?;
     } else {
+        if let Some(variant_id) = item.product_variant_id {
+            let variant = product_variants::Entity::find_by_id(variant_id)
+                .one(db)
+                .await?;
+            if let Some(v) = variant {
+                if v.track_inventory {
+                    let available = v.inventory_quantity - v.reserved_quantity;
+                    if available < quantity && !v.allow_backorder {
+                        return Err(Error::BadRequest(
+                            t!("cart.insufficient_stock", available = available).into(),
+                        ));
+                    }
+                }
+            }
+        }
+
         let mut active: cart_items::ActiveModel = item.into();
         active.quantity = Set(Some(quantity));
         active.updated_at = Set(chrono::Utc::now().into());
@@ -331,5 +410,74 @@ where
             tracing::error!(error = ?e, "failed to clear cart");
             Error::InternalServerError
         })?;
+    Ok(())
+}
+
+pub async fn expire_stale_reservations<C>(db: &C) -> Result<u64>
+where
+    C: ConnectionTrait,
+{
+    let now = chrono::Utc::now();
+    let expired = stock_reservations::Entity::find()
+        .filter(stock_reservations::Column::Status.eq("active"))
+        .filter(stock_reservations::Column::ExpiresAt.lt(now))
+        .all(db)
+        .await?;
+
+    let mut released_count: u64 = 0;
+    for reservation in &expired {
+        let variant = product_variants::Entity::find_by_id(reservation.product_variant_id)
+            .one(db)
+            .await?
+            .ok_or_else(|| Error::InternalServerError)?;
+
+        let current_reserved = variant.reserved_quantity;
+        let new_reserved = (current_reserved - reservation.quantity).max(0);
+
+        let mut pv_active: product_variants::ActiveModel = variant.into();
+        pv_active.reserved_quantity = Set(new_reserved);
+        pv_active.updated_at = Set(now.into());
+        pv_active.update(db).await?;
+
+        let mut res_active: stock_reservations::ActiveModel = reservation.clone().into();
+        res_active.status = Set("expired".to_string());
+        res_active.updated_at = Set(now.into());
+        res_active.update(db).await?;
+        released_count += 1;
+    }
+
+    Ok(released_count)
+}
+
+pub async fn release_cart_reservations<C>(db: &C, cart_id: i32) -> Result<()>
+where
+    C: ConnectionTrait,
+{
+    let reservations = stock_reservations::Entity::find()
+        .filter(stock_reservations::Column::CartId.eq(cart_id))
+        .filter(stock_reservations::Column::Status.eq("active"))
+        .all(db)
+        .await?;
+
+    for reservation in &reservations {
+        let variant = product_variants::Entity::find_by_id(reservation.product_variant_id)
+            .one(db)
+            .await?
+            .ok_or_else(|| Error::InternalServerError)?;
+
+        let current_reserved = variant.reserved_quantity;
+        let new_reserved = (current_reserved - reservation.quantity).max(0);
+
+        let mut pv_active: product_variants::ActiveModel = variant.into();
+        pv_active.reserved_quantity = Set(new_reserved);
+        pv_active.updated_at = Set(chrono::Utc::now().into());
+        pv_active.update(db).await?;
+
+        let mut res_active: stock_reservations::ActiveModel = reservation.clone().into();
+        res_active.status = Set("released".to_string());
+        res_active.updated_at = Set(chrono::Utc::now().into());
+        res_active.update(db).await?;
+    }
+
     Ok(())
 }

@@ -18,11 +18,46 @@ impl ActiveModelBehavior for ActiveModel {
     }
 }
 
-// implement your read-oriented logic here
-impl Model {}
+impl Model {
+    pub fn available_quantity(&self) -> i32 {
+        self.inventory_quantity - self.reserved_quantity
+    }
 
-// implement your write-oriented logic here
+    pub fn is_in_stock(&self) -> bool {
+        if self.track_inventory {
+            self.available_quantity() > 0 || self.allow_backorder
+        } else {
+            true
+        }
+    }
+
+    pub fn is_low_stock(&self) -> bool {
+        if self.track_inventory {
+            self.available_quantity() > 0 && self.available_quantity() <= self.low_stock_threshold
+        } else {
+            false
+        }
+    }
+
+    pub fn is_out_of_stock(&self) -> bool {
+        if self.track_inventory {
+            self.available_quantity() <= 0 && !self.allow_backorder
+        } else {
+            false
+        }
+    }
+
+    pub fn can_reserve(&self, quantity: i32) -> bool {
+        if !self.track_inventory {
+            return true;
+        }
+        if self.allow_backorder {
+            return true;
+        }
+        self.available_quantity() >= quantity
+    }
+}
+
 impl ActiveModel {}
 
-// implement your custom finders, selectors oriented logic here
 impl Entity {}

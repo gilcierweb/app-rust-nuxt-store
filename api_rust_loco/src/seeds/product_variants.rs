@@ -40,13 +40,20 @@ pub async fn seed(db: &sea_orm::DatabaseConnection) -> Result<()> {
                 unique::uuid_v4().split('-').next().unwrap_or("VAR")
             );
 
+            let inventory_qty: i32 = rand::rng().random_range(10..500);
+            let low_stock_threshold: i32 = rand::rng().random_range(3..10);
+
             let variant = ActiveModel {
                 name: Set(Some(variant_name.to_string())),
                 sku: Set(Some(sku)),
                 price: Set(Some(price)),
                 cost_price: Set(Some(cost_price)),
                 compare_price: Set(Some(compare_price)),
-                inventory_quantity: Set(Some(rand::rng().random_range(10..500))),
+                inventory_quantity: Set(inventory_qty),
+                reserved_quantity: Set(0),
+                track_inventory: Set(true),
+                allow_backorder: Set(false),
+                low_stock_threshold: Set(low_stock_threshold),
                 weight: Set(Some(Decimal::new(
                     rand::rng().random_range(100..2000) as i64,
                     2,

@@ -35,6 +35,7 @@ pub struct CreateOrderParams {
 #[derive(Debug, Deserialize)]
 pub struct OrderItemParam {
     pub product_id: i32,
+    pub product_variant_id: Option<i32>,
     pub quantity: i32,
     #[serde(with = "crate::utils::decimal")]
     pub price: Decimal,
