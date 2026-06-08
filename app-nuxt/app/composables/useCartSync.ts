@@ -86,10 +86,9 @@ export function useCartSync() {
 
     syncing.value = true
     try {
-      const data = await apiFetch<CartApiResponse>(`/api/carts/remove_item/${item.id}`, {
+      await apiFetch<CartApiResponse>(`/api/carts/remove_item/${item.id}`, {
         method: 'DELETE',
       })
-      cartStore.setItems(data.items.map(mapCartApiItem))
     } catch {
       // non-blocking
     } finally {
@@ -107,14 +106,13 @@ export function useCartSync() {
 
     syncing.value = true
     try {
-      const data = await apiFetch<CartApiResponse>('/api/carts/update_item', {
+      await apiFetch<CartApiResponse>('/api/carts/update_item', {
         method: 'PUT',
         body: {
           item_id: Number(item.id),
           quantity,
         },
       })
-      cartStore.setItems(data.items.map(mapCartApiItem))
     } catch {
       // non-blocking
     } finally {
