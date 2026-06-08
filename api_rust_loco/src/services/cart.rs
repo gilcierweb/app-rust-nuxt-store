@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::{
@@ -36,28 +34,6 @@ pub struct CartWithItems {
 }
 
 #[derive(Debug, FromQueryResult)]
-struct CartItemRow {
-    id: i32,
-    cart_id: i32,
-    product_id: i32,
-    product_variant_id: Option<i32>,
-    quantity: Option<i32>,
-    price: Option<Decimal>,
-    product_name: Option<String>,
-    product_slug: Option<String>,
-    inventory_quantity: Option<i32>,
-    reserved_quantity: Option<i32>,
-    track_inventory: Option<bool>,
-    allow_backorder: Option<bool>,
-}
-
-#[derive(Debug, FromQueryResult)]
-struct CoverImageRow {
-    product_id: i32,
-    image: Option<String>,
-}
-
-#[derive(Debug, FromQueryResult)]
 struct CartItemRowCombined {
     id: i32,
     cart_id: i32,
@@ -72,116 +48,6 @@ struct CartItemRowCombined {
     reserved_quantity: Option<i32>,
     track_inventory: Option<bool>,
     allow_backorder: Option<bool>,
-}
-
-#[derive(Debug, FromQueryResult)]
-struct SetupResult {
-    cart_id: i32,
-    track_inventory: bool,
-    available: i32,
-    allow_backorder: bool,
-    new_quantity: i32,
-}
-
-async fn fetch_cart_items_by_user<C>(db: &C, user_id: i32) -> Result<(i32, Vec<CartItemWithProduct>)>
-where
-    C: ConnectionTrait,
-{
-    let backend = db.get_database_backend();
-
-    let items_sql = r#"
-        SELECT
-            ci.id              AS id,
-            ci.cart_id         AS cart_id,
-            ci.product_id      AS product_id,
-            ci.product_variant_id AS product_variant_id,
-            ci.quantity        AS quantity,
-            ci.price           AS price,
-            p.name             AS product_name,
-            p.slug             AS product_slug,
-            pv.inventory_quantity AS inventory_quantity,
-            pv.reserved_quantity AS reserved_quantity,
-            pv.track_inventory AS track_inventory,
-            pv.allow_backorder AS allow_backorder
-        FROM cart_items ci
-        INNER JOIN (
-            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
-        ) c ON c.id = ci.cart_id
-        INNER JOIN products p ON p.id = ci.product_id
-        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
-        ORDER BY ci.id
-    "#;
-
-    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        items_sql,
-        vec![user_id.into()],
-    ))
-    .all(db)
-    .await?;
-
-    let cart_id = raw_items.first().map(|row| row.cart_id).unwrap_or(0);
-    let items = enrich_with_images(db, raw_items).await?;
-    Ok((cart_id, items))
-}
-
-async fn enrich_with_images<C>(db: &C, raw_items: Vec<CartItemRow>) -> Result<Vec<CartItemWithProduct>>
-where
-    C: ConnectionTrait,
-{
-    if raw_items.is_empty() {
-        return Ok(Vec::new());
-    }
-
-    let backend = db.get_database_backend();
-    let product_ids: Vec<i32> = raw_items.iter().map(|r| r.product_id).collect();
-
-    let images_sql = r#"
-        SELECT DISTINCT ON (product_id)
-            product_id, image
-        FROM product_images
-        WHERE cover = TRUE AND product_id = ANY($1)
-        ORDER BY product_id, position
-    "#;
-
-    let images = CoverImageRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        images_sql,
-        vec![product_ids.into()],
-    ))
-    .all(db)
-    .await?;
-
-    let image_map: HashMap<i32, Option<String>> = images
-        .into_iter()
-        .map(|r| (r.product_id, r.image))
-        .collect();
-
-    Ok(raw_items
-        .into_iter()
-        .map(|row| {
-            let inventory_qty = row.inventory_quantity.unwrap_or(0);
-            let reserved_qty = row.reserved_quantity.unwrap_or(0);
-            let track = row.track_inventory.unwrap_or(true);
-            let allow_backorder = row.allow_backorder.unwrap_or(false);
-            let available = inventory_qty - reserved_qty;
-            let in_stock = !track || available > 0 || allow_backorder;
-
-            CartItemWithProduct {
-                id: row.id,
-                cart_id: row.cart_id,
-                product_id: row.product_id,
-                product_variant_id: row.product_variant_id,
-                quantity: row.quantity.unwrap_or(1),
-                price: row.price.unwrap_or(Decimal::ZERO),
-                product_name: row.product_name,
-                product_slug: row.product_slug,
-                product_image: image_map.get(&row.product_id).and_then(|i| i.clone()),
-                in_stock,
-                available_quantity: available,
-            }
-        })
-        .collect())
 }
 
 async fn fetch_cart_with_items_combined<C>(db: &C, cart_id: i32) -> Result<CartWithItems>
@@ -290,7 +156,101 @@ pub async fn get_cart_with_items_for_user<C>(db: &C, user_id: i32) -> Result<Car
 where
     C: ConnectionTrait,
 {
-    let (cart_id, items) = fetch_cart_items_by_user(db, user_id).await?;
+    let backend = db.get_database_backend();
+
+    let sql = r#"
+        WITH
+        cart AS (
+            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
+        ),
+        cover AS (
+            SELECT DISTINCT ON (pi.product_id) pi.product_id, pi.image
+            FROM product_images pi
+            WHERE pi.cover = TRUE
+              AND pi.product_id IN (SELECT ci.product_id FROM cart_items ci WHERE ci.cart_id = (SELECT id FROM cart))
+            ORDER BY pi.product_id, pi.position
+        )
+        SELECT
+            ci.id, ci.cart_id, ci.product_id, ci.product_variant_id,
+            ci.quantity, ci.price,
+            p.name AS product_name, p.slug AS product_slug,
+            cover.image AS product_image,
+            COALESCE(pv.inventory_quantity, 0) AS inventory_quantity,
+            COALESCE(pv.reserved_quantity, 0) AS reserved_quantity,
+            COALESCE(pv.track_inventory, false) AS track_inventory,
+            COALESCE(pv.allow_backorder, false) AS allow_backorder
+        FROM cart_items ci
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+        LEFT JOIN cover ON cover.product_id = ci.product_id
+        WHERE ci.cart_id = (SELECT id FROM cart)
+        ORDER BY ci.id
+    "#;
+
+    #[derive(Debug, FromQueryResult)]
+    struct Row {
+        id: i32,
+        cart_id: i32,
+        product_id: i32,
+        product_variant_id: Option<i32>,
+        quantity: Option<i32>,
+        price: Option<Decimal>,
+        product_name: Option<String>,
+        product_slug: Option<String>,
+        product_image: Option<String>,
+        inventory_quantity: Option<i32>,
+        reserved_quantity: Option<i32>,
+        track_inventory: Option<bool>,
+        allow_backorder: Option<bool>,
+    }
+
+    let rows = Row::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        sql,
+        vec![user_id.into()],
+    ))
+    .all(db)
+    .await?;
+
+    let cart_id = match rows.first() {
+        Some(r) => r.cart_id,
+        None => {
+            let cart = carts::Entity::find()
+                .filter(carts::Column::UserId.eq(user_id))
+                .one(db)
+                .await?;
+            cart.map(|c| c.id).unwrap_or(0)
+        }
+    };
+
+    if rows.is_empty() {
+        return Ok(CartWithItems { id: cart_id, items: Vec::new() });
+    }
+
+    let items: Vec<CartItemWithProduct> = rows
+        .into_iter()
+        .map(|r| {
+            let inv = r.inventory_quantity.unwrap_or(0);
+            let res = r.reserved_quantity.unwrap_or(0);
+            let track = r.track_inventory.unwrap_or(true);
+            let allow = r.allow_backorder.unwrap_or(false);
+            let available = inv - res;
+            CartItemWithProduct {
+                id: r.id,
+                cart_id: r.cart_id,
+                product_id: r.product_id,
+                product_variant_id: r.product_variant_id,
+                quantity: r.quantity.unwrap_or(1),
+                price: r.price.unwrap_or(Decimal::ZERO),
+                product_name: r.product_name,
+                product_slug: r.product_slug,
+                product_image: r.product_image,
+                in_stock: !track || available > 0 || allow,
+                available_quantity: available,
+            }
+        })
+        .collect();
+
     Ok(CartWithItems { id: cart_id, items })
 }
 
@@ -317,7 +277,7 @@ where
             Box::pin(async move {
                 let backend = txn.get_database_backend();
 
-                let setup_sql = r#"
+                let merged_sql = r#"
                     WITH
                     ensure_cart AS (
                         INSERT INTO carts (user_id, created_at, updated_at)
@@ -362,19 +322,69 @@ where
                         FROM cart c
                         WHERE NOT EXISTS (SELECT 1 FROM upserted)
                         RETURNING id
+                    ),
+                    cover AS (
+                        SELECT DISTINCT ON (pi.product_id)
+                            pi.product_id, pi.id AS image_id, pi.image, pi.alt_text, pi.active, pi.cover, pi.position
+                        FROM product_images pi
+                        WHERE pi.cover = TRUE
+                          AND pi.product_id IN (
+                              SELECT ci2.product_id FROM cart_items ci2
+                              WHERE ci2.cart_id = (SELECT id FROM cart)
+                          )
+                        ORDER BY pi.product_id, pi.position
                     )
                     SELECT
-                        (SELECT id FROM cart) AS cart_id,
+                        ci.id,
+                        ci.cart_id,
+                        ci.product_id,
+                        ci.product_variant_id,
+                        ci.quantity,
+                        ci.price,
+                        p.name AS product_name,
+                        p.slug AS product_slug,
+                        cover.image AS product_image,
+                        COALESCE(pv.inventory_quantity, 0) AS inventory_quantity,
+                        COALESCE(pv.reserved_quantity, 0) AS reserved_quantity,
+                        COALESCE(pv.track_inventory, false) AS pv_track_inventory,
+                        COALESCE(pv.allow_backorder, false) AS pv_allow_backorder,
                         vi.available,
                         vi.track_inventory,
                         vi.allow_backorder,
                         COALESCE((SELECT quantity FROM existing), 0) + $4 AS new_quantity
-                    FROM variant_info vi
+                    FROM cart_items ci
+                    INNER JOIN products p ON p.id = ci.product_id
+                    LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+                    LEFT JOIN cover ON cover.product_id = ci.product_id
+                    CROSS JOIN variant_info vi
+                    WHERE ci.cart_id = (SELECT id FROM cart)
+                    ORDER BY ci.id
                 "#;
 
-                let setup = SetupResult::find_by_statement(Statement::from_sql_and_values(
+                #[derive(Debug, FromQueryResult)]
+                struct MergedRow {
+                    id: i32,
+                    cart_id: i32,
+                    product_id: i32,
+                    product_variant_id: Option<i32>,
+                    quantity: i32,
+                    price: rust_decimal::Decimal,
+                    product_name: String,
+                    product_slug: String,
+                    product_image: Option<String>,
+                    inventory_quantity: i32,
+                    reserved_quantity: i32,
+                    pv_track_inventory: bool,
+                    pv_allow_backorder: bool,
+                    available: i32,
+                    track_inventory: bool,
+                    allow_backorder: bool,
+                    new_quantity: i32,
+                }
+
+                let rows = MergedRow::find_by_statement(Statement::from_sql_and_values(
                     backend,
-                    setup_sql,
+                    merged_sql,
                     vec![
                         user_id.into(),
                         product_id.into(),
@@ -383,19 +393,43 @@ where
                         price.into(),
                     ],
                 ))
-                .one(txn)
-                .await?
-                .ok_or_else(|| Error::InternalServerError)?;
+                .all(txn)
+                .await?;
 
-                if setup.track_inventory && !setup.allow_backorder {
-                    if setup.new_quantity > setup.available {
+                if rows.is_empty() {
+                    return Err(Error::InternalServerError);
+                }
+
+                let first = &rows[0];
+                if first.track_inventory && !first.allow_backorder {
+                    if first.new_quantity > first.available {
                         return Err(Error::BadRequest(
-                            t!("cart.insufficient_stock", available = setup.available).into(),
+                            t!("cart.insufficient_stock", available = first.available).into(),
                         ));
                     }
                 }
 
-                fetch_cart_with_items_combined(txn, setup.cart_id).await
+                let cart_id = first.cart_id;
+                let mut items = Vec::with_capacity(rows.len());
+                for r in &rows {
+                    let available = r.inventory_quantity - r.reserved_quantity;
+                    let in_stock = !r.pv_track_inventory || available > 0 || r.pv_allow_backorder;
+                    items.push(CartItemWithProduct {
+                        id: r.id,
+                        cart_id: r.cart_id,
+                        product_id: r.product_id,
+                        product_variant_id: r.product_variant_id,
+                        quantity: r.quantity,
+                        price: r.price,
+                        product_name: Some(r.product_name.clone()),
+                        product_slug: Some(r.product_slug.clone()),
+                        product_image: r.product_image.clone(),
+                        in_stock,
+                        available_quantity: available,
+                    });
+                }
+
+                Ok(CartWithItems { id: cart_id, items })
             })
         })
         .await;
@@ -422,7 +456,7 @@ where
                 let backend = txn.get_database_backend();
 
                 if quantity <= 0 {
-                    let del_sql = r#"
+                    let del_merged_sql = r#"
                         WITH
                         cart AS (
                             SELECT id FROM carts WHERE user_id = $1 LIMIT 1
@@ -432,32 +466,98 @@ where
                             USING cart c
                             WHERE ci.id = $2 AND ci.cart_id = c.id
                             RETURNING ci.cart_id
+                        ),
+                        cover AS (
+                            SELECT DISTINCT ON (pi.product_id)
+                                pi.product_id, pi.id AS image_id, pi.image, pi.alt_text, pi.active, pi.cover, pi.position
+                            FROM product_images pi
+                            WHERE pi.cover = TRUE
+                              AND pi.product_id IN (
+                                  SELECT ci2.product_id FROM cart_items ci2
+                                  WHERE ci2.cart_id = (SELECT cart_id FROM deleted)
+                              )
+                            ORDER BY pi.product_id, pi.position
                         )
-                        SELECT COALESCE((SELECT id FROM deleted d), 0) AS cart_id
+                        SELECT
+                            ci.id,
+                            ci.cart_id,
+                            ci.product_id,
+                            ci.product_variant_id,
+                            ci.quantity,
+                            ci.price,
+                            p.name AS product_name,
+                            p.slug AS product_slug,
+                            cover.image AS product_image,
+                            COALESCE(pv.inventory_quantity, 0) AS inventory_quantity,
+                            COALESCE(pv.reserved_quantity, 0) AS reserved_quantity,
+                            COALESCE(pv.track_inventory, false) AS track_inventory,
+                            COALESCE(pv.allow_backorder, false) AS allow_backorder
+                        FROM cart_items ci
+                        INNER JOIN products p ON p.id = ci.product_id
+                        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+                        LEFT JOIN cover ON cover.product_id = ci.product_id
+                        WHERE ci.cart_id = (SELECT cart_id FROM deleted)
+                        ORDER BY ci.id
                     "#;
 
                     #[derive(Debug, FromQueryResult)]
-                    struct DelResult {
+                    struct DelMergedRow {
+                        id: i32,
                         cart_id: i32,
+                        product_id: i32,
+                        product_variant_id: Option<i32>,
+                        quantity: Option<i32>,
+                        price: Option<Decimal>,
+                        product_name: Option<String>,
+                        product_slug: Option<String>,
+                        product_image: Option<String>,
+                        inventory_quantity: Option<i32>,
+                        reserved_quantity: Option<i32>,
+                        track_inventory: Option<bool>,
+                        allow_backorder: Option<bool>,
                     }
 
-                    let del = DelResult::find_by_statement(Statement::from_sql_and_values(
+                    let rows = DelMergedRow::find_by_statement(Statement::from_sql_and_values(
                         backend,
-                        del_sql,
+                        del_merged_sql,
                         vec![user_id.into(), item_id.into()],
                     ))
-                    .one(txn)
-                    .await?
-                    .ok_or_else(|| Error::InternalServerError)?;
+                    .all(txn)
+                    .await?;
 
-                    if del.cart_id == 0 {
+                    if rows.is_empty() {
                         return Err(Error::BadRequest(t!("cart.item_not_found").into()));
                     }
 
-                    return fetch_cart_with_items_combined(txn, del.cart_id).await;
+                    let cart_id = rows[0].cart_id;
+                    let items: Vec<CartItemWithProduct> = rows
+                        .into_iter()
+                        .map(|r| {
+                            let inv = r.inventory_quantity.unwrap_or(0);
+                            let res = r.reserved_quantity.unwrap_or(0);
+                            let track = r.track_inventory.unwrap_or(true);
+                            let allow = r.allow_backorder.unwrap_or(false);
+                            let available = inv - res;
+                            CartItemWithProduct {
+                                id: r.id,
+                                cart_id: r.cart_id,
+                                product_id: r.product_id,
+                                product_variant_id: r.product_variant_id,
+                                quantity: r.quantity.unwrap_or(1),
+                                price: r.price.unwrap_or(Decimal::ZERO),
+                                product_name: r.product_name,
+                                product_slug: r.product_slug,
+                                product_image: r.product_image,
+                                in_stock: !track || available > 0 || allow,
+                                available_quantity: available,
+                            }
+                        })
+                        .collect();
+
+                    return Ok(CartWithItems { id: cart_id, items });
                 }
 
-                let setup_sql = r#"
+                let merged_sql = r#"
                     WITH
                     cart AS (
                         SELECT id FROM carts WHERE user_id = $1 LIMIT 1
@@ -486,42 +586,122 @@ where
                             OR (SELECT available FROM variant_info) >= $3
                           )
                         RETURNING ci.id, ci.cart_id
+                    ),
+                    update_result AS (
+                        SELECT
+                            COALESCE((SELECT cart_id FROM do_update), 0) AS cart_id,
+                            COALESCE((SELECT track_inventory FROM variant_info), false) AS track_inventory,
+                            COALESCE((SELECT available FROM variant_info), 0) AS available,
+                            COALESCE((SELECT allow_backorder FROM variant_info), false) AS allow_backorder
+                    ),
+                    cover AS (
+                        SELECT DISTINCT ON (pi.product_id)
+                            pi.product_id, pi.id AS image_id, pi.image, pi.alt_text, pi.active, pi.cover, pi.position
+                        FROM product_images pi
+                        WHERE pi.cover = TRUE
+                          AND pi.product_id IN (
+                              SELECT ci2.product_id FROM cart_items ci2
+                              WHERE ci2.cart_id = (SELECT cart_id FROM update_result)
+                          )
+                        ORDER BY pi.product_id, pi.position
                     )
                     SELECT
-                        COALESCE((SELECT cart_id FROM do_update), 0) AS cart_id,
-                        COALESCE((SELECT track_inventory FROM variant_info), false) AS track_inventory,
-                        COALESCE((SELECT available FROM variant_info), 0) AS available,
-                        COALESCE((SELECT allow_backorder FROM variant_info), false) AS allow_backorder
+                        ci.id,
+                        ci.cart_id,
+                        ci.product_id,
+                        ci.product_variant_id,
+                        ci.quantity,
+                        ci.price,
+                        p.name AS product_name,
+                        p.slug AS product_slug,
+                        cover.image AS product_image,
+                        COALESCE(pv.inventory_quantity, 0) AS inventory_quantity,
+                        COALESCE(pv.reserved_quantity, 0) AS reserved_quantity,
+                        COALESCE(pv.track_inventory, false) AS pv_track_inventory,
+                        COALESCE(pv.allow_backorder, false) AS pv_allow_backorder,
+                        ur.cart_id AS update_cart_id,
+                        ur.track_inventory,
+                        ur.available,
+                        ur.allow_backorder
+                    FROM cart_items ci
+                    INNER JOIN products p ON p.id = ci.product_id
+                    LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+                    LEFT JOIN cover ON cover.product_id = ci.product_id
+                    CROSS JOIN update_result ur
+                    WHERE ci.cart_id = (SELECT cart_id FROM update_result)
+                    ORDER BY ci.id
                 "#;
 
                 #[derive(Debug, FromQueryResult)]
-                struct UpdateResult {
+                struct MergedRow {
+                    id: i32,
                     cart_id: i32,
+                    product_id: i32,
+                    product_variant_id: Option<i32>,
+                    quantity: Option<i32>,
+                    price: Option<Decimal>,
+                    product_name: Option<String>,
+                    product_slug: Option<String>,
+                    product_image: Option<String>,
+                    inventory_quantity: Option<i32>,
+                    reserved_quantity: Option<i32>,
+                    pv_track_inventory: Option<bool>,
+                    pv_allow_backorder: Option<bool>,
+                    update_cart_id: i32,
                     track_inventory: bool,
                     available: i32,
                     allow_backorder: bool,
                 }
 
-                let ur = UpdateResult::find_by_statement(Statement::from_sql_and_values(
+                let rows = MergedRow::find_by_statement(Statement::from_sql_and_values(
                     backend,
-                    setup_sql,
+                    merged_sql,
                     vec![user_id.into(), item_id.into(), quantity.into()],
                 ))
-                .one(txn)
-                .await?
-                .ok_or_else(|| Error::InternalServerError)?;
+                .all(txn)
+                .await?;
 
-                if ur.cart_id == 0 {
+                if rows.is_empty() {
                     return Err(Error::BadRequest(t!("cart.item_not_found").into()));
                 }
 
-                if ur.track_inventory && !ur.allow_backorder && ur.available < quantity {
+                let first = &rows[0];
+                if first.update_cart_id == 0 {
+                    return Err(Error::BadRequest(t!("cart.item_not_found").into()));
+                }
+
+                if first.track_inventory && !first.allow_backorder && first.available < quantity {
                     return Err(Error::BadRequest(
-                        t!("cart.insufficient_stock", available = ur.available).into(),
+                        t!("cart.insufficient_stock", available = first.available).into(),
                     ));
                 }
 
-                fetch_cart_with_items_combined(txn, ur.cart_id).await
+                let cart_id = first.cart_id;
+                let items: Vec<CartItemWithProduct> = rows
+                    .into_iter()
+                    .map(|r| {
+                        let inv = r.inventory_quantity.unwrap_or(0);
+                        let res = r.reserved_quantity.unwrap_or(0);
+                        let track = r.pv_track_inventory.unwrap_or(true);
+                        let allow = r.pv_allow_backorder.unwrap_or(false);
+                        let available = inv - res;
+                        CartItemWithProduct {
+                            id: r.id,
+                            cart_id: r.cart_id,
+                            product_id: r.product_id,
+                            product_variant_id: r.product_variant_id,
+                            quantity: r.quantity.unwrap_or(1),
+                            price: r.price.unwrap_or(Decimal::ZERO),
+                            product_name: r.product_name,
+                            product_slug: r.product_slug,
+                            product_image: r.product_image,
+                            in_stock: !track || available > 0 || allow,
+                            available_quantity: available,
+                        }
+                    })
+                    .collect();
+
+                Ok(CartWithItems { id: cart_id, items })
             })
         })
         .await;
@@ -539,7 +719,7 @@ where
 {
     let backend = db.get_database_backend();
 
-    let del_sql = r#"
+    let merged_sql = r#"
         WITH
         cart AS (
             SELECT id FROM carts WHERE user_id = $1 LIMIT 1
@@ -549,29 +729,95 @@ where
             USING cart c
             WHERE ci.id = $2 AND ci.cart_id = c.id
             RETURNING ci.cart_id
+        ),
+        cover AS (
+            SELECT DISTINCT ON (pi.product_id)
+                pi.product_id, pi.id AS image_id, pi.image, pi.alt_text, pi.active, pi.cover, pi.position
+            FROM product_images pi
+            WHERE pi.cover = TRUE
+              AND pi.product_id IN (
+                  SELECT ci2.product_id FROM cart_items ci2
+                  WHERE ci2.cart_id = (SELECT cart_id FROM deleted)
+              )
+            ORDER BY pi.product_id, pi.position
         )
-        SELECT COALESCE((SELECT id FROM deleted d), 0) AS cart_id
+        SELECT
+            ci.id,
+            ci.cart_id,
+            ci.product_id,
+            ci.product_variant_id,
+            ci.quantity,
+            ci.price,
+            p.name AS product_name,
+            p.slug AS product_slug,
+            cover.image AS product_image,
+            COALESCE(pv.inventory_quantity, 0) AS inventory_quantity,
+            COALESCE(pv.reserved_quantity, 0) AS reserved_quantity,
+            COALESCE(pv.track_inventory, false) AS track_inventory,
+            COALESCE(pv.allow_backorder, false) AS allow_backorder
+        FROM cart_items ci
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+        LEFT JOIN cover ON cover.product_id = ci.product_id
+        WHERE ci.cart_id = (SELECT cart_id FROM deleted)
+        ORDER BY ci.id
     "#;
 
     #[derive(Debug, FromQueryResult)]
-    struct DelResult {
+    struct MergedRow {
+        id: i32,
         cart_id: i32,
+        product_id: i32,
+        product_variant_id: Option<i32>,
+        quantity: Option<i32>,
+        price: Option<Decimal>,
+        product_name: Option<String>,
+        product_slug: Option<String>,
+        product_image: Option<String>,
+        inventory_quantity: Option<i32>,
+        reserved_quantity: Option<i32>,
+        track_inventory: Option<bool>,
+        allow_backorder: Option<bool>,
     }
 
-    let del = DelResult::find_by_statement(Statement::from_sql_and_values(
+    let rows = MergedRow::find_by_statement(Statement::from_sql_and_values(
         backend,
-        del_sql,
+        merged_sql,
         vec![user_id.into(), item_id.into()],
     ))
-    .one(db)
-    .await?
-    .ok_or_else(|| Error::InternalServerError)?;
+    .all(db)
+    .await?;
 
-    if del.cart_id == 0 {
+    if rows.is_empty() {
         return Err(Error::BadRequest(t!("cart.item_not_found").into()));
     }
 
-    fetch_cart_with_items_combined(db, del.cart_id).await
+    let cart_id = rows[0].cart_id;
+    let items: Vec<CartItemWithProduct> = rows
+        .into_iter()
+        .map(|r| {
+            let inv = r.inventory_quantity.unwrap_or(0);
+            let res = r.reserved_quantity.unwrap_or(0);
+            let track = r.track_inventory.unwrap_or(true);
+            let allow = r.allow_backorder.unwrap_or(false);
+            let available = inv - res;
+            CartItemWithProduct {
+                id: r.id,
+                cart_id: r.cart_id,
+                product_id: r.product_id,
+                product_variant_id: r.product_variant_id,
+                quantity: r.quantity.unwrap_or(1),
+                price: r.price.unwrap_or(Decimal::ZERO),
+                product_name: r.product_name,
+                product_slug: r.product_slug,
+                product_image: r.product_image,
+                in_stock: !track || available > 0 || allow,
+                available_quantity: available,
+            }
+        })
+        .collect();
+
+    Ok(CartWithItems { id: cart_id, items })
 }
 
 pub async fn clear_cart<C>(db: &C, cart_id: i32) -> Result<()>
