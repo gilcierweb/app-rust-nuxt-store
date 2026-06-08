@@ -1,9 +1,10 @@
-import type { LoginResponse, CurrentResponse } from '~/types/index'
+import type { LoginResponse, CurrentResponse, AdminSectionsResponse } from '~/types/index'
 
 export const useAuth = () => {
   const { apiFetch } = useApi()
 
   const user = useState<CurrentResponse | null>('auth_user', () => null)
+  const adminSections = useState<string[]>('auth_admin_sections', () => [])
   const isAuthenticated = computed(() => !!user.value)
   const loading = useState<boolean>('auth_loading', () => false)
   const error = useState<string | null>('auth_error', () => null)
@@ -23,7 +24,12 @@ export const useAuth = () => {
         name: data.name,
         email,
         roles: data.roles,
-        can_manage_admin: data.can_manage_admin
+        can_manage_admin: data.can_manage_admin,
+        admin_sections: data.admin_sections
+      }
+
+      if (data.admin_sections) {
+        adminSections.value = data.admin_sections
       }
 
       const { mergeCartOnLogin } = useCartSync()
@@ -64,6 +70,7 @@ export const useAuth = () => {
       console.error('Erro ao fazer logout no servidor', err)
     } finally {
       user.value = null
+      adminSections.value = []
       error.value = null
       navigateTo('/users/sessions')
     }
@@ -78,13 +85,39 @@ export const useAuth = () => {
         headers: { 'Content-Type': 'application/json' }
       })
       user.value = data
+
+      if (data.admin_sections) {
+        adminSections.value = data.admin_sections
+      } else if (data.can_manage_admin) {
+        await fetchAdminSections()
+      }
+
       return data
     } catch {
       user.value = null
+      adminSections.value = []
       return null
     } finally {
       loading.value = false
     }
+  }
+
+  async function fetchAdminSections() {
+    try {
+      const data = await apiFetch<AdminSectionsResponse>('/api/admin/rbac/sections')
+      adminSections.value = data.sections
+      if (user.value) {
+        user.value.admin_sections = data.sections
+      }
+    } catch {
+      adminSections.value = []
+    }
+  }
+
+  function hasSectionAccess(section: string): boolean {
+    if (!user.value?.can_manage_admin) return false
+    if (user.value.roles?.includes('admin')) return true
+    return adminSections.value.includes(section)
   }
 
   async function forgotPassword(email: string) {
@@ -130,6 +163,7 @@ export const useAuth = () => {
 
   return {
     user,
+    adminSections,
     isAuthenticated,
     loading,
     error,
@@ -137,6 +171,8 @@ export const useAuth = () => {
     register,
     logout,
     fetchCurrentUser,
+    fetchAdminSections,
+    hasSectionAccess,
     forgotPassword,
     resetPassword,
     init

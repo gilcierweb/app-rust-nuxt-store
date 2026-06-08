@@ -134,6 +134,7 @@ export interface LoginResponse {
   roles: string[]
   can_manage_admin: boolean
   is_verified: boolean
+  admin_sections?: string[]
 }
 
 export interface CurrentResponse {
@@ -143,6 +144,11 @@ export interface CurrentResponse {
   avatar?: string
   roles: string[]
   can_manage_admin: boolean
+  admin_sections?: string[]
+}
+
+export interface AdminSectionsResponse {
+  sections: string[]
 }
 
 export interface RegisterParams {

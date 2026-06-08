@@ -18,7 +18,7 @@ const USER_ATTRIBUTES: &[Attribute] = &[
     "updated_at",
 ];
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum Action {
     Manage,
     Read,
@@ -48,17 +48,64 @@ impl Action {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub enum Subject {
     All,
     Admin,
     User,
+    Dashboard,
+    Product,
+    Category,
+    Order,
+    Review,
+    Banner,
+    Coupon,
+    Shipping,
+    Shipment,
+    Profile,
+    Address,
+    Post,
+    Variant,
+    Payment,
+    Inventory,
+    Settings,
+    AuditLog,
+    Email,
+    Rbac,
 }
 
 impl Subject {
     #[must_use]
     pub fn matches(self, requested: Self) -> bool {
         self == Self::All || self == requested
+    }
+
+    #[must_use]
+    pub fn section_name(self) -> &'static str {
+        match self {
+            Self::Dashboard => "dashboard",
+            Self::Product => "products",
+            Self::Category => "categories",
+            Self::Order => "orders",
+            Self::Review => "reviews",
+            Self::Banner => "banners",
+            Self::Coupon => "coupons",
+            Self::Shipping => "shippings",
+            Self::Shipment => "shipments",
+            Self::Profile => "profiles",
+            Self::Address => "addresses",
+            Self::Post => "posts",
+            Self::Variant => "variants",
+            Self::Payment => "payments",
+            Self::Inventory => "inventory",
+            Self::Settings => "settings",
+            Self::AuditLog => "audit_logs",
+            Self::Email => "emails",
+            Self::Rbac => "rbac",
+            Self::User => "customers",
+            Self::Admin => "admin",
+            Self::All => "all",
+        }
     }
 }
 
@@ -200,8 +247,26 @@ impl Ability {
             ability.define_authenticated_user_rules(user_id);
         }
 
-        if roles.iter().any(|role| role == "admin") {
+        let has_admin = roles.iter().any(|role| role == "admin");
+        let has_store_manager = roles.iter().any(|role| role == "store_manager");
+        let has_editor = roles.iter().any(|role| role == "editor");
+        let has_support = roles.iter().any(|role| role == "support");
+        let has_viewer = roles.iter().any(|role| role == "viewer");
+
+        if has_admin {
             ability.define_admin_rules(user_id);
+        }
+        if has_store_manager {
+            ability.define_store_manager_rules();
+        }
+        if has_editor {
+            ability.define_editor_rules();
+        }
+        if has_support {
+            ability.define_support_rules();
+        }
+        if has_viewer {
+            ability.define_viewer_rules();
         }
 
         ability
@@ -357,6 +422,43 @@ impl Ability {
     }
 
     #[must_use]
+    pub fn can_access_section(&self, subject: Subject) -> bool {
+        self.can(Action::Read, subject) || self.can(Action::Manage, subject)
+    }
+
+    #[must_use]
+    pub fn admin_sections(&self) -> Vec<&'static str> {
+        let sections = [
+            Subject::Dashboard,
+            Subject::Product,
+            Subject::Category,
+            Subject::Order,
+            Subject::Review,
+            Subject::Banner,
+            Subject::Coupon,
+            Subject::Shipping,
+            Subject::Shipment,
+            Subject::Profile,
+            Subject::Address,
+            Subject::Post,
+            Subject::Variant,
+            Subject::Payment,
+            Subject::Inventory,
+            Subject::Settings,
+            Subject::AuditLog,
+            Subject::Email,
+            Subject::Rbac,
+            Subject::User,
+        ];
+
+        sections
+            .iter()
+            .filter(|&&s| self.can_access_section(s))
+            .map(|s| s.section_name())
+            .collect()
+    }
+
+    #[must_use]
     pub fn merge(mut self, other: Self) -> Self {
         self.rules.extend(other.rules);
         self
@@ -381,6 +483,120 @@ impl Ability {
         if let Some(user_id) = user_id {
             self.deny_user_id(vec![Action::Destroy], vec![Subject::User], user_id);
         }
+    }
+
+    fn define_store_manager_rules(&mut self) {
+        self.allow(vec![Action::Manage], vec![Subject::Admin]);
+        self.allow(
+            vec![Action::Read],
+            vec![
+                Subject::Dashboard,
+                Subject::User,
+                Subject::AuditLog,
+            ],
+        );
+        self.allow(
+            vec![Action::Manage],
+            vec![
+                Subject::Product,
+                Subject::Category,
+                Subject::Order,
+                Subject::Review,
+                Subject::Banner,
+                Subject::Coupon,
+                Subject::Shipping,
+                Subject::Shipment,
+                Subject::Variant,
+                Subject::Inventory,
+            ],
+        );
+        self.allow(
+            vec![Action::Read],
+            vec![
+                Subject::Payment,
+                Subject::Address,
+                Subject::Profile,
+            ],
+        );
+    }
+
+    fn define_editor_rules(&mut self) {
+        self.allow(vec![Action::Manage], vec![Subject::Admin]);
+        self.allow(
+            vec![Action::Read],
+            vec![
+                Subject::Dashboard,
+                Subject::Payment,
+                Subject::Shipment,
+                Subject::Shipping,
+                Subject::Address,
+                Subject::Profile,
+                Subject::User,
+            ],
+        );
+        self.allow(
+            vec![Action::Manage],
+            vec![
+                Subject::Product,
+                Subject::Category,
+                Subject::Review,
+                Subject::Banner,
+                Subject::Post,
+                Subject::Variant,
+            ],
+        );
+    }
+
+    fn define_support_rules(&mut self) {
+        self.allow(vec![Action::Manage], vec![Subject::Admin]);
+        self.allow(
+            vec![Action::Read],
+            vec![
+                Subject::Dashboard,
+                Subject::Product,
+                Subject::Category,
+                Subject::Order,
+                Subject::Payment,
+                Subject::Shipment,
+                Subject::Shipping,
+                Subject::Address,
+                Subject::Profile,
+                Subject::User,
+                Subject::Review,
+                Subject::Coupon,
+                Subject::Variant,
+            ],
+        );
+        self.allow(
+            vec![Action::Update],
+            vec![Subject::Review],
+        );
+    }
+
+    fn define_viewer_rules(&mut self) {
+        self.allow(vec![Action::Manage], vec![Subject::Admin]);
+        self.allow(
+            vec![Action::Read],
+            vec![
+                Subject::Dashboard,
+                Subject::Product,
+                Subject::Category,
+                Subject::Order,
+                Subject::Review,
+                Subject::Banner,
+                Subject::Coupon,
+                Subject::Shipping,
+                Subject::Shipment,
+                Subject::Profile,
+                Subject::Address,
+                Subject::Post,
+                Subject::Variant,
+                Subject::Payment,
+                Subject::Inventory,
+                Subject::AuditLog,
+                Subject::User,
+            ],
+        );
     }
 }
 
@@ -452,5 +668,128 @@ mod tests {
         let ability = base.merge(override_rules);
 
         assert!(ability.cannot(Action::Read, Subject::User));
+    }
+
+    #[test]
+    fn store_manager_can_manage_products() {
+        let ability = Ability::for_roles_and_user(vec!["store_manager".to_string()], None);
+
+        assert!(ability.can(Action::Manage, Subject::Product));
+        assert!(ability.can(Action::Manage, Subject::Category));
+        assert!(ability.can(Action::Manage, Subject::Order));
+        assert!(ability.can(Action::Manage, Subject::Inventory));
+        assert!(ability.can(Action::Read, Subject::Dashboard));
+    }
+
+    #[test]
+    fn store_manager_cannot_manage_users() {
+        let ability = Ability::for_roles_and_user(vec!["store_manager".to_string()], None);
+
+        assert!(ability.cannot(Action::Manage, Subject::User));
+        assert!(ability.cannot(Action::Manage, Subject::Rbac));
+        assert!(ability.cannot(Action::Manage, Subject::Settings));
+    }
+
+    #[test]
+    fn editor_can_manage_content() {
+        let ability = Ability::for_roles_and_user(vec!["editor".to_string()], None);
+
+        assert!(ability.can(Action::Manage, Subject::Post));
+        assert!(ability.can(Action::Manage, Subject::Banner));
+        assert!(ability.can(Action::Manage, Subject::Review));
+        assert!(ability.can(Action::Manage, Subject::Product));
+        assert!(ability.can(Action::Read, Subject::Dashboard));
+    }
+
+    #[test]
+    fn editor_cannot_manage_orders() {
+        let ability = Ability::for_roles_and_user(vec!["editor".to_string()], None);
+
+        assert!(ability.cannot(Action::Manage, Subject::Order));
+        assert!(ability.cannot(Action::Manage, Subject::Coupon));
+        assert!(ability.cannot(Action::Manage, Subject::Shipping));
+    }
+
+    #[test]
+    fn support_can_read_most_things() {
+        let ability = Ability::for_roles_and_user(vec!["support".to_string()], None);
+
+        assert!(ability.can(Action::Read, Subject::Order));
+        assert!(ability.can(Action::Read, Subject::Product));
+        assert!(ability.can(Action::Read, Subject::User));
+        assert!(ability.can(Action::Read, Subject::Payment));
+        assert!(ability.can(Action::Update, Subject::Review));
+    }
+
+    #[test]
+    fn support_cannot_manage_products() {
+        let ability = Ability::for_roles_and_user(vec!["support".to_string()], None);
+
+        assert!(ability.cannot(Action::Manage, Subject::Product));
+        assert!(ability.cannot(Action::Manage, Subject::Order));
+        assert!(ability.cannot(Action::Destroy, Subject::User));
+    }
+
+    #[test]
+    fn viewer_can_only_read() {
+        let ability = Ability::for_roles_and_user(vec!["viewer".to_string()], None);
+
+        assert!(ability.can(Action::Read, Subject::Dashboard));
+        assert!(ability.can(Action::Read, Subject::Product));
+        assert!(ability.can(Action::Read, Subject::Order));
+        assert!(ability.can(Action::Read, Subject::AuditLog));
+    }
+
+    #[test]
+    fn viewer_cannot_write_anything() {
+        let ability = Ability::for_roles_and_user(vec!["viewer".to_string()], None);
+
+        assert!(ability.cannot(Action::Create, Subject::Product));
+        assert!(ability.cannot(Action::Update, Subject::Order));
+        assert!(ability.cannot(Action::Destroy, Subject::Review));
+        assert!(ability.cannot(Action::Manage, Subject::Settings));
+    }
+
+    #[test]
+    fn admin_sections_returns_accessible_sections() {
+        let ability = Ability::for_roles_and_user(vec!["admin".to_string()], Some(1));
+        let sections = ability.admin_sections();
+        assert!(sections.contains(&"dashboard"));
+        assert!(sections.contains(&"products"));
+        assert!(sections.contains(&"rbac"));
+        assert!(sections.contains(&"settings"));
+    }
+
+    #[test]
+    fn viewer_sections_exclude_management() {
+        let ability = Ability::for_roles_and_user(vec!["viewer".to_string()], None);
+        let sections = ability.admin_sections();
+        assert!(sections.contains(&"dashboard"));
+        assert!(sections.contains(&"products"));
+        assert!(!sections.contains(&"settings"));
+        assert!(!sections.contains(&"rbac"));
+        assert!(!sections.contains(&"emails"));
+    }
+
+    #[test]
+    fn composite_roles_merge_permissions() {
+        let ability = Ability::for_roles_and_user(
+            vec!["editor".to_string(), "support".to_string()],
+            None,
+        );
+
+        assert!(ability.can(Action::Manage, Subject::Post));
+        assert!(ability.can(Action::Read, Subject::Order));
+        assert!(ability.can(Action::Update, Subject::Review));
+    }
+
+    #[test]
+    fn subject_section_name_mapping() {
+        assert_eq!(Subject::Dashboard.section_name(), "dashboard");
+        assert_eq!(Subject::Product.section_name(), "products");
+        assert_eq!(Subject::Order.section_name(), "orders");
+        assert_eq!(Subject::Rbac.section_name(), "rbac");
+        assert_eq!(Subject::Inventory.section_name(), "inventory");
+        assert_eq!(Subject::Payment.section_name(), "payments");
     }
 }

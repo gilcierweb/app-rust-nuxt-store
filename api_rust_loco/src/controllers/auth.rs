@@ -59,12 +59,20 @@ fn current_response_from_claims(claims: &UserClaims) -> Option<CurrentResponse> 
         .map(|role| role.as_str().map(ToString::to_string))
         .collect::<Option<Vec<_>>>()?;
 
+    let ability = crate::models::ability::Ability::from_roles(roles.clone());
+    let admin_sections = if can_manage_admin {
+        ability.admin_sections().into_iter().map(String::from).collect()
+    } else {
+        Vec::new()
+    };
+
     Some(CurrentResponse {
         pid: claims.pid.clone(),
         name,
         email,
         roles,
         can_manage_admin,
+        admin_sections,
     })
 }
 

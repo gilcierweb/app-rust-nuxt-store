@@ -18,149 +18,157 @@
         <div class="flex gap-3 mt-2">
            <a href="#" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--brand-github] size-4"></i></a>
            <a href="#" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--brand-twitter] size-4"></i></a>
-           <NuxtLinkLocale to="/admin/settings" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--settings] size-4"></i></NuxtLinkLocale>
+           <NuxtLinkLocale v-if="hasAccess('settings')" to="/admin/settings" class="btn btn-text btn-circle btn-xs"><i class="icon-[tabler--settings] size-4"></i></NuxtLinkLocale>
         </div>
       </div>
 
       <!-- Navigation Menu -->
       <div class="h-full overflow-y-auto px-4 py-4">
         <ul class="menu p-0 gap-1">
-          <li>
+          <li v-if="hasAccess('dashboard')">
             <NuxtLinkLocale to="/admin" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--home] size-5"></i>
               {{ $t('admin.sidebar.dashboard') }}
             </NuxtLinkLocale>
           </li>
           
-          <li class="menu-title mt-4 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_ecommerce') }}
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/orders" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--shopping-cart] size-5"></i>
-              {{ $t('admin.orders.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/payments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--credit-card] size-5"></i>
-              {{ $t('admin.payments.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/products" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--package] size-5"></i>
-              {{ $t('admin.products.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/inventory" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--packages] size-5"></i>
-              {{ $t('admin.inventory.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/categories" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--category] size-5"></i>
-              {{ $t('admin.categories.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/banners" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--photo] size-5"></i>
-              {{ $t('admin.banners.title') }}
-            </NuxtLinkLocale>
-          </li>
+          <template v-if="hasAnyAccess(['orders', 'payments', 'products', 'inventory', 'categories', 'banners'])">
+            <li class="menu-title mt-4 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
+              {{ $t('admin.sidebar.category_ecommerce') }}
+            </li>
+            <li v-if="hasAccess('orders')">
+              <NuxtLinkLocale to="/admin/orders" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--shopping-cart] size-5"></i>
+                {{ $t('admin.orders.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('payments')">
+              <NuxtLinkLocale to="/admin/payments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--credit-card] size-5"></i>
+                {{ $t('admin.payments.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('products')">
+              <NuxtLinkLocale to="/admin/products" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--package] size-5"></i>
+                {{ $t('admin.products.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('inventory')">
+              <NuxtLinkLocale to="/admin/inventory" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--packages] size-5"></i>
+                {{ $t('admin.inventory.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('categories')">
+              <NuxtLinkLocale to="/admin/categories" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--category] size-5"></i>
+                {{ $t('admin.categories.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('banners')">
+              <NuxtLinkLocale to="/admin/banners" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--photo] size-5"></i>
+                {{ $t('admin.banners.title') }}
+              </NuxtLinkLocale>
+            </li>
+          </template>
 
-          <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_logistics') }}
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/shipments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--truck-delivery] size-5"></i>
-              {{ $t('admin.shipments.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/shippings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--map-pin] size-5"></i>
-              {{ $t('admin.shippings.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/addresses" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--address-book] size-5"></i>
-              {{ $t('admin.addresses.title') }}
-            </NuxtLinkLocale>
-          </li>
+          <template v-if="hasAnyAccess(['shipments', 'shippings', 'addresses'])">
+            <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
+              {{ $t('admin.sidebar.category_logistics') }}
+            </li>
+            <li v-if="hasAccess('shipments')">
+              <NuxtLinkLocale to="/admin/shipments" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--truck-delivery] size-5"></i>
+                {{ $t('admin.shipments.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('shippings')">
+              <NuxtLinkLocale to="/admin/shippings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--map-pin] size-5"></i>
+                {{ $t('admin.shippings.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('addresses')">
+              <NuxtLinkLocale to="/admin/addresses" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--address-book] size-5"></i>
+                {{ $t('admin.addresses.title') }}
+              </NuxtLinkLocale>
+            </li>
+          </template>
 
-          <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_content') }}
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/posts" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--article] size-5"></i>
-              {{ $t('admin.posts.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/reviews" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--star] size-5"></i>
-              {{ $t('admin.reviews.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/coupons" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--ticket] size-5"></i>
-              {{ $t('admin.coupons.title') }}
-            </NuxtLinkLocale>
-          </li>
+          <template v-if="hasAnyAccess(['posts', 'reviews', 'coupons'])">
+            <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
+              {{ $t('admin.sidebar.category_content') }}
+            </li>
+            <li v-if="hasAccess('posts')">
+              <NuxtLinkLocale to="/admin/posts" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--article] size-5"></i>
+                {{ $t('admin.posts.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('reviews')">
+              <NuxtLinkLocale to="/admin/reviews" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--star] size-5"></i>
+                {{ $t('admin.reviews.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('coupons')">
+              <NuxtLinkLocale to="/admin/coupons" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--ticket] size-5"></i>
+                {{ $t('admin.coupons.title') }}
+              </NuxtLinkLocale>
+            </li>
+          </template>
 
-          <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
-            {{ $t('admin.sidebar.category_admin') }}
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/customers" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--users] size-5"></i>
-              {{ $t('admin.customers.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/users" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--user-shield] size-5"></i>
-              {{ $t('admin.users.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/rbac" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--shield-lock] size-5"></i>
-              {{ $t('admin.rbac.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/emails" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--mail] size-5"></i>
-              {{ $t('admin.emails.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--activity-heartbeat] size-5"></i>
-              {{ $t('admin.monitoring.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/audit-logs" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--history] size-5"></i>
-              {{ $t('admin.audit.title') }}
-            </NuxtLinkLocale>
-          </li>
-          <li>
-            <NuxtLinkLocale to="/admin/settings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
-              <i class="icon-[tabler--settings] size-5"></i>
-              {{ $t('admin.settings.title') }}
-            </NuxtLinkLocale>
-          </li>
+          <template v-if="hasAnyAccess(['customers', 'users', 'rbac', 'emails', 'audit_logs', 'settings'])">
+            <li class="menu-title mt-6 mb-2 px-4 text-xs font-bold uppercase tracking-wider text-base-content/40">
+              {{ $t('admin.sidebar.category_admin') }}
+            </li>
+            <li v-if="hasAccess('customers')">
+              <NuxtLinkLocale to="/admin/customers" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--users] size-5"></i>
+                {{ $t('admin.customers.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('users')">
+              <NuxtLinkLocale to="/admin/users" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--user-shield] size-5"></i>
+                {{ $t('admin.users.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('rbac')">
+              <NuxtLinkLocale to="/admin/rbac" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--shield-lock] size-5"></i>
+                {{ $t('admin.rbac.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('emails')">
+              <NuxtLinkLocale to="/admin/emails" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--mail] size-5"></i>
+                {{ $t('admin.emails.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li>
+              <NuxtLinkLocale to="/admin/monitoring" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--activity-heartbeat] size-5"></i>
+                {{ $t('admin.monitoring.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('audit_logs')">
+              <NuxtLinkLocale to="/admin/audit-logs" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--history] size-5"></i>
+                {{ $t('admin.audit.title') }}
+              </NuxtLinkLocale>
+            </li>
+            <li v-if="hasAccess('settings')">
+              <NuxtLinkLocale to="/admin/settings" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-base-200 transition-colors" active-class="bg-primary/10 text-primary font-bold">
+                <i class="icon-[tabler--settings] size-5"></i>
+                {{ $t('admin.settings.title') }}
+              </NuxtLinkLocale>
+            </li>
+          </template>
         </ul>
       </div>
 
@@ -176,7 +184,15 @@
 </template>
 
 <script lang="ts" setup>
-const { isAuthenticated, user, logout } = useAuth()
+const { isAuthenticated, user, logout, hasSectionAccess } = useAuth()
+
+function hasAccess(section: string): boolean {
+  return hasSectionAccess(section)
+}
+
+function hasAnyAccess(sections: string[]): boolean {
+  return sections.some(s => hasSectionAccess(s))
+}
 
 function handleLogout() {
     logout()

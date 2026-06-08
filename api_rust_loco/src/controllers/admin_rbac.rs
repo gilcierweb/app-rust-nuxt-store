@@ -57,6 +57,18 @@ pub struct PermissionGroupJson {
 #[derive(Clone, Debug, Serialize)]
 pub struct PermissionsJson {
     pub groups: Vec<PermissionGroupJson>,
+    pub role_matrix: Vec<RolePermissionJson>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct RolePermissionJson {
+    pub role: String,
+    pub sections: Vec<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct SectionsJson {
+    pub sections: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -263,6 +275,66 @@ pub async fn summary(
 
 #[debug_handler]
 pub async fn permissions() -> Result<Response> {
+    let role_matrix = vec![
+        RolePermissionJson {
+            role: "admin".to_string(),
+            sections: vec![
+                "dashboard", "products", "categories", "orders", "reviews",
+                "banners", "coupons", "shippings", "shipments", "profiles",
+                "addresses", "posts", "variants", "payments", "inventory",
+                "settings", "audit_logs", "emails", "rbac", "customers",
+            ]
+            .into_iter()
+            .map(String::from)
+            .collect(),
+        },
+        RolePermissionJson {
+            role: "store_manager".to_string(),
+            sections: vec![
+                "dashboard", "products", "categories", "orders", "reviews",
+                "banners", "coupons", "shippings", "shipments", "variants",
+                "inventory", "payments", "profiles", "addresses",
+            ]
+            .into_iter()
+            .map(String::from)
+            .collect(),
+        },
+        RolePermissionJson {
+            role: "editor".to_string(),
+            sections: vec![
+                "dashboard", "products", "categories", "reviews", "banners",
+                "posts", "variants", "payments", "shippings", "shipments",
+                "profiles", "addresses", "customers",
+            ]
+            .into_iter()
+            .map(String::from)
+            .collect(),
+        },
+        RolePermissionJson {
+            role: "support".to_string(),
+            sections: vec![
+                "dashboard", "products", "categories", "orders", "payments",
+                "shipments", "shippings", "profiles", "addresses", "customers",
+                "reviews", "coupons", "variants",
+            ]
+            .into_iter()
+            .map(String::from)
+            .collect(),
+        },
+        RolePermissionJson {
+            role: "viewer".to_string(),
+            sections: vec![
+                "dashboard", "products", "categories", "orders", "reviews",
+                "banners", "coupons", "shippings", "shipments", "profiles",
+                "addresses", "posts", "variants", "payments", "inventory",
+                "audit_logs", "customers",
+            ]
+            .into_iter()
+            .map(String::from)
+            .collect(),
+        },
+    ];
+
     format::json(PermissionsJson {
         groups: vec![
             PermissionGroupJson {
@@ -286,6 +358,17 @@ pub async fn permissions() -> Result<Response> {
                 source: "Ability::define_authenticated_user_rules".to_string(),
             },
         ],
+        role_matrix,
+    })
+}
+
+#[debug_handler]
+pub async fn sections(
+    Extension(session): Extension<AdminSession>,
+) -> Result<Response> {
+    let sections = session.ability.admin_sections();
+    format::json(SectionsJson {
+        sections: sections.into_iter().map(String::from).collect(),
     })
 }
 
@@ -460,6 +543,7 @@ pub fn routes() -> Routes {
         .prefix("api/admin/rbac")
         .add("summary", get(summary))
         .add("permissions", get(permissions))
+        .add("sections", get(sections))
         .add("roles", post(create_role))
         .add("roles/{id}", delete(delete_role))
         .add("assignments", post(assign_role))
