@@ -253,15 +253,20 @@ pub async fn add_item<C>(
 where
     C: ConnectionTrait,
 {
-    if let Some(variant_id) = product_variant_id {
-        let variant = product_variants::Entity::find_by_id(variant_id)
+    let variant = if let Some(variant_id) = product_variant_id {
+        let v = product_variants::Entity::find_by_id(variant_id)
             .one(db)
             .await?
             .ok_or_else(|| Error::BadRequest(t!("cart.variant_not_found").into()))?;
+        Some(v)
+    } else {
+        None
+    };
 
-        if variant.track_inventory {
-            let available = variant.inventory_quantity - variant.reserved_quantity;
-            if available < quantity && !variant.allow_backorder {
+    if let Some(ref v) = variant {
+        if v.track_inventory {
+            let available = v.inventory_quantity - v.reserved_quantity;
+            if available < quantity && !v.allow_backorder {
                 return Err(Error::BadRequest(
                     t!("cart.insufficient_stock", available = available).into(),
                 ));
@@ -281,18 +286,13 @@ where
     if let Some(existing_item) = existing {
         let new_qty = existing_item.quantity.unwrap_or(0) + quantity;
 
-        if let Some(variant_id) = product_variant_id {
-            let variant = product_variants::Entity::find_by_id(variant_id)
-                .one(db)
-                .await?;
-            if let Some(v) = variant {
-                if v.track_inventory {
-                    let available = v.inventory_quantity - v.reserved_quantity;
-                    if available < new_qty && !v.allow_backorder {
-                        return Err(Error::BadRequest(
-                            t!("cart.insufficient_stock", available = available).into(),
-                        ));
-                    }
+        if let Some(ref v) = variant {
+            if v.track_inventory {
+                let available = v.inventory_quantity - v.reserved_quantity;
+                if available < new_qty && !v.allow_backorder {
+                    return Err(Error::BadRequest(
+                        t!("cart.insufficient_stock", available = available).into(),
+                    ));
                 }
             }
         }
