@@ -17,7 +17,7 @@ export const useCartStore = defineStore('cart', {
         existing.quantity += item.quantity || 1
       } else {
         this.items.push({
-          id: Date.now().toString(),
+          id: '',
           productId: item.productId,
           name: item.name,
           price: Number(item.price),

@@ -338,19 +338,19 @@ where
                             COALESCE(pv.track_inventory, false) AS track_inventory,
                             COALESCE(pv.allow_backorder, false) AS allow_backorder
                         FROM (SELECT 1) dummy
-                        LEFT JOIN product_variants pv ON pv.id = $4
+                        LEFT JOIN product_variants pv ON pv.id = $3
                     ),
                     existing AS (
                         SELECT ci.id, COALESCE(ci.quantity, 0) AS quantity
                         FROM cart_items ci, cart c
                         WHERE ci.cart_id = c.id
                           AND ci.product_id = $2
-                          AND ci.product_variant_id IS NOT DISTINCT FROM $4
+                          AND ci.product_variant_id IS NOT DISTINCT FROM $3
                     ),
                     upserted AS (
                         UPDATE cart_items ci
-                        SET quantity = (SELECT quantity FROM existing) + $5,
-                            price = $6,
+                        SET quantity = (SELECT quantity FROM existing) + $4,
+                            price = $5,
                             updated_at = NOW()
                         FROM existing e
                         WHERE ci.id = e.id
@@ -358,7 +358,7 @@ where
                     ),
                     inserted AS (
                         INSERT INTO cart_items (cart_id, product_id, product_variant_id, quantity, price, created_at, updated_at)
-                        SELECT c.id, $2, $4, $5, $6, NOW(), NOW()
+                        SELECT c.id, $2, $3, $4, $5, NOW(), NOW()
                         FROM cart c
                         WHERE NOT EXISTS (SELECT 1 FROM upserted)
                         RETURNING id
@@ -368,7 +368,7 @@ where
                         vi.available,
                         vi.track_inventory,
                         vi.allow_backorder,
-                        COALESCE((SELECT quantity FROM existing), 0) + $5 AS new_quantity
+                        COALESCE((SELECT quantity FROM existing), 0) + $4 AS new_quantity
                     FROM variant_info vi
                 "#;
 

@@ -142,40 +142,6 @@ fn product_select_sql(from_clause: &str, image_join_filter: &str) -> String {
     )
 }
 
-fn product_list_select_sql() -> String {
-    let from_clause = r#"
-        (
-            SELECT *
-            FROM products
-            ORDER BY id ASC
-            LIMIT $1 OFFSET $2
-        )
-    "#;
-    format!(
-        r#"
-        SELECT
-            p.id,
-            p.name,
-            p.slug,
-            p.sku,
-            p.short_description,
-            p.description,
-            p.price,
-            p.cost_price,
-            p.compare_price,
-            p.featured,
-            p.active,
-            p.status,
-            c.id AS category_id,
-            c.name AS category_name,
-            c.slug AS category_slug
-        FROM {from_clause} p
-        LEFT JOIN categories c ON c.id = p.category_id
-        ORDER BY p.id ASC
-        "#
-    )
-}
-
 fn product_detail_select_sql() -> String {
     product_select_sql(
         r#"
@@ -284,17 +250,6 @@ struct ProductRow {
     category_slug: Option<String>,
 }
 
-#[derive(Debug, FromQueryResult)]
-struct ProductCoverImageRow {
-    product_id: i32,
-    id: i32,
-    image: Option<String>,
-    alt_text: Option<String>,
-    active: Option<bool>,
-    cover: Option<bool>,
-    position: Option<i32>,
-}
-
 fn product_from_product_row(row: &ProductRow) -> ProductWithCategory {
     ProductWithCategory {
         id: row.id,
@@ -341,9 +296,60 @@ pub async fn get_products_with_categories(
 
     let backend = ctx.db.get_database_backend();
 
-    let product_rows = ProductRow::find_by_statement(Statement::from_sql_and_values(
+    #[derive(Debug, FromQueryResult)]
+    struct ProductImageResult {
+        id: i32,
+        name: Option<String>,
+        slug: Option<String>,
+        sku: Option<String>,
+        short_description: Option<String>,
+        description: Option<String>,
+        price: Option<Decimal>,
+        cost_price: Option<Decimal>,
+        compare_price: Option<Decimal>,
+        featured: Option<bool>,
+        active: Option<bool>,
+        status: Option<i32>,
+        category_id: Option<i32>,
+        category_name: Option<String>,
+        category_slug: Option<String>,
+        image_id: Option<i32>,
+        image: Option<String>,
+        alt_text: Option<String>,
+        image_active: Option<bool>,
+        cover: Option<bool>,
+        position: Option<i32>,
+        image_product_id: Option<i32>,
+    }
+
+    let rows = ProductImageResult::find_by_statement(Statement::from_sql_and_values(
         backend,
-        &product_list_select_sql(),
+        r#"
+        WITH paginated AS (
+            SELECT id FROM products
+            ORDER BY id ASC
+            LIMIT $1 OFFSET $2
+        ),
+        cover_images AS (
+            SELECT DISTINCT ON (pi.product_id)
+                pi.product_id, pi.id, pi.image, pi.alt_text, pi.active, pi.cover, pi.position
+            FROM product_images pi
+            WHERE pi.cover = TRUE
+              AND pi.product_id IN (SELECT id FROM paginated)
+            ORDER BY pi.product_id, pi.position
+        )
+        SELECT
+            p.id, p.name, p.slug, p.sku, p.short_description, p.description,
+            p.price, p.cost_price, p.compare_price, p.featured, p.active, p.status,
+            c.id AS category_id, c.name AS category_name, c.slug AS category_slug,
+            ci.id AS image_id, ci.image, ci.alt_text, ci.active AS image_active,
+            ci.cover, ci.position, ci.product_id AS image_product_id
+        FROM paginated pg
+        INNER JOIN products p ON p.id = pg.id
+        LEFT JOIN categories c ON c.id = p.category_id
+        LEFT JOIN cover_images ci ON ci.product_id = p.id
+        ORDER BY p.id ASC
+        "#,
         [
             (pagination.page_size() as i64).into(),
             pagination.offset().into(),
@@ -352,53 +358,54 @@ pub async fn get_products_with_categories(
     .all(&ctx.db)
     .await?;
 
-    if product_rows.is_empty() {
+    if rows.is_empty() {
         let data = Arc::new(Vec::<ProductWithCategory>::new());
         products_cache().insert(cache_key, Arc::clone(&data));
         return format::json(data);
     }
 
-    let product_ids: Vec<i32> = product_rows.iter().map(|r| r.id).collect();
+    let mut products: Vec<ProductWithCategory> = Vec::new();
+    let mut positions: HashMap<i32, usize> = HashMap::new();
 
-    let image_rows = ProductCoverImageRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        r#"
-        SELECT DISTINCT ON (product_id)
-            product_id, id, image, alt_text, active, cover, position
-        FROM product_images
-        WHERE cover = TRUE AND product_id = ANY($1)
-        ORDER BY product_id, position
-        "#,
-        vec![product_ids.into()],
-    ))
-    .all(&ctx.db)
-    .await?;
-
-    let mut image_map: HashMap<i32, ProductImageJson> = HashMap::new();
-    for row in image_rows {
-        image_map.insert(row.product_id, ProductImageJson {
-            id: row.id,
-            image: row.image,
-            alt_text: row.alt_text,
-            active: row.active,
-            cover: row.cover,
-            position: row.position,
-            product_id: row.product_id,
+    for row in rows {
+        let idx = *positions.entry(row.id).or_insert_with(|| {
+            products.push(product_from_product_row(&ProductRow {
+                id: row.id,
+                name: row.name.clone(),
+                slug: row.slug.clone(),
+                sku: row.sku.clone(),
+                short_description: row.short_description.clone(),
+                description: row.description.clone(),
+                price: row.price,
+                cost_price: row.cost_price,
+                compare_price: row.compare_price,
+                featured: row.featured,
+                active: row.active,
+                status: row.status,
+                category_id: row.category_id,
+                category_name: row.category_name.clone(),
+                category_slug: row.category_slug.clone(),
+            }));
+            products.len() - 1
         });
+
+        if let Some(image_id) = row.image_id {
+            products[idx]
+                .images
+                .get_or_insert_with(Vec::new)
+                .push(ProductImageJson {
+                    id: image_id,
+                    image: row.image,
+                    alt_text: row.alt_text,
+                    active: row.image_active,
+                    cover: row.cover,
+                    position: row.position,
+                    product_id: row.image_product_id.unwrap_or(row.id),
+                });
+        }
     }
 
-    let data: Vec<ProductWithCategory> = product_rows
-        .into_iter()
-        .map(|row| {
-            let mut product = product_from_product_row(&row);
-            if let Some(image) = image_map.remove(&row.id) {
-                product.images = Some(vec![image]);
-            }
-            product
-        })
-        .collect();
-
-    let data = Arc::new(data);
+    let data = Arc::new(products);
     products_cache().insert(cache_key, Arc::clone(&data));
     format::json(data)
 }
