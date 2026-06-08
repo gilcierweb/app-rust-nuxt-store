@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::{
@@ -33,6 +35,167 @@ pub struct CartWithItems {
     pub items: Vec<CartItemWithProduct>,
 }
 
+#[derive(Debug, FromQueryResult)]
+struct CartItemRow {
+    id: i32,
+    cart_id: i32,
+    product_id: i32,
+    product_variant_id: Option<i32>,
+    quantity: Option<i32>,
+    price: Option<Decimal>,
+    product_name: Option<String>,
+    product_slug: Option<String>,
+    inventory_quantity: Option<i32>,
+    reserved_quantity: Option<i32>,
+    track_inventory: Option<bool>,
+    allow_backorder: Option<bool>,
+}
+
+#[derive(Debug, FromQueryResult)]
+struct CoverImageRow {
+    product_id: i32,
+    image: Option<String>,
+}
+
+async fn fetch_cart_items_by_id<C>(db: &C, cart_id: i32) -> Result<Vec<CartItemWithProduct>>
+where
+    C: ConnectionTrait,
+{
+    let backend = db.get_database_backend();
+
+    let items_sql = r#"
+        SELECT
+            ci.id              AS id,
+            ci.cart_id         AS cart_id,
+            ci.product_id      AS product_id,
+            ci.product_variant_id AS product_variant_id,
+            ci.quantity        AS quantity,
+            ci.price           AS price,
+            p.name             AS product_name,
+            p.slug             AS product_slug,
+            pv.inventory_quantity AS inventory_quantity,
+            pv.reserved_quantity AS reserved_quantity,
+            pv.track_inventory AS track_inventory,
+            pv.allow_backorder AS allow_backorder
+        FROM cart_items ci
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+        WHERE ci.cart_id = $1
+        ORDER BY ci.id
+    "#;
+
+    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        items_sql,
+        vec![cart_id.into()],
+    ))
+    .all(db)
+    .await?;
+
+    enrich_with_images(db, raw_items).await
+}
+
+async fn fetch_cart_items_by_user<C>(db: &C, user_id: i32) -> Result<(i32, Vec<CartItemWithProduct>)>
+where
+    C: ConnectionTrait,
+{
+    let backend = db.get_database_backend();
+
+    let items_sql = r#"
+        SELECT
+            ci.id              AS id,
+            ci.cart_id         AS cart_id,
+            ci.product_id      AS product_id,
+            ci.product_variant_id AS product_variant_id,
+            ci.quantity        AS quantity,
+            ci.price           AS price,
+            p.name             AS product_name,
+            p.slug             AS product_slug,
+            pv.inventory_quantity AS inventory_quantity,
+            pv.reserved_quantity AS reserved_quantity,
+            pv.track_inventory AS track_inventory,
+            pv.allow_backorder AS allow_backorder
+        FROM cart_items ci
+        INNER JOIN (
+            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
+        ) c ON c.id = ci.cart_id
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+        ORDER BY ci.id
+    "#;
+
+    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        items_sql,
+        vec![user_id.into()],
+    ))
+    .all(db)
+    .await?;
+
+    let cart_id = raw_items.first().map(|row| row.cart_id).unwrap_or(0);
+    let items = enrich_with_images(db, raw_items).await?;
+    Ok((cart_id, items))
+}
+
+async fn enrich_with_images<C>(db: &C, raw_items: Vec<CartItemRow>) -> Result<Vec<CartItemWithProduct>>
+where
+    C: ConnectionTrait,
+{
+    if raw_items.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let backend = db.get_database_backend();
+    let product_ids: Vec<i32> = raw_items.iter().map(|r| r.product_id).collect();
+
+    let images_sql = r#"
+        SELECT DISTINCT ON (product_id)
+            product_id, image
+        FROM product_images
+        WHERE cover = TRUE AND product_id = ANY($1)
+        ORDER BY product_id, position
+    "#;
+
+    let images = CoverImageRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        images_sql,
+        vec![product_ids.into()],
+    ))
+    .all(db)
+    .await?;
+
+    let image_map: HashMap<i32, Option<String>> = images
+        .into_iter()
+        .map(|r| (r.product_id, r.image))
+        .collect();
+
+    Ok(raw_items
+        .into_iter()
+        .map(|row| {
+            let inventory_qty = row.inventory_quantity.unwrap_or(0);
+            let reserved_qty = row.reserved_quantity.unwrap_or(0);
+            let track = row.track_inventory.unwrap_or(true);
+            let allow_backorder = row.allow_backorder.unwrap_or(false);
+            let available = inventory_qty - reserved_qty;
+            let in_stock = !track || available > 0 || allow_backorder;
+
+            CartItemWithProduct {
+                id: row.id,
+                cart_id: row.cart_id,
+                product_id: row.product_id,
+                product_variant_id: row.product_variant_id,
+                quantity: row.quantity.unwrap_or(1),
+                price: row.price.unwrap_or(Decimal::ZERO),
+                product_name: row.product_name,
+                product_slug: row.product_slug,
+                product_image: image_map.get(&row.product_id).and_then(|i| i.clone()),
+                in_stock,
+                available_quantity: available,
+            }
+        })
+        .collect())
+}
+
 pub async fn get_or_create_cart<C>(db: &C, user_id: i32) -> Result<carts::Model>
 where
     C: ConnectionTrait,
@@ -66,91 +229,7 @@ pub async fn get_cart_with_items_for_user<C>(db: &C, user_id: i32) -> Result<Car
 where
     C: ConnectionTrait,
 {
-    #[derive(Debug, FromQueryResult)]
-    struct CartItemRow {
-        id: i32,
-        cart_id: i32,
-        product_id: i32,
-        product_variant_id: Option<i32>,
-        quantity: Option<i32>,
-        price: Option<Decimal>,
-        product_name: Option<String>,
-        product_slug: Option<String>,
-        product_image: Option<String>,
-        inventory_quantity: Option<i32>,
-        reserved_quantity: Option<i32>,
-        track_inventory: Option<bool>,
-        allow_backorder: Option<bool>,
-    }
-
-    let backend = db.get_database_backend();
-
-    let items_sql = r#"
-        SELECT
-            ci.id              AS id,
-            ci.cart_id         AS cart_id,
-            ci.product_id      AS product_id,
-            ci.product_variant_id AS product_variant_id,
-            ci.quantity        AS quantity,
-            ci.price           AS price,
-            p.name             AS product_name,
-            p.slug             AS product_slug,
-            cover.image        AS product_image,
-            pv.inventory_quantity AS inventory_quantity,
-            pv.reserved_quantity AS reserved_quantity,
-            pv.track_inventory AS track_inventory,
-            pv.allow_backorder AS allow_backorder
-        FROM cart_items ci
-        INNER JOIN (
-            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
-        ) c ON c.id = ci.cart_id
-        INNER JOIN products p ON p.id = ci.product_id
-        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
-        LEFT JOIN LATERAL (
-            SELECT pi.image
-            FROM product_images pi
-            WHERE pi.product_id = ci.product_id AND pi.cover = TRUE
-            ORDER BY pi.position
-            LIMIT 1
-        ) cover ON TRUE
-        ORDER BY ci.id
-    "#;
-
-    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        items_sql,
-        vec![user_id.into()],
-    ))
-    .all(db)
-    .await?;
-
-    let cart_id = raw_items.first().map(|row| row.cart_id).unwrap_or(0);
-    let items = raw_items
-        .into_iter()
-        .map(|row| {
-            let inventory_qty = row.inventory_quantity.unwrap_or(0);
-            let reserved_qty = row.reserved_quantity.unwrap_or(0);
-            let track = row.track_inventory.unwrap_or(true);
-            let allow_backorder = row.allow_backorder.unwrap_or(false);
-            let available = inventory_qty - reserved_qty;
-            let in_stock = !track || available > 0 || allow_backorder;
-
-            CartItemWithProduct {
-                id: row.id,
-                cart_id: row.cart_id,
-                product_id: row.product_id,
-                product_variant_id: row.product_variant_id,
-                quantity: row.quantity.unwrap_or(1),
-                price: row.price.unwrap_or(Decimal::ZERO),
-                product_name: row.product_name,
-                product_slug: row.product_slug,
-                product_image: row.product_image,
-                in_stock,
-                available_quantity: available,
-            }
-        })
-        .collect();
-
+    let (cart_id, items) = fetch_cart_items_by_user(db, user_id).await?;
     Ok(CartWithItems { id: cart_id, items })
 }
 
@@ -158,87 +237,7 @@ pub async fn get_cart_with_items<C>(db: &C, cart_id: i32) -> Result<CartWithItem
 where
     C: ConnectionTrait,
 {
-    #[derive(Debug, FromQueryResult)]
-    struct CartItemRow {
-        id: i32,
-        cart_id: i32,
-        product_id: i32,
-        product_variant_id: Option<i32>,
-        quantity: Option<i32>,
-        price: Option<Decimal>,
-        product_name: Option<String>,
-        product_slug: Option<String>,
-        product_image: Option<String>,
-        inventory_quantity: Option<i32>,
-        reserved_quantity: Option<i32>,
-        track_inventory: Option<bool>,
-        allow_backorder: Option<bool>,
-    }
-
-    let backend = db.get_database_backend();
-    let sql = r#"
-        SELECT
-            ci.id              AS id,
-            ci.cart_id         AS cart_id,
-            ci.product_id      AS product_id,
-            ci.product_variant_id AS product_variant_id,
-            ci.quantity        AS quantity,
-            ci.price           AS price,
-            p.name             AS product_name,
-            p.slug             AS product_slug,
-            cover.image        AS product_image,
-            pv.inventory_quantity AS inventory_quantity,
-            pv.reserved_quantity AS reserved_quantity,
-            pv.track_inventory AS track_inventory,
-            pv.allow_backorder AS allow_backorder
-        FROM cart_items ci
-        INNER JOIN products p ON p.id = ci.product_id
-        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
-        LEFT JOIN LATERAL (
-            SELECT pi.image
-            FROM product_images pi
-            WHERE pi.product_id = ci.product_id AND pi.cover = TRUE
-            ORDER BY pi.position
-            LIMIT 1
-        ) cover ON TRUE
-        WHERE ci.cart_id = $1
-        ORDER BY ci.id
-    "#;
-
-    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        sql,
-        vec![cart_id.into()],
-    ))
-    .all(db)
-    .await?;
-
-    let items = raw_items
-        .into_iter()
-        .map(|row| {
-            let inventory_qty = row.inventory_quantity.unwrap_or(0);
-            let reserved_qty = row.reserved_quantity.unwrap_or(0);
-            let track = row.track_inventory.unwrap_or(true);
-            let allow_backorder = row.allow_backorder.unwrap_or(false);
-            let available = inventory_qty - reserved_qty;
-            let in_stock = !track || available > 0 || allow_backorder;
-
-            CartItemWithProduct {
-                id: row.id,
-                cart_id: row.cart_id,
-                product_id: row.product_id,
-                product_variant_id: row.product_variant_id,
-                quantity: row.quantity.unwrap_or(1),
-                price: row.price.unwrap_or(Decimal::ZERO),
-                product_name: row.product_name,
-                product_slug: row.product_slug,
-                product_image: row.product_image,
-                in_stock,
-                available_quantity: available,
-            }
-        })
-        .collect();
-
+    let items = fetch_cart_items_by_id(db, cart_id).await?;
     Ok(CartWithItems { id: cart_id, items })
 }
 

@@ -168,23 +168,9 @@ fn product_list_select_sql() -> String {
             p.status,
             c.id AS category_id,
             c.name AS category_name,
-            c.slug AS category_slug,
-            pi.id AS image_id,
-            pi.image,
-            pi.alt_text,
-            pi.active AS image_active,
-            pi.cover,
-            pi.position,
-            pi.product_id AS image_product_id
+            c.slug AS category_slug
         FROM {from_clause} p
         LEFT JOIN categories c ON c.id = p.category_id
-        LEFT JOIN LATERAL (
-            SELECT id, product_id, image, alt_text, active, cover, position
-            FROM product_images
-            WHERE product_id = p.id
-            ORDER BY cover DESC, position ASC NULLS LAST, id ASC
-            LIMIT 1
-        ) pi ON TRUE
         ORDER BY p.id ASC
         "#
     )
@@ -279,6 +265,59 @@ async fn save_image(
     })
 }
 
+#[derive(Debug, FromQueryResult)]
+struct ProductRow {
+    id: i32,
+    name: Option<String>,
+    slug: Option<String>,
+    sku: Option<String>,
+    short_description: Option<String>,
+    description: Option<String>,
+    price: Option<Decimal>,
+    cost_price: Option<Decimal>,
+    compare_price: Option<Decimal>,
+    featured: Option<bool>,
+    active: Option<bool>,
+    status: Option<i32>,
+    category_id: Option<i32>,
+    category_name: Option<String>,
+    category_slug: Option<String>,
+}
+
+#[derive(Debug, FromQueryResult)]
+struct ProductCoverImageRow {
+    product_id: i32,
+    id: i32,
+    image: Option<String>,
+    alt_text: Option<String>,
+    active: Option<bool>,
+    cover: Option<bool>,
+    position: Option<i32>,
+}
+
+fn product_from_product_row(row: &ProductRow) -> ProductWithCategory {
+    ProductWithCategory {
+        id: row.id,
+        name: row.name.clone(),
+        slug: row.slug.clone(),
+        sku: row.sku.clone(),
+        short_description: row.short_description.clone(),
+        description: row.description.clone(),
+        price: row.price,
+        cost_price: row.cost_price,
+        compare_price: row.compare_price,
+        featured: row.featured,
+        active: row.active,
+        status: row.status,
+        category: row.category_id.map(|id| CategoryJson {
+            id,
+            name: row.category_name.clone(),
+            slug: row.category_slug.clone(),
+        }),
+        images: Some(Vec::new()),
+    }
+}
+
 #[utoipa::path(
     get,
     path = "/api/products/",
@@ -300,8 +339,10 @@ pub async fn get_products_with_categories(
         return format::json(value);
     }
 
-    let rows = ProductJoinedRow::find_by_statement(Statement::from_sql_and_values(
-        ctx.db.get_database_backend(),
+    let backend = ctx.db.get_database_backend();
+
+    let product_rows = ProductRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
         &product_list_select_sql(),
         [
             (pagination.page_size() as i64).into(),
@@ -311,7 +352,52 @@ pub async fn get_products_with_categories(
     .all(&ctx.db)
     .await?;
 
-    let data = products_from_rows(rows);
+    if product_rows.is_empty() {
+        let data = Arc::new(Vec::<ProductWithCategory>::new());
+        products_cache().insert(cache_key, Arc::clone(&data));
+        return format::json(data);
+    }
+
+    let product_ids: Vec<i32> = product_rows.iter().map(|r| r.id).collect();
+
+    let image_rows = ProductCoverImageRow::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        r#"
+        SELECT DISTINCT ON (product_id)
+            product_id, id, image, alt_text, active, cover, position
+        FROM product_images
+        WHERE cover = TRUE AND product_id = ANY($1)
+        ORDER BY product_id, position
+        "#,
+        vec![product_ids.into()],
+    ))
+    .all(&ctx.db)
+    .await?;
+
+    let mut image_map: HashMap<i32, ProductImageJson> = HashMap::new();
+    for row in image_rows {
+        image_map.insert(row.product_id, ProductImageJson {
+            id: row.id,
+            image: row.image,
+            alt_text: row.alt_text,
+            active: row.active,
+            cover: row.cover,
+            position: row.position,
+            product_id: row.product_id,
+        });
+    }
+
+    let data: Vec<ProductWithCategory> = product_rows
+        .into_iter()
+        .map(|row| {
+            let mut product = product_from_product_row(&row);
+            if let Some(image) = image_map.remove(&row.id) {
+                product.images = Some(vec![image]);
+            }
+            product
+        })
+        .collect();
+
     let data = Arc::new(data);
     products_cache().insert(cache_key, Arc::clone(&data));
     format::json(data)
