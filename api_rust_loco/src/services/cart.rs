@@ -171,7 +171,8 @@ where
             ORDER BY pi.product_id, pi.position
         )
         SELECT
-            ci.id, ci.cart_id, ci.product_id, ci.product_variant_id,
+            COALESCE((SELECT id FROM cart), 0) AS cart_id,
+            ci.id, ci.cart_id AS ci_cart_id, ci.product_id, ci.product_variant_id,
             ci.quantity, ci.price,
             p.name AS product_name, p.slug AS product_slug,
             cover.image AS product_image,
@@ -189,8 +190,9 @@ where
 
     #[derive(Debug, FromQueryResult)]
     struct Row {
-        id: i32,
         cart_id: i32,
+        id: i32,
+        ci_cart_id: i32,
         product_id: i32,
         product_variant_id: Option<i32>,
         quantity: Option<i32>,
@@ -212,19 +214,24 @@ where
     .all(db)
     .await?;
 
-    let cart_id = match rows.first() {
-        Some(r) => r.cart_id,
-        None => {
+    let cart_id = rows.first().map(|r| r.cart_id).unwrap_or(0);
+
+    if rows.is_empty() {
+        if cart_id == 0 {
             let cart = carts::Entity::find()
                 .filter(carts::Column::UserId.eq(user_id))
                 .one(db)
                 .await?;
-            cart.map(|c| c.id).unwrap_or(0)
+            let real_cart_id = cart.map(|c| c.id).unwrap_or(0);
+            return Ok(CartWithItems {
+                id: real_cart_id,
+                items: Vec::new(),
+            });
         }
-    };
-
-    if rows.is_empty() {
-        return Ok(CartWithItems { id: cart_id, items: Vec::new() });
+        return Ok(CartWithItems {
+            id: cart_id,
+            items: Vec::new(),
+        });
     }
 
     let items: Vec<CartItemWithProduct> = rows
@@ -237,7 +244,7 @@ where
             let available = inv - res;
             CartItemWithProduct {
                 id: r.id,
-                cart_id: r.cart_id,
+                cart_id: r.ci_cart_id,
                 product_id: r.product_id,
                 product_variant_id: r.product_variant_id,
                 quantity: r.quantity.unwrap_or(1),
@@ -261,6 +268,16 @@ where
     fetch_cart_with_items_combined(db, cart_id).await
 }
 
+#[derive(Debug, FromQueryResult)]
+struct AddItemLookup {
+    cart_id: Option<i32>,
+    item_id: Option<i32>,
+    item_quantity: Option<i32>,
+    track_inventory: Option<bool>,
+    allow_backorder: Option<bool>,
+    available: Option<i32>,
+}
+
 pub async fn add_item<C>(
     db: &C,
     user_id: i32,
@@ -276,14 +293,42 @@ where
         .transaction::<_, _, Error>(|txn| {
             Box::pin(async move {
                 let now = chrono::Utc::now().into();
+                let backend = txn.get_database_backend();
 
-                let cart = carts::Entity::find()
-                    .filter(carts::Column::UserId.eq(user_id))
-                    .one(txn)
-                    .await?;
+                let lookup_sql = r#"
+                    SELECT
+                        c.id AS cart_id,
+                        ci.id AS item_id,
+                        ci.quantity AS item_quantity,
+                        pv.track_inventory AS track_inventory,
+                        pv.allow_backorder AS allow_backorder,
+                        (COALESCE(pv.inventory_quantity, 0) - COALESCE(pv.reserved_quantity, 0)) AS available
+                    FROM carts c
+                    LEFT JOIN cart_items ci
+                        ON ci.cart_id = c.id
+                        AND ci.product_id = $2
+                        AND ci.product_variant_id IS NOT DISTINCT FROM $3
+                    LEFT JOIN product_variants pv
+                        ON pv.id = $3
+                    WHERE c.user_id = $1
+                    LIMIT 1
+                "#;
 
-                let cart = match cart {
-                    Some(c) => c,
+                let lookup = AddItemLookup::find_by_statement(Statement::from_sql_and_values(
+                    backend,
+                    lookup_sql,
+                    vec![user_id.into(), product_id.into(), product_variant_id.into()],
+                ))
+                .one(txn)
+                .await?;
+
+                let cart_id = match &lookup {
+                    Some(l) => l.cart_id,
+                    None => None,
+                };
+
+                let cart_id = match cart_id {
+                    Some(id) => id,
                     None => {
                         let new_cart = carts::ActiveModel {
                             user_id: Set(user_id),
@@ -293,59 +338,42 @@ where
                             updated_at: Set(now),
                             ..Default::default()
                         };
-                        new_cart.insert(txn).await?
+                        new_cart.insert(txn).await?.id
                     }
                 };
 
-                let existing_item = if let Some(vid) = product_variant_id {
-                    cart_items::Entity::find()
-                        .filter(cart_items::Column::CartId.eq(cart.id))
-                        .filter(cart_items::Column::ProductId.eq(product_id))
-                        .filter(cart_items::Column::ProductVariantId.eq(vid))
-                        .one(txn)
-                        .await?
-                } else {
-                    cart_items::Entity::find()
-                        .filter(cart_items::Column::CartId.eq(cart.id))
-                        .filter(cart_items::Column::ProductId.eq(product_id))
-                        .filter(cart_items::Column::ProductVariantId.is_null())
-                        .one(txn)
-                        .await?
-                };
-
-                if let Some(vid) = product_variant_id {
-                    let variant = product_variants::Entity::find_by_id(vid)
-                        .one(txn)
-                        .await?;
-
-                    if let Some(v) = variant {
-                        if v.track_inventory && !v.allow_backorder {
-                            let available = v.inventory_quantity - v.reserved_quantity;
-                            let new_qty = match &existing_item {
-                                Some(e) => e.quantity.unwrap_or(0) + quantity,
-                                None => quantity,
-                            };
-                            if new_qty > available {
-                                return Err(Error::BadRequest(
-                                    t!("cart.insufficient_stock", available = available).into(),
-                                ));
-                            }
+                if let Some(ref l) = lookup {
+                    let track = l.track_inventory.unwrap_or(false);
+                    let allow = l.allow_backorder.unwrap_or(false);
+                    if track && !allow {
+                        let available = l.available.unwrap_or(0);
+                        let current_qty = l.item_quantity.unwrap_or(0);
+                        let new_qty = current_qty + quantity;
+                        if new_qty > available {
+                            return Err(Error::BadRequest(
+                                t!("cart.insufficient_stock", available = available).into(),
+                            ));
                         }
                     }
                 }
 
-                match existing_item {
-                    Some(item) => {
-                        let current_qty = item.quantity.unwrap_or(0);
-                        let mut active: cart_items::ActiveModel = item.into();
-                        active.quantity = Set(Some(current_qty + quantity));
-                        active.price = Set(Some(price));
-                        active.updated_at = Set(now);
-                        active.update(txn).await?;
+                match lookup.and_then(|l| l.item_id) {
+                    Some(item_id) => {
+                        let existing = cart_items::Entity::find_by_id(item_id)
+                            .one(txn)
+                            .await?;
+                        if let Some(item) = existing {
+                            let current_qty = item.quantity.unwrap_or(0);
+                            let mut active: cart_items::ActiveModel = item.into();
+                            active.quantity = Set(Some(current_qty + quantity));
+                            active.price = Set(Some(price));
+                            active.updated_at = Set(now);
+                            active.update(txn).await?;
+                        }
                     }
                     None => {
                         let new_item = cart_items::ActiveModel {
-                            cart_id: Set(cart.id),
+                            cart_id: Set(cart_id),
                             product_id: Set(product_id),
                             product_variant_id: Set(product_variant_id),
                             quantity: Set(Some(quantity)),
@@ -358,7 +386,7 @@ where
                     }
                 }
 
-                fetch_cart_with_items_combined(txn, cart.id).await
+                fetch_cart_with_items_combined(txn, cart_id).await
             })
         })
         .await;
