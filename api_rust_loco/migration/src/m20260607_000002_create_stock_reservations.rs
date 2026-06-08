@@ -83,31 +83,61 @@ impl MigrationTrait for Migration {
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::SetNull),
                     )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_reservations_variant")
-                            .col(StockReservations::ProductVariantId),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_reservations_cart")
-                            .col(StockReservations::CartId),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_reservations_order")
-                            .col(StockReservations::OrderId),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_reservations_status")
-                            .col(StockReservations::Status),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_reservations_expires")
-                            .col(StockReservations::ExpiresAt),
-                    )
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_reservations_variant")
+                    .table(StockReservations::Table)
+                    .col(StockReservations::ProductVariantId)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_reservations_cart")
+                    .table(StockReservations::Table)
+                    .col(StockReservations::CartId)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_reservations_order")
+                    .table(StockReservations::Table)
+                    .col(StockReservations::OrderId)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_reservations_status")
+                    .table(StockReservations::Table)
+                    .col(StockReservations::Status)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_reservations_expires")
+                    .table(StockReservations::Table)
+                    .col(StockReservations::ExpiresAt)
                     .to_owned(),
             )
             .await?;

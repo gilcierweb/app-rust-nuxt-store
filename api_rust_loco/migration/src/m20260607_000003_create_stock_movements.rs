@@ -92,31 +92,61 @@ impl MigrationTrait for Migration {
                             .on_update(ForeignKeyAction::Cascade)
                             .on_delete(ForeignKeyAction::SetNull),
                     )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_movements_variant")
-                            .col(StockMovements::ProductVariantId),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_movements_order")
-                            .col(StockMovements::OrderId),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_movements_user")
-                            .col(StockMovements::UserId),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_movements_type")
-                            .col(StockMovements::Type),
-                    )
-                    .index(
-                        Index::create()
-                            .name("idx_stock_movements_created")
-                            .col(StockMovements::CreatedAt),
-                    )
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_movements_variant")
+                    .table(StockMovements::Table)
+                    .col(StockMovements::ProductVariantId)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_movements_order")
+                    .table(StockMovements::Table)
+                    .col(StockMovements::OrderId)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_movements_user")
+                    .table(StockMovements::Table)
+                    .col(StockMovements::UserId)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_movements_type")
+                    .table(StockMovements::Table)
+                    .col(StockMovements::Type)
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("idx_stock_movements_created")
+                    .table(StockMovements::Table)
+                    .col(StockMovements::CreatedAt)
                     .to_owned(),
             )
             .await?;
