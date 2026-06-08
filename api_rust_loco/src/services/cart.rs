@@ -275,96 +275,90 @@ where
     let result = db
         .transaction::<_, _, Error>(|txn| {
             Box::pin(async move {
-                let backend = txn.get_database_backend();
+                let now = chrono::Utc::now().into();
 
-                let setup_sql = r#"
-                    WITH
-                    ensure_cart AS (
-                        INSERT INTO carts (user_id, created_at, updated_at)
-                        SELECT $1, NOW(), NOW()
-                        WHERE NOT EXISTS (SELECT 1 FROM carts WHERE user_id = $1)
-                        ON CONFLICT DO NOTHING
-                        RETURNING id
-                    ),
-                    cart AS (
-                        SELECT id FROM carts WHERE user_id = $1
-                        UNION ALL
-                        SELECT id FROM ensure_cart
-                        LIMIT 1
-                    ),
-                    variant_info AS (
-                        SELECT
-                            COALESCE(pv.inventory_quantity, 0) - COALESCE(pv.reserved_quantity, 0) AS available,
-                            COALESCE(pv.track_inventory, false) AS track_inventory,
-                            COALESCE(pv.allow_backorder, false) AS allow_backorder
-                        FROM (SELECT 1) dummy
-                        LEFT JOIN product_variants pv ON pv.id = $3
-                    ),
-                    existing AS (
-                        SELECT ci.id, COALESCE(ci.quantity, 0) AS quantity
-                        FROM cart_items ci, cart c
-                        WHERE ci.cart_id = c.id
-                          AND ci.product_id = $2
-                          AND ci.product_variant_id IS NOT DISTINCT FROM $3
-                    ),
-                    upserted AS (
-                        UPDATE cart_items ci
-                        SET quantity = (SELECT quantity FROM existing) + $4,
-                            price = $5,
-                            updated_at = NOW()
-                        FROM existing e
-                        WHERE ci.id = e.id
-                        RETURNING ci.id
-                    ),
-                    inserted AS (
-                        INSERT INTO cart_items (cart_id, product_id, product_variant_id, quantity, price, created_at, updated_at)
-                        SELECT c.id, $2, $3, $4, $5, NOW(), NOW()
-                        FROM cart c
-                        WHERE NOT EXISTS (SELECT 1 FROM upserted)
-                        RETURNING id
-                    )
-                    SELECT
-                        (SELECT id FROM cart) AS cart_id,
-                        vi.available,
-                        vi.track_inventory,
-                        vi.allow_backorder,
-                        COALESCE((SELECT quantity FROM existing), 0) + $4 AS new_quantity
-                    FROM variant_info vi
-                "#;
+                let cart = carts::Entity::find()
+                    .filter(carts::Column::UserId.eq(user_id))
+                    .one(txn)
+                    .await?;
 
-                #[derive(Debug, FromQueryResult)]
-                struct SetupResult {
-                    cart_id: i32,
-                    available: i32,
-                    track_inventory: bool,
-                    allow_backorder: bool,
-                    new_quantity: i32,
-                }
+                let cart = match cart {
+                    Some(c) => c,
+                    None => {
+                        let new_cart = carts::ActiveModel {
+                            user_id: Set(user_id),
+                            session_id: Set(None),
+                            expires_at: Set(None),
+                            created_at: Set(now),
+                            updated_at: Set(now),
+                            ..Default::default()
+                        };
+                        new_cart.insert(txn).await?
+                    }
+                };
 
-                let setup = SetupResult::find_by_statement(Statement::from_sql_and_values(
-                    backend,
-                    setup_sql,
-                    vec![
-                        user_id.into(),
-                        product_id.into(),
-                        product_variant_id.into(),
-                        quantity.into(),
-                        price.into(),
-                    ],
-                ))
-                .one(txn)
-                .await?
-                .ok_or_else(|| Error::InternalServerError)?;
+                let existing_item = if let Some(vid) = product_variant_id {
+                    cart_items::Entity::find()
+                        .filter(cart_items::Column::CartId.eq(cart.id))
+                        .filter(cart_items::Column::ProductId.eq(product_id))
+                        .filter(cart_items::Column::ProductVariantId.eq(vid))
+                        .one(txn)
+                        .await?
+                } else {
+                    cart_items::Entity::find()
+                        .filter(cart_items::Column::CartId.eq(cart.id))
+                        .filter(cart_items::Column::ProductId.eq(product_id))
+                        .filter(cart_items::Column::ProductVariantId.is_null())
+                        .one(txn)
+                        .await?
+                };
 
-                if setup.track_inventory && !setup.allow_backorder {
-                    if setup.new_quantity > setup.available {
-                        return Err(Error::BadRequest(
-                            t!("cart.insufficient_stock", available = setup.available).into(),
-                        ));
+                if let Some(vid) = product_variant_id {
+                    let variant = product_variants::Entity::find_by_id(vid)
+                        .one(txn)
+                        .await?;
+
+                    if let Some(v) = variant {
+                        if v.track_inventory && !v.allow_backorder {
+                            let available = v.inventory_quantity - v.reserved_quantity;
+                            let new_qty = match &existing_item {
+                                Some(e) => e.quantity.unwrap_or(0) + quantity,
+                                None => quantity,
+                            };
+                            if new_qty > available {
+                                return Err(Error::BadRequest(
+                                    t!("cart.insufficient_stock", available = available).into(),
+                                ));
+                            }
+                        }
                     }
                 }
 
-                fetch_cart_with_items_combined(txn, setup.cart_id).await
+                match existing_item {
+                    Some(item) => {
+                        let current_qty = item.quantity.unwrap_or(0);
+                        let mut active: cart_items::ActiveModel = item.into();
+                        active.quantity = Set(Some(current_qty + quantity));
+                        active.price = Set(Some(price));
+                        active.updated_at = Set(now);
+                        active.update(txn).await?;
+                    }
+                    None => {
+                        let new_item = cart_items::ActiveModel {
+                            cart_id: Set(cart.id),
+                            product_id: Set(product_id),
+                            product_variant_id: Set(product_variant_id),
+                            quantity: Set(Some(quantity)),
+                            price: Set(Some(price)),
+                            created_at: Set(now),
+                            updated_at: Set(now),
+                            ..Default::default()
+                        };
+                        new_item.insert(txn).await?;
+                    }
+                }
+
+                fetch_cart_with_items_combined(txn, cart.id).await
             })
         })
         .await;
