@@ -4,7 +4,7 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::{
     ActiveModelTrait, ActiveValue::Set, ColumnTrait, ConnectionTrait, EntityTrait, FromQueryResult,
-    QueryFilter, Statement,
+    QueryFilter, Statement, TransactionError, TransactionTrait,
 };
 use serde::Serialize;
 
@@ -57,42 +57,30 @@ struct CoverImageRow {
     image: Option<String>,
 }
 
-async fn fetch_cart_items_by_id<C>(db: &C, cart_id: i32) -> Result<Vec<CartItemWithProduct>>
-where
-    C: ConnectionTrait,
-{
-    let backend = db.get_database_backend();
+#[derive(Debug, FromQueryResult)]
+struct CartItemRowCombined {
+    id: i32,
+    cart_id: i32,
+    product_id: i32,
+    product_variant_id: Option<i32>,
+    quantity: Option<i32>,
+    price: Option<Decimal>,
+    product_name: Option<String>,
+    product_slug: Option<String>,
+    product_image: Option<String>,
+    inventory_quantity: Option<i32>,
+    reserved_quantity: Option<i32>,
+    track_inventory: Option<bool>,
+    allow_backorder: Option<bool>,
+}
 
-    let items_sql = r#"
-        SELECT
-            ci.id              AS id,
-            ci.cart_id         AS cart_id,
-            ci.product_id      AS product_id,
-            ci.product_variant_id AS product_variant_id,
-            ci.quantity        AS quantity,
-            ci.price           AS price,
-            p.name             AS product_name,
-            p.slug             AS product_slug,
-            pv.inventory_quantity AS inventory_quantity,
-            pv.reserved_quantity AS reserved_quantity,
-            pv.track_inventory AS track_inventory,
-            pv.allow_backorder AS allow_backorder
-        FROM cart_items ci
-        INNER JOIN products p ON p.id = ci.product_id
-        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
-        WHERE ci.cart_id = $1
-        ORDER BY ci.id
-    "#;
-
-    let raw_items = CartItemRow::find_by_statement(Statement::from_sql_and_values(
-        backend,
-        items_sql,
-        vec![cart_id.into()],
-    ))
-    .all(db)
-    .await?;
-
-    enrich_with_images(db, raw_items).await
+#[derive(Debug, FromQueryResult)]
+struct SetupResult {
+    cart_id: i32,
+    track_inventory: bool,
+    available: i32,
+    allow_backorder: bool,
+    new_quantity: i32,
 }
 
 async fn fetch_cart_items_by_user<C>(db: &C, user_id: i32) -> Result<(i32, Vec<CartItemWithProduct>)>
@@ -196,6 +184,79 @@ where
         .collect())
 }
 
+async fn fetch_cart_with_items_combined<C>(db: &C, cart_id: i32) -> Result<CartWithItems>
+where
+    C: ConnectionTrait,
+{
+    let backend = db.get_database_backend();
+
+    let sql = r#"
+        WITH cover AS (
+            SELECT DISTINCT ON (pi.product_id) pi.product_id, pi.image
+            FROM product_images pi
+            WHERE pi.cover = TRUE
+              AND pi.product_id IN (SELECT ci.product_id FROM cart_items ci WHERE ci.cart_id = $1)
+            ORDER BY pi.product_id, pi.position
+        )
+        SELECT
+            ci.id              AS id,
+            ci.cart_id         AS cart_id,
+            ci.product_id      AS product_id,
+            ci.product_variant_id AS product_variant_id,
+            ci.quantity        AS quantity,
+            ci.price           AS price,
+            p.name             AS product_name,
+            p.slug             AS product_slug,
+            c.image            AS product_image,
+            pv.inventory_quantity AS inventory_quantity,
+            pv.reserved_quantity AS reserved_quantity,
+            pv.track_inventory AS track_inventory,
+            pv.allow_backorder AS allow_backorder
+        FROM cart_items ci
+        INNER JOIN products p ON p.id = ci.product_id
+        LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
+        LEFT JOIN cover c ON c.product_id = ci.product_id
+        WHERE ci.cart_id = $1
+        ORDER BY ci.id
+    "#;
+
+    let rows = CartItemRowCombined::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        sql,
+        vec![cart_id.into()],
+    ))
+    .all(db)
+    .await?;
+
+    let items = rows
+        .into_iter()
+        .map(|row| {
+            let inventory_qty = row.inventory_quantity.unwrap_or(0);
+            let reserved_qty = row.reserved_quantity.unwrap_or(0);
+            let track = row.track_inventory.unwrap_or(true);
+            let allow_backorder = row.allow_backorder.unwrap_or(false);
+            let available = inventory_qty - reserved_qty;
+            let in_stock = !track || available > 0 || allow_backorder;
+
+            CartItemWithProduct {
+                id: row.id,
+                cart_id: row.cart_id,
+                product_id: row.product_id,
+                product_variant_id: row.product_variant_id,
+                quantity: row.quantity.unwrap_or(1),
+                price: row.price.unwrap_or(Decimal::ZERO),
+                product_name: row.product_name,
+                product_slug: row.product_slug,
+                product_image: row.product_image,
+                in_stock,
+                available_quantity: available,
+            }
+        })
+        .collect();
+
+    Ok(CartWithItems { id: cart_id, items })
+}
+
 pub async fn get_or_create_cart<C>(db: &C, user_id: i32) -> Result<carts::Model>
 where
     C: ConnectionTrait,
@@ -237,164 +298,280 @@ pub async fn get_cart_with_items<C>(db: &C, cart_id: i32) -> Result<CartWithItem
 where
     C: ConnectionTrait,
 {
-    let items = fetch_cart_items_by_id(db, cart_id).await?;
-    Ok(CartWithItems { id: cart_id, items })
+    fetch_cart_with_items_combined(db, cart_id).await
 }
 
 pub async fn add_item<C>(
     db: &C,
-    cart_id: i32,
+    user_id: i32,
     product_id: i32,
     product_variant_id: Option<i32>,
     quantity: i32,
     price: Decimal,
 ) -> Result<CartWithItems>
 where
-    C: ConnectionTrait,
+    C: ConnectionTrait + TransactionTrait,
 {
-    let variant = if let Some(variant_id) = product_variant_id {
-        let v = product_variants::Entity::find_by_id(variant_id)
-            .one(db)
-            .await?
-            .ok_or_else(|| Error::BadRequest(t!("cart.variant_not_found").into()))?;
-        Some(v)
-    } else {
-        None
-    };
+    let result = db
+        .transaction::<_, _, Error>(|txn| {
+            Box::pin(async move {
+                let backend = txn.get_database_backend();
 
-    if let Some(ref v) = variant {
-        if v.track_inventory {
-            let available = v.inventory_quantity - v.reserved_quantity;
-            if available < quantity && !v.allow_backorder {
-                return Err(Error::BadRequest(
-                    t!("cart.insufficient_stock", available = available).into(),
-                ));
-            }
-        }
-    }
+                let setup_sql = r#"
+                    WITH
+                    ensure_cart AS (
+                        INSERT INTO carts (user_id, created_at, updated_at)
+                        SELECT $1, NOW(), NOW()
+                        WHERE NOT EXISTS (SELECT 1 FROM carts WHERE user_id = $1)
+                        ON CONFLICT DO NOTHING
+                        RETURNING id
+                    ),
+                    cart AS (
+                        SELECT id FROM carts WHERE user_id = $1
+                        UNION ALL
+                        SELECT id FROM ensure_cart
+                        LIMIT 1
+                    ),
+                    variant_info AS (
+                        SELECT
+                            COALESCE(pv.inventory_quantity, 0) - COALESCE(pv.reserved_quantity, 0) AS available,
+                            COALESCE(pv.track_inventory, false) AS track_inventory,
+                            COALESCE(pv.allow_backorder, false) AS allow_backorder
+                        FROM (SELECT 1) dummy
+                        LEFT JOIN product_variants pv ON pv.id = $4
+                    ),
+                    existing AS (
+                        SELECT ci.id, COALESCE(ci.quantity, 0) AS quantity
+                        FROM cart_items ci, cart c
+                        WHERE ci.cart_id = c.id
+                          AND ci.product_id = $2
+                          AND ci.product_variant_id IS NOT DISTINCT FROM $4
+                    ),
+                    upserted AS (
+                        UPDATE cart_items ci
+                        SET quantity = (SELECT quantity FROM existing) + $5,
+                            price = $6,
+                            updated_at = NOW()
+                        FROM existing e
+                        WHERE ci.id = e.id
+                        RETURNING ci.id
+                    ),
+                    inserted AS (
+                        INSERT INTO cart_items (cart_id, product_id, product_variant_id, quantity, price, created_at, updated_at)
+                        SELECT c.id, $2, $4, $5, $6, NOW(), NOW()
+                        FROM cart c
+                        WHERE NOT EXISTS (SELECT 1 FROM upserted)
+                        RETURNING id
+                    )
+                    SELECT
+                        (SELECT id FROM cart) AS cart_id,
+                        vi.available,
+                        vi.track_inventory,
+                        vi.allow_backorder,
+                        COALESCE((SELECT quantity FROM existing), 0) + $5 AS new_quantity
+                    FROM variant_info vi
+                "#;
 
-    let existing = cart_items::Entity::find()
-        .filter(cart_items::Column::CartId.eq(cart_id))
-        .filter(cart_items::Column::ProductId.eq(product_id))
-        .filter(cart_items::Column::ProductVariantId.eq(product_variant_id))
-        .one(db)
-        .await?;
+                let setup = SetupResult::find_by_statement(Statement::from_sql_and_values(
+                    backend,
+                    setup_sql,
+                    vec![
+                        user_id.into(),
+                        product_id.into(),
+                        product_variant_id.into(),
+                        quantity.into(),
+                        price.into(),
+                    ],
+                ))
+                .one(txn)
+                .await?
+                .ok_or_else(|| Error::InternalServerError)?;
 
-    let now = chrono::Utc::now().into();
-
-    if let Some(existing_item) = existing {
-        let new_qty = existing_item.quantity.unwrap_or(0) + quantity;
-
-        if let Some(ref v) = variant {
-            if v.track_inventory {
-                let available = v.inventory_quantity - v.reserved_quantity;
-                if available < new_qty && !v.allow_backorder {
-                    return Err(Error::BadRequest(
-                        t!("cart.insufficient_stock", available = available).into(),
-                    ));
+                if setup.track_inventory && !setup.allow_backorder {
+                    if setup.new_quantity > setup.available {
+                        return Err(Error::BadRequest(
+                            t!("cart.insufficient_stock", available = setup.available).into(),
+                        ));
+                    }
                 }
-            }
-        }
 
-        let mut active: cart_items::ActiveModel = existing_item.into();
-        active.quantity = Set(Some(new_qty));
-        active.price = Set(Some(price));
-        active.updated_at = Set(now);
-        active.update(db).await.map_err(|e| {
-            tracing::error!(error = ?e, "failed to update cart item quantity");
-            Error::InternalServerError
-        })?;
-    } else {
-        let new_item = cart_items::ActiveModel {
-            cart_id: Set(cart_id),
-            product_id: Set(product_id),
-            product_variant_id: Set(product_variant_id),
-            quantity: Set(Some(quantity)),
-            price: Set(Some(price)),
-            created_at: Set(now),
-            updated_at: Set(now),
-            ..Default::default()
-        };
-        new_item.insert(db).await.map_err(|e| {
-            tracing::error!(error = ?e, "failed to add cart item");
-            Error::InternalServerError
-        })?;
+                fetch_cart_with_items_combined(txn, setup.cart_id).await
+            })
+        })
+        .await;
+
+    match result {
+        Ok(cart) => Ok(cart),
+        Err(TransactionError::Connection(e)) => Err(Error::DB(e)),
+        Err(TransactionError::Transaction(e)) => Err(e),
     }
-
-    get_cart_with_items(db, cart_id).await
 }
 
 pub async fn update_item_quantity<C>(
     db: &C,
+    user_id: i32,
     item_id: i32,
-    cart_id: i32,
     quantity: i32,
 ) -> Result<CartWithItems>
 where
-    C: ConnectionTrait,
+    C: ConnectionTrait + TransactionTrait,
 {
-    let item = cart_items::Entity::find_by_id(item_id)
-        .one(db)
-        .await?
-        .ok_or_else(|| Error::BadRequest(t!("cart.item_not_found").into()))?;
+    let result = db
+        .transaction::<_, _, Error>(|txn| {
+            Box::pin(async move {
+                let backend = txn.get_database_backend();
 
-    if item.cart_id != cart_id {
-        return Err(Error::NotFound);
-    }
+                if quantity <= 0 {
+                    let del_sql = r#"
+                        WITH
+                        cart AS (
+                            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
+                        ),
+                        deleted AS (
+                            DELETE FROM cart_items ci
+                            USING cart c
+                            WHERE ci.id = $2 AND ci.cart_id = c.id
+                            RETURNING ci.cart_id
+                        )
+                        SELECT COALESCE((SELECT id FROM deleted d), 0) AS cart_id
+                    "#;
 
-    if quantity <= 0 {
-        item.delete(db).await.map_err(|e| {
-            tracing::error!(error = ?e, "failed to remove cart item");
-            Error::InternalServerError
-        })?;
-    } else {
-        if let Some(variant_id) = item.product_variant_id {
-            let variant = product_variants::Entity::find_by_id(variant_id)
-                .one(db)
-                .await?;
-            if let Some(v) = variant {
-                if v.track_inventory {
-                    let available = v.inventory_quantity - v.reserved_quantity;
-                    if available < quantity && !v.allow_backorder {
-                        return Err(Error::BadRequest(
-                            t!("cart.insufficient_stock", available = available).into(),
-                        ));
+                    #[derive(Debug, FromQueryResult)]
+                    struct DelResult {
+                        cart_id: i32,
                     }
+
+                    let del = DelResult::find_by_statement(Statement::from_sql_and_values(
+                        backend,
+                        del_sql,
+                        vec![user_id.into(), item_id.into()],
+                    ))
+                    .one(txn)
+                    .await?
+                    .ok_or_else(|| Error::InternalServerError)?;
+
+                    if del.cart_id == 0 {
+                        return Err(Error::BadRequest(t!("cart.item_not_found").into()));
+                    }
+
+                    return fetch_cart_with_items_combined(txn, del.cart_id).await;
                 }
-            }
-        }
 
-        let mut active: cart_items::ActiveModel = item.into();
-        active.quantity = Set(Some(quantity));
-        active.updated_at = Set(chrono::Utc::now().into());
-        active.update(db).await.map_err(|e| {
-            tracing::error!(error = ?e, "failed to update cart item quantity");
-            Error::InternalServerError
-        })?;
+                let setup_sql = r#"
+                    WITH
+                    cart AS (
+                        SELECT id FROM carts WHERE user_id = $1 LIMIT 1
+                    ),
+                    item_check AS (
+                        SELECT ci.id, ci.cart_id, ci.product_variant_id
+                        FROM cart_items ci, cart c
+                        WHERE ci.id = $2 AND ci.cart_id = c.id
+                    ),
+                    variant_info AS (
+                        SELECT
+                            COALESCE(pv.inventory_quantity, 0) - COALESCE(pv.reserved_quantity, 0) AS available,
+                            COALESCE(pv.track_inventory, false) AS track_inventory,
+                            COALESCE(pv.allow_backorder, false) AS allow_backorder
+                        FROM item_check ic
+                        LEFT JOIN product_variants pv ON pv.id = ic.product_variant_id
+                    ),
+                    do_update AS (
+                        UPDATE cart_items ci
+                        SET quantity = $3, updated_at = NOW()
+                        FROM item_check ic
+                        WHERE ci.id = ic.id
+                          AND (
+                            NOT (SELECT track_inventory FROM variant_info)
+                            OR (SELECT allow_backorder FROM variant_info)
+                            OR (SELECT available FROM variant_info) >= $3
+                          )
+                        RETURNING ci.id, ci.cart_id
+                    )
+                    SELECT
+                        COALESCE((SELECT cart_id FROM do_update), 0) AS cart_id,
+                        COALESCE((SELECT track_inventory FROM variant_info), false) AS track_inventory,
+                        COALESCE((SELECT available FROM variant_info), 0) AS available,
+                        COALESCE((SELECT allow_backorder FROM variant_info), false) AS allow_backorder
+                "#;
+
+                #[derive(Debug, FromQueryResult)]
+                struct UpdateResult {
+                    cart_id: i32,
+                    track_inventory: bool,
+                    available: i32,
+                    allow_backorder: bool,
+                }
+
+                let ur = UpdateResult::find_by_statement(Statement::from_sql_and_values(
+                    backend,
+                    setup_sql,
+                    vec![user_id.into(), item_id.into(), quantity.into()],
+                ))
+                .one(txn)
+                .await?
+                .ok_or_else(|| Error::InternalServerError)?;
+
+                if ur.cart_id == 0 {
+                    return Err(Error::BadRequest(t!("cart.item_not_found").into()));
+                }
+
+                if ur.track_inventory && !ur.allow_backorder && ur.available < quantity {
+                    return Err(Error::BadRequest(
+                        t!("cart.insufficient_stock", available = ur.available).into(),
+                    ));
+                }
+
+                fetch_cart_with_items_combined(txn, ur.cart_id).await
+            })
+        })
+        .await;
+
+    match result {
+        Ok(cart) => Ok(cart),
+        Err(TransactionError::Connection(e)) => Err(Error::DB(e)),
+        Err(TransactionError::Transaction(e)) => Err(e),
     }
-
-    get_cart_with_items(db, cart_id).await
 }
 
-pub async fn remove_item<C>(db: &C, item_id: i32, cart_id: i32) -> Result<CartWithItems>
+pub async fn remove_item<C>(db: &C, user_id: i32, item_id: i32) -> Result<CartWithItems>
 where
     C: ConnectionTrait,
 {
-    let item = cart_items::Entity::find_by_id(item_id)
-        .one(db)
-        .await?
-        .ok_or_else(|| Error::BadRequest(t!("cart.item_not_found").into()))?;
+    let backend = db.get_database_backend();
 
-    if item.cart_id != cart_id {
-        return Err(Error::NotFound);
+    let del_sql = r#"
+        WITH
+        cart AS (
+            SELECT id FROM carts WHERE user_id = $1 LIMIT 1
+        ),
+        deleted AS (
+            DELETE FROM cart_items ci
+            USING cart c
+            WHERE ci.id = $2 AND ci.cart_id = c.id
+            RETURNING ci.cart_id
+        )
+        SELECT COALESCE((SELECT id FROM deleted d), 0) AS cart_id
+    "#;
+
+    #[derive(Debug, FromQueryResult)]
+    struct DelResult {
+        cart_id: i32,
     }
 
-    item.delete(db).await.map_err(|e| {
-        tracing::error!(error = ?e, "failed to remove cart item");
-        Error::InternalServerError
-    })?;
+    let del = DelResult::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        del_sql,
+        vec![user_id.into(), item_id.into()],
+    ))
+    .one(db)
+    .await?
+    .ok_or_else(|| Error::InternalServerError)?;
 
-    get_cart_with_items(db, cart_id).await
+    if del.cart_id == 0 {
+        return Err(Error::BadRequest(t!("cart.item_not_found").into()));
+    }
+
+    fetch_cart_with_items_combined(db, del.cart_id).await
 }
 
 pub async fn clear_cart<C>(db: &C, cart_id: i32) -> Result<()>

@@ -62,10 +62,9 @@ pub async fn add_item(
     }
 
     let user_id = current_user_id(&ctx, &auth).await?;
-    let user_cart = cart::get_or_create_cart(&ctx.db, user_id).await?;
     let result = cart::add_item(
         &ctx.db,
-        user_cart.id,
+        user_id,
         params.product_id,
         params.product_variant_id,
         params.quantity,
@@ -82,8 +81,7 @@ pub async fn update_item(
     Json(params): Json<UpdateItemParams>,
 ) -> Result<Response> {
     let user_id = current_user_id(&ctx, &auth).await?;
-    let user_cart = cart::get_or_create_cart(&ctx.db, user_id).await?;
-    let result = cart::update_item_quantity(&ctx.db, params.item_id, user_cart.id, params.quantity).await?;
+    let result = cart::update_item_quantity(&ctx.db, user_id, params.item_id, params.quantity).await?;
     format::json(result)
 }
 
@@ -94,8 +92,7 @@ pub async fn remove_item(
     Path(item_id): Path<i32>,
 ) -> Result<Response> {
     let user_id = current_user_id(&ctx, &auth).await?;
-    let user_cart = cart::get_or_create_cart(&ctx.db, user_id).await?;
-    let result = cart::remove_item(&ctx.db, item_id, user_cart.id).await?;
+    let result = cart::remove_item(&ctx.db, user_id, item_id).await?;
     format::json(result)
 }
 
