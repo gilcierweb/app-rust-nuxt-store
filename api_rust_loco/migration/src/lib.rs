@@ -57,6 +57,7 @@ mod m20260607_000001_add_inventory_hardening_columns;
 mod m20260607_000002_create_stock_reservations;
 mod m20260607_000003_create_stock_movements;
 mod m20260608_000001_add_cart_performance_indexes;
+mod m20260608_000002_add_remaining_performance_indexes;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -117,6 +118,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260607_000002_create_stock_reservations::Migration),
             Box::new(m20260607_000003_create_stock_movements::Migration),
             Box::new(m20260608_000001_add_cart_performance_indexes::Migration),
+            Box::new(m20260608_000002_add_remaining_performance_indexes::Migration),
             // inject-above (do not remove this comment)
         ]
     }

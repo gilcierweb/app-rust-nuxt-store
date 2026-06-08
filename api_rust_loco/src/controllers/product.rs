@@ -143,16 +143,50 @@ fn product_select_sql(from_clause: &str, image_join_filter: &str) -> String {
 }
 
 fn product_list_select_sql() -> String {
-    product_select_sql(
-        r#"
+    let from_clause = r#"
         (
             SELECT *
             FROM products
             ORDER BY id ASC
             LIMIT $1 OFFSET $2
         )
-        "#,
-        "AND (pi.cover = TRUE OR pi.position = 0)",
+    "#;
+    format!(
+        r#"
+        SELECT
+            p.id,
+            p.name,
+            p.slug,
+            p.sku,
+            p.short_description,
+            p.description,
+            p.price,
+            p.cost_price,
+            p.compare_price,
+            p.featured,
+            p.active,
+            p.status,
+            c.id AS category_id,
+            c.name AS category_name,
+            c.slug AS category_slug,
+            pi.id AS image_id,
+            pi.image,
+            pi.alt_text,
+            pi.active AS image_active,
+            pi.cover,
+            pi.position,
+            pi.product_id AS image_product_id
+        FROM {from_clause} p
+        LEFT JOIN categories c ON c.id = p.category_id
+        LEFT JOIN LATERAL (
+            SELECT id, product_id, image, alt_text, active, cover, position
+            FROM product_images
+            WHERE product_id = p.id
+            ORDER BY cover DESC, position ASC NULLS LAST, id ASC
+            LIMIT 1
+        ) pi ON TRUE
+        ORDER BY p.id ASC
+        "#
     )
 }
 

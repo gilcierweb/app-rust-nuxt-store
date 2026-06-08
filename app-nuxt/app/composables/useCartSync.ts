@@ -53,17 +53,6 @@ export function useCartSync() {
   async function addItemSync(item: { productId: number; name: string; price: number; image?: string; slug?: string; quantity?: number; variantId?: number }) {
     const quantity = item.quantity || 1
 
-    const { available, maxQuantity } = await checkStock(item.productId, item.variantId)
-    if (!available) {
-      throw new Error('out_of_stock')
-    }
-
-    const existingItem = cartStore.items.find(i => i.productId === item.productId && i.variantId === (item.variantId ?? i.variantId))
-    const existingQty = existingItem?.quantity ?? 0
-    if (existingQty + quantity > maxQuantity) {
-      throw new Error('insufficient_stock')
-    }
-
     cartStore.addItem(item)
 
     if (!isAuthenticated.value) return
@@ -111,11 +100,6 @@ export function useCartSync() {
   async function updateQuantitySync(productId: number, quantity: number) {
     const item = cartStore.items.find(i => i.productId === productId)
     if (!item) return
-
-    const { available, maxQuantity } = await checkStock(productId, item.variantId)
-    if (!available || quantity > maxQuantity) {
-      throw new Error('insufficient_stock')
-    }
 
     cartStore.updateQuantity(productId, quantity)
 

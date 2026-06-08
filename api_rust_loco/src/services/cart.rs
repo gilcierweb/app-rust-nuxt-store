@@ -107,10 +107,10 @@ where
         INNER JOIN products p ON p.id = ci.product_id
         LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
         LEFT JOIN LATERAL (
-            SELECT image
-            FROM product_images
-            WHERE product_id = p.id AND cover = TRUE
-            ORDER BY position
+            SELECT pi.image
+            FROM product_images pi
+            WHERE pi.product_id = ci.product_id AND pi.cover = TRUE
+            ORDER BY pi.position
             LIMIT 1
         ) cover ON TRUE
         ORDER BY ci.id
@@ -195,10 +195,10 @@ where
         INNER JOIN products p ON p.id = ci.product_id
         LEFT JOIN product_variants pv ON pv.id = ci.product_variant_id
         LEFT JOIN LATERAL (
-            SELECT image
-            FROM product_images
-            WHERE product_id = p.id AND cover = TRUE
-            ORDER BY position
+            SELECT pi.image
+            FROM product_images pi
+            WHERE pi.product_id = ci.product_id AND pi.cover = TRUE
+            ORDER BY pi.position
             LIMIT 1
         ) cover ON TRUE
         WHERE ci.cart_id = $1
