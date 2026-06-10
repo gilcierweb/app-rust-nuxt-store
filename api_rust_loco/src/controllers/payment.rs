@@ -179,7 +179,8 @@ pub fn account_routes() -> Routes {
 }
 
 pub fn admin_receipt_routes() -> Routes {
-    routes_with_prefix("api/admin/payments/")
+    Routes::new()
+        .prefix("api/admin/payments/")
         .add("{id}/receipt", get(admin_receipt))
 }
 
