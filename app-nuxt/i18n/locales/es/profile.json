@@ -102,7 +102,12 @@
     "loadingPayment": "Cargando pago...",
     "errorLoadingPayment": "Error al cargar pago:",
     "paymentNotFound": "Pago no encontrado",
-    "errorDownloadingReceipt": "Error al descargar recibo"
+    "errorDownloadingReceipt": "Error al descargar recibo",
+    "shipments": "Envios",
+    "shipmentNumber": "Envio #",
+    "shippedOn": "Enviado el",
+    "downloadShippingLabel": "Descargar Etiqueta",
+    "noShipments": "Sin envios aun"
   },
   "profile": {
     "authorAlt": "Autor"

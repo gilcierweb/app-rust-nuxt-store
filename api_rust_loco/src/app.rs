@@ -105,6 +105,7 @@ impl Hooks for App {
             .add_route(controllers::auth::routes())
             .add_route(controllers::shipment::routes())
             .add_route(controllers::shipment::admin_routes())
+            .add_route(controllers::shipment::account_routes())
             .add_route(controllers::admin_inventory::routes())
             .add_route(controllers::admin_settings::routes())
             .add_route(controllers::admin_payment_gateways::routes())

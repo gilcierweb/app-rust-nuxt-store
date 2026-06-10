@@ -7,6 +7,8 @@ use loco_rs::prelude::*;
 use sea_orm::{PaginatorTrait, QueryOrder};
 use serde::{Deserialize, Serialize};
 
+use crate::middleware::auth::CookieJWT;
+use crate::models::_entities::orders;
 use crate::models::_entities::shipments::{ActiveModel, Entity, Model};
 use crate::utils::pagination::PaginationParams;
 
@@ -107,6 +109,71 @@ fn routes_with_prefix(prefix: &str) -> Routes {
 
 #[debug_handler]
 pub async fn label(Path(shipment_id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+    let data =
+        crate::services::shipping_label::load_shipping_label_data(&ctx.db, shipment_id)
+            .await
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to load shipping label data");
+                e
+            })?;
+
+    let pdf_bytes = crate::services::shipping_label::generate_shipping_label_pdf(&data).map_err(
+        |e| {
+            tracing::error!(error = ?e, "failed to generate shipping label PDF");
+            loco_rs::Error::string(&format!("PDF generation error: {e}"))
+        },
+    )?;
+
+    let tracking = data
+        .shipment
+        .tracking_number
+        .as_deref()
+        .unwrap_or("label");
+    let filename = format!("shipping-label-{tracking}.pdf");
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/pdf")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(pdf_bytes))
+        .unwrap())
+}
+
+pub fn account_routes() -> Routes {
+    routes_with_prefix("api/account/shipments/")
+        .add("{id}/label", get(account_label))
+}
+
+#[debug_handler]
+pub async fn account_label(
+    auth: CookieJWT,
+    Path(shipment_id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let current_user_id = auth
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|v| v.as_i64())
+        .and_then(|v| i32::try_from(v).ok())
+        .ok_or_else(|| loco_rs::Error::string("unauthorized"))?;
+
+    let shipment = Entity::find_by_id(shipment_id)
+        .one(&ctx.db)
+        .await?
+        .ok_or_else(|| Error::NotFound)?;
+
+    let order = orders::Entity::find_by_id(shipment.order_id)
+        .one(&ctx.db)
+        .await?
+        .ok_or_else(|| Error::NotFound)?;
+
+    if order.user_id != current_user_id {
+        return Err(loco_rs::Error::string("unauthorized"));
+    }
+
     let data =
         crate::services::shipping_label::load_shipping_label_data(&ctx.db, shipment_id)
             .await

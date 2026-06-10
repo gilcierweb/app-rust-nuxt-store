@@ -175,6 +175,17 @@ export interface OrderItem {
   product_name?: string
 }
 
+export interface Shipment {
+  id: number
+  tracking_number?: string
+  carrier?: string
+  status?: number
+  shipped_at?: string
+  delivered_at?: string
+  shipping_method_id: number
+  created_at: string
+}
+
 export interface Order {
   id: number
   order_number: string
@@ -192,6 +203,7 @@ export interface Order {
   created_at: string
   updated_at: string
   items?: OrderItem[]
+  shipments?: Shipment[]
 }
 
 export interface ProductVariant {

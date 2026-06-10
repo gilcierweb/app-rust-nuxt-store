@@ -71,6 +71,44 @@
             </div>
           </div>
         </div>
+
+        <div v-if="order.shipments?.length" class="rounded-box border border-base-content/10 bg-base-100 p-6 shadow-sm">
+          <div class="mb-5 flex items-center justify-between gap-4">
+            <h2 class="text-lg font-semibold">{{ $t('account.shipments') }}</h2>
+            <span class="badge badge-soft">{{ order.shipments.length }}</span>
+          </div>
+
+          <div class="divide-y divide-base-content/10">
+            <div v-for="shipment in order.shipments" :key="shipment.id" class="flex items-center justify-between gap-4 py-4">
+              <div class="flex min-w-0 items-center gap-4">
+                <div class="bg-base-200 flex size-12 shrink-0 items-center justify-center rounded-lg">
+                  <span class="icon-[tabler--truck] text-base-content/40 size-6"></span>
+                </div>
+                <div class="min-w-0">
+                  <p class="truncate font-semibold">{{ shipment.tracking_number || `${$t('account.shipmentNumber')}${shipment.id}` }}</p>
+                  <p class="text-base-content/60 text-sm">
+                    {{ shipment.carrier || '-' }}
+                    <span v-if="shipment.shipped_at"> &middot; {{ $t('account.shippedOn') }} {{ formatDate(shipment.shipped_at) }}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                class="btn btn-primary btn-outline btn-sm"
+                :disabled="downloadingLabel === shipment.id"
+                @click="downloadShippingLabel(shipment.id, shipment.tracking_number)"
+              >
+                <span v-if="downloadingLabel === shipment.id" class="loading loading-spinner loading-xs"></span>
+                <span v-else class="icon-[tabler--printer] size-4"></span>
+                {{ $t('account.downloadShippingLabel') }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="rounded-box border border-dashed border-base-content/20 bg-base-100 p-8 text-center">
+          <span class="icon-[tabler--truck-off] text-base-content/30 mx-auto mb-4 size-12"></span>
+          <p class="text-base-content/60">{{ $t('account.noShipments') }}</p>
+        </div>
       </section>
 
       <aside class="space-y-6">
@@ -150,6 +188,7 @@ const { data: order, pending, error } = useApiLazyFetch<Order>(
 
 const downloadingInvoice = ref(false)
 const downloadingQuotation = ref(false)
+const downloadingLabel = ref<number | null>(null)
 
 const statusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('account.status.pending'), badge: 'badge-soft badge-warning' },
@@ -239,6 +278,27 @@ async function downloadQuotation() {
     console.error('Failed to download quotation:', err)
   } finally {
     downloadingQuotation.value = false
+  }
+}
+
+async function downloadShippingLabel(shipmentId: number, trackingNumber?: string) {
+  downloadingLabel.value = shipmentId
+  try {
+    const blob = await apiFetch<Blob>(`/api/account/shipments/${shipmentId}/label`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `shipping-label-${trackingNumber || shipmentId}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to download shipping label:', err)
+  } finally {
+    downloadingLabel.value = null
   }
 }
 </script>

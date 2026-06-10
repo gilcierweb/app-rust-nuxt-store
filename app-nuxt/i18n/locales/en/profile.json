@@ -102,7 +102,12 @@
     "loadingPayment": "Loading payment...",
     "errorLoadingPayment": "Error loading payment:",
     "paymentNotFound": "Payment not found",
-    "errorDownloadingReceipt": "Failed to download receipt"
+    "errorDownloadingReceipt": "Failed to download receipt",
+    "shipments": "Shipments",
+    "shipmentNumber": "Shipment #",
+    "shippedOn": "Shipped on",
+    "downloadShippingLabel": "Download Label",
+    "noShipments": "No shipments yet"
   },
   "profile": {
     "authorAlt": "Author"

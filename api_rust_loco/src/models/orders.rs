@@ -59,6 +59,18 @@ pub struct OrderItemJson {
 }
 
 #[derive(Debug, Serialize)]
+pub struct ShipmentJson {
+    pub id: i32,
+    pub tracking_number: Option<String>,
+    pub carrier: Option<String>,
+    pub status: Option<i32>,
+    pub shipped_at: Option<String>,
+    pub delivered_at: Option<String>,
+    pub shipping_method_id: i32,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct OrderWithItems {
     pub id: i32,
     pub order_number: Option<String>,
@@ -81,6 +93,7 @@ pub struct OrderWithItems {
     pub created_at: chrono::DateTime<chrono::FixedOffset>,
     pub updated_at: chrono::DateTime<chrono::FixedOffset>,
     pub items: Vec<OrderItemJson>,
+    pub shipments: Vec<ShipmentJson>,
 }
 
 #[async_trait::async_trait]

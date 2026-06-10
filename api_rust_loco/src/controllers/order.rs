@@ -20,7 +20,7 @@ use crate::models::_entities::shipments;
 use crate::models::_entities::stock_movements;
 use crate::models::_entities::stock_reservations;
 use crate::models::order_status::OrderStatus;
-use crate::models::orders::{CreateOrderParams, OrderWithItems, UpdateStatusParams};
+use crate::models::orders::{CreateOrderParams, OrderWithItems, ShipmentJson, UpdateStatusParams};
 use crate::models::users;
 use crate::payment_gateways::{
     create_payment_attempt, latest_payment_session_json, order_payment_status,
@@ -456,6 +456,25 @@ async fn respond_with_order_items(
         })
         .collect::<Vec<_>>();
 
+    let shipments = crate::models::_entities::shipments::Entity::find()
+        .filter(crate::models::_entities::shipments::Column::OrderId.eq(id))
+        .all(&ctx.db)
+        .await?;
+
+    let shipments_json = shipments
+        .into_iter()
+        .map(|s| ShipmentJson {
+            id: s.id,
+            tracking_number: s.tracking_number,
+            carrier: s.carrier,
+            status: s.status,
+            shipped_at: s.shipped_at.map(|dt| dt.and_utc().to_rfc3339()),
+            delivered_at: s.delivered_at.map(|dt| dt.and_utc().to_rfc3339()),
+            shipping_method_id: s.shipping_method_id,
+            created_at: s.created_at,
+        })
+        .collect::<Vec<_>>();
+
     let response = OrderWithItems {
         id: order.id,
         order_number: order.order_number,
@@ -473,6 +492,7 @@ async fn respond_with_order_items(
         created_at: order.created_at,
         updated_at: order.updated_at,
         items: items_json,
+        shipments: shipments_json,
     };
 
     format::json(response)
