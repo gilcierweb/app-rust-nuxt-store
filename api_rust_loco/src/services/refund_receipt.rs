@@ -1,3 +1,14 @@
+//! Refund confirmation PDF generation service.
+//!
+//! Generates Comprovante de Reembolso (refund confirmation) PDFs containing
+//! refund details, payment information, and processing status.
+//!
+//! **Access control:** Admin-only by design. The `receipt` endpoint is
+//! registered under `api/admin/payment-refunds/{id}/receipt` with admin auth.
+//! No customer-facing endpoint exists — refund confirmations are sent to
+//! customers via email by the payment gateway. This endpoint is for internal
+//! administrative use and financial reconciliation only.
+
 use loco_rs::prelude::*;
 use printpdf::{
     BuiltinFont, Color, Line, LinePoint, Mm, Op, PdfDocument, PdfFontHandle, PdfPage,

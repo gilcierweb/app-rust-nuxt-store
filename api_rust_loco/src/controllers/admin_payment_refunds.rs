@@ -1,6 +1,12 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::unused_async)]
 
+// Refund confirmation (Comprovante de Reembolso) — admin-only by design.
+// Refund receipts contain internal payment processing details (gateway response,
+// refund transaction IDs, failure codes) and financial reconciliation data.
+// Customers receive refund confirmation via email from the payment gateway;
+// they do not access this document through the storefront API.
+
 use std::collections::{HashMap, HashSet};
 
 use axum::debug_handler;
