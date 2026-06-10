@@ -745,7 +745,8 @@
         "title": "Detalhes da Remessa",
         "back": "Voltar para lista",
         "confirmDelete": "Tem certeza que deseja excluir a remessa #{id}?",
-        "errorDelete": "Erro ao excluir remessa"
+        "errorDelete": "Erro ao excluir remessa",
+        "downloadLabel": "Etiqueta de Postagem"
       }
     },
     "shippings": {

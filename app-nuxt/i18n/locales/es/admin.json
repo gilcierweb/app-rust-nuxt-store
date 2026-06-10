@@ -745,7 +745,8 @@
         "title": "Detalles del Envío",
         "back": "Volver a la lista",
         "confirmDelete": "¿Está seguro de que desea eliminar el envío #{id}?",
-        "errorDelete": "Error al eliminar el envío"
+        "errorDelete": "Error al eliminar el envío",
+        "downloadLabel": "Etiqueta de Envio"
       }
     },
     "shippings": {

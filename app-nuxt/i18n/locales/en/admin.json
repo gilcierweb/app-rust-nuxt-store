@@ -745,7 +745,8 @@
         "title": "Shipment Details",
         "back": "Back to list",
         "confirmDelete": "Are you sure you want to delete shipment #{id}?",
-        "errorDelete": "Error deleting shipment"
+        "errorDelete": "Error deleting shipment",
+        "downloadLabel": "Shipping Label"
       }
     },
     "shippings": {

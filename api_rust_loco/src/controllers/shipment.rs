@@ -102,4 +102,39 @@ fn routes_with_prefix(prefix: &str) -> Routes {
         .add("{id}", delete(remove))
         .add("{id}", put(update))
         .add("{id}", patch(update))
+        .add("{id}/label", get(label))
+}
+
+#[debug_handler]
+pub async fn label(Path(shipment_id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+    let data =
+        crate::services::shipping_label::load_shipping_label_data(&ctx.db, shipment_id)
+            .await
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to load shipping label data");
+                e
+            })?;
+
+    let pdf_bytes = crate::services::shipping_label::generate_shipping_label_pdf(&data).map_err(
+        |e| {
+            tracing::error!(error = ?e, "failed to generate shipping label PDF");
+            loco_rs::Error::string(&format!("PDF generation error: {e}"))
+        },
+    )?;
+
+    let tracking = data
+        .shipment
+        .tracking_number
+        .as_deref()
+        .unwrap_or("label");
+    let filename = format!("shipping-label-{tracking}.pdf");
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/pdf")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(pdf_bytes))
+        .unwrap())
 }

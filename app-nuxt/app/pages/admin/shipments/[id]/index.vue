@@ -11,6 +11,11 @@
         </div>
       </div>
       <div v-if="shipment" class="flex gap-2">
+        <button class="btn btn-outline" @click="downloadLabel" :disabled="isLabelLoading">
+          <span v-if="isLabelLoading" class="loading loading-spinner loading-xs"></span>
+          <i v-else class="icon-[tabler--file-download] size-4"></i>
+          {{ $t('admin.shipments.detail.downloadLabel', 'Shipping Label') }}
+        </button>
         <button @click="deleteShipment" class="btn btn-error btn-outline">
           <i class="icon-[tabler--trash] size-5 mr-2" /> {{ t('common.delete') }}
         </button>
@@ -91,6 +96,8 @@ const dialog = useAppDialog()
 
 const { pending, data: shipment, error, refresh } = await useApiFetch<Shipment>(`/api/admin/shipments/${route.params.id}`)
 
+const isLabelLoading = ref(false)
+
 const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('shipping.status.pending'), badge: 'badge-soft badge-warning' },
   2: { label: t('shipping.status.shipped'), badge: 'badge-soft badge-info' },
@@ -128,6 +135,28 @@ const deleteShipment = async () => {
   } catch (err) {
     toast.error(t('admin.shipments.detail.errorDelete'))
     console.error(err)
+  }
+}
+
+const downloadLabel = async () => {
+  if (!shipment.value) return
+  isLabelLoading.value = true
+  try {
+    const blob = await apiFetch(`/api/admin/shipments/${shipment.value.id}/label`, {
+      responseType: 'blob'
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `shipping-label-${shipment.value.id}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (e: any) {
+    toast.error(`Download failed: ${e.message}`)
+  } finally {
+    isLabelLoading.value = false
   }
 }
 </script>
