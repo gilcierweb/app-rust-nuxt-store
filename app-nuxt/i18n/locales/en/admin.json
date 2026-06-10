@@ -894,6 +894,19 @@
         "showing": "Showing {current} of {total} payments",
         "previous": "Previous",
         "next": "Next"
+      },
+      "detail": {
+        "title": "Payment",
+        "overview": "Overview",
+        "amount": "Amount",
+        "status": "Status",
+        "orderId": "Order ID",
+        "transactionId": "Transaction ID",
+        "createdAt": "Created At",
+        "capture": "Capture",
+        "void": "Void",
+        "refund": "Refund",
+        "downloadReceipt": "Download Receipt"
       }
     },
     "inventory": {

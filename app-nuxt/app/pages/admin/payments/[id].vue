@@ -60,7 +60,7 @@
             
             <div class="divider"></div>
             
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-wrap">
               <button class="btn btn-primary" @click="capturePayment" :disabled="isActionLoading">
                 {{ $t('admin.payments.detail.capture', 'Capture') }}
               </button>
@@ -69,6 +69,11 @@
               </button>
               <button class="btn btn-error" @click="refundPayment" :disabled="isActionLoading">
                 {{ $t('admin.payments.detail.refund', 'Refund') }}
+              </button>
+              <button class="btn btn-outline" @click="downloadReceipt" :disabled="isReceiptLoading">
+                <span v-if="isReceiptLoading" class="loading loading-spinner loading-xs"></span>
+                <i v-else class="icon-[tabler--file-download] size-4"></i>
+                {{ $t('admin.payments.detail.downloadReceipt', 'Download Receipt') }}
               </button>
             </div>
           </div>
@@ -301,6 +306,7 @@ const { pending, data: detail, error, refresh } = await useApiFetch<AdminPayment
 )
 
 const isActionLoading = ref(false)
+const isReceiptLoading = ref(false)
 const toast = useAppToast()
 const dialog = useAppDialog()
 const paymentSessions = computed(() => detail.value?.sessions || [])
@@ -384,6 +390,27 @@ const refundPayment = async () => {
     toast.error(`Refund failed: ${e.message}`)
   } finally {
     isActionLoading.value = false
+  }
+}
+
+const downloadReceipt = async () => {
+  isReceiptLoading.value = true
+  try {
+    const blob = await apiFetch(`/api/admin/payments/${paymentId}/receipt`, {
+      responseType: 'blob'
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `receipt-${paymentId}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (e: any) {
+    toast.error(`Download failed: ${e.message}`)
+  } finally {
+    isReceiptLoading.value = false
   }
 }
 

@@ -890,6 +890,19 @@
         "showing": "Mostrando {current} de {total} pagos",
         "previous": "Anterior",
         "next": "Siguiente"
+      },
+      "detail": {
+        "title": "Pago",
+        "overview": "Resumen",
+        "amount": "Importe",
+        "status": "Estado",
+        "orderId": "Pedido",
+        "transactionId": "ID de Transacción",
+        "createdAt": "Creado en",
+        "capture": "Capturar",
+        "void": "Anular",
+        "refund": "Reembolsar",
+        "downloadReceipt": "Descargar Comprobante"
       }
     },
     "inventory": {

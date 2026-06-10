@@ -892,6 +892,19 @@
         "showing": "Mostrando {current} de {total} pagamentos",
         "previous": "Anterior",
         "next": "Próximo"
+      },
+      "detail": {
+        "title": "Pagamento",
+        "overview": "Visão Geral",
+        "amount": "Valor",
+        "status": "Status",
+        "orderId": "Pedido",
+        "transactionId": "ID da Transação",
+        "createdAt": "Criado em",
+        "capture": "Capturar",
+        "void": "Cancelar",
+        "refund": "Reembolsar",
+        "downloadReceipt": "Baixar Comprovante"
       }
     },
     "inventory": {

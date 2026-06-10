@@ -80,6 +80,8 @@ impl Hooks for App {
             .add_route(controllers::shipping::admin_routes())
             .add_route(controllers::payment::routes())
             .add_route(controllers::payment::admin_routes())
+            .add_route(controllers::payment::account_routes())
+            .add_route(controllers::payment::admin_receipt_routes())
             .add_route(controllers::coupon::routes())
             .add_route(controllers::coupon::admin_routes())
             .add_route(controllers::address::routes())

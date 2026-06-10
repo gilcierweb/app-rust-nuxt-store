@@ -8,6 +8,7 @@ use sea_orm::ActiveValue::Set;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::middleware::auth::CookieJWT;
 use crate::models::_entities::payment_gateways;
 use crate::models::_entities::payment_methods;
 use crate::models::_entities::payments::Entity;
@@ -170,4 +171,85 @@ fn routes_with_prefix(prefix: &str) -> Routes {
         .add("process", post(process))
         .add("order/{order_id}", get(get_by_order))
         .add("methods", get(list_methods))
+}
+
+pub fn account_routes() -> Routes {
+    routes_with_prefix("api/account/payments/")
+        .add("{id}/receipt", get(account_receipt))
+}
+
+pub fn admin_receipt_routes() -> Routes {
+    routes_with_prefix("api/admin/payments/")
+        .add("{id}/receipt", get(admin_receipt))
+}
+
+#[debug_handler]
+pub async fn account_receipt(
+    auth: CookieJWT,
+    Path(payment_id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let current_user_id = auth
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|v| v.as_i64())
+        .and_then(|v| i32::try_from(v).ok())
+        .ok_or_else(|| loco_rs::Error::string("unauthorized"))?;
+
+    let data = crate::services::receipt::load_receipt_data(&ctx.db, payment_id, Some(current_user_id))
+        .await
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to load receipt data");
+            e
+        })?;
+
+    let pdf_bytes = crate::services::receipt::generate_receipt_pdf(&data)
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to generate receipt PDF");
+            loco_rs::Error::string(&format!("PDF generation error: {e}"))
+        })?;
+
+    let payment_number = data.payment.number.as_deref().unwrap_or("payment");
+    let filename = format!("receipt-{payment_number}.pdf");
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/pdf")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(pdf_bytes))
+        .unwrap())
+}
+
+#[debug_handler]
+pub async fn admin_receipt(
+    Path(payment_id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let data = crate::services::receipt::load_receipt_data(&ctx.db, payment_id, None)
+        .await
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to load receipt data");
+            e
+        })?;
+
+    let pdf_bytes = crate::services::receipt::generate_receipt_pdf(&data)
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to generate receipt PDF");
+            loco_rs::Error::string(&format!("PDF generation error: {e}"))
+        })?;
+
+    let payment_number = data.payment.number.as_deref().unwrap_or("payment");
+    let filename = format!("receipt-{payment_number}.pdf");
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/pdf")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(pdf_bytes))
+        .unwrap())
 }
