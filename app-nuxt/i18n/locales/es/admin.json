@@ -528,7 +528,8 @@
         "summary": "Resumen del Pedido",
         "currency": "Moneda",
         "addressNotFound": "No se encontró la dirección de envío predeterminada.",
-        "noCustomerInfo": "Información del cliente no disponible (User ID: {id})"
+        "noCustomerInfo": "Información del cliente no disponible (User ID: {id})",
+        "downloadInvoice": "Descargar Factura"
       }
     },
     "posts": {

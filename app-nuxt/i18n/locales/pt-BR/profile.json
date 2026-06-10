@@ -81,7 +81,8 @@
     "exploreProducts": "Explorar produtos",
     "addedOn": "Adicionado em",
     "viewProduct": "Ver produto",
-    "remove": "Remover"
+    "remove": "Remover",
+    "downloadInvoice": "Baixar Nota Fiscal"
   },
   "profile": {
     "authorAlt": "Autor"

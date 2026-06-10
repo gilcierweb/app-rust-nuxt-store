@@ -26,6 +26,11 @@
           <span :class="paymentBadgeClass(order.payment_status)" class="text-sm">
             {{ paymentLabel(order.payment_status) }}
           </span>
+          <button class="btn btn-sm btn-outline" :disabled="downloadingInvoice" @click="downloadInvoice">
+            <span v-if="downloadingInvoice" class="loading loading-spinner loading-xs" />
+            <span v-else class="icon-[tabler--file-download] size-4" />
+            {{ $t('admin.orders.detail.downloadInvoice') }}
+          </button>
         </div>
       </div>
 
@@ -237,6 +242,7 @@ const selectedStatus = ref('')
 const updating = ref(false)
 const statusMsg = ref('')
 const statusMsgType = ref('')
+const downloadingInvoice = ref(false)
 
 const statusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('order.status.pending'), badge: 'badge-soft badge-warning' },
@@ -308,6 +314,28 @@ async function updateStatus() {
     statusMsgType.value = 'text-error'
   } finally {
     updating.value = false
+  }
+}
+
+async function downloadInvoice() {
+  if (!order.value) return
+  downloadingInvoice.value = true
+  try {
+    const blob = await apiFetch<Blob>(`/api/admin/orders/${order.value.id}/invoice`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `invoice-${order.value.order_number || order.value.id}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to download invoice:', err)
+  } finally {
+    downloadingInvoice.value = false
   }
 }
 </script>

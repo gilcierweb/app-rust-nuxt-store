@@ -81,7 +81,8 @@
     "exploreProducts": "Explorar productos",
     "addedOn": "Agregado el",
     "viewProduct": "Ver producto",
-    "remove": "Eliminar"
+    "remove": "Eliminar",
+    "downloadInvoice": "Descargar Factura"
   },
   "profile": {
     "authorAlt": "Autor"

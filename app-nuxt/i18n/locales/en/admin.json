@@ -528,7 +528,8 @@
         "summary": "Order Summary",
         "currency": "Currency",
         "addressNotFound": "Default shipping address not found.",
-        "noCustomerInfo": "Customer information not available (User ID: {id})"
+        "noCustomerInfo": "Customer information not available (User ID: {id})",
+        "downloadInvoice": "Download Invoice"
       }
     },
     "posts": {

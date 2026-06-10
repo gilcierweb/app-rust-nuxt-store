@@ -81,7 +81,8 @@
     "exploreProducts": "Explore products",
     "addedOn": "Added on",
     "viewProduct": "View product",
-    "remove": "Remove"
+    "remove": "Remove",
+    "downloadInvoice": "Download Invoice"
   },
   "profile": {
     "authorAlt": "Author"

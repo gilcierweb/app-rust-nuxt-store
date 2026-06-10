@@ -528,7 +528,8 @@
         "summary": "Resumo do Pedido",
         "currency": "Moeda",
         "addressNotFound": "Endereço padrão não encontrado.",
-        "noCustomerInfo": "Informações do cliente não disponíveis (User ID: {id})"
+        "noCustomerInfo": "Informações do cliente não disponíveis (User ID: {id})",
+        "downloadInvoice": "Baixar Nota Fiscal"
       }
     },
     "posts": {

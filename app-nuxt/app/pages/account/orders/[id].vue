@@ -12,6 +12,11 @@
         <span class="icon-[tabler--arrow-left] size-5"></span>
         {{ $t('account.back') }}
       </NuxtLinkLocale>
+      <button class="btn btn-sm btn-outline" :disabled="downloadingInvoice" @click="downloadInvoice">
+        <span v-if="downloadingInvoice" class="loading loading-spinner loading-xs" />
+        <span v-else class="icon-[tabler--file-download] size-4" />
+        {{ $t('account.downloadInvoice') }}
+      </button>
     </div>
 
     <div v-if="pending" class="rounded-box border border-base-content/10 bg-base-100 p-8">
@@ -122,7 +127,7 @@ definePageMeta({
 
 const route = useRoute()
 const { locale, t } = useI18n()
-const { useApiLazyFetch } = useApi()
+const { useApiLazyFetch, apiFetch } = useApi()
 
 const orderId = computed(() => {
   const id = route.params.id
@@ -137,6 +142,8 @@ const { data: order, pending, error } = useApiLazyFetch<Order>(
   `/api/account/orders/${orderId.value}`,
   { key: `account-order-${orderId.value}` }
 )
+
+const downloadingInvoice = ref(false)
 
 const statusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('account.status.pending'), badge: 'badge-soft badge-warning' },
@@ -183,5 +190,27 @@ function formatDate(value?: string): string {
     dateStyle: 'short',
     timeStyle: 'short'
   }).format(new Date(value))
+}
+
+async function downloadInvoice() {
+  if (!order.value) return
+  downloadingInvoice.value = true
+  try {
+    const blob = await apiFetch<Blob>(`/api/account/orders/${orderId.value}/invoice`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `invoice-${order.value.order_number || orderId.value}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to download invoice:', err)
+  } finally {
+    downloadingInvoice.value = false
+  }
 }
 </script>
