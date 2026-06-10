@@ -406,7 +406,7 @@ Key backend auth env vars:
 ### Core Commerce — Production Hardening
 * [x] Inventory management hardening (normalized stock reservations, stock movements, automatic out-of-stock handling)
 * [x] Transactional order emails (order confirmation, shipping updates, delivery confirmation, abandoned cart, back-in-stock)
-* [ ] Payment production hardening (expired-session cleanup, provider failure alerts, PCI/security review)
+* [x] Payment production hardening (expired-session cleanup, provider failure alerts, PCI/security review)
 * [ ] Order invoice generation (PDF)
 * [ ] Tax calculation by region
 * [ ] Multi-currency support with exchange rates

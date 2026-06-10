@@ -27,6 +27,7 @@ use crate::payment_gateways::{
     CreatePaymentAttemptInput,
 };
 use crate::services::cart;
+use crate::services::invoice;
 use crate::utils::pagination::PaginationParams;
 use crate::mailers::order::OrderMailer;
 use crate::mailers::email_service::EmailService;
@@ -626,6 +627,68 @@ pub async fn update_status(
     format::json(serde_json::json!({ "status": new_status.to_i32() }))
 }
 
+#[debug_handler]
+pub async fn account_invoice(
+    auth: CookieJWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let current_user_id = current_user_id(&ctx, &auth).await?;
+    let data = invoice::load_invoice_data(&ctx.db, id, Some(current_user_id)).await?;
+    let pdf_bytes = invoice::generate_invoice_pdf(&data)?;
+
+    let filename = format!(
+        "invoice-{}.pdf",
+        data.order
+            .order_number
+            .as_deref()
+            .unwrap_or("unknown")
+    );
+
+    let headers = [
+        (
+            axum::http::header::CONTENT_TYPE,
+            "application/pdf".to_string(),
+        ),
+        (
+            axum::http::header::CONTENT_DISPOSITION,
+            format!("attachment; filename=\"{filename}\""),
+        ),
+    ];
+
+    Ok((headers, pdf_bytes).into_response())
+}
+
+#[debug_handler]
+pub async fn admin_invoice(
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let data = invoice::load_invoice_data(&ctx.db, id, None).await?;
+    let pdf_bytes = invoice::generate_invoice_pdf(&data)?;
+
+    let filename = format!(
+        "invoice-{}.pdf",
+        data.order
+            .order_number
+            .as_deref()
+            .unwrap_or("unknown")
+    );
+
+    let headers = [
+        (
+            axum::http::header::CONTENT_TYPE,
+            "application/pdf".to_string(),
+        ),
+        (
+            axum::http::header::CONTENT_DISPOSITION,
+            format!("attachment; filename=\"{filename}\""),
+        ),
+    ];
+
+    Ok((headers, pdf_bytes).into_response())
+}
+
 pub fn routes() -> Routes {
     routes_with_prefix("api/orders")
 }
@@ -637,6 +700,7 @@ pub fn admin_routes() -> Routes {
         .add("/list", get(list))
         .add("/{id}", get(get_one))
         .add("/{id}/status", put(update_status))
+        .add("/{id}/invoice", get(admin_invoice))
 }
 
 pub fn account_routes() -> Routes {
@@ -645,6 +709,7 @@ pub fn account_routes() -> Routes {
         .add("/", get(my_orders))
         .add("/checkout", post(checkout))
         .add("/{id}", get(account_get_one))
+        .add("/{id}/invoice", get(account_invoice))
 }
 
 fn routes_with_prefix(prefix: &str) -> Routes {
