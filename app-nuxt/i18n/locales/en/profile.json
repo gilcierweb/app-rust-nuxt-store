@@ -83,7 +83,26 @@
     "viewProduct": "View product",
     "remove": "Remove",
     "downloadInvoice": "Download Invoice",
-    "downloadQuotation": "Download Quotation"
+    "downloadQuotation": "Download Quotation",
+    "downloadReceipt": "Download Receipt",
+    "payment": "Payment",
+    "paymentNumber": "Payment #",
+    "paymentDetails": "Payment details and receipt download",
+    "paymentOverview": "Payment Overview",
+    "paymentMethod": "Payment Method",
+    "gateway": "Gateway",
+    "transactionId": "Transaction ID",
+    "paymentDate": "Payment Date",
+    "orderReference": "Order Reference",
+    "viewOrder": "View Order",
+    "paymentInfo": "Payment Info",
+    "paymentId": "Payment ID",
+    "currency": "Currency",
+    "externalId": "External ID",
+    "loadingPayment": "Loading payment...",
+    "errorLoadingPayment": "Error loading payment:",
+    "paymentNotFound": "Payment not found",
+    "errorDownloadingReceipt": "Failed to download receipt"
   },
   "profile": {
     "authorAlt": "Author"

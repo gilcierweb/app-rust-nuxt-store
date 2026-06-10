@@ -83,7 +83,26 @@
     "viewProduct": "Ver producto",
     "remove": "Eliminar",
     "downloadInvoice": "Descargar Factura",
-    "downloadQuotation": "Descargar Cotizacion"
+    "downloadQuotation": "Descargar Cotizacion",
+    "downloadReceipt": "Descargar Recibo",
+    "payment": "Pago",
+    "paymentNumber": "Pago #",
+    "paymentDetails": "Detalles del pago y descarga del recibo",
+    "paymentOverview": "Resumen del Pago",
+    "paymentMethod": "Metodo de Pago",
+    "gateway": "Gateway",
+    "transactionId": "ID de Transaccion",
+    "paymentDate": "Fecha de Pago",
+    "orderReference": "Referencia del Pedido",
+    "viewOrder": "Ver Pedido",
+    "paymentInfo": "Info del Pago",
+    "paymentId": "ID del Pago",
+    "currency": "Moneda",
+    "externalId": "ID Externo",
+    "loadingPayment": "Cargando pago...",
+    "errorLoadingPayment": "Error al cargar pago:",
+    "paymentNotFound": "Pago no encontrado",
+    "errorDownloadingReceipt": "Error al descargar recibo"
   },
   "profile": {
     "authorAlt": "Autor"

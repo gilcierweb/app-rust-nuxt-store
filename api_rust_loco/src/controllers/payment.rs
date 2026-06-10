@@ -12,6 +12,7 @@ use crate::middleware::auth::CookieJWT;
 use crate::models::_entities::payment_gateways;
 use crate::models::_entities::payment_methods;
 use crate::models::_entities::payments::Entity;
+use crate::models::_entities::{orders, payments};
 use crate::payment_gateways::{
     create_payment_attempt, latest_payment_session_json, order_payment_status,
     CreatePaymentAttemptInput,
@@ -175,7 +176,72 @@ fn routes_with_prefix(prefix: &str) -> Routes {
 
 pub fn account_routes() -> Routes {
     routes_with_prefix("api/account/payments/")
+        .add("{id}", get(account_get_one))
         .add("{id}/receipt", get(account_receipt))
+}
+
+#[derive(Debug, Serialize)]
+pub struct AccountPaymentDetail {
+    pub payment: payments::Model,
+    pub order_number: Option<String>,
+    pub payment_method_name: Option<String>,
+    pub gateway_name: Option<String>,
+}
+
+#[debug_handler]
+pub async fn account_get_one(
+    auth: CookieJWT,
+    Path(payment_id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let current_user_id = auth
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|v| v.as_i64())
+        .and_then(|v| i32::try_from(v).ok())
+        .ok_or_else(|| loco_rs::Error::string("unauthorized"))?;
+
+    let payment = Entity::find_by_id(payment_id)
+        .one(&ctx.db)
+        .await?
+        .ok_or_else(|| Error::NotFound)?;
+
+    let order = orders::Entity::find_by_id(payment.order_id)
+        .one(&ctx.db)
+        .await?
+        .ok_or_else(|| Error::NotFound)?;
+
+    if order.user_id != current_user_id {
+        return Err(loco_rs::Error::string("unauthorized"));
+    }
+
+    let payment_method =
+        payment_methods::Entity::find_by_id(payment.payment_method_id)
+            .one(&ctx.db)
+            .await?;
+
+    let gateway_name = if let Some(pm) = &payment_method {
+        if let Some(gw_id) = pm.payment_gateway_id {
+            payment_gateways::Entity::find_by_id(gw_id)
+                .one(&ctx.db)
+                .await
+                .ok()
+                .flatten()
+                .map(|gw| gw.name)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    format::json(AccountPaymentDetail {
+        order_number: order.order_number,
+        payment_method_name: payment_method.and_then(|pm| pm.name),
+        gateway_name,
+        payment,
+    })
 }
 
 pub fn admin_receipt_routes() -> Routes {

@@ -83,7 +83,26 @@
     "viewProduct": "Ver produto",
     "remove": "Remover",
     "downloadInvoice": "Baixar Nota Fiscal",
-    "downloadQuotation": "Baixar Orcamento"
+    "downloadQuotation": "Baixar Orcamento",
+    "downloadReceipt": "Baixar Comprovante",
+    "payment": "Pagamento",
+    "paymentNumber": "Pagamento #",
+    "paymentDetails": "Detalhes do pagamento e download do comprovante",
+    "paymentOverview": "Resumo do Pagamento",
+    "paymentMethod": "Forma de Pagamento",
+    "gateway": "Gateway",
+    "transactionId": "ID da Transacao",
+    "paymentDate": "Data do Pagamento",
+    "orderReference": "Referencia do Pedido",
+    "viewOrder": "Ver Pedido",
+    "paymentInfo": "Info do Pagamento",
+    "paymentId": "ID do Pagamento",
+    "currency": "Moeda",
+    "externalId": "ID Externo",
+    "loadingPayment": "Carregando pagamento...",
+    "errorLoadingPayment": "Erro ao carregar pagamento:",
+    "paymentNotFound": "Pagamento nao encontrado",
+    "errorDownloadingReceipt": "Falha ao baixar comprovante"
   },
   "profile": {
     "authorAlt": "Autor"
