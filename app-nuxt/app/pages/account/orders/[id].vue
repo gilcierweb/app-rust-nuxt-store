@@ -17,6 +17,11 @@
         <span v-else class="icon-[tabler--file-download] size-4" />
         {{ $t('account.downloadInvoice') }}
       </button>
+      <button class="btn btn-sm btn-outline" :disabled="downloadingQuotation" @click="downloadQuotation">
+        <span v-if="downloadingQuotation" class="loading loading-spinner loading-xs" />
+        <span v-else class="icon-[tabler--file-text] size-4" />
+        {{ $t('account.downloadQuotation', 'Quotation') }}
+      </button>
     </div>
 
     <div v-if="pending" class="rounded-box border border-base-content/10 bg-base-100 p-8">
@@ -144,6 +149,7 @@ const { data: order, pending, error } = useApiLazyFetch<Order>(
 )
 
 const downloadingInvoice = ref(false)
+const downloadingQuotation = ref(false)
 
 const statusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('account.status.pending'), badge: 'badge-soft badge-warning' },
@@ -211,6 +217,28 @@ async function downloadInvoice() {
     console.error('Failed to download invoice:', err)
   } finally {
     downloadingInvoice.value = false
+  }
+}
+
+async function downloadQuotation() {
+  if (!order.value) return
+  downloadingQuotation.value = true
+  try {
+    const blob = await apiFetch<Blob>(`/api/account/orders/${orderId.value}/quotation`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `quotation-${order.value.order_number || orderId.value}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to download quotation:', err)
+  } finally {
+    downloadingQuotation.value = false
   }
 }
 </script>

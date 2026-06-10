@@ -529,7 +529,8 @@
         "currency": "Moeda",
         "addressNotFound": "Endereço padrão não encontrado.",
         "noCustomerInfo": "Informações do cliente não disponíveis (User ID: {id})",
-        "downloadInvoice": "Baixar Nota Fiscal"
+        "downloadInvoice": "Baixar Nota Fiscal",
+        "downloadQuotation": "Baixar Orcamento"
       }
     },
     "posts": {

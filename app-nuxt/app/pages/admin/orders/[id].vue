@@ -31,6 +31,11 @@
             <span v-else class="icon-[tabler--file-download] size-4" />
             {{ $t('admin.orders.detail.downloadInvoice') }}
           </button>
+          <button class="btn btn-sm btn-outline" :disabled="downloadingQuotation" @click="downloadQuotation">
+            <span v-if="downloadingQuotation" class="loading loading-spinner loading-xs" />
+            <span v-else class="icon-[tabler--file-text] size-4" />
+            {{ $t('admin.orders.detail.downloadQuotation', 'Quotation') }}
+          </button>
         </div>
       </div>
 
@@ -243,6 +248,7 @@ const updating = ref(false)
 const statusMsg = ref('')
 const statusMsgType = ref('')
 const downloadingInvoice = ref(false)
+const downloadingQuotation = ref(false)
 
 const statusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('order.status.pending'), badge: 'badge-soft badge-warning' },
@@ -336,6 +342,28 @@ async function downloadInvoice() {
     console.error('Failed to download invoice:', err)
   } finally {
     downloadingInvoice.value = false
+  }
+}
+
+async function downloadQuotation() {
+  if (!order.value) return
+  downloadingQuotation.value = true
+  try {
+    const blob = await apiFetch<Blob>(`/api/admin/orders/${order.value.id}/quotation`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `quotation-${order.value.order_number || order.value.id}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to download quotation:', err)
+  } finally {
+    downloadingQuotation.value = false
   }
 }
 </script>

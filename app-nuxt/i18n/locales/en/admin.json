@@ -529,7 +529,8 @@
         "currency": "Currency",
         "addressNotFound": "Default shipping address not found.",
         "noCustomerInfo": "Customer information not available (User ID: {id})",
-        "downloadInvoice": "Download Invoice"
+        "downloadInvoice": "Download Invoice",
+        "downloadQuotation": "Download Quotation"
       }
     },
     "posts": {

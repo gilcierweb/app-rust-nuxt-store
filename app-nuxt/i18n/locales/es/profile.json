@@ -82,7 +82,8 @@
     "addedOn": "Agregado el",
     "viewProduct": "Ver producto",
     "remove": "Eliminar",
-    "downloadInvoice": "Descargar Factura"
+    "downloadInvoice": "Descargar Factura",
+    "downloadQuotation": "Descargar Cotizacion"
   },
   "profile": {
     "authorAlt": "Autor"

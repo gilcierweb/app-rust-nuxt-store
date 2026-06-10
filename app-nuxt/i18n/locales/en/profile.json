@@ -82,7 +82,8 @@
     "addedOn": "Added on",
     "viewProduct": "View product",
     "remove": "Remove",
-    "downloadInvoice": "Download Invoice"
+    "downloadInvoice": "Download Invoice",
+    "downloadQuotation": "Download Quotation"
   },
   "profile": {
     "authorAlt": "Author"

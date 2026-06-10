@@ -82,7 +82,8 @@
     "addedOn": "Adicionado em",
     "viewProduct": "Ver produto",
     "remove": "Remover",
-    "downloadInvoice": "Baixar Nota Fiscal"
+    "downloadInvoice": "Baixar Nota Fiscal",
+    "downloadQuotation": "Baixar Orcamento"
   },
   "profile": {
     "authorAlt": "Autor"
