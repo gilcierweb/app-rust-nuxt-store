@@ -773,6 +773,12 @@ pub async fn admin_quotation(
     Ok((headers, pdf_bytes).into_response())
 }
 
+// NF-e/DANFE endpoint: admin-only by design (legal compliance).
+// The DANFE is a Brazilian fiscal document containing sensitive tax data
+// (CNPJ, IE, ICMS/PIS/COFINS rates, SEFAZ authorization). Per Brazilian
+// tax regulations, DANFEs are issued by the seller and provided to the
+// buyer only upon request or as required by the fiscal operation.
+// Customers do not need direct access to this document.
 #[debug_handler]
 pub async fn admin_nfe(
     Path(id): Path<i32>,

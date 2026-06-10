@@ -1,3 +1,16 @@
+//! NF-e/DANFE PDF generation service.
+//!
+//! This service generates DANFE (Documento Auxiliar da Nota Fiscal Eletronica)
+//! PDFs for Brazilian tax compliance. The DANFE is issued by the seller and
+//! contains sensitive fiscal data (emitente CNPJ/IE, tax calculations,
+//! SEFAZ authorization placeholder).
+//!
+//! **Access control:** Admin-only by design. The `admin_nfe` endpoint is
+//! registered under `api/admin/orders/{id}/nfe` with admin auth middleware.
+//! No customer-facing endpoint exists — this is intentional per Brazilian
+//! tax regulations. Customers receive the DANFE as a printed or emailed
+//! attachment during the fiscal operation, not via the storefront API.
+
 use loco_rs::prelude::*;
 use printpdf::{
     BuiltinFont, Color, Line, LinePoint, Mm, Op, PdfDocument, PdfFontHandle, PdfPage,
