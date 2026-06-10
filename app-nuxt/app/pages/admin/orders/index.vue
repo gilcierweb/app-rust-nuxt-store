@@ -3,6 +3,16 @@
     <div class="mb-6 flex justify-between items-center">
       <h1 class="h1">{{ $t('admin.orders.title') }}</h1>
       <div class="flex gap-2">
+        <button
+          v-if="selectedIds.length > 0"
+          class="btn btn-primary btn-sm"
+          :disabled="exporting"
+          @click="bulkExportInvoices"
+        >
+          <span v-if="exporting" class="loading loading-spinner loading-xs"></span>
+          <span v-else class="icon-[tabler--download] size-4 mr-1"></span>
+          {{ $t('admin.orders.exportSelected', 'Export Selected') }} ({{ selectedIds.length }})
+        </button>
         <button class="btn btn-outline btn-sm">
           <i class="icon-[tabler--download] size-4 mr-2"></i>
           {{ $t('common.export', 'Exportar') }}
@@ -60,6 +70,14 @@
         <table class="table table-lg">
           <thead class="bg-base-200/50">
             <tr>
+              <th class="w-10">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :checked="allFilteredSelected"
+                  @change="toggleSelectAll"
+                />
+              </th>
               <th>{{ $t('admin.orders.table.number') }}</th>
               <th>{{ $t('admin.orders.table.date', 'Data') }}</th>
               <th>{{ $t('admin.orders.table.customer', 'Cliente (ID)') }}</th>
@@ -71,6 +89,14 @@
           </thead>
           <tbody>
             <tr v-for="order in filteredOrders" :key="order.id" class="hover:bg-base-200/30 transition-colors">
+              <td>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :checked="selectedIds.includes(order.id)"
+                  @change="toggleSelect(order.id)"
+                />
+              </td>
               <td class="font-mono text-sm font-bold text-primary">
                 {{ order.order_number || `#${order.id}` }}
               </td>
@@ -108,7 +134,7 @@
               </td>
             </tr>
             <tr v-if="filteredOrders.length === 0">
-              <td colspan="7" class="text-center py-20 text-gray-500 italic">
+              <td colspan="8" class="text-center py-20 text-gray-500 italic">
                 {{ $t('admin.orders.notFound', 'Nenhum pedido encontrado.') }}
               </td>
             </tr>
@@ -124,11 +150,13 @@ import type { Order } from '~/types'
 
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
-const { useApiFetch } = useApi()
+const { useApiFetch, apiFetch } = useApi()
 
 // Filters
 const searchQuery = ref('')
 const selectedStatus = ref('')
+const selectedIds = ref<number[]>([])
+const exporting = ref(false)
 
 const { data: ordersData, pending } = await useApiFetch<Order[]>(
   '/api/admin/orders/list',
@@ -146,9 +174,62 @@ const filteredOrders = computed(() => {
   }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 })
 
+const allFilteredSelected = computed(() => {
+  if (filteredOrders.value.length === 0) return false
+  return filteredOrders.value.every(o => selectedIds.value.includes(o.id))
+})
+
+function toggleSelect(id: number) {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedIds.value.splice(idx, 1)
+  } else {
+    selectedIds.value.push(id)
+  }
+}
+
+function toggleSelectAll() {
+  if (allFilteredSelected.value) {
+    const filteredIds = new Set(filteredOrders.value.map(o => o.id))
+    selectedIds.value = selectedIds.value.filter(id => !filteredIds.has(id))
+  } else {
+    const filteredIds = filteredOrders.value.map(o => o.id)
+    const existing = new Set(selectedIds.value)
+    for (const id of filteredIds) {
+      if (!existing.has(id)) {
+        selectedIds.value.push(id)
+      }
+    }
+  }
+}
+
 const resetFilters = () => {
   searchQuery.value = ''
   selectedStatus.value = ''
+}
+
+async function bulkExportInvoices() {
+  if (selectedIds.value.length === 0) return
+  exporting.value = true
+  try {
+    const blob = await apiFetch<Blob>('/api/admin/orders/bulk-export', {
+      method: 'POST',
+      body: { ids: selectedIds.value },
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'invoices.zip'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to bulk export invoices:', err)
+  } finally {
+    exporting.value = false
+  }
 }
 
 const statusMap: Record<number, { label: string; badge: string }> = {

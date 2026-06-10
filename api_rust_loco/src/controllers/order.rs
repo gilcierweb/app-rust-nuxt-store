@@ -7,6 +7,7 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{PaginatorTrait, QueryOrder, TransactionTrait};
+use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::models::_entities::addresses;
@@ -803,6 +804,37 @@ pub async fn admin_nfe(
     Ok((headers, pdf_bytes).into_response())
 }
 
+#[derive(Deserialize)]
+pub struct BulkExportParams {
+    pub ids: Vec<i32>,
+}
+
+#[debug_handler]
+pub async fn bulk_export(
+    State(ctx): State<AppContext>,
+    Json(params): Json<BulkExportParams>,
+) -> Result<Response> {
+    if params.ids.is_empty() {
+        return Err(Error::BadRequest("No IDs provided".into()));
+    }
+
+    let (zip_bytes, filename) = crate::services::bulk_pdf::build_orders_zip(&ctx.db, &params.ids)
+        .await
+        .map_err(|e| {
+            tracing::error!(error = ?e, "failed to build orders ZIP");
+            loco_rs::Error::string(&format!("Bulk export error: {e}"))
+        })?;
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/zip")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(zip_bytes))
+        .unwrap())
+}
+
 pub fn routes() -> Routes {
     routes_with_prefix("api/orders")
 }
@@ -812,6 +844,7 @@ pub fn admin_routes() -> Routes {
         .prefix("api/admin/orders")
         .add("/", get(index))
         .add("/list", get(list))
+        .add("/bulk-export", post(bulk_export))
         .add("/{id}", get(get_one))
         .add("/{id}/status", put(update_status))
         .add("/{id}/invoice", get(admin_invoice))

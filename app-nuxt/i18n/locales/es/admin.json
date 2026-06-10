@@ -506,6 +506,7 @@
     },
     "orders": {
       "title": "Pedidos",
+      "exportSelected": "Exportar Seleccionados",
       "table": {
         "number": "Número",
         "date": "Fecha",
@@ -732,6 +733,7 @@
       "title": "Envíos",
       "searchPlaceholder": "Buscar envíos",
       "add": "Crear Envío",
+      "exportSelected": "Exportar Seleccionados",
       "loading": "Cargando envíos...",
       "error": "Error al cargar envíos: {message}",
       "notFound": "No se encontraron envíos.",
@@ -842,6 +844,7 @@
     "payments": {
       "title": "Pagos",
       "description": "Revise intentos de pago, referencias del gateway y estado operativo.",
+      "exportSelected": "Exportar Seleccionados",
       "loading": "Cargando pagos...",
       "error": "Error al cargar pagos: {message}",
       "empty": "No se encontraron pagos.",

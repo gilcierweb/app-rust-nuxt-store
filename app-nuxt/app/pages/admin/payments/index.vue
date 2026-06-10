@@ -6,6 +6,16 @@
         <p class="text-sm text-base-content/60">{{ t('admin.payments.description') }}</p>
       </div>
       <div class="flex gap-2">
+        <button
+          v-if="selectedIds.length > 0"
+          class="btn btn-primary btn-sm"
+          :disabled="exporting"
+          @click="bulkExportReceipts"
+        >
+          <span v-if="exporting" class="loading loading-spinner loading-xs"></span>
+          <span v-else class="icon-[tabler--download] size-4 mr-1"></span>
+          {{ t('admin.payments.exportSelected', 'Export Selected') }} ({{ selectedIds.length }})
+        </button>
         <NuxtLinkLocale to="/admin/payments/events" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--inbox] size-4"></i>
           {{ t('admin.payments.actions.events') }}
@@ -108,6 +118,14 @@
         <table class="table table-lg">
           <thead class="bg-base-200/50">
             <tr>
+              <th class="w-10">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :checked="allFilteredSelected"
+                  @change="toggleSelectAll"
+                />
+              </th>
               <th>{{ t('admin.payments.table.payment') }}</th>
               <th>{{ t('admin.payments.table.order') }}</th>
               <th>{{ t('admin.payments.table.method') }}</th>
@@ -120,6 +138,14 @@
           </thead>
           <tbody>
             <tr v-for="payment in payments" :key="payment.id" class="hover:bg-base-200/30 transition-colors">
+              <td>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :checked="selectedIds.includes(payment.id)"
+                  @change="toggleSelect(payment.id)"
+                />
+              </td>
               <td>
                 <div class="font-mono text-sm font-bold text-primary">{{ payment.number || `#${payment.id}` }}</div>
                 <div class="mt-1 max-w-44 truncate text-xs text-base-content/50">
@@ -162,7 +188,7 @@
               </td>
             </tr>
             <tr v-if="payments.length === 0">
-              <td colspan="8" class="py-20 text-center text-base-content/50 italic">
+              <td colspan="9" class="py-20 text-center text-base-content/50 italic">
                 {{ t('admin.payments.empty') }}
               </td>
             </tr>
@@ -228,7 +254,7 @@ interface AdminPaymentListResponse extends AdminPaginatedResponse<AdminPayment> 
 }
 
 const { t } = useI18n()
-const { useApiFetch } = useApi()
+const { useApiFetch, apiFetch } = useApi()
 
 const searchQuery = ref('')
 const debouncedSearchQuery = ref('')
@@ -237,6 +263,8 @@ const selectedGateway = ref('')
 const selectedCurrency = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
+const selectedIds = ref<number[]>([])
+const exporting = ref(false)
 
 const apiQuery = reactive({
   page: currentPage,
@@ -368,6 +396,59 @@ function formatDate(dateString?: string | null) {
 function formatTime(dateString?: string | null) {
   if (!dateString) return ''
   return new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }).format(new Date(dateString))
+}
+
+const allFilteredSelected = computed(() => {
+  if (payments.value.length === 0) return false
+  return payments.value.every(p => selectedIds.value.includes(p.id))
+})
+
+function toggleSelect(id: number) {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedIds.value.splice(idx, 1)
+  } else {
+    selectedIds.value.push(id)
+  }
+}
+
+function toggleSelectAll() {
+  if (allFilteredSelected.value) {
+    const currentIds = new Set(payments.value.map(p => p.id))
+    selectedIds.value = selectedIds.value.filter(id => !currentIds.has(id))
+  } else {
+    const currentIds = payments.value.map(p => p.id)
+    const existing = new Set(selectedIds.value)
+    for (const id of currentIds) {
+      if (!existing.has(id)) {
+        selectedIds.value.push(id)
+      }
+    }
+  }
+}
+
+async function bulkExportReceipts() {
+  if (selectedIds.value.length === 0) return
+  exporting.value = true
+  try {
+    const blob = await apiFetch<Blob>('/api/admin/payments/bulk-export', {
+      method: 'POST',
+      body: { ids: selectedIds.value },
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'receipts.zip'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to bulk export receipts:', err)
+  } finally {
+    exporting.value = false
+  }
 }
 
 onBeforeUnmount(() => {

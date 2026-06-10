@@ -12,7 +12,7 @@ use std::collections::{HashMap, HashSet};
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QueryOrder, QuerySelect};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::{payment_gateways, payment_methods, payment_refunds, payments};
 
@@ -140,8 +140,41 @@ pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/admin/payment-refunds")
         .add("/", get(list))
+        .add("bulk-export", post(bulk_export))
         .add("{id}", get(get_one))
         .add("{id}/receipt", get(receipt))
+}
+
+#[derive(Deserialize)]
+pub struct BulkExportParams {
+    pub ids: Vec<i32>,
+}
+
+#[debug_handler]
+pub async fn bulk_export(
+    State(ctx): State<AppContext>,
+    Json(params): Json<BulkExportParams>,
+) -> Result<Response> {
+    if params.ids.is_empty() {
+        return Err(Error::BadRequest("No IDs provided".into()));
+    }
+
+    let (zip_bytes, filename) =
+        crate::services::bulk_pdf::build_refunds_zip(&ctx.db, &params.ids)
+            .await
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to build refunds ZIP");
+                loco_rs::Error::string(&format!("Bulk export error: {e}"))
+            })?;
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/zip")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(zip_bytes))
+        .unwrap())
 }
 
 #[debug_handler]

@@ -2,10 +2,22 @@
   <div>
     <div class="mb-6 flex items-center justify-between">
       <h1 class="h1">{{ $t('admin.shipments.title') }}</h1>
-      <NuxtLinkLocale to="/admin/shipments/new" class="btn btn-primary">
-        <i class="icon-[tabler--plus] size-5 mr-2"></i>
-        {{ $t('admin.shipments.add') }}
-      </NuxtLinkLocale>
+      <div class="flex gap-2">
+        <button
+          v-if="selectedIds.length > 0"
+          class="btn btn-primary btn-sm"
+          :disabled="exporting"
+          @click="bulkExportLabels"
+        >
+          <span v-if="exporting" class="loading loading-spinner loading-xs"></span>
+          <span v-else class="icon-[tabler--download] size-4 mr-1"></span>
+          {{ $t('admin.shipments.exportSelected', 'Export Selected') }} ({{ selectedIds.length }})
+        </button>
+        <NuxtLinkLocale to="/admin/shipments/new" class="btn btn-primary">
+          <i class="icon-[tabler--plus] size-5 mr-2"></i>
+          {{ $t('admin.shipments.add') }}
+        </NuxtLinkLocale>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -26,6 +38,14 @@
         <table class="table">
           <thead>
             <tr>
+              <th class="w-10">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :checked="allFilteredSelected"
+                  @change="toggleSelectAll"
+                />
+              </th>
               <th class="w-16">ID</th>
               <th>{{ $t('admin.shipments.table.order') }}</th>
               <th>{{ $t('admin.shipments.table.tracking') }}</th>
@@ -37,6 +57,14 @@
           </thead>
           <tbody>
             <tr v-for="shipment in shipments" :key="shipment.id" class="row-hover">
+              <td>
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                  :checked="selectedIds.includes(shipment.id)"
+                  @change="toggleSelect(shipment.id)"
+                />
+              </td>
               <td><span class="font-mono text-sm">#{{ shipment.id }}</span></td>
               <td>
                 <NuxtLinkLocale :to="`/admin/orders/${shipment.order_id}`" class="link link-hover font-bold text-primary font-mono text-sm">
@@ -66,7 +94,7 @@
               </td>
             </tr>
             <tr v-if="shipments.length === 0">
-              <td colspan="7" class="text-center py-20 text-gray-500 italic">
+              <td colspan="8" class="text-center py-20 text-gray-500 italic">
                 {{ $t('admin.shipments.notFound') }}
               </td>
             </tr>
@@ -87,10 +115,66 @@ const { t } = useI18n()
 const toast = useAppToast()
 const dialog = useAppDialog()
 
+const selectedIds = ref<number[]>([])
+const exporting = ref(false)
+
 const { pending, data: shipments, error, refresh } = await useApiFetch<Shipment[]>(
   '/api/admin/shipments',
   { key: 'admin-shipments-list' }
 )
+
+const allFilteredSelected = computed(() => {
+  if (!shipments.value || shipments.value.length === 0) return false
+  return shipments.value.every(s => selectedIds.value.includes(s.id))
+})
+
+function toggleSelect(id: number) {
+  const idx = selectedIds.value.indexOf(id)
+  if (idx >= 0) {
+    selectedIds.value.splice(idx, 1)
+  } else {
+    selectedIds.value.push(id)
+  }
+}
+
+function toggleSelectAll() {
+  if (allFilteredSelected.value) {
+    const currentIds = new Set(shipments.value?.map(s => s.id) ?? [])
+    selectedIds.value = selectedIds.value.filter(id => !currentIds.has(id))
+  } else {
+    const currentIds = shipments.value?.map(s => s.id) ?? []
+    const existing = new Set(selectedIds.value)
+    for (const id of currentIds) {
+      if (!existing.has(id)) {
+        selectedIds.value.push(id)
+      }
+    }
+  }
+}
+
+async function bulkExportLabels() {
+  if (selectedIds.value.length === 0) return
+  exporting.value = true
+  try {
+    const blob = await apiFetch<Blob>('/api/admin/shipments/bulk-export', {
+      method: 'POST',
+      body: { ids: selectedIds.value },
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'shipping-labels.zip'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to bulk export shipping labels:', err)
+  } finally {
+    exporting.value = false
+  }
+}
 
 const shipmentStatusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('shipping.status.pending'), badge: 'badge-warning' },

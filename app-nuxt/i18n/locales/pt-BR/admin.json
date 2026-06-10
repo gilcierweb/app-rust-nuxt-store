@@ -506,6 +506,7 @@
     },
     "orders": {
       "title": "Pedidos",
+      "exportSelected": "Exportar Selecionados",
       "table": {
         "number": "Número",
         "date": "Data",
@@ -732,6 +733,7 @@
       "title": "Remessas",
       "searchPlaceholder": "Buscar remessas",
       "add": "Criar Remessa",
+      "exportSelected": "Exportar Selecionados",
       "loading": "Carregando remessas...",
       "error": "Erro ao carregar remessas: {message}",
       "notFound": "Nenhuma remessa encontrada.",
@@ -844,6 +846,7 @@
     "payments": {
       "title": "Pagamentos",
       "description": "Revise tentativas de pagamento, referências do gateway e status operacional.",
+      "exportSelected": "Exportar Selecionados",
       "loading": "Carregando pagamentos...",
       "error": "Erro ao carregar pagamentos: {message}",
       "empty": "Nenhum pagamento encontrado.",

@@ -91,8 +91,41 @@ pub fn routes() -> Routes {
     routes_with_prefix("api/shipments/")
 }
 
+#[derive(Deserialize)]
+pub struct BulkExportParams {
+    pub ids: Vec<i32>,
+}
+
+#[debug_handler]
+pub async fn bulk_export(
+    State(ctx): State<AppContext>,
+    Json(params): Json<BulkExportParams>,
+) -> Result<Response> {
+    if params.ids.is_empty() {
+        return Err(Error::BadRequest("No IDs provided".into()));
+    }
+
+    let (zip_bytes, filename) =
+        crate::services::bulk_pdf::build_shipments_zip(&ctx.db, &params.ids)
+            .await
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to build shipments ZIP");
+                loco_rs::Error::string(&format!("Bulk export error: {e}"))
+            })?;
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/zip")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(zip_bytes))
+        .unwrap())
+}
+
 pub fn admin_routes() -> Routes {
     routes_with_prefix("api/admin/shipments/")
+        .add("bulk-export", post(bulk_export))
 }
 
 fn routes_with_prefix(prefix: &str) -> Routes {

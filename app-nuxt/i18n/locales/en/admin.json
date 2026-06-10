@@ -506,6 +506,7 @@
     },
     "orders": {
       "title": "Orders",
+      "exportSelected": "Export Selected",
       "table": {
         "number": "Number",
         "date": "Date",
@@ -732,6 +733,7 @@
       "title": "Shipments",
       "searchPlaceholder": "Search shipments",
       "add": "Create Shipment",
+      "exportSelected": "Export Selected",
       "loading": "Loading shipments...",
       "error": "Error loading shipments: {message}",
       "notFound": "No shipments found.",
@@ -846,6 +848,7 @@
     "payments": {
       "title": "Payments",
       "description": "Review payment attempts, gateway references, and operational status.",
+      "exportSelected": "Export Selected",
       "loading": "Loading payments...",
       "error": "Failed to load payments: {message}",
       "empty": "No payments found.",

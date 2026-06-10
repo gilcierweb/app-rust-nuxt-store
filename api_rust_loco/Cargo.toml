@@ -53,6 +53,7 @@ urlencoding = "2.1"
 unicode-normalization = "0.1.25"
 ammonia = "4.1.2"
 printpdf = "0.9.1"
+zip = "2"
 axum-extra = { version = "0.10.0", features = ["cookie"] }
 time = "0.3"
 moka = { version = "0.12", features = ["sync"] }
