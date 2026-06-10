@@ -175,7 +175,8 @@ pub async fn label(Path(shipment_id): Path<i32>, State(ctx): State<AppContext>) 
 }
 
 pub fn account_routes() -> Routes {
-    routes_with_prefix("api/account/shipments/")
+    Routes::new()
+        .prefix("api/account/shipments/")
         .add("{id}/label", get(account_label))
 }
 
