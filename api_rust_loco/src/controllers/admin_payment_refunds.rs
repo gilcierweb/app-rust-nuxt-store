@@ -135,4 +135,39 @@ pub fn routes() -> Routes {
         .prefix("api/admin/payment-refunds")
         .add("/", get(list))
         .add("{id}", get(get_one))
+        .add("{id}/receipt", get(receipt))
+}
+
+#[debug_handler]
+pub async fn receipt(Path(refund_id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
+    let data =
+        crate::services::refund_receipt::load_refund_receipt_data(&ctx.db, refund_id, None)
+            .await
+            .map_err(|e| {
+                tracing::error!(error = ?e, "failed to load refund receipt data");
+                e
+            })?;
+
+    let pdf_bytes = crate::services::refund_receipt::generate_refund_receipt_pdf(&data).map_err(
+        |e| {
+            tracing::error!(error = ?e, "failed to generate refund receipt PDF");
+            loco_rs::Error::string(&format!("PDF generation error: {e}"))
+        },
+    )?;
+
+    let refund_number = data
+        .refund
+        .external_refund_id
+        .as_deref()
+        .unwrap_or("refund");
+    let filename = format!("refund-confirmation-{refund_number}.pdf");
+
+    Ok(axum::response::Response::builder()
+        .header("content-type", "application/pdf")
+        .header(
+            "content-disposition",
+            format!("attachment; filename=\"{filename}\""),
+        )
+        .body(axum::body::Body::from(pdf_bytes))
+        .unwrap())
 }

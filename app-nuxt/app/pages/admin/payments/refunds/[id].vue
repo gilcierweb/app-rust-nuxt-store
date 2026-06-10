@@ -18,6 +18,11 @@
         <i class="icon-[tabler--credit-card] size-4"></i>
         Payment
       </NuxtLinkLocale>
+      <button class="btn btn-outline btn-sm" @click="downloadReceipt" :disabled="isReceiptLoading">
+        <span v-if="isReceiptLoading" class="loading loading-spinner loading-xs"></span>
+        <i v-else class="icon-[tabler--file-download] size-4"></i>
+        {{ $t('admin.payments.refunds.detail.downloadReceipt', 'Download Confirmation') }}
+      </button>
     </div>
 
     <div v-if="pending" class="card shadow-base-300/10 shadow-md">
@@ -149,12 +154,15 @@ interface AdminRefundDetail {
 
 const route = useRoute()
 const refundId = route.params.id
-const { useApiFetch } = useApi()
+const { apiFetch, useApiFetch } = useApi()
 
 const { pending, data: detail, error } = await useApiFetch<AdminRefundDetail>(
   `/api/admin/payment-refunds/${refundId}`,
   { key: `admin-payment-refund-${refundId}` }
 )
+
+const isReceiptLoading = ref(false)
+const toast = useAppToast()
 
 const refundStatuses = [
   { value: 1, label: 'Pending', badge: 'badge-warning' },
@@ -206,5 +214,26 @@ function formatDate(dateString?: string | null) {
     hour: '2-digit',
     minute: '2-digit'
   }).format(new Date(dateString))
+}
+
+const downloadReceipt = async () => {
+  isReceiptLoading.value = true
+  try {
+    const blob = await apiFetch(`/api/admin/payment-refunds/${refundId}/receipt`, {
+      responseType: 'blob'
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `refund-confirmation-${refundId}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (e: any) {
+    toast.error(`Download failed: ${e.message}`)
+  } finally {
+    isReceiptLoading.value = false
+  }
 }
 </script>

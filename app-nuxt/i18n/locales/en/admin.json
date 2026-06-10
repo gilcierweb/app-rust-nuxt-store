@@ -909,6 +909,11 @@
         "downloadReceipt": "Download Receipt"
       }
     },
+    "refunds": {
+      "detail": {
+        "downloadReceipt": "Download Confirmation"
+      }
+    },
     "inventory": {
       "title": "Inventory",
       "description": "Track variant stock, cart reservations, and low-stock exposure.",

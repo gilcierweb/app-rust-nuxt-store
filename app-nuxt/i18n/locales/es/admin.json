@@ -905,6 +905,11 @@
         "downloadReceipt": "Descargar Comprobante"
       }
     },
+    "refunds": {
+      "detail": {
+        "downloadReceipt": "Descargar Confirmacion"
+      }
+    },
     "inventory": {
       "title": "Inventario",
       "description": "Controle stock por variante, reservas del carrito y exposición a bajo stock.",

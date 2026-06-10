@@ -907,6 +907,11 @@
         "downloadReceipt": "Baixar Comprovante"
       }
     },
+    "refunds": {
+      "detail": {
+        "downloadReceipt": "Baixar Confirmacao"
+      }
+    },
     "inventory": {
       "title": "Estoque",
       "description": "Acompanhe estoque por variante, reservas em carrinho e exposição de baixo estoque.",
