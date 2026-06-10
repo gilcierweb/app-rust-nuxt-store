@@ -13,6 +13,9 @@ use crate::models::_entities::{
     payment_gateway_events, payment_gateway_logs, payment_gateways, payment_methods,
     payment_refunds, payment_sessions, payments,
 };
+use crate::models::payment_gateway_status::{
+    PaymentAttemptStatus, PaymentGatewayEventStatus, PaymentSessionStatus,
+};
 use crate::payment_gateways::registry::gateway_for_driver;
 use crate::payment_gateways::types::{CapturePaymentInput, RefundPaymentInput, VoidPaymentInput};
 use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams};
@@ -242,6 +245,138 @@ pub async fn list_gateway_logs(State(ctx): State<AppContext>) -> Result<Response
     format::json(items)
 }
 
+#[derive(Debug, Serialize)]
+pub struct PaymentHealthSummary {
+    pub failed_events_24h: u64,
+    pub failed_payments_24h: u64,
+    pub stale_processing_count: u64,
+    pub expired_sessions_count: u64,
+    pub total_events_30d: u64,
+    pub total_logs_30d: u64,
+    pub gateways_with_recent_failures: Vec<GatewayFailureInfo>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GatewayFailureInfo {
+    pub gateway_id: i32,
+    pub gateway_name: String,
+    pub gateway_driver: String,
+    pub failed_event_count: u64,
+}
+
+#[debug_handler]
+pub async fn health_summary(State(ctx): State<AppContext>) -> Result<Response> {
+    let now = chrono::Utc::now();
+    let h24 = now - chrono::Duration::hours(24);
+    let d30 = now - chrono::Duration::days(30);
+
+    let failed_events_24h_fut = payment_gateway_events::Entity::find()
+        .filter(
+            payment_gateway_events::Column::Status
+                .eq(PaymentGatewayEventStatus::Failed.to_i16()),
+        )
+        .filter(payment_gateway_events::Column::CreatedAt.gt(h24.naive_utc()))
+        .count(&ctx.db);
+
+    let failed_payments_24h_fut = payments::Entity::find()
+        .filter(
+            payments::Column::Status
+                .eq(Some(PaymentAttemptStatus::Failed.to_i16() as i32)),
+        )
+        .filter(payments::Column::CreatedAt.gt(h24.naive_utc()))
+        .count(&ctx.db);
+
+    let stale_processing_fut = payments::Entity::find()
+        .filter(
+            payments::Column::Status.is_in([
+                PaymentAttemptStatus::Processing.to_i16() as i32,
+                PaymentAttemptStatus::Pending.to_i16() as i32,
+            ]),
+        )
+        .filter(payments::Column::CreatedAt.lt(h24.naive_utc()))
+        .count(&ctx.db);
+
+    let expired_sessions_fut = payment_sessions::Entity::find()
+        .filter(
+            payment_sessions::Column::Status
+                .eq(PaymentSessionStatus::Expired.to_i16()),
+        )
+        .filter(payment_sessions::Column::CreatedAt.gt(h24.naive_utc()))
+        .count(&ctx.db);
+
+    let total_events_30d_fut = payment_gateway_events::Entity::find()
+        .filter(payment_gateway_events::Column::CreatedAt.gt(d30.naive_utc()))
+        .count(&ctx.db);
+
+    let total_logs_30d_fut = payment_gateway_logs::Entity::find()
+        .filter(payment_gateway_logs::Column::CreatedAt.gt(d30.naive_utc()))
+        .count(&ctx.db);
+
+    let (
+        failed_events_24h,
+        failed_payments_24h,
+        stale_processing_count,
+        expired_sessions_count,
+        total_events_30d,
+        total_logs_30d,
+    ) = tokio::try_join!(
+        failed_events_24h_fut,
+        failed_payments_24h_fut,
+        stale_processing_fut,
+        expired_sessions_fut,
+        total_events_30d_fut,
+        total_logs_30d_fut,
+    )
+    .map_err(|e| {
+        tracing::error!(error = ?e, "failed to load payment health summary");
+        Error::InternalServerError
+    })?;
+
+    // Find gateways with recent failures
+    let failed_events_with_gateway = payment_gateway_events::Entity::find()
+        .filter(
+            payment_gateway_events::Column::Status
+                .eq(PaymentGatewayEventStatus::Failed.to_i16()),
+        )
+        .filter(payment_gateway_events::Column::CreatedAt.gt(h24.naive_utc()))
+        .all(&ctx.db)
+        .await?;
+
+    let mut gateway_failure_map: std::collections::HashMap<i32, u64> =
+        std::collections::HashMap::new();
+    for event in &failed_events_with_gateway {
+        *gateway_failure_map
+            .entry(event.payment_gateway_id)
+            .or_insert(0) += 1;
+    }
+
+    let mut gateways_with_recent_failures = Vec::new();
+    for (gateway_id, count) in &gateway_failure_map {
+        if let Ok(Some(gateway)) = payment_gateways::Entity::find_by_id(*gateway_id)
+            .one(&ctx.db)
+            .await
+        {
+            gateways_with_recent_failures.push(GatewayFailureInfo {
+                gateway_id: *gateway_id,
+                gateway_name: gateway.name.clone(),
+                gateway_driver: gateway.driver,
+                failed_event_count: *count,
+            });
+        }
+    }
+    gateways_with_recent_failures.sort_by(|a, b| b.failed_event_count.cmp(&a.failed_event_count));
+
+    format::json(PaymentHealthSummary {
+        failed_events_24h,
+        failed_payments_24h,
+        stale_processing_count,
+        expired_sessions_count,
+        total_events_30d,
+        total_logs_30d,
+        gateways_with_recent_failures,
+    })
+}
+
 #[debug_handler]
 pub async fn capture(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     let payment = payments::Entity::find_by_id(id)
@@ -369,6 +504,7 @@ pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/admin/payments")
         .add("/", get(list))
+        .add("/health", get(health_summary))
         .add("{id}", get(get_one))
         .add("{id}/capture", post(capture))
         .add("{id}/void", post(void))

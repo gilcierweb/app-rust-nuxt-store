@@ -139,6 +139,9 @@ impl Hooks for App {
         queue
             .register(crate::workers::payment_webhook_retry::Worker::build(ctx))
             .await?;
+        queue
+            .register(crate::workers::payment_session_cleanup::Worker::build(ctx))
+            .await?;
         queue.register(DownloadWorker::build(ctx)).await?;
         Ok(())
     }
