@@ -407,7 +407,7 @@ Key backend auth env vars:
 * [x] Inventory management hardening (normalized stock reservations, stock movements, automatic out-of-stock handling)
 * [x] Transactional order emails (order confirmation, shipping updates, delivery confirmation, abandoned cart, back-in-stock)
 * [x] Payment production hardening (expired-session cleanup, provider failure alerts, PCI/security review)
-* [ ] Order invoice generation (PDF)
+* [x] Order invoice generation (PDF)
 * [ ] Tax calculation by region
 * [ ] Multi-currency support with exchange rates
 * [ ] Subscription products (recurring billing)
