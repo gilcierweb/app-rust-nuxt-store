@@ -530,7 +530,8 @@
         "addressNotFound": "Default shipping address not found.",
         "noCustomerInfo": "Customer information not available (User ID: {id})",
         "downloadInvoice": "Download Invoice",
-        "downloadQuotation": "Download Quotation"
+        "downloadQuotation": "Download Quotation",
+        "downloadNfe": "DANFE"
       }
     },
     "posts": {

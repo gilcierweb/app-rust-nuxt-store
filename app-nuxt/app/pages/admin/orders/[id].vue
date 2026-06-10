@@ -36,6 +36,11 @@
             <span v-else class="icon-[tabler--file-text] size-4" />
             {{ $t('admin.orders.detail.downloadQuotation', 'Quotation') }}
           </button>
+          <button class="btn btn-sm btn-outline" :disabled="downloadingNfe" @click="downloadNfe">
+            <span v-if="downloadingNfe" class="loading loading-spinner loading-xs" />
+            <span v-else class="icon-[tabler--receipt-2] size-4" />
+            {{ $t('admin.orders.detail.downloadNfe', 'DANFE') }}
+          </button>
         </div>
       </div>
 
@@ -249,6 +254,7 @@ const statusMsg = ref('')
 const statusMsgType = ref('')
 const downloadingInvoice = ref(false)
 const downloadingQuotation = ref(false)
+const downloadingNfe = ref(false)
 
 const statusMap: Record<number, { label: string; badge: string }> = {
   1: { label: t('order.status.pending'), badge: 'badge-soft badge-warning' },
@@ -364,6 +370,28 @@ async function downloadQuotation() {
     console.error('Failed to download quotation:', err)
   } finally {
     downloadingQuotation.value = false
+  }
+}
+
+async function downloadNfe() {
+  if (!order.value) return
+  downloadingNfe.value = true
+  try {
+    const blob = await apiFetch<Blob>(`/api/admin/orders/${order.value.id}/nfe`, {
+      responseType: 'blob',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `danfe-${order.value.order_number || order.value.id}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to download DANFE:', err)
+  } finally {
+    downloadingNfe.value = false
   }
 }
 </script>

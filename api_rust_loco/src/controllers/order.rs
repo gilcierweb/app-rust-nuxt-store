@@ -28,6 +28,7 @@ use crate::payment_gateways::{
 };
 use crate::services::cart;
 use crate::services::invoice;
+use crate::services::nfe;
 use crate::services::quotation;
 use crate::utils::pagination::PaginationParams;
 use crate::mailers::order::OrderMailer;
@@ -752,6 +753,30 @@ pub async fn admin_quotation(
     Ok((headers, pdf_bytes).into_response())
 }
 
+#[debug_handler]
+pub async fn admin_nfe(
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let data = nfe::load_nfe_data(&ctx.db, id).await?;
+    let pdf_bytes = nfe::generate_nfe_pdf(&data)?;
+
+    let filename = format!("danfe-{}.pdf", data.numero);
+
+    let headers = [
+        (
+            axum::http::header::CONTENT_TYPE,
+            "application/pdf".to_string(),
+        ),
+        (
+            axum::http::header::CONTENT_DISPOSITION,
+            format!("attachment; filename=\"{filename}\""),
+        ),
+    ];
+
+    Ok((headers, pdf_bytes).into_response())
+}
+
 pub fn routes() -> Routes {
     routes_with_prefix("api/orders")
 }
@@ -765,6 +790,7 @@ pub fn admin_routes() -> Routes {
         .add("/{id}/status", put(update_status))
         .add("/{id}/invoice", get(admin_invoice))
         .add("/{id}/quotation", get(admin_quotation))
+        .add("/{id}/nfe", get(admin_nfe))
 }
 
 pub fn account_routes() -> Routes {

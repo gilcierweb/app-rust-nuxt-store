@@ -530,7 +530,8 @@
         "addressNotFound": "Endereço padrão não encontrado.",
         "noCustomerInfo": "Informações do cliente não disponíveis (User ID: {id})",
         "downloadInvoice": "Baixar Nota Fiscal",
-        "downloadQuotation": "Baixar Orcamento"
+        "downloadQuotation": "Baixar Orcamento",
+        "downloadNfe": "DANFE"
       }
     },
     "posts": {

@@ -530,7 +530,8 @@
         "addressNotFound": "No se encontró la dirección de envío predeterminada.",
         "noCustomerInfo": "Información del cliente no disponible (User ID: {id})",
         "downloadInvoice": "Descargar Factura",
-        "downloadQuotation": "Descargar Cotizacion"
+        "downloadQuotation": "Descargar Cotizacion",
+        "downloadNfe": "DANFE"
       }
     },
     "posts": {
