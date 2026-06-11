@@ -4,10 +4,12 @@
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
-use sea_orm::{PaginatorTrait, QueryOrder};
+use sea_orm::{ColumnTrait, PaginatorTrait, QueryFilter, QueryOrder};
 use serde::{Deserialize, Serialize};
 
-use crate::models::_entities::addresses::{ActiveModel, Entity, Model};
+use crate::middleware::auth::CookieJWT;
+use crate::models::_entities::addresses::{ActiveModel, Column, Entity, Model};
+use crate::models::users;
 use crate::utils::pagination::PaginationParams;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -24,7 +26,6 @@ pub struct Params {
     pub country: Option<String>,
     pub phone: Option<String>,
     pub default: Option<bool>,
-    pub user_id: Option<i32>,
 }
 
 impl Params {
@@ -41,14 +42,36 @@ impl Params {
         item.country = Set(self.country.clone());
         item.phone = Set(self.phone.clone());
         item.default = Set(self.default);
-        if let Some(user_id) = self.user_id {
-            item.user_id = Set(user_id);
-        }
     }
+}
+
+async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
+    if let Some(user_id) = auth
+        .claims
+        .claims
+        .get("user_id")
+        .and_then(|value| value.as_i64())
+        .and_then(|value| i32::try_from(value).ok())
+    {
+        return Ok(user_id);
+    }
+
+    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
+        .await?
+        .id)
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     let item = Entity::find_by_id(id).one(&ctx.db).await?;
+    item.ok_or_else(|| Error::NotFound)
+}
+
+async fn load_item_for_user(ctx: &AppContext, id: i32, user_id: i32) -> Result<Model> {
+    let item = Entity::find()
+        .filter(Column::Id.eq(id))
+        .filter(Column::UserId.eq(user_id))
+        .one(&ctx.db)
+        .await?;
     item.ok_or_else(|| Error::NotFound)
 }
 
@@ -58,7 +81,7 @@ pub async fn list(
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
     let items = Entity::find()
-        .order_by_desc(crate::models::_entities::addresses::Column::CreatedAt)
+        .order_by_desc(Column::CreatedAt)
         .paginate(&ctx.db, pagination.page_size())
         .fetch_page(pagination.page_index())
         .await?;
@@ -67,8 +90,14 @@ pub async fn list(
 }
 
 #[debug_handler]
-pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> Result<Response> {
+pub async fn add(
+    auth: CookieJWT,
+    State(ctx): State<AppContext>,
+    Json(params): Json<Params>,
+) -> Result<Response> {
+    let user_id = current_user_id(&ctx, &auth).await?;
     let mut item = ActiveModel {
+        user_id: Set(user_id),
         ..Default::default()
     };
     params.update(&mut item);
@@ -78,11 +107,13 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
 
 #[debug_handler]
 pub async fn update(
+    auth: CookieJWT,
     Path(id): Path<i32>,
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
-    let item = load_item(&ctx, id).await?;
+    let user_id = current_user_id(&ctx, &auth).await?;
+    let item = load_item_for_user(&ctx, id, user_id).await?;
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
@@ -90,14 +121,30 @@ pub async fn update(
 }
 
 #[debug_handler]
-pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
-    load_item(&ctx, id).await?.delete(&ctx.db).await?;
+pub async fn remove(
+    auth: CookieJWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let user_id = current_user_id(&ctx, &auth).await?;
+    let item = load_item_for_user(&ctx, id, user_id).await?;
+    item.delete(&ctx.db).await?;
     format::empty()
 }
 
 #[debug_handler]
 pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     format::json(load_item(&ctx, id).await?)
+}
+
+#[debug_handler]
+pub async fn account_get_one(
+    auth: CookieJWT,
+    Path(id): Path<i32>,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let user_id = current_user_id(&ctx, &auth).await?;
+    format::json(load_item_for_user(&ctx, id, user_id).await?)
 }
 
 pub fn routes() -> Routes {
@@ -113,6 +160,17 @@ pub fn admin_routes() -> Routes {
         .add("/", get(list))
         .add("/", post(add))
         .add("/{id}", get(get_one))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
+}
+
+pub fn account_routes() -> Routes {
+    Routes::new()
+        .prefix("api/account/addresses/")
+        .add("/", get(list))
+        .add("/", post(add))
+        .add("/{id}", get(account_get_one))
         .add("/{id}", delete(remove))
         .add("/{id}", put(update))
         .add("/{id}", patch(update))
