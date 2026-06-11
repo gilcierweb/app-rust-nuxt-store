@@ -279,7 +279,8 @@
       "securePayment": "Pago Seguro con Criptografía SSL de 256 bits",
       "promoCode": "Cupón de Descuento",
       "apply": "Aplicar",
-      "invalidCart": "Tu carrito contiene datos inválidos o corruptos. Intenta agregar los productos nuevamente."
+      "invalidCart": "Tu carrito contiene datos inválidos o corruptos. Intenta agregar los productos nuevamente.",
+      "couponError": "Error al validar el cupón de descuento. Inténtalo de nuevo."
     },
     "confirmation": {
       "title": "Pedido Confirmado",

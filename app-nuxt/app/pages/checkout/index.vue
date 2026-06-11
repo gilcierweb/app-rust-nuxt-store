@@ -494,7 +494,7 @@ async function applyCoupon() {
       couponMessage.value = result.message
     }
   } catch {
-    couponMessage.value = t('product.reviewError')
+    couponMessage.value = t('pages.checkout.couponError')
   } finally {
     couponChecking.value = false
   }

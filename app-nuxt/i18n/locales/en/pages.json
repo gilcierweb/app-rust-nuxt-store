@@ -279,7 +279,8 @@
       "securePayment": "Secure Payment with 256-bit SSL Encryption",
       "promoCode": "Promo Code",
       "apply": "Apply",
-      "invalidCart": "Your cart contains invalid or corrupted data. Please try adding the items again."
+      "invalidCart": "Your cart contains invalid or corrupted data. Please try adding the items again.",
+      "couponError": "Error validating promo code. Please try again."
     },
     "confirmation": {
       "title": "Order Confirmed",
