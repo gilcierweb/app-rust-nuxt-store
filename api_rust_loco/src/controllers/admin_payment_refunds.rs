@@ -12,7 +12,7 @@ use std::collections::{HashMap, HashSet};
 use axum::debug_handler;
 use loco_rs::prelude::*;
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter, QueryOrder, QuerySelect};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::models::_entities::{payment_gateways, payment_methods, payment_refunds, payments};
 
@@ -145,15 +145,10 @@ pub fn routes() -> Routes {
         .add("{id}/receipt", get(receipt))
 }
 
-#[derive(Deserialize)]
-pub struct BulkExportParams {
-    pub ids: Vec<i32>,
-}
-
 #[debug_handler]
 pub async fn bulk_export(
     State(ctx): State<AppContext>,
-    Json(params): Json<BulkExportParams>,
+    Json(params): Json<crate::utils::bulk_export::BulkExportParams>,
 ) -> Result<Response> {
     if params.ids.is_empty() {
         return Err(Error::BadRequest("No IDs provided".into()));

@@ -7,7 +7,6 @@ use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
 use sea_orm::{PaginatorTrait, QueryOrder, TransactionTrait};
-use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::models::_entities::addresses;
@@ -789,15 +788,10 @@ pub async fn admin_nfe(
     Ok((headers, pdf_bytes).into_response())
 }
 
-#[derive(Deserialize)]
-pub struct BulkExportParams {
-    pub ids: Vec<i32>,
-}
-
 #[debug_handler]
 pub async fn bulk_export(
     State(ctx): State<AppContext>,
-    Json(params): Json<BulkExportParams>,
+    Json(params): Json<crate::utils::bulk_export::BulkExportParams>,
 ) -> Result<Response> {
     if params.ids.is_empty() {
         return Err(Error::BadRequest("No IDs provided".into()));

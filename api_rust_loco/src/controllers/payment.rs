@@ -162,15 +162,10 @@ pub fn routes() -> Routes {
     routes_with_prefix("api/payments/")
 }
 
-#[derive(Deserialize)]
-pub struct BulkExportParams {
-    pub ids: Vec<i32>,
-}
-
 #[debug_handler]
 pub async fn bulk_export(
     State(ctx): State<AppContext>,
-    Json(params): Json<BulkExportParams>,
+    Json(params): Json<crate::utils::bulk_export::BulkExportParams>,
 ) -> Result<Response> {
     if params.ids.is_empty() {
         return Err(Error::BadRequest("No IDs provided".into()));
