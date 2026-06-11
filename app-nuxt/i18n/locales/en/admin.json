@@ -284,7 +284,51 @@
       },
       "editTitle": "Edit Product",
       "loading": "Loading product...",
-      "error": "Error loading product: {message}"
+      "error": "Error loading product: {message}",
+      "form": {
+        "titleEdit": "Edit Product",
+        "titleNew": "New Product",
+        "saving": "Saving product...",
+        "name": "Product Name",
+        "namePlaceholder": "Product name",
+        "sku": "SKU",
+        "skuPlaceholder": "Unique SKU",
+        "slug": "Slug",
+        "slugPlaceholder": "product-slug",
+        "category": "Category",
+        "categoryPlaceholder": "Select a category",
+        "shortDescription": "Short Description",
+        "shortDescriptionPlaceholder": "Brief product description",
+        "description": "Full Description",
+        "descriptionPlaceholder": "Detailed product description",
+        "salePrice": "Sale Price",
+        "costPrice": "Cost Price",
+        "comparePrice": "Compare Price",
+        "status": "Status",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "statusDraft": "Draft",
+        "featured": "Featured Product",
+        "active": "Active Product",
+        "images": "Product Images",
+        "addField": "Add Field",
+        "image": "Image",
+        "altText": "Alt Text",
+        "imageDescription": "Image description",
+        "position": "Position",
+        "activeField": "Active",
+        "cover": "Cover",
+        "remove": "Remove",
+        "dragDrop": "Drag and drop images here",
+        "dragDropSub": "or click to select files",
+        "cancel": "Cancel",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitProduct": "Product",
+        "successCreated": "Product created successfully!",
+        "successUpdated": "Product updated successfully!",
+        "error": "Error saving product. Please try again."
+      }
     },
     "categories": {
       "title": "Categories",
@@ -326,6 +370,32 @@
         "delete": "Delete",
         "confirmDelete": "Are you sure you want to delete category \"{name}\"?",
         "errorDelete": "Error deleting category"
+      },
+      "form": {
+        "titleEdit": "Edit Category",
+        "titleNew": "New Category",
+        "saving": "Saving category...",
+        "name": "Category Name",
+        "namePlaceholder": "Category name",
+        "slug": "Slug",
+        "slugPlaceholder": "category-slug",
+        "slugHint": "Auto-generated if left blank",
+        "description": "Description",
+        "descriptionPlaceholder": "Category description",
+        "parentCategory": "Parent Category",
+        "parentCategoryRoot": "None (root category)",
+        "position": "Position",
+        "active": "Active Category",
+        "cancel": "Cancel",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitCategory": "Category",
+        "validation": {
+          "nameRequired": "Category name is required"
+        },
+        "successCreated": "Category created successfully!",
+        "successUpdated": "Category updated successfully!",
+        "error": "Error saving category. Please try again."
       }
     },
     "coupons": {
@@ -535,42 +605,6 @@
         "downloadNfe": "DANFE"
       }
     },
-    "posts": {
-      "title": "Posts",
-      "searchPlaceholder": "Search posts",
-      "add": "Add",
-      "loading": "Loading posts...",
-      "error": "Error loading posts: {message}",
-      "notFound": "No posts found.",
-      "createFirst": "Create first post",
-      "noTitle": "(No title)",
-      "table": {
-        "title": "Title",
-        "status": "Status",
-        "author": "Author ID",
-        "date": "Date",
-        "actions": "Actions"
-      },
-      "status": {
-        "draft": "Draft",
-        "pending": "Pending",
-        "scheduled": "Scheduled",
-        "published": "Published",
-        "private": "Private",
-        "archived": "Archived",
-        "trashed": "Trashed",
-        "rejected": "Rejected",
-        "unknown": "Unknown"
-      },
-      "detail": {
-        "title": "Post Details",
-        "content": "Content",
-        "noContent": "No content",
-        "back": "Back to list",
-        "confirmDelete": "Are you sure you want to delete post \"{name}\"?",
-        "errorDelete": "Error deleting post"
-      }
-    },
     "customers": {
       "title": "Customers",
       "searchPlaceholder": "Search customers",
@@ -727,6 +761,34 @@
         "back": "Back to list",
         "confirmDelete": "Are you sure you want to delete review #{id}?",
         "errorDelete": "Error deleting review"
+      },
+      "form": {
+        "titleEdit": "Edit Review",
+        "titleNew": "New Review",
+        "saving": "Saving review...",
+        "productId": "Product ID",
+        "productIdPlaceholder": "Product ID",
+        "userId": "User ID",
+        "userIdPlaceholder": "User ID",
+        "rating": "Rating (1-5)",
+        "title": "Title",
+        "titlePlaceholder": "Review title",
+        "comment": "Comment",
+        "commentPlaceholder": "Write your review...",
+        "verifiedPurchase": "Verified Purchase",
+        "active": "Active",
+        "cancel": "Cancel",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitReview": "Review",
+        "validation": {
+          "productIdRequired": "Product ID is required",
+          "userIdRequired": "User ID is required",
+          "ratingRange": "Rating must be between 1 and 5"
+        },
+        "successCreated": "Review created successfully!",
+        "successUpdated": "Review updated successfully!",
+        "error": "Error saving review. Please try again."
       }
     },
     "shipments": {
@@ -843,6 +905,53 @@
         "back": "Back to list",
         "confirmDelete": "Are you sure you want to delete address for \"{name}\"?",
         "errorDelete": "Error deleting address"
+      },
+      "form": {
+        "titleEdit": "Edit Address",
+        "titleNew": "New Address",
+        "saving": "Saving address...",
+        "type": "Type",
+        "typePlaceholder": "Select...",
+        "firstName": "First Name",
+        "firstNamePlaceholder": "First name",
+        "lastName": "Last Name",
+        "lastNamePlaceholder": "Last name",
+        "company": "Company",
+        "companyPlaceholder": "Company name",
+        "address1": "Address Line 1",
+        "address1Placeholder": "Street, number",
+        "address2": "Address Line 2",
+        "address2Placeholder": "Complement, apt, block",
+        "city": "City",
+        "cityPlaceholder": "City",
+        "state": "State",
+        "statePlaceholder": "State/UF",
+        "zipCode": "Zip Code",
+        "zipCodePlaceholder": "00000-000",
+        "country": "Country",
+        "countryPlaceholder": "Country",
+        "phone": "Phone",
+        "phonePlaceholder": "(00) 00000-0000",
+        "userId": "User ID",
+        "userIdPlaceholder": "User ID",
+        "default": "Default Address",
+        "cancel": "Cancel",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitAddress": "Address",
+        "validation": {
+          "firstNameRequired": "First name is required",
+          "lastNameRequired": "Last name is required",
+          "addressRequired": "Address is required",
+          "cityRequired": "City is required",
+          "stateRequired": "State is required",
+          "zipCodeRequired": "Zip code is required",
+          "countryRequired": "Country is required",
+          "userIdRequired": "User ID is required"
+        },
+        "successCreated": "Address created successfully!",
+        "successUpdated": "Address updated successfully!",
+        "error": "Error saving address. Please try again."
       }
     },
     "payments": {
@@ -1086,6 +1195,103 @@
         "defaultSubject": "Default Subject",
         "htmlTemplate": "HTML Template (html.tera)",
         "textTemplate": "Text Template (text.tera)"
+      }
+    },
+    "profiles": {
+      "form": {
+        "titleEdit": "Edit Profile",
+        "titleNew": "New Profile",
+        "saving": "Saving profile...",
+        "firstName": "First Name",
+        "firstNamePlaceholder": "First name",
+        "lastName": "Last Name",
+        "lastNamePlaceholder": "Last name",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Full name",
+        "fullNameHint": "Auto-generated if left blank",
+        "username": "Username",
+        "usernamePlaceholder": "username",
+        "nickname": "Nickname",
+        "nicknamePlaceholder": "Nickname",
+        "phone": "Phone",
+        "phonePlaceholder": "5511999999999",
+        "whatsapp": "WhatsApp",
+        "whatsappPlaceholder": "5511999999999",
+        "birthDate": "Birth Date",
+        "avatarUrl": "Avatar URL",
+        "avatarUrlPlaceholder": "https://example.com/avatar.jpg",
+        "bio": "Bio",
+        "bioPlaceholder": "About you...",
+        "userId": "User ID",
+        "userIdPlaceholder": "User ID",
+        "cancel": "Cancel",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitProfile": "Profile",
+        "validation": {
+          "firstNameRequired": "First name is required",
+          "lastNameRequired": "Last name is required",
+          "userIdRequired": "User ID is required"
+        },
+        "successCreated": "Profile created successfully!",
+        "successUpdated": "Profile updated successfully!",
+        "error": "Error saving profile. Please try again."
+      }
+    },
+    "posts": {
+      "title": "Posts",
+      "searchPlaceholder": "Search posts",
+      "add": "Add",
+      "loading": "Loading posts...",
+      "error": "Error loading posts: {message}",
+      "notFound": "No posts found.",
+      "createFirst": "Create first post",
+      "noTitle": "(No title)",
+      "table": {
+        "title": "Title",
+        "status": "Status",
+        "author": "Author ID",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "status": {
+        "draft": "Draft",
+        "pending": "Pending",
+        "scheduled": "Scheduled",
+        "published": "Published",
+        "private": "Private",
+        "archived": "Archived",
+        "trashed": "Trashed",
+        "rejected": "Rejected",
+        "unknown": "Unknown"
+      },
+      "detail": {
+        "title": "Post Details",
+        "content": "Content",
+        "noContent": "No content",
+        "back": "Back to list",
+        "confirmDelete": "Are you sure you want to delete post \"{name}\"?",
+        "errorDelete": "Error deleting post"
+      },
+      "form": {
+        "titleEdit": "Edit Post",
+        "titleNew": "New Post",
+        "saving": "Saving post...",
+        "title": "Title",
+        "titlePlaceholder": "Post title",
+        "content": "Content",
+        "contentPlaceholder": "Post content",
+        "status": "Status",
+        "cancel": "Cancel",
+        "submitUpdate": "Update",
+        "submitSave": "Save",
+        "submitPost": "Post",
+        "validation": {
+          "titleRequired": "Title is required"
+        },
+        "successCreated": "Post created successfully!",
+        "successUpdated": "Post updated successfully!",
+        "error": "Error saving post. Please try again."
       }
     },
     "monitoring": {

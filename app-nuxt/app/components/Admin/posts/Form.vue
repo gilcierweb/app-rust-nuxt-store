@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Post' : 'Novo Post' }}
+          {{ isEditing ? t('admin.posts.form.titleEdit') : t('admin.posts.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando post...</span>
+          <span class="ml-3">{{ t('admin.posts.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -34,12 +34,12 @@
           <!-- Title -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Título *</span>
+              <span class="label-text font-semibold">{{ t('admin.posts.form.title') }} *</span>
             </label>
             <input
               v-model="form.title"
               type="text"
-              placeholder="Título do post"
+              :placeholder="t('admin.posts.form.titlePlaceholder')"
               class="input input-bordered w-full"
               :class="{ 'input-error': errors.title }"
               required
@@ -53,11 +53,11 @@
           <!-- Content -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Conteúdo</span>
+              <span class="label-text font-semibold">{{ t('admin.posts.form.content') }}</span>
             </label>
             <textarea
               v-model="form.content"
-              placeholder="Conteúdo do post"
+              :placeholder="t('admin.posts.form.contentPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="6"
               :disabled="pending"
@@ -68,7 +68,7 @@
             <!-- Status -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Status</span>
+                <span class="label-text font-semibold">{{ t('admin.posts.form.status') }}</span>
               </label>
               <select v-model.number="form.status" class="select select-bordered w-full" :disabled="pending">
                 <option v-for="(label, value) in PostStatusLabels" :key="value" :value="Number(value)">
@@ -86,11 +86,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('admin.posts.form.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Post
+              {{ isEditing ? t('admin.posts.form.submitUpdate') : t('admin.posts.form.submitSave') }} {{ t('admin.posts.form.submitPost') }}
             </button>
           </div>
         </form>
@@ -118,6 +118,7 @@ const emit = defineEmits<{
 }>()
 
 const { apiFetch } = useApi()
+const { t } = useI18n()
 
 // Form state
 const form = reactive({
@@ -158,7 +159,7 @@ const validate = () => {
   errors.title = ''
 
   if (!form.title.trim()) {
-    errors.title = 'O título é obrigatório'
+    errors.title = t('admin.posts.form.validation.titleRequired')
     isValid = false
   }
 
@@ -192,12 +193,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Post atualizado com sucesso!'
-      : 'Post criado com sucesso!'
+      ? t('admin.posts.form.successUpdated')
+      : t('admin.posts.form.successCreated')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar post. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.posts.form.error')
   } finally {
     pending.value = false
   }

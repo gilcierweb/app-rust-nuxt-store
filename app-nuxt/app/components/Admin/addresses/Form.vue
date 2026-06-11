@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Endereço' : 'Novo Endereço' }}
+          {{ isEditing ? t('admin.addresses.form.titleEdit') : t('admin.addresses.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando endereço...</span>
+          <span class="ml-3">{{ t('admin.addresses.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -34,13 +34,13 @@
           <!-- Type -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Tipo</span>
+              <span class="label-text font-semibold">{{ t('admin.addresses.form.type') }}</span>
             </label>
             <select v-model="form.type" class="select select-bordered w-full" :disabled="pending">
-              <option value="">Selecione...</option>
-              <option value="home">Casa</option>
-              <option value="work">Trabalho</option>
-              <option value="other">Outro</option>
+              <option value="">{{ t('admin.addresses.form.typePlaceholder') }}</option>
+              <option value="home">{{ t('admin.addresses.types.home') }}</option>
+              <option value="work">{{ t('admin.addresses.types.work') }}</option>
+              <option value="other">{{ t('admin.addresses.types.other') }}</option>
             </select>
           </div>
 
@@ -48,12 +48,12 @@
             <!-- First Name -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Nome *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.firstName') }} *</span>
               </label>
               <input
                 v-model="form.first_name"
                 type="text"
-                placeholder="Primeiro nome"
+                :placeholder="t('admin.addresses.form.firstNamePlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': errors.first_name }"
                 required
@@ -67,7 +67,7 @@
             <!-- Last Name -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Sobrenome *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.lastName') }} *</span>
               </label>
               <input
                 v-model="form.last_name"
@@ -87,12 +87,12 @@
           <!-- Company -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Empresa</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.company') }}</span>
             </label>
             <input
               v-model="form.company"
               type="text"
-              placeholder="Nome da empresa"
+              :placeholder="t('admin.addresses.form.companyPlaceholder')"
               class="input input-bordered w-full"
               :disabled="pending"
             />
@@ -101,12 +101,12 @@
           <!-- Address 1 -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Endereço 1 *</span>
+              <span class="label-text font-semibold">{{ t('admin.addresses.form.address1') }} *</span>
             </label>
             <input
               v-model="form.address1"
               type="text"
-              placeholder="Rua, número"
+              :placeholder="t('admin.addresses.form.address1Placeholder')"
               class="input input-bordered w-full"
               :class="{ 'input-error': errors.address1 }"
               required
@@ -120,12 +120,12 @@
           <!-- Address 2 -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Endereço 2</span>
+              <span class="label-text font-semibold">{{ t('admin.addresses.form.address2') }}</span>
             </label>
             <input
               v-model="form.address2"
               type="text"
-              placeholder="Complemento, apto, bloco"
+              :placeholder="t('admin.addresses.form.address2Placeholder')"
               class="input input-bordered w-full"
               :disabled="pending"
             />
@@ -135,7 +135,7 @@
             <!-- City -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Cidade *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.city') }} *</span>
               </label>
               <input
                 v-model="form.city"
@@ -154,12 +154,12 @@
             <!-- State -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Estado *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.state') }} *</span>
               </label>
               <input
                 v-model="form.state"
                 type="text"
-                placeholder="Estado/UF"
+                :placeholder="t('admin.addresses.form.statePlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': errors.state }"
                 required
@@ -175,7 +175,7 @@
             <!-- Zip Code -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">CEP *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.zipCode') }} *</span>
               </label>
               <input
                 v-model="form.zip_code"
@@ -194,7 +194,7 @@
             <!-- Country -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">País *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.country') }} *</span>
               </label>
               <input
                 v-model="form.country"
@@ -215,7 +215,7 @@
             <!-- Phone -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Telefone</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.phone') }}</span>
               </label>
               <input
                 v-model="form.phone"
@@ -229,12 +229,12 @@
             <!-- User ID -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Usuário ID *</span>
+                <span class="label-text font-semibold">{{ t('admin.addresses.form.userId') }} *</span>
               </label>
               <input
                 v-model.number="form.user_id"
                 type="number"
-                placeholder="ID do usuário"
+                :placeholder="t('admin.addresses.form.userIdPlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': errors.user_id }"
                 required
@@ -249,7 +249,7 @@
           <!-- Default -->
           <div class="form-control">
             <label class="label cursor-pointer">
-              <span class="label-text font-semibold">Endereço Padrão</span>
+              <span class="label-text font-semibold">{{ t('admin.addresses.form.default') }}</span>
               <input
                 v-model="form.default"
                 type="checkbox"
@@ -267,11 +267,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('admin.addresses.form.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Endereço
+              {{ isEditing ? t('admin.addresses.form.submitUpdate') : t('admin.addresses.form.submitSave') }} {{ t('admin.addresses.form.submitAddress') }}
             </button>
           </div>
         </form>
@@ -297,6 +297,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const { t } = useI18n()
 const { apiFetch } = useApi()
 
 // Form state
@@ -382,42 +383,42 @@ const validate = () => {
   errors.user_id = ''
 
   if (!form.first_name?.trim()) {
-    errors.first_name = 'O nome é obrigatório'
+    errors.first_name = t('admin.addresses.form.validation.firstNameRequired')
     isValid = false
   }
 
   if (!form.last_name?.trim()) {
-    errors.last_name = 'O sobrenome é obrigatório'
+    errors.last_name = t('admin.addresses.form.validation.lastNameRequired')
     isValid = false
   }
 
   if (!form.address1?.trim()) {
-    errors.address1 = 'O endereço é obrigatório'
+    errors.address1 = t('admin.addresses.form.validation.addressRequired')
     isValid = false
   }
 
   if (!form.city?.trim()) {
-    errors.city = 'A cidade é obrigatória'
+    errors.city = t('admin.addresses.form.validation.cityRequired')
     isValid = false
   }
 
   if (!form.state?.trim()) {
-    errors.state = 'O estado é obrigatório'
+    errors.state = t('admin.addresses.form.validation.stateRequired')
     isValid = false
   }
 
   if (!form.zip_code?.trim()) {
-    errors.zip_code = 'O CEP é obrigatório'
+    errors.zip_code = t('admin.addresses.form.validation.zipCodeRequired')
     isValid = false
   }
 
   if (!form.country?.trim()) {
-    errors.country = 'O país é obrigatório'
+    errors.country = t('admin.addresses.form.validation.countryRequired')
     isValid = false
   }
 
   if (!form.user_id) {
-    errors.user_id = 'O ID do usuário é obrigatório'
+    errors.user_id = t('admin.addresses.form.validation.userIdRequired')
     isValid = false
   }
 
@@ -461,12 +462,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Endereço atualizado com sucesso!'
-      : 'Endereço criado com sucesso!'
+      ? t('admin.addresses.form.successUpdated')
+      : t('admin.addresses.form.successCreated')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar endereço. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.addresses.form.error')
   } finally {
     pending.value = false
   }

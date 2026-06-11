@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Avaliação' : 'Nova Avaliação' }}
+          {{ isEditing ? t('admin.reviews.form.titleEdit') : t('admin.reviews.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando avaliação...</span>
+          <span class="ml-3">{{ t('admin.reviews.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -35,12 +35,12 @@
             <!-- Product ID -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Produto ID *</span>
+                <span class="label-text font-semibold">{{ t('admin.reviews.form.productId') }} *</span>
               </label>
               <input
                 v-model.number="form.product_id"
                 type="number"
-                placeholder="ID do produto"
+                :placeholder="t('admin.reviews.form.productIdPlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': errors.product_id }"
                 required
@@ -54,12 +54,12 @@
             <!-- User ID -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Usuário ID *</span>
+                <span class="label-text font-semibold">{{ t('admin.reviews.form.userId') }} *</span>
               </label>
               <input
                 v-model.number="form.user_id"
                 type="number"
-                placeholder="ID do usuário"
+                :placeholder="t('admin.reviews.form.userIdPlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': errors.user_id }"
                 required
@@ -74,7 +74,7 @@
           <!-- Rating -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Avaliação (1-5) *</span>
+              <span class="label-text font-semibold">{{ t('admin.reviews.form.rating') }} *</span>
             </label>
             <div class="flex items-center gap-2">
               <input
@@ -100,12 +100,12 @@
           <!-- Title -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Título</span>
+              <span class="label-text font-semibold">{{ t('admin.reviews.form.title') }}</span>
             </label>
             <input
               v-model="form.title"
               type="text"
-              placeholder="Título da avaliação"
+              :placeholder="t('admin.reviews.form.titlePlaceholder')"
               class="input input-bordered w-full"
               :disabled="pending"
             />
@@ -114,11 +114,11 @@
           <!-- Comment -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Comentário</span>
+              <span class="label-text font-semibold">{{ t('admin.reviews.form.comment') }}</span>
             </label>
             <textarea
               v-model="form.comment"
-              placeholder="Escreva sua avaliação..."
+              :placeholder="t('admin.reviews.form.commentPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="4"
               :disabled="pending"
@@ -129,7 +129,7 @@
             <!-- Verified Purchase -->
             <div class="form-control">
               <label class="label cursor-pointer">
-                <span class="label-text font-semibold">Compra Verificada</span>
+                <span class="label-text font-semibold">{{ t('admin.reviews.form.verifiedPurchase') }}</span>
                 <input
                   v-model="form.verified_purchase"
                   type="checkbox"
@@ -142,7 +142,7 @@
             <!-- Active -->
             <div class="form-control">
               <label class="label cursor-pointer">
-                <span class="label-text font-semibold">Ativa</span>
+                <span class="label-text font-semibold">{{ t('admin.reviews.form.active') }}</span>
                 <input
                   v-model="form.active"
                   type="checkbox"
@@ -161,11 +161,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('admin.reviews.form.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Avaliação
+              {{ isEditing ? t('admin.reviews.form.submitUpdate') : t('admin.reviews.form.submitSave') }} {{ t('admin.reviews.form.submitReview') }}
             </button>
           </div>
         </form>
@@ -192,6 +192,7 @@ const emit = defineEmits<{
 }>()
 
 const { apiFetch } = useApi()
+const { t } = useI18n()
 
 // Form state
 const form = reactive({
@@ -248,17 +249,17 @@ const validate = () => {
   errors.rating = ''
 
   if (!form.product_id) {
-    errors.product_id = 'O ID do produto é obrigatório'
+    errors.product_id = t('admin.reviews.form.validation.productIdRequired')
     isValid = false
   }
 
   if (!form.user_id) {
-    errors.user_id = 'O ID do usuário é obrigatório'
+    errors.user_id = t('admin.reviews.form.validation.userIdRequired')
     isValid = false
   }
 
   if (!form.rating || form.rating < 1 || form.rating > 5) {
-    errors.rating = 'A avaliação deve ser entre 1 e 5'
+    errors.rating = t('admin.reviews.form.validation.ratingRange')
     isValid = false
   }
 
@@ -296,12 +297,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Avaliação atualizada com sucesso!'
-      : 'Avaliação criada com sucesso!'
+      ? t('admin.reviews.form.successUpdated')
+      : t('admin.reviews.form.successCreated')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar avaliação. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.reviews.form.error')
   } finally {
     pending.value = false
   }

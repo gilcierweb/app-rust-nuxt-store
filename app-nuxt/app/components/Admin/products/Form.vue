@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ propsIsEditing ? 'Editar Produto' : 'Novo Produto' }}
+          {{ propsIsEditing ? t('admin.products.form.titleEdit') : t('admin.products.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando produto...</span>
+          <span class="ml-3">{{ t('admin.products.form.saving') }}</span>
         </div>
 
 
@@ -23,13 +23,13 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Nome do Produto *</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.name') }} *</span>
               </label>
               <input
                 v-model="name"
                 @blur="nameBlur"
                 type="text"
-                placeholder="Nome do produto"
+                :placeholder="t('admin.products.form.namePlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': nameError }"
                 required
@@ -41,13 +41,13 @@
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">SKU *</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.sku') }} *</span>
               </label>
               <input
                 v-model="sku"
                 @blur="skuBlur"
                 type="text"
-                placeholder="SKU único"
+                :placeholder="t('admin.products.form.skuPlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': skuError }"
                 required
@@ -61,17 +61,17 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Slug</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.slug') }}</span>
               </label>
-              <input v-model="values.slug" type="text" placeholder="slug-do-produto" class="input input-bordered w-full" />
+              <input v-model="values.slug" type="text" :placeholder="t('admin.products.form.slugPlaceholder')" class="input input-bordered w-full" />
             </div>
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Categoria</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.category') }}</span>
               </label>
               <select v-model="values.categoryId" class="select select-bordered w-full">
-                <option value="">Selecione uma categoria</option>
+                <option value="">{{ t('admin.products.form.categoryPlaceholder') }}</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">
                   {{ category.name }}
                 </option>
@@ -82,23 +82,23 @@
           <!-- Descriptions -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Descrição Curta</span>
+              <span class="label-text font-semibold">{{ t('admin.products.form.shortDescription') }}</span>
             </label>
-            <textarea v-model="values.shortDescription" placeholder="Descrição breve do produto" class="textarea textarea-bordered w-full" rows="3"></textarea>
+            <textarea v-model="values.shortDescription" :placeholder="t('admin.products.form.shortDescriptionPlaceholder')" class="textarea textarea-bordered w-full" rows="3"></textarea>
           </div>
 
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Descrição Completa</span>
+              <span class="label-text font-semibold">{{ t('admin.products.form.description') }}</span>
             </label>
-            <textarea v-model="values.description" placeholder="Descrição detalhada do produto" class="textarea textarea-bordered w-full" rows="5"></textarea>
+            <textarea v-model="values.description" :placeholder="t('admin.products.form.descriptionPlaceholder')" class="textarea textarea-bordered w-full" rows="5"></textarea>
           </div>
 
           <!-- Pricing -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Preço de Venda *</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.salePrice') }} *</span>
               </label>
               <input
                 v-model="price"
@@ -118,14 +118,14 @@
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Preço de Custo</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.costPrice') }}</span>
               </label>
               <input v-model="values.costPrice" type="number" step="0.01" min="0" placeholder="0.00" class="input input-bordered w-full" />
             </div>
 
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Preço Comparativo</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.comparePrice') }}</span>
               </label>
               <input v-model="values.comparePrice" type="number" step="0.01" min="0" placeholder="0.00" class="input input-bordered w-full" />
             </div>
@@ -135,25 +135,25 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Status</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.status') }}</span>
               </label>
               <select v-model="values.status" class="select select-bordered w-full">
-                <option :value="1">Ativo</option>
-                <option :value="0">Inativo</option>
-                <option :value="2">Rascunho</option>
+                <option :value="1">{{ t('admin.products.form.statusActive') }}</option>
+                <option :value="0">{{ t('admin.products.form.statusInactive') }}</option>
+                <option :value="2">{{ t('admin.products.form.statusDraft') }}</option>
               </select>
             </div>
 
             <div class="form-control">
               <label class="label cursor-pointer">
-                <span class="label-text font-semibold">Produto em Destaque</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.featured') }}</span>
                 <input v-model="values.featured" type="checkbox" class="checkbox checkbox-primary" />
               </label>
             </div>
 
             <div class="form-control">
               <label class="label cursor-pointer">
-                <span class="label-text font-semibold">Produto Ativo</span>
+                <span class="label-text font-semibold">{{ t('admin.products.form.active') }}</span>
                 <input v-model="values.active" type="checkbox" class="checkbox checkbox-primary" />
               </label>
             </div>
@@ -162,12 +162,12 @@
           <!-- Image Upload Section -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Imagens do Produto</span>
+              <span class="label-text font-semibold">{{ t('admin.products.form.images') }}</span>
             </label>
 
             <div class="flex items-center gap-4 mb-4">
               <input type="file" @change="handleImageUpload" multiple accept="image/*" class="file-input file-input-bordered w-full max-w-xs" :disabled="pending" />
-              <button type="button" @click="addImageField()" class="btn btn-outline btn-sm" :disabled="pending">Adicionar Campo</button>
+              <button type="button" @click="addImageField()" class="btn btn-outline btn-sm" :disabled="pending">{{ t('admin.products.form.addField') }}</button>
             </div>
 
             <div v-if="imageFields.length > 0" class="space-y-4">
@@ -175,7 +175,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div class="form-control">
                     <label class="label">
-                      <span class="label-text">Imagem {{ index + 1 }}</span>
+                      <span class="label-text">{{ t('admin.products.form.image') }} {{ index + 1 }}</span>
                     </label>
                     <input type="file" @change="(e) => handleImageFieldChange(e, index)" accept="image/*" class="file-input file-input-bordered w-full" :disabled="pending" />
                     <div v-if="field.preview" class="mt-2">
@@ -185,32 +185,32 @@
 
                   <div class="form-control">
                     <label class="label">
-                      <span class="label-text">Texto Alternativo</span>
+                      <span class="label-text">{{ t('admin.products.form.altText') }}</span>
                     </label>
-                    <input v-model="field.alt_text" type="text" placeholder="Descrição da imagem" class="input input-bordered w-full" :disabled="pending" />
+                    <input v-model="field.alt_text" type="text" :placeholder="t('admin.products.form.imageDescription')" class="input input-bordered w-full" :disabled="pending" />
                   </div>
 
                   <div class="form-control">
                     <label class="label">
-                      <span class="label-text">Posição</span>
+                      <span class="label-text">{{ t('admin.products.form.position') }}</span>
                     </label>
                     <input v-model="field.position" type="number" min="0" class="input input-bordered w-full" :disabled="pending" />
                   </div>
 
                   <div class="form-control space-y-2">
                     <label class="label cursor-pointer">
-                      <span class="label-text">Ativa</span>
+                      <span class="label-text">{{ t('admin.products.form.activeField') }}</span>
                       <input v-model="field.active" type="checkbox" class="checkbox checkbox-primary" :disabled="pending" />
                     </label>
                     <label class="label cursor-pointer">
-                      <span class="label-text">Capa</span>
+                      <span class="label-text">{{ t('admin.products.form.cover') }}</span>
                       <input v-model="field.cover" type="checkbox" class="checkbox checkbox-primary" :disabled="pending" @change="() => handleCoverChange(index)" />
                     </label>
                   </div>
                 </div>
 
                 <div class="flex justify-end mt-3">
-                  <button type="button" @click="removeImageField(index)" class="btn btn-error btn-sm" :disabled="pending">Remover</button>
+                  <button type="button" @click="removeImageField(index)" class="btn btn-error btn-sm" :disabled="pending">{{ t('admin.products.form.remove') }}</button>
                 </div>
               </div>
             </div>
@@ -220,18 +220,18 @@
                 <svg class="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <p class="text-lg font-medium">Arraste e solte imagens aqui</p>
-                <p class="text-sm">ou clique para selecionar arquivos</p>
+                <p class="text-lg font-medium">{{ t('admin.products.form.dragDrop') }}</p>
+                <p class="text-sm">{{ t('admin.products.form.dragDropSub') }}</p>
               </div>
             </div>
           </div>
 
           <!-- Action Buttons -->
           <div class="flex justify-end space-x-4 pt-6">
-            <button type="button" @click="emit('cancel')" class="btn btn-outline" :disabled="pending">Cancelar</button>
+            <button type="button" @click="emit('cancel')" class="btn btn-outline" :disabled="pending">{{ t('admin.products.form.cancel') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ propsIsEditing ? 'Atualizar' : 'Salvar' }} Produto
+              {{ propsIsEditing ? t('admin.products.form.submitUpdate') : t('admin.products.form.submitSave') }} {{ t('admin.products.form.submitProduct') }}
             </button>
           </div>
         </form>
@@ -243,6 +243,8 @@
 <script setup lang="ts">
 import { useForm, useField } from 'vee-validate'
 import type { ProductApi, Category } from '~/types'
+
+const { t } = useI18n()
 
 /* Props / Emits */
 interface Props {
@@ -461,7 +463,7 @@ const onSubmit = handleSubmit(async (vals: FormValues) => {
       })
 
       const response = await apiFetch(url, { method, body: formData })
-      successMessage.value = 'Produto criado com sucesso!'
+      successMessage.value = t('admin.products.form.successCreated')
       emit('saved', response as ProductApi)
       resetForm()
     } else {
@@ -477,13 +479,13 @@ const onSubmit = handleSubmit(async (vals: FormValues) => {
         active: !!vals.active
       }
       const response = await apiFetch(url, { method, body: payload })
-      successMessage.value = props.isEditing ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!'
+      successMessage.value = props.isEditing ? t('admin.products.form.successUpdated') : t('admin.products.form.successCreated')
       emit('saved', response as ProductApi)
       if (!props.isEditing) resetForm()
     }
     // Auto-close é gerenciado pelo componente AppAlert
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar produto. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.products.form.error')
   } finally {
     pending.value = false
   }

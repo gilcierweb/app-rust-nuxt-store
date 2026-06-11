@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Perfil' : 'Novo Perfil' }}
+          {{ isEditing ? t('admin.profiles.form.titleEdit') : t('admin.profiles.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando perfil...</span>
+          <span class="ml-3">{{ t('admin.profiles.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -44,12 +44,12 @@
             <!-- First Name -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Nome *</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.firstName') }} *</span>
               </label>
               <input
                 v-model="form.first_name"
                 type="text"
-                placeholder="Primeiro nome"
+                :placeholder="t('admin.profiles.form.firstNamePlaceholder')"
                 class="input input-bordered w-full"
                 :class="{ 'input-error': errors.first_name }"
                 required
@@ -63,7 +63,7 @@
             <!-- Last Name -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Sobrenome *</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.lastName') }} *</span>
               </label>
               <input
                 v-model="form.last_name"
@@ -83,17 +83,17 @@
           <!-- Full Name (Auto-generated) -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Nome Completo</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.fullName') }}</span>
             </label>
             <input
               v-model="form.full_name"
               type="text"
-              placeholder="Nome completo"
+              :placeholder="t('admin.profiles.form.fullNamePlaceholder')"
               class="input input-bordered w-full"
               :disabled="pending"
             />
             <label class="label">
-              <span class="label-text-alt text-gray-500">Gerado automaticamente se deixado em branco</span>
+              <span class="label-text-alt text-gray-500">{{ t('admin.profiles.form.fullNameHint') }}</span>
             </label>
           </div>
 
@@ -101,12 +101,12 @@
             <!-- Username -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Username</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.username') }}</span>
               </label>
               <input
                 v-model="form.username"
                 type="text"
-                placeholder="nome_usuario"
+                :placeholder="t('admin.profiles.form.usernamePlaceholder')"
                 class="input input-bordered w-full"
                 :disabled="pending"
               />
@@ -115,7 +115,7 @@
             <!-- Nickname -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Apelido</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.nickname') }}</span>
               </label>
               <input
                 v-model="form.nickname"
@@ -131,7 +131,7 @@
             <!-- Phone -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Telefone</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.phone') }}</span>
               </label>
               <input
                 v-model.number="form.phone"
@@ -145,7 +145,7 @@
             <!-- WhatsApp -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">WhatsApp</span>
+                <span class="label-text font-semibold">{{ t('admin.profiles.form.whatsapp') }}</span>
               </label>
               <input
                 v-model.number="form.whatsapp"
@@ -160,7 +160,7 @@
           <!-- Birth Date -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Data de Nascimento</span>
+              <span class="label-text font-semibold">{{ t('admin.profiles.form.birthDate') }}</span>
             </label>
             <input
               v-model="form.birth_date"
@@ -173,7 +173,7 @@
           <!-- Avatar URL -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">URL do Avatar</span>
+              <span class="label-text font-semibold">{{ t('admin.profiles.form.avatarUrl') }}</span>
             </label>
             <input
               v-model="form.avatar"
@@ -187,11 +187,11 @@
           <!-- Bio -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Biografia</span>
+              <span class="label-text font-semibold">{{ t('admin.profiles.form.bio') }}</span>
             </label>
             <textarea
               v-model="form.bio"
-              placeholder="Sobre você..."
+              :placeholder="t('admin.profiles.form.bioPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="3"
               :disabled="pending"
@@ -201,12 +201,12 @@
           <!-- User ID -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Usuário ID *</span>
+              <span class="label-text font-semibold">{{ t('admin.profiles.form.userId') }} *</span>
             </label>
             <input
               v-model.number="form.user_id"
               type="number"
-              placeholder="ID do usuário"
+              :placeholder="t('admin.profiles.form.userIdPlaceholder')"
               class="input input-bordered w-full"
               :class="{ 'input-error': errors.user_id }"
               required
@@ -225,11 +225,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('admin.profiles.form.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Perfil
+              {{ isEditing ? t('admin.profiles.form.submitUpdate') : t('admin.profiles.form.submitSave') }} {{ t('admin.profiles.form.submitProfile') }}
             </button>
           </div>
         </form>
@@ -255,6 +255,7 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const { t } = useI18n()
 const { apiFetch } = useApi()
 
 // Form state
@@ -331,17 +332,17 @@ const validate = () => {
   errors.user_id = ''
 
   if (!form.first_name?.trim()) {
-    errors.first_name = 'O nome é obrigatório'
+    errors.first_name = t('admin.profiles.form.validation.firstNameRequired')
     isValid = false
   }
 
   if (!form.last_name?.trim()) {
-    errors.last_name = 'O sobrenome é obrigatório'
+    errors.last_name = t('admin.profiles.form.validation.lastNameRequired')
     isValid = false
   }
 
   if (!form.user_id) {
-    errors.user_id = 'O ID do usuário é obrigatório'
+    errors.user_id = t('admin.profiles.form.validation.userIdRequired')
     isValid = false
   }
 
@@ -383,12 +384,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Perfil atualizado com sucesso!'
-      : 'Perfil criado com sucesso!'
+      ? t('admin.profiles.form.successUpdated')
+      : t('admin.profiles.form.successCreated')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar perfil. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.profiles.form.error')
   } finally {
     pending.value = false
   }

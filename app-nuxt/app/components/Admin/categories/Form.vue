@@ -3,13 +3,13 @@
     <div class="card bg-white shadow-lg">
       <div class="card-body">
         <h2 class="card-title text-2xl font-bold mb-6">
-          {{ isEditing ? 'Editar Categoria' : 'Nova Categoria' }}
+          {{ isEditing ? t('admin.categories.form.titleEdit') : t('admin.categories.form.titleNew') }}
         </h2>
 
         <!-- Loading State -->
         <div v-if="pending" class="flex items-center justify-center py-8">
           <span class="loading loading-spinner text-primary size-12"></span>
-          <span class="ml-3">Salvando categoria...</span>
+          <span class="ml-3">{{ t('admin.categories.form.saving') }}</span>
         </div>
 
         <!-- Alerts -->
@@ -34,12 +34,12 @@
           <!-- Name -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Nome da Categoria *</span>
+                <span class="label-text font-semibold">{{ t('admin.categories.form.name') }} *</span>
             </label>
             <input
               v-model="form.name"
               type="text"
-              placeholder="Nome da categoria"
+              :placeholder="t('admin.categories.form.namePlaceholder')"
               class="input input-bordered w-full"
               :class="{ 'input-error': errors.name }"
               required
@@ -53,28 +53,28 @@
           <!-- Slug -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Slug</span>
+                <span class="label-text font-semibold">{{ t('admin.categories.form.slug') }}</span>
             </label>
             <input
               v-model="form.slug"
               type="text"
-              placeholder="slug-da-categoria"
+              :placeholder="t('admin.categories.form.slugPlaceholder')"
               class="input input-bordered w-full"
               :disabled="pending"
             />
             <label class="label">
-              <span class="label-text-alt text-gray-500">Gerado automaticamente se deixado em branco</span>
+              <span class="label-text-alt text-gray-500">{{ t('admin.categories.form.slugHint') }}</span>
             </label>
           </div>
 
           <!-- Description -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Descrição</span>
+                <span class="label-text font-semibold">{{ t('admin.categories.form.description') }}</span>
             </label>
             <textarea
               v-model="form.description"
-              placeholder="Descrição da categoria"
+              :placeholder="t('admin.categories.form.descriptionPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="3"
               :disabled="pending"
@@ -84,10 +84,10 @@
           <!-- Parent Category -->
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Categoria Pai</span>
+                <span class="label-text font-semibold">{{ t('admin.categories.form.parentCategory') }}</span>
             </label>
             <select v-model="form.parent_id" class="select select-bordered w-full" :disabled="pending">
-              <option :value="null">Nenhuma (categoria raiz)</option>
+              <option :value="null">{{ t('admin.categories.form.parentCategoryRoot') }}</option>
               <option
                 v-for="cat in availableParentCategories"
                 :key="cat.id"
@@ -102,7 +102,7 @@
             <!-- Position -->
             <div class="form-control">
               <label class="label">
-                <span class="label-text font-semibold">Posição</span>
+                <span class="label-text font-semibold">{{ t('admin.categories.form.position') }}</span>
               </label>
               <input
                 v-model.number="form.position"
@@ -117,7 +117,7 @@
             <!-- Active -->
             <div class="form-control">
               <label class="label cursor-pointer">
-                <span class="label-text font-semibold">Categoria Ativa</span>
+                <span class="label-text font-semibold">{{ t('admin.categories.form.active') }}</span>
                 <input
                   v-model="form.active"
                   type="checkbox"
@@ -136,11 +136,11 @@
               :disabled="pending"
               @click="emit('cancel')"
             >
-              Cancelar
+              {{ t('admin.categories.form.cancel') }}
             </button>
             <button type="submit" class="btn btn-primary" :disabled="pending">
               <span v-if="pending" class="loading loading-spinner loading-sm"></span>
-              {{ isEditing ? 'Atualizar' : 'Salvar' }} Categoria
+              {{ isEditing ? t('admin.categories.form.submitUpdate') : t('admin.categories.form.submitSave') }} {{ t('admin.categories.form.submitCategory') }}
             </button>
           </div>
         </form>
@@ -151,6 +151,8 @@
 
 <script setup lang="ts">
 import type { Category } from '~/types'
+
+const { t } = useI18n()
 
 interface Props {
   category?: Partial<Category>
@@ -247,7 +249,7 @@ const validate = () => {
   errors.name = ''
 
   if (!form.name.trim()) {
-    errors.name = 'O nome é obrigatório'
+    errors.name = t('admin.categories.form.validation.nameRequired')
     isValid = false
   }
 
@@ -284,12 +286,12 @@ const onSubmit = async () => {
     })
 
     successMessage.value = props.isEditing
-      ? 'Categoria atualizada com sucesso!'
-      : 'Categoria criada com sucesso!'
+      ? t('admin.categories.form.successUpdated')
+      : t('admin.categories.form.successCreated')
 
     emit('saved', response)
   } catch (err: any) {
-    errorMessage.value = err?.data?.message || err.message || 'Erro ao salvar categoria. Tente novamente.'
+    errorMessage.value = err?.data?.message || err.message || t('admin.categories.form.error')
   } finally {
     pending.value = false
   }

@@ -284,7 +284,51 @@
       },
       "editTitle": "Editar Producto",
       "loading": "Cargando producto...",
-      "error": "Error al cargar el producto: {message}"
+      "error": "Error al cargar el producto: {message}",
+      "form": {
+        "titleEdit": "Editar Producto",
+        "titleNew": "Nuevo Producto",
+        "saving": "Guardando producto...",
+        "name": "Nombre del Producto",
+        "namePlaceholder": "Nombre del producto",
+        "sku": "SKU",
+        "skuPlaceholder": "SKU único",
+        "slug": "Slug",
+        "slugPlaceholder": "slug-del-producto",
+        "category": "Categoría",
+        "categoryPlaceholder": "Seleccionar categoría",
+        "shortDescription": "Descripción Corta",
+        "shortDescriptionPlaceholder": "Descripción breve del producto",
+        "description": "Descripción Completa",
+        "descriptionPlaceholder": "Descripción detallada del producto",
+        "salePrice": "Precio de Venta",
+        "costPrice": "Precio de Costo",
+        "comparePrice": "Precio Comparativo",
+        "status": "Estado",
+        "statusActive": "Activo",
+        "statusInactive": "Inactivo",
+        "statusDraft": "Borrador",
+        "featured": "Producto Destacado",
+        "active": "Producto Activo",
+        "images": "Imágenes del Producto",
+        "addField": "Agregar Campo",
+        "image": "Imagen",
+        "altText": "Texto Alternativo",
+        "imageDescription": "Descripción de la imagen",
+        "position": "Posición",
+        "activeField": "Activa",
+        "cover": "Portada",
+        "remove": "Eliminar",
+        "dragDrop": "Arrastra y suelta imágenes aquí",
+        "dragDropSub": "o haz clic para seleccionar archivos",
+        "cancel": "Cancelar",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitProduct": "Producto",
+        "successCreated": "¡Producto creado exitosamente!",
+        "successUpdated": "¡Producto actualizado exitosamente!",
+        "error": "Error al guardar el producto. Por favor, inténtelo de nuevo."
+      }
     },
     "categories": {
       "title": "Categorías",
@@ -326,6 +370,32 @@
         "delete": "Eliminar",
         "confirmDelete": "¿Está seguro de que desea eliminar la categoría \"{name}\"?",
         "errorDelete": "Error al eliminar la categoría"
+      },
+      "form": {
+        "titleEdit": "Editar Categoría",
+        "titleNew": "Nueva Categoría",
+        "saving": "Guardando categoría...",
+        "name": "Nombre de la Categoría",
+        "namePlaceholder": "Nombre de la categoría",
+        "slug": "Slug",
+        "slugPlaceholder": "slug-de-la-categoría",
+        "slugHint": "Se genera automáticamente si se deja en blanco",
+        "description": "Descripción",
+        "descriptionPlaceholder": "Descripción de la categoría",
+        "parentCategory": "Categoría Padre",
+        "parentCategoryRoot": "Ninguna (categoría raíz)",
+        "position": "Posición",
+        "active": "Categoría Activa",
+        "cancel": "Cancelar",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitCategory": "Categoría",
+        "validation": {
+          "nameRequired": "El nombre de la categoría es obligatorio"
+        },
+        "successCreated": "¡Categoría creada exitosamente!",
+        "successUpdated": "¡Categoría actualizada exitosamente!",
+        "error": "Error al guardar la categoría. Por favor, inténtelo de nuevo."
       }
     },
     "coupons": {
@@ -569,6 +639,26 @@
         "back": "Volver a la lista",
         "confirmDelete": "¿Está seguro de que desea eliminar el post \"{name}\"?",
         "errorDelete": "Error al eliminar el post"
+      },
+      "form": {
+        "titleEdit": "Editar Publicación",
+        "titleNew": "Nueva Publicación",
+        "saving": "Guardando publicación...",
+        "title": "Título",
+        "titlePlaceholder": "Título de la publicación",
+        "content": "Contenido",
+        "contentPlaceholder": "Contenido de la publicación",
+        "status": "Estado",
+        "cancel": "Cancelar",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitPost": "Publicación",
+        "validation": {
+          "titleRequired": "El título es obligatorio"
+        },
+        "successCreated": "¡Publicación creada exitosamente!",
+        "successUpdated": "¡Publicación actualizada exitosamente!",
+        "error": "Error al guardar la publicación. Por favor, inténtelo de nuevo."
       }
     },
     "customers": {
@@ -727,6 +817,34 @@
         "back": "Volver a la lista",
         "confirmDelete": "¿Está seguro de que desea eliminar la reseña #{id}?",
         "errorDelete": "Error al eliminar la reseña"
+      },
+      "form": {
+        "titleEdit": "Editar Reseña",
+        "titleNew": "Nueva Reseña",
+        "saving": "Guardando reseña...",
+        "productId": "ID de Producto",
+        "productIdPlaceholder": "ID de producto",
+        "userId": "ID de Usuario",
+        "userIdPlaceholder": "ID de usuario",
+        "rating": "Calificación (1-5)",
+        "title": "Título",
+        "titlePlaceholder": "Título de la reseña",
+        "comment": "Comentario",
+        "commentPlaceholder": "Escribe tu reseña...",
+        "verifiedPurchase": "Compra Verificada",
+        "active": "Activa",
+        "cancel": "Cancelar",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitReview": "Reseña",
+        "validation": {
+          "productIdRequired": "El ID de producto es obligatorio",
+          "userIdRequired": "El ID de usuario es obligatorio",
+          "ratingRange": "La calificación debe estar entre 1 y 5"
+        },
+        "successCreated": "¡Reseña creada exitosamente!",
+        "successUpdated": "¡Reseña actualizada exitosamente!",
+        "error": "Error al guardar la reseña. Por favor, inténtelo de nuevo."
       }
     },
     "shipments": {
@@ -839,6 +957,53 @@
       "detail": {
         "confirmDelete": "¿Está seguro de que desea eliminar la dirección de \"{name}\"?",
         "errorDelete": "Error al eliminar la dirección"
+      },
+      "form": {
+        "titleEdit": "Editar Dirección",
+        "titleNew": "Nueva Dirección",
+        "saving": "Guardando dirección...",
+        "type": "Tipo",
+        "typePlaceholder": "Seleccionar...",
+        "firstName": "Nombre",
+        "firstNamePlaceholder": "Nombre",
+        "lastName": "Apellido",
+        "lastNamePlaceholder": "Apellido",
+        "company": "Empresa",
+        "companyPlaceholder": "Nombre de la empresa",
+        "address1": "Dirección Línea 1",
+        "address1Placeholder": "Calle, número",
+        "address2": "Dirección Línea 2",
+        "address2Placeholder": "Complemento, apto, bloque",
+        "city": "Ciudad",
+        "cityPlaceholder": "Ciudad",
+        "state": "Estado",
+        "statePlaceholder": "Estado/UF",
+        "zipCode": "Código Postal",
+        "zipCodePlaceholder": "00000-000",
+        "country": "País",
+        "countryPlaceholder": "País",
+        "phone": "Teléfono",
+        "phonePlaceholder": "(00) 00000-0000",
+        "userId": "ID de Usuario",
+        "userIdPlaceholder": "ID de usuario",
+        "default": "Dirección Predeterminada",
+        "cancel": "Cancelar",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitAddress": "Dirección",
+        "validation": {
+          "firstNameRequired": "El nombre es obligatorio",
+          "lastNameRequired": "El apellido es obligatorio",
+          "addressRequired": "La dirección es obligatoria",
+          "cityRequired": "La ciudad es obligatoria",
+          "stateRequired": "El estado es obligatorio",
+          "zipCodeRequired": "El código postal es obligatorio",
+          "countryRequired": "El país es obligatorio",
+          "userIdRequired": "El ID de usuario es obligatorio"
+        },
+        "successCreated": "¡Dirección creada exitosamente!",
+        "successUpdated": "¡Dirección actualizada exitosamente!",
+        "error": "Error al guardar la dirección. Por favor, inténtelo de nuevo."
       }
     },
     "payments": {
@@ -1163,6 +1328,47 @@
       "show": "Mostrar {size}",
       "empty": "Sin filas",
       "showing": "Mostrando {start}-{end} de {total}"
+    },
+    "profiles": {
+      "form": {
+        "titleEdit": "Editar Perfil",
+        "titleNew": "Nuevo Perfil",
+        "saving": "Guardando perfil...",
+        "firstName": "Nombre",
+        "firstNamePlaceholder": "Nombre",
+        "lastName": "Apellido",
+        "lastNamePlaceholder": "Apellido",
+        "fullName": "Nombre Completo",
+        "fullNamePlaceholder": "Nombre completo",
+        "fullNameHint": "Se genera automáticamente si se deja en blanco",
+        "username": "Nombre de usuario",
+        "usernamePlaceholder": "nombre_usuario",
+        "nickname": "Apodo",
+        "nicknamePlaceholder": "Apodo",
+        "phone": "Teléfono",
+        "phonePlaceholder": "5511999999999",
+        "whatsapp": "WhatsApp",
+        "whatsappPlaceholder": "5511999999999",
+        "birthDate": "Fecha de Nacimiento",
+        "avatarUrl": "URL del Avatar",
+        "avatarUrlPlaceholder": "https://ejemplo.com/avatar.jpg",
+        "bio": "Biografía",
+        "bioPlaceholder": "Sobre ti...",
+        "userId": "ID de Usuario",
+        "userIdPlaceholder": "ID de usuario",
+        "cancel": "Cancelar",
+        "submitUpdate": "Actualizar",
+        "submitSave": "Guardar",
+        "submitProfile": "Perfil",
+        "validation": {
+          "firstNameRequired": "El nombre es obligatorio",
+          "lastNameRequired": "El apellido es obligatorio",
+          "userIdRequired": "El ID de usuario es obligatorio"
+        },
+        "successCreated": "¡Perfil creado exitosamente!",
+        "successUpdated": "¡Perfil actualizado exitosamente!",
+        "error": "Error al guardar el perfil. Por favor, inténtelo de nuevo."
+      }
     }
   }
 }

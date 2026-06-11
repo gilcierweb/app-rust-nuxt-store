@@ -284,7 +284,51 @@
       },
       "editTitle": "Editar Produto",
       "loading": "Carregando produto...",
-      "error": "Erro ao carregar produto: {message}"
+      "error": "Erro ao carregar produto: {message}",
+      "form": {
+        "titleEdit": "Editar Produto",
+        "titleNew": "Novo Produto",
+        "saving": "Salvando produto...",
+        "name": "Nome do Produto",
+        "namePlaceholder": "Nome do produto",
+        "sku": "SKU",
+        "skuPlaceholder": "SKU único",
+        "slug": "Slug",
+        "slugPlaceholder": "slug-do-produto",
+        "category": "Categoria",
+        "categoryPlaceholder": "Selecione uma categoria",
+        "shortDescription": "Descrição Curta",
+        "shortDescriptionPlaceholder": "Descrição breve do produto",
+        "description": "Descrição Completa",
+        "descriptionPlaceholder": "Descrição detalhada do produto",
+        "salePrice": "Preço de Venda",
+        "costPrice": "Preço de Custo",
+        "comparePrice": "Preço Comparativo",
+        "status": "Status",
+        "statusActive": "Ativo",
+        "statusInactive": "Inativo",
+        "statusDraft": "Rascunho",
+        "featured": "Produto em Destaque",
+        "active": "Produto Ativo",
+        "images": "Imagens do Produto",
+        "addField": "Adicionar Campo",
+        "image": "Imagem",
+        "altText": "Texto Alternativo",
+        "imageDescription": "Descrição da imagem",
+        "position": "Posição",
+        "activeField": "Ativa",
+        "cover": "Capa",
+        "remove": "Remover",
+        "dragDrop": "Arraste e solte imagens aqui",
+        "dragDropSub": "ou clique para selecionar arquivos",
+        "cancel": "Cancelar",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitProduct": "Produto",
+        "successCreated": "Produto criado com sucesso!",
+        "successUpdated": "Produto atualizado com sucesso!",
+        "error": "Erro ao salvar produto. Tente novamente."
+      }
     },
     "categories": {
       "title": "Categorias",
@@ -326,6 +370,32 @@
         "delete": "Excluir",
         "confirmDelete": "Tem certeza que deseja excluir a categoria \"{name}\"?",
         "errorDelete": "Erro ao excluir categoria"
+      },
+      "form": {
+        "titleEdit": "Editar Categoria",
+        "titleNew": "Nova Categoria",
+        "saving": "Salvando categoria...",
+        "name": "Nome da Categoria",
+        "namePlaceholder": "Nome da categoria",
+        "slug": "Slug",
+        "slugPlaceholder": "slug-da-categoria",
+        "slugHint": "Gerado automaticamente se deixado em branco",
+        "description": "Descrição",
+        "descriptionPlaceholder": "Descrição da categoria",
+        "parentCategory": "Categoria Pai",
+        "parentCategoryRoot": "Nenhuma (categoria raiz)",
+        "position": "Posição",
+        "active": "Categoria Ativa",
+        "cancel": "Cancelar",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitCategory": "Categoria",
+        "validation": {
+          "nameRequired": "O nome é obrigatório"
+        },
+        "successCreated": "Categoria criada com sucesso!",
+        "successUpdated": "Categoria atualizada com sucesso!",
+        "error": "Erro ao salvar categoria. Tente novamente."
       }
     },
     "coupons": {
@@ -569,6 +639,26 @@
         "back": "Voltar para lista",
         "confirmDelete": "Tem certeza que deseja excluir o post \"{name}\"?",
         "errorDelete": "Erro ao excluir post"
+      },
+      "form": {
+        "titleEdit": "Editar Post",
+        "titleNew": "Novo Post",
+        "saving": "Salvando post...",
+        "title": "Título",
+        "titlePlaceholder": "Título do post",
+        "content": "Conteúdo",
+        "contentPlaceholder": "Conteúdo do post",
+        "status": "Status",
+        "cancel": "Cancelar",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitPost": "Post",
+        "validation": {
+          "titleRequired": "O título é obrigatório"
+        },
+        "successCreated": "Post criado com sucesso!",
+        "successUpdated": "Post atualizado com sucesso!",
+        "error": "Erro ao salvar post. Tente novamente."
       }
     },
     "customers": {
@@ -727,6 +817,34 @@
         "back": "Voltar para lista",
         "confirmDelete": "Tem certeza que deseja excluir a avaliação #{id}?",
         "errorDelete": "Erro ao excluir avaliação"
+      },
+      "form": {
+        "titleEdit": "Editar Avaliação",
+        "titleNew": "Nova Avaliação",
+        "saving": "Salvando avaliação...",
+        "productId": "Produto ID",
+        "productIdPlaceholder": "ID do produto",
+        "userId": "Usuário ID",
+        "userIdPlaceholder": "ID do usuário",
+        "rating": "Avaliação (1-5)",
+        "title": "Título",
+        "titlePlaceholder": "Título da avaliação",
+        "comment": "Comentário",
+        "commentPlaceholder": "Escreva sua avaliação...",
+        "verifiedPurchase": "Compra Verificada",
+        "active": "Ativa",
+        "cancel": "Cancelar",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitReview": "Avaliação",
+        "validation": {
+          "productIdRequired": "O ID do produto é obrigatório",
+          "userIdRequired": "O ID do usuário é obrigatório",
+          "ratingRange": "A avaliação deve ser entre 1 e 5"
+        },
+        "successCreated": "Avaliação criada com sucesso!",
+        "successUpdated": "Avaliação atualizada com sucesso!",
+        "error": "Erro ao salvar avaliação. Tente novamente."
       }
     },
     "shipments": {
@@ -841,6 +959,53 @@
       "detail": {
         "confirmDelete": "Tem certeza que deseja excluir o endereço de \"{name}\"?",
         "errorDelete": "Erro ao excluir endereço"
+      },
+      "form": {
+        "titleEdit": "Editar Endereço",
+        "titleNew": "Novo Endereço",
+        "saving": "Salvando endereço...",
+        "type": "Tipo",
+        "typePlaceholder": "Selecione...",
+        "firstName": "Nome",
+        "firstNamePlaceholder": "Primeiro nome",
+        "lastName": "Sobrenome",
+        "lastNamePlaceholder": "Sobrenome",
+        "company": "Empresa",
+        "companyPlaceholder": "Nome da empresa",
+        "address1": "Endereço 1",
+        "address1Placeholder": "Rua, número",
+        "address2": "Endereço 2",
+        "address2Placeholder": "Complemento, apto, bloco",
+        "city": "Cidade",
+        "cityPlaceholder": "Cidade",
+        "state": "Estado",
+        "statePlaceholder": "Estado/UF",
+        "zipCode": "CEP",
+        "zipCodePlaceholder": "00000-000",
+        "country": "País",
+        "countryPlaceholder": "País",
+        "phone": "Telefone",
+        "phonePlaceholder": "(00) 00000-0000",
+        "userId": "Usuário ID",
+        "userIdPlaceholder": "ID do usuário",
+        "default": "Endereço Padrão",
+        "cancel": "Cancelar",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitAddress": "Endereço",
+        "validation": {
+          "firstNameRequired": "O nome é obrigatório",
+          "lastNameRequired": "O sobrenome é obrigatório",
+          "addressRequired": "O endereço é obrigatório",
+          "cityRequired": "A cidade é obrigatória",
+          "stateRequired": "O estado é obrigatório",
+          "zipCodeRequired": "O CEP é obrigatório",
+          "countryRequired": "O país é obrigatório",
+          "userIdRequired": "O ID do usuário é obrigatório"
+        },
+        "successCreated": "Endereço criado com sucesso!",
+        "successUpdated": "Endereço atualizado com sucesso!",
+        "error": "Erro ao salvar endereço. Tente novamente."
       }
     },
     "payments": {
@@ -916,6 +1081,62 @@
     "refunds": {
       "detail": {
         "downloadReceipt": "Baixar Confirmacao"
+      }
+    },
+    "profiles": {
+      "title": "Perfis",
+      "searchPlaceholder": "Buscar perfis",
+      "add": "Adicionar",
+      "loading": "Carregando perfis...",
+      "error": "Erro ao carregar perfis: {message}",
+      "notFound": "Nenhum perfil encontrado.",
+      "createFirst": "Criar primeiro perfil",
+      "table": {
+        "name": "Nome",
+        "username": "Username",
+        "phone": "Telefone",
+        "user": "Usuário ID",
+        "date": "Data",
+        "actions": "Ações"
+      },
+      "form": {
+        "titleEdit": "Editar Perfil",
+        "titleNew": "Novo Perfil",
+        "saving": "Salvando perfil...",
+        "firstName": "Nome",
+        "firstNamePlaceholder": "Primeiro nome",
+        "lastName": "Sobrenome",
+        "lastNamePlaceholder": "Sobrenome",
+        "fullName": "Nome Completo",
+        "fullNamePlaceholder": "Nome completo",
+        "fullNameHint": "Gerado automaticamente se deixado em branco",
+        "username": "Username",
+        "usernamePlaceholder": "nome_usuario",
+        "nickname": "Apelido",
+        "nicknamePlaceholder": "Apelido",
+        "phone": "Telefone",
+        "phonePlaceholder": "5511999999999",
+        "whatsapp": "WhatsApp",
+        "whatsappPlaceholder": "5511999999999",
+        "birthDate": "Data de Nascimento",
+        "avatarUrl": "URL do Avatar",
+        "avatarUrlPlaceholder": "https://exemplo.com/avatar.jpg",
+        "bio": "Biografia",
+        "bioPlaceholder": "Sobre você...",
+        "userId": "Usuário ID",
+        "userIdPlaceholder": "ID do usuário",
+        "cancel": "Cancelar",
+        "submitUpdate": "Atualizar",
+        "submitSave": "Salvar",
+        "submitProfile": "Perfil",
+        "validation": {
+          "firstNameRequired": "O nome é obrigatório",
+          "lastNameRequired": "O sobrenome é obrigatório",
+          "userIdRequired": "O ID do usuário é obrigatório"
+        },
+        "successCreated": "Perfil criado com sucesso!",
+        "successUpdated": "Perfil atualizado com sucesso!",
+        "error": "Erro ao salvar perfil. Tente novamente."
       }
     },
     "inventory": {
