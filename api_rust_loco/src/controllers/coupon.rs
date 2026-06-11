@@ -199,21 +199,19 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/coupons/")
+    Routes::new()
+        .prefix("api/coupons/")
+        .add("/validate", post(validate))
 }
 
 pub fn admin_routes() -> Routes {
-    routes_with_prefix("api/admin/coupons/")
-}
-
-fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix(prefix)
+        .prefix("api/admin/coupons/")
         .add("/", get(list))
         .add("/", post(add))
-        .add("validate", post(validate))
-        .add("{id}", get(get_one))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/validate", post(validate))
+        .add("/{id}", get(get_one))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
 }

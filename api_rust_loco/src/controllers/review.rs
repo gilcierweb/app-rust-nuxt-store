@@ -121,20 +121,19 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/reviews/")
+    Routes::new()
+        .prefix("api/reviews/")
+        .add("/", get(list))
+        .add("/{id}", get(get_one))
 }
 
 pub fn admin_routes() -> Routes {
-    routes_with_prefix("api/admin/reviews/")
-}
-
-fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix(prefix)
+        .prefix("api/admin/reviews/")
         .add("/", get(list))
         .add("/", post(add))
-        .add("{id}", get(get_one))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/{id}", get(get_one))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
 }

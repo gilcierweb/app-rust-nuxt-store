@@ -232,23 +232,25 @@ pub async fn hierarchy(State(ctx): State<AppContext>) -> Result<Response> {
 // }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/categories/")
+    Routes::new()
+        .prefix("api/categories/")
+        .add("/", get(list))
+        .add("/relations", get(list_with_relations))
+        .add("/{id}", get(get_one))
+        .add("/{id}/relations", get(get_one_with_relations))
+        .add("/hierarchy", get(hierarchy))
 }
 
 pub fn admin_routes() -> Routes {
-    routes_with_prefix("api/admin/categories/")
-}
-
-fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix(prefix)
+        .prefix("api/admin/categories/")
         .add("/", get(list))
         .add("/relations", get(list_with_relations))
         .add("/", post(add))
-        .add("{id}", get(get_one))
-        .add("{id}/relations", get(get_one_with_relations))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/{id}", get(get_one))
+        .add("/{id}/relations", get(get_one_with_relations))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
         .add("/hierarchy", get(hierarchy))
 }

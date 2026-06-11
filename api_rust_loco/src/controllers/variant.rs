@@ -388,21 +388,21 @@ pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resul
 }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/variants/")
+    Routes::new()
+        .prefix("api/variants/")
+        .add("/", get(index))
+        .add("/list", get(list))
+        .add("/{id}", get(get_one))
 }
 
 pub fn admin_routes() -> Routes {
-    routes_with_prefix("api/admin/variants/")
-}
-
-fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix(prefix)
+        .prefix("api/admin/variants/")
         .add("/", get(index))
-        .add("list", get(list))
-        .add("{id}", get(get_one))
+        .add("/list", get(list))
+        .add("/{id}", get(get_one))
         .add("/", post(add))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
 }

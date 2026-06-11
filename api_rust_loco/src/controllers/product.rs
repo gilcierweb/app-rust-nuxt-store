@@ -593,21 +593,20 @@ pub async fn get_one(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
 }
 
 pub fn routes() -> Routes {
-    routes_with_prefix("api/products/")
+    Routes::new()
+        .prefix("api/products/")
+        .add("/", get(get_products_with_categories))
+        .add("/{id}", get(get_one))
 }
 
 pub fn admin_routes() -> Routes {
-    routes_with_prefix("api/admin/products/")
-}
-
-fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
-        .prefix(prefix)
+        .prefix("api/admin/products/")
         // .add("/", get(list))
         .add("/", get(get_products_with_categories))
         .add("/", post(add))
-        .add("{id}", get(get_one))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/{id}", get(get_one))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
 }

@@ -169,11 +169,7 @@ pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/profiles")
         .add("/", get(list))
-        .add("/", post(add))
-        .add("{id}", get(get_one))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/{id}", get(get_one))
 }
 
 pub fn admin_routes() -> Routes {
@@ -181,8 +177,8 @@ pub fn admin_routes() -> Routes {
         .prefix("api/admin/profiles")
         .add("/", get(admin_list))
         .add("/", post(add))
-        .add("{id}", get(get_one))
-        .add("{id}", delete(remove))
-        .add("{id}", put(update))
-        .add("{id}", patch(update))
+        .add("/{id}", get(get_one))
+        .add("/{id}", delete(remove))
+        .add("/{id}", put(update))
+        .add("/{id}", patch(update))
 }
