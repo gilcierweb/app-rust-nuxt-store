@@ -264,6 +264,26 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
     let ip_key = format!("ip:{}", client_ip(req.headers()));
     let user_key = user_key(&ctx, req.headers());
 
+    // Fast path: if both keys were allowed within the last second (per the in-memory
+    // cache), skip the Redis round-trips entirely.  This is safe because:
+    //   * We only cache "allowed" (true) results — a cached "blocked" entry is never
+    //     stored, so a blocked client is always re-checked against Redis.
+    //   * The worst case over-count is 1 extra request per key per second, which is
+    //     negligible compared to the 120 req/min IP / 300 req/min user limits.
+    let rl_cache = crate::cache::rate_limit_cache();
+    let ip_cache_key = ip_key.clone();
+    let user_cache_key = user_key.as_deref().map(|k| k.to_string());
+
+    let ip_cached_ok = rl_cache.get(&ip_cache_key).unwrap_or(false);
+    let user_cached_ok = user_cache_key
+        .as_ref()
+        .map(|k| rl_cache.get(k).unwrap_or(false))
+        .unwrap_or(true); // unauthenticated: no user key to check
+
+    if ip_cached_ok && user_cached_ok {
+        return next.run(req).await;
+    }
+
     let mut conn = match get_connection_manager(&config.redis_url).await {
         Some(conn) => conn,
         None => {
@@ -278,56 +298,94 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
         let ip_window = config.ip_window;
         let user_limit = config.user_requests;
         let user_window = config.user_window;
-        let mut conn2 = conn.clone();
 
+        // Skip individual checks that are already cached.
+        let ip_fut_opt = if ip_cached_ok {
+            None
+        } else {
+            let mut c = conn.clone();
+            Some(async move {
+                check_rate_limit_redis(&mut c, &ip_key, ip_limit, ip_window, "ip").await
+            })
+        };
+
+        let user_key_clone = user_key.clone();
+        let user_fut_opt = if user_cached_ok {
+            None
+        } else {
+            let mut c = conn.clone();
+            Some(async move {
+                check_rate_limit_redis(&mut c, &user_key_clone, user_limit, user_window, "user")
+                    .await
+            })
+        };
+
+        // Resolve futures (at most two Redis calls, may be zero if both cached).
         let (ip_result, user_result) = tokio::join!(
-            check_rate_limit_redis(&mut conn, &ip_key, ip_limit, ip_window, "ip"),
-            check_rate_limit_redis(&mut conn2, &user_key, user_limit, user_window, "user"),
+            async {
+                match ip_fut_opt {
+                    Some(fut) => Some(fut.await),
+                    None => None,
+                }
+            },
+            async {
+                match user_fut_opt {
+                    Some(fut) => Some(fut.await),
+                    None => None,
+                }
+            }
         );
 
-        let ip_state = match ip_result {
-            Ok(state) => state,
-            Err(e) => {
-                tracing::error!(error = ?e, "Redis IP rate limit check failed");
-                return next.run(req).await;
+        if let Some(ip_result) = ip_result {
+            let ip_state = match ip_result {
+                Ok(state) => state,
+                Err(e) => {
+                    tracing::error!(error = ?e, "Redis IP rate limit check failed");
+                    return next.run(req).await;
+                }
+            };
+            if !ip_state.allowed {
+                return rate_limited_response(ip_state);
             }
-        };
-
-        if !ip_state.allowed {
-            return rate_limited_response(ip_state);
+            rl_cache.insert(ip_cache_key, true);
         }
 
-        let user_state = match user_result {
-            Ok(state) => state,
-            Err(e) => {
-                tracing::error!(error = ?e, "Redis user rate limit check failed");
-                return next.run(req).await;
+        if let Some(user_result) = user_result {
+            let user_state = match user_result {
+                Ok(state) => state,
+                Err(e) => {
+                    tracing::error!(error = ?e, "Redis user rate limit check failed");
+                    return next.run(req).await;
+                }
+            };
+            if !user_state.allowed {
+                return rate_limited_response(user_state);
             }
-        };
-
-        if !user_state.allowed {
-            return rate_limited_response(user_state);
+            rl_cache.insert(user_key, true);
         }
     } else {
         // Unauthenticated: only check IP limit.
-        let ip_state = match check_rate_limit_redis(
-            &mut conn,
-            &ip_key,
-            config.ip_requests,
-            config.ip_window,
-            "ip",
-        )
-        .await
-        {
-            Ok(state) => state,
-            Err(e) => {
-                tracing::error!(error = ?e, "Redis IP rate limit check failed");
-                return next.run(req).await;
-            }
-        };
+        if !ip_cached_ok {
+            let ip_state = match check_rate_limit_redis(
+                &mut conn,
+                &ip_key,
+                config.ip_requests,
+                config.ip_window,
+                "ip",
+            )
+            .await
+            {
+                Ok(state) => state,
+                Err(e) => {
+                    tracing::error!(error = ?e, "Redis IP rate limit check failed");
+                    return next.run(req).await;
+                }
+            };
 
-        if !ip_state.allowed {
-            return rate_limited_response(ip_state);
+            if !ip_state.allowed {
+                return rate_limited_response(ip_state);
+            }
+            rl_cache.insert(ip_cache_key, true);
         }
     }
 

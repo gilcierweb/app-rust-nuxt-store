@@ -148,6 +148,11 @@ pub async fn summary(
     let page_size = pagination.page_size().min(100);
     let page_index = pagination.page_index();
 
+    let cache_key = format!("rbac_summary:p{}:s{}", page_index, page_size);
+    if let Some(cached) = crate::cache::json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let roles_fut = roles::Entity::find()
         .order_by_asc(roles::Column::Name)
         .order_by_asc(roles::Column::ResourceType)
@@ -264,13 +269,18 @@ pub async fn summary(
         })
         .collect();
 
-    format::json(RbacSummaryJson {
+    let response = RbacSummaryJson {
         roles: role_items,
         users: user_items,
         total_users,
         page: pagination.page.max(1) as u64,
         page_size,
-    })
+    };
+
+    let value = std::sync::Arc::new(serde_json::to_value(&response).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key, value);
+
+    format::json(response)
 }
 
 #[debug_handler]
@@ -426,6 +436,7 @@ pub async fn create_role(
     )
     .await?;
 
+    crate::cache::invalidate_json_cache_with_prefix("rbac_summary:");
     format::json(to_role_json(&role, 0))
 }
 
@@ -463,6 +474,7 @@ pub async fn assign_role(
             Some("Assigned RBAC role to user".to_string()),
         )
         .await?;
+        crate::cache::invalidate_json_cache_with_prefix("rbac_summary:");
     }
 
     format::empty()
@@ -499,6 +511,7 @@ pub async fn remove_assignment(
     )
     .await?;
 
+    crate::cache::invalidate_json_cache_with_prefix("rbac_summary:");
     format::empty()
 }
 
@@ -535,6 +548,7 @@ pub async fn delete_role(
         Some("Deleted RBAC role".to_string()),
     )
     .await?;
+    crate::cache::invalidate_json_cache_with_prefix("rbac_summary:");
     format::empty()
 }
 

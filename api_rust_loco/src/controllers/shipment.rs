@@ -11,6 +11,7 @@ use crate::middleware::auth::CookieJWT;
 use crate::models::_entities::orders;
 use crate::models::_entities::shipments::{ActiveModel, Entity, Model};
 use crate::utils::pagination::PaginationParams;
+use crate::cache::{json_cache, invalidate_json_cache_with_prefix};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -41,11 +42,19 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
+    let cache_key = format!("shipments:admin:p{}:s{}", pagination.page_index(), pagination.page_size());
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let items = Entity::find()
         .order_by_desc(crate::models::_entities::shipments::Column::CreatedAt)
         .paginate(&ctx.db, pagination.page_size())
         .fetch_page(pagination.page_index())
         .await?;
+
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key, value);
 
     format::json(items)
 }
@@ -60,6 +69,7 @@ pub async fn add(State(ctx): State<AppContext>, Json(params): Json<Params>) -> R
     item.created_at = Set(now);
     item.updated_at = Set(now);
     let item = item.insert(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("shipments:admin:");
     format::json(item)
 }
 
@@ -73,12 +83,14 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("shipments:admin:");
     format::json(item)
 }
 
 #[debug_handler]
 pub async fn remove(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<Response> {
     load_item(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("shipments:admin:");
     format::empty()
 }
 

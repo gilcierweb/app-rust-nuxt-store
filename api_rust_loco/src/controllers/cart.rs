@@ -8,6 +8,7 @@ use serde::Deserialize;
 
 use crate::services::cart;
 use crate::utils::auth::current_user_id;
+use crate::cache::{json_cache, invalidate_json_cache};
 
 #[derive(Debug, Deserialize)]
 pub struct AddItemParams {
@@ -28,7 +29,16 @@ pub async fn list(
     State(ctx): State<AppContext>,
 ) -> Result<Response> {
     let user_id = current_user_id(&ctx, &auth).await?;
+    let cache_key = format!("cart:{}", user_id);
+
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let result = cart::get_cart_with_items_for_user(&ctx.db, user_id).await?;
+    let value = std::sync::Arc::new(serde_json::to_value(&result).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+
     format::json(result)
 }
 
@@ -51,6 +61,7 @@ pub async fn add_item(
         params.quantity,
     )
     .await?;
+    invalidate_json_cache(&format!("cart:{}", user_id));
     format::json(result)
 }
 
@@ -62,6 +73,7 @@ pub async fn update_item(
 ) -> Result<Response> {
     let user_id = current_user_id(&ctx, &auth).await?;
     let result = cart::update_item_quantity(&ctx.db, user_id, params.item_id, params.quantity).await?;
+    invalidate_json_cache(&format!("cart:{}", user_id));
     format::json(result)
 }
 
@@ -73,6 +85,7 @@ pub async fn remove_item(
 ) -> Result<Response> {
     let user_id = current_user_id(&ctx, &auth).await?;
     let result = cart::remove_item(&ctx.db, user_id, item_id).await?;
+    invalidate_json_cache(&format!("cart:{}", user_id));
     format::json(result)
 }
 
@@ -84,6 +97,7 @@ pub async fn clear(
     let user_id = current_user_id(&ctx, &auth).await?;
     let user_cart = cart::get_or_create_cart(&ctx.db, user_id).await?;
     cart::clear_cart(&ctx.db, user_cart.id).await?;
+    invalidate_json_cache(&format!("cart:{}", user_id));
     format::json(serde_json::json!({ "cleared": true }))
 }
 

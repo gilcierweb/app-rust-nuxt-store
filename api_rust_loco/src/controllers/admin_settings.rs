@@ -215,7 +215,15 @@ async fn settings_response(ctx: &AppContext) -> Result<SettingsJson> {
 
 #[debug_handler]
 pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
-    format::json(settings_response(&ctx).await?)
+    let cache_key = "admin_settings:list";
+    if let Some(cached) = crate::cache::json_cache().get(cache_key) {
+        return format::json(cached);
+    }
+
+    let res = settings_response(&ctx).await?;
+    let value = std::sync::Arc::new(serde_json::to_value(&res).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key.to_string(), value);
+    format::json(res)
 }
 
 #[debug_handler]
@@ -320,6 +328,7 @@ pub async fn update(
     )
     .await?;
 
+    crate::cache::invalidate_json_cache("admin_settings:list");
     format::json(settings_response(&ctx).await?)
 }
 

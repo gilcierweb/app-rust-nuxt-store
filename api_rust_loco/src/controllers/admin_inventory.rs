@@ -80,6 +80,12 @@ pub async fn list(
     Query(params): Query<AdminInventoryListParams>,
 ) -> Result<Response> {
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let cache_key = format!("inventory:admin:p{}:s{}:q{:?}:st{:?}:t{:?}", 
+        pagination.page_index(), pagination.page_size(), params.search, params.status, params.low_stock_threshold);
+    if let Some(cached) = crate::cache::json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let low_stock_threshold = params.low_stock_threshold.unwrap_or(5).max(0);
     let backend = ctx.db.get_database_backend();
     let page_size = pagination.page_size();
@@ -177,13 +183,18 @@ pub async fn list(
     };
 
     let response = AdminPaginatedResponse::new(items, total, pagination);
-    format::json(InventoryListResponse {
+    let result = InventoryListResponse {
         items: response.items,
         total: response.total,
         page: response.page,
         page_size: response.page_size,
         summary,
-    })
+    };
+
+    let value = std::sync::Arc::new(serde_json::to_value(&result).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key, value);
+
+    format::json(result)
 }
 
 #[debug_handler]
@@ -213,6 +224,7 @@ pub async fn update(
     active_model.updated_at = Set(chrono::Utc::now().into());
     let updated = active_model.update(&ctx.db).await?;
     invalidate_variants_cache();
+    crate::cache::invalidate_json_cache_with_prefix("inventory:admin:");
 
     format::json(updated)
 }

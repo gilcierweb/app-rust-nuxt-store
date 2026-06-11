@@ -11,6 +11,7 @@ use crate::middleware::auth::CookieJWT;
 use crate::models::_entities::addresses::{ActiveModel, Column, Entity, Model};
 use crate::utils::auth::current_user_id;
 use crate::utils::pagination::PaginationParams;
+use crate::cache::{json_cache, invalidate_json_cache_with_prefix};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -60,16 +61,47 @@ async fn load_item_for_user(ctx: &AppContext, id: i32, user_id: i32) -> Result<M
 }
 
 #[debug_handler]
-pub async fn list(
+pub async fn admin_list(
     State(ctx): State<AppContext>,
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
+    let cache_key = format!("addresses:admin:p{}:s{}", pagination.page_index(), pagination.page_size());
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let items = Entity::find()
         .order_by_desc(Column::CreatedAt)
         .paginate(&ctx.db, pagination.page_size())
         .fetch_page(pagination.page_index())
         .await?;
 
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+    format::json(items)
+}
+
+#[debug_handler]
+pub async fn account_list(
+    auth: CookieJWT,
+    State(ctx): State<AppContext>,
+    Query(pagination): Query<PaginationParams>,
+) -> Result<Response> {
+    let user_id = current_user_id(&ctx, &auth).await?;
+    let cache_key = format!("addresses:account:{}:p{}:s{}", user_id, pagination.page_index(), pagination.page_size());
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
+    let items = Entity::find()
+        .filter(Column::UserId.eq(user_id))
+        .order_by_desc(Column::CreatedAt)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key, value);
     format::json(items)
 }
 
@@ -86,6 +118,7 @@ pub async fn add(
     };
     params.update(&mut item);
     let item = item.insert(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("addresses:");
     format::json(item)
 }
 
@@ -101,6 +134,7 @@ pub async fn update(
     let mut item = item.into_active_model();
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("addresses:");
     format::json(item)
 }
 
@@ -113,6 +147,7 @@ pub async fn remove(
     let user_id = current_user_id(&ctx, &auth).await?;
     let item = load_item_for_user(&ctx, id, user_id).await?;
     item.delete(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("addresses:");
     format::empty()
 }
 
@@ -134,14 +169,14 @@ pub async fn account_get_one(
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/addresses/")
-        .add("/", get(list))
+        .add("/", get(admin_list))
         .add("/{id}", get(get_one))
 }
 
 pub fn admin_routes() -> Routes {
     Routes::new()
         .prefix("api/admin/addresses/")
-        .add("/", get(list))
+        .add("/", get(admin_list))
         .add("/", post(add))
         .add("/{id}", get(get_one))
         .add("/{id}", delete(remove))
@@ -152,7 +187,7 @@ pub fn admin_routes() -> Routes {
 pub fn account_routes() -> Routes {
     Routes::new()
         .prefix("api/account/addresses/")
-        .add("/", get(list))
+        .add("/", get(account_list))
         .add("/", post(add))
         .add("/{id}", get(account_get_one))
         .add("/{id}", delete(remove))

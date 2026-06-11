@@ -20,8 +20,17 @@ pub struct LogsParams {
 
 #[debug_handler]
 pub async fn list_templates(State(_ctx): State<AppContext>) -> Result<Response> {
+    let cache_key = "email_templates:all";
+    if let Some(cached) = crate::cache::json_cache().get(cache_key) {
+        return format::json(cached);
+    }
+
     let mut templates = AuthMailer::get_all_templates();
     templates.extend(OrderMailer::get_all_templates());
+
+    let value = std::sync::Arc::new(serde_json::to_value(&templates).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key.to_string(), value);
+
     format::json(templates)
 }
 
@@ -32,6 +41,12 @@ pub async fn list_logs(
 ) -> Result<Response> {
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
     let page_size = pagination.page_size();
+
+    let cache_key = format!("email_logs:admin:p{}:s{}:r{:?}:st{:?}", 
+        pagination.page_index(), page_size, params.recipient, params.status);
+    if let Some(cached) = crate::cache::json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
 
     let mut query = email_logs::Entity::find();
 
@@ -58,7 +73,11 @@ pub async fn list_logs(
         Error::InternalServerError
     })?;
 
-    format::json(AdminPaginatedResponse::new(items, total, pagination))
+    let response = AdminPaginatedResponse::new(items, total, pagination);
+    let value = std::sync::Arc::new(serde_json::to_value(&response).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key, value);
+
+    format::json(response)
 }
 
 #[debug_handler]

@@ -24,6 +24,10 @@ static JSON_CACHE: OnceLock<Cache<String, Arc<Value>>> = OnceLock::new();
 /// TTL of 2 s is intentionally short: a revoked token will be blocked within at most 2 s
 /// of logout, which is acceptable for the security model in use.
 static BLACKLIST_CACHE: OnceLock<Cache<String, bool>> = OnceLock::new();
+/// In-memory rate-limit result cache keyed by "<scope>:<key>".
+/// TTL of 1 s: avoids hitting Redis on every request for the same user/IP
+/// while still converging to accurate counts within one sliding window tick.
+static RATE_LIMIT_CACHE: OnceLock<Cache<String, bool>> = OnceLock::new();
 
 pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
     CURRENT_CACHE.get_or_init(|| {
@@ -120,8 +124,21 @@ pub fn blacklist_cache() -> &'static Cache<String, bool> {
 pub fn json_cache() -> &'static Cache<String, Arc<Value>> {
     JSON_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(10))
+            .time_to_live(Duration::from_secs(30))
             .max_capacity(512)
+            .build()
+    })
+}
+
+/// Short-lived in-memory cache for rate-limit "allowed" decisions.
+/// Avoids a Redis round-trip on every request from the same user/IP within a 1 s window.
+/// The worst case is one extra request per second per key, which is negligible compared
+/// to the 300 req/min user limit and 120 req/min IP limit.
+pub fn rate_limit_cache() -> &'static Cache<String, bool> {
+    RATE_LIMIT_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(1))
+            .max_capacity(8192)
             .build()
     })
 }
@@ -160,6 +177,10 @@ pub fn invalidate_dashboard_cache() {
 
 pub fn invalidate_blacklist_cache(token_hash: &str) {
     blacklist_cache().invalidate(token_hash);
+}
+
+pub fn invalidate_rate_limit_cache(key: &str) {
+    rate_limit_cache().invalidate(key);
 }
 
 pub fn invalidate_catalog_caches() {

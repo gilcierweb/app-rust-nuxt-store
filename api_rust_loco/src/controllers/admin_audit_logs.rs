@@ -9,6 +9,7 @@ use serde::Deserialize;
 
 use crate::models::_entities::admin_audit_logs;
 use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams};
+use crate::cache::json_cache;
 
 #[derive(Debug, Deserialize)]
 pub struct AuditLogParams {
@@ -27,6 +28,12 @@ pub async fn list(
 ) -> Result<Response> {
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
     let page_size = pagination.page_size();
+
+    let cache_key = format!("audit_logs:p{}:s{}:a{:?}:r{:?}:u{:?}:q{:?}", 
+        pagination.page_index(), page_size, params.action, params.resource_type, params.actor_user_id, params.search);
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
 
     let mut query = admin_audit_logs::Entity::find()
         .order_by_desc(admin_audit_logs::Column::CreatedAt)
@@ -84,7 +91,11 @@ pub async fn list(
         Error::InternalServerError
     })?;
 
-    format::json(AdminPaginatedResponse::new(items, total, pagination))
+    let response = AdminPaginatedResponse::new(items, total, pagination);
+    let value = std::sync::Arc::new(serde_json::to_value(&response).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+
+    format::json(response)
 }
 
 pub fn routes() -> Routes {

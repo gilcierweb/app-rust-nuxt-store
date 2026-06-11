@@ -95,6 +95,13 @@ pub async fn admin_list(
     Query(params): Query<AdminProfileListParams>,
 ) -> Result<Response> {
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let cache_key = format!("profiles:admin:p{}:s{}:q{:?}", 
+        pagination.page_index(), pagination.page_size(), params.search);
+
+    if let Some(cached) = crate::cache::json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let mut query = Entity::find()
         .order_by_desc(Column::CreatedAt)
         .order_by_desc(Column::Id);
@@ -129,7 +136,11 @@ pub async fn admin_list(
         Error::InternalServerError
     })?;
 
-    format::json(AdminPaginatedResponse::new(items, total, pagination))
+    let response = AdminPaginatedResponse::new(items, total, pagination);
+    let value = std::sync::Arc::new(serde_json::to_value(&response).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key, value);
+
+    format::json(response)
 }
 
 #[debug_handler]
@@ -146,6 +157,7 @@ pub async fn add(
     params.update(&mut item);
     let item = item.insert(&ctx.db).await?;
     invalidate_profiles_cache();
+    crate::cache::invalidate_json_cache_with_prefix("profiles:admin:");
     format::json(item)
 }
 
@@ -162,6 +174,7 @@ pub async fn update(
     params.update(&mut item);
     let item = item.update(&ctx.db).await?;
     invalidate_profiles_cache();
+    crate::cache::invalidate_json_cache_with_prefix("profiles:admin:");
     format::json(item)
 }
 
@@ -175,6 +188,7 @@ pub async fn remove(
     let item = load_item_for_user(&ctx, id, user_id).await?;
     item.delete(&ctx.db).await?;
     invalidate_profiles_cache();
+    crate::cache::invalidate_json_cache_with_prefix("profiles:admin:");
     format::empty()
 }
 

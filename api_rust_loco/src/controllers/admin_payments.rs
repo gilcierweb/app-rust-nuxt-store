@@ -19,6 +19,7 @@ use crate::models::payment_gateway_status::{
 use crate::payment_gateways::registry::gateway_for_driver;
 use crate::payment_gateways::types::{CapturePaymentInput, RefundPaymentInput, VoidPaymentInput};
 use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams};
+use crate::cache::json_cache;
 
 #[derive(Serialize)]
 pub struct PaymentDetailJson {
@@ -66,6 +67,13 @@ pub async fn list(
     Query(params): Query<AdminPaymentListParams>,
 ) -> Result<Response> {
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
+    let cache_key = format!("payments:admin:p{}:s{}:q{:?}:st{:?}:g{:?}:c{:?}", 
+        pagination.page_index(), pagination.page_size(), params.search, params.status, params.gateway_id, params.currency);
+
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let mut query = payments::Entity::find()
         .order_by_desc(payments::Column::CreatedAt)
         .order_by_desc(payments::Column::Id);
@@ -153,13 +161,18 @@ pub async fn list(
 
     let response = AdminPaginatedResponse::new(items, total, pagination);
 
-    format::json(AdminPaymentListResponse {
+    let result = AdminPaymentListResponse {
         items: response.items,
         total: response.total,
         page: response.page,
         page_size: response.page_size,
         currencies,
-    })
+    };
+
+    let value = std::sync::Arc::new(serde_json::to_value(&result).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+
+    format::json(result)
 }
 
 #[debug_handler]
@@ -221,22 +234,38 @@ pub async fn list_gateway_events(
     Query(params): Query<GatewayEventsParams>,
 ) -> Result<Response> {
     let limit = params.limit.unwrap_or(200).clamp(1, 500);
+    let cache_key = format!("payment_gateway_events:l{}", limit);
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let items = payment_gateway_events::Entity::find()
         .order_by_desc(payment_gateway_events::Column::CreatedAt)
         .limit(limit)
         .all(&ctx.db)
         .await?;
 
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+
     format::json(items)
 }
 
 #[debug_handler]
 pub async fn list_gateway_logs(State(ctx): State<AppContext>) -> Result<Response> {
+    let cache_key = "payment_gateway_logs:l200";
+    if let Some(cached) = json_cache().get(cache_key) {
+        return format::json(cached);
+    }
+
     let items = payment_gateway_logs::Entity::find()
         .order_by_desc(payment_gateway_logs::Column::CreatedAt)
         .limit(200)
         .all(&ctx.db)
         .await?;
+
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key.to_string(), value);
 
     format::json(items)
 }

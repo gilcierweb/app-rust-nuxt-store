@@ -336,6 +336,18 @@ pub async fn admin_list(
     ability.authorize(Action::Read, Subject::Admin)?;
 
     let pagination = AdminPaginationParams::new(params.page, params.page_size);
+
+    // Cache key includes all filter params so each unique query is cached independently.
+    let cache_key = format!(
+        "admin_users:p{}:s{}:q{:?}",
+        pagination.page_index(),
+        pagination.page_size(),
+        params.search
+    );
+    if let Some(cached) = crate::cache::json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let mut query = ability
         .accessible_users_query(Action::Read, current_user_id)
         .order_by_desc(crate::models::_entities::users::Column::CreatedAt)
@@ -367,9 +379,13 @@ pub async fn admin_list(
         Error::InternalServerError
     })?;
 
-    let response = build_list_items(&ctx, items).await?;
+    let response_items = build_list_items(&ctx, items).await?;
+    let response = AdminPaginatedResponse::new(response_items, total, pagination);
 
-    format::json(AdminPaginatedResponse::new(response, total, pagination))
+    let value = std::sync::Arc::new(serde_json::to_value(&response).unwrap_or_default());
+    crate::cache::json_cache().insert(cache_key, value);
+
+    format::json(response)
 }
 
 #[debug_handler]
@@ -434,6 +450,7 @@ pub async fn add(
     .await?;
     txn.commit().await?;
 
+    crate::cache::invalidate_json_cache_with_prefix("admin_users:");
     let roles = item.roles(&ctx.db).await?;
     format::json(to_detail(item, roles))
 }
@@ -491,6 +508,7 @@ pub async fn update(
     .await?;
     txn.commit().await?;
 
+    crate::cache::invalidate_json_cache_with_prefix("admin_users:");
     let roles = item.roles(&ctx.db).await?;
     format::json(to_detail(item, roles))
 }
@@ -523,6 +541,7 @@ pub async fn remove(
     )
     .await?;
     txn.commit().await?;
+    crate::cache::invalidate_json_cache_with_prefix("admin_users:");
     format::empty()
 }
 
