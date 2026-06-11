@@ -60,6 +60,23 @@ async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
         .id)
 }
 
+const REVIEW_RATING_MIN: i32 = 1;
+const REVIEW_RATING_MAX: i32 = 5;
+
+fn validate_rating(rating: Option<i32>) -> Result<()> {
+    match rating {
+        Some(r) if r >= REVIEW_RATING_MIN && r <= REVIEW_RATING_MAX => Ok(()),
+        Some(r) => Err(Error::BadRequest(
+            format!(
+                "rating must be between {} and {}, got {}",
+                REVIEW_RATING_MIN, REVIEW_RATING_MAX, r
+            )
+            .into(),
+        )),
+        None => Err(Error::BadRequest("rating is required".into())),
+    }
+}
+
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     let item = Entity::find_by_id(id).one(&ctx.db).await?;
     item.ok_or_else(|| Error::NotFound)
@@ -111,6 +128,8 @@ pub async fn add(
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
+    validate_rating(params.rating)?;
+
     let user_id = current_user_id(&ctx, &auth).await?;
     let mut item = ActiveModel {
         user_id: Set(user_id),
@@ -129,6 +148,8 @@ pub async fn update(
     State(ctx): State<AppContext>,
     Json(params): Json<Params>,
 ) -> Result<Response> {
+    validate_rating(params.rating)?;
+
     let user_id = current_user_id(&ctx, &auth).await?;
     let item = load_item_for_user(&ctx, id, user_id).await?;
     let mut item = item.into_active_model();
