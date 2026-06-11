@@ -8,27 +8,11 @@ use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 
 use crate::models::_entities::wishlists::{ActiveModel, Entity};
-use crate::models::users;
+use crate::utils::auth::current_user_id;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AddParams {
     pub product_id: i32,
-}
-
-async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
-    if let Some(user_id) = auth
-        .claims
-        .claims
-        .get("user_id")
-        .and_then(|value| value.as_i64())
-        .and_then(|value| i32::try_from(value).ok())
-    {
-        return Ok(user_id);
-    }
-
-    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
-        .await?
-        .id)
 }
 
 #[debug_handler]

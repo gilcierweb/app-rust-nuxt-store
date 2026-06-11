@@ -11,7 +11,7 @@ use std::sync::Arc;
 use crate::cache::{invalidate_profiles_cache, profile_detail_cache, profiles_cache};
 use crate::middleware::auth::CookieJWT;
 use crate::models::_entities::profiles::{ActiveModel, Column, Entity, Model};
-use crate::models::users;
+use crate::utils::auth::current_user_id;
 use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams, PaginationParams};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -48,22 +48,6 @@ impl Params {
         item.bio = Set(self.bio.clone());
         item.whatsapp = Set(self.whatsapp.clone());
     }
-}
-
-async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
-    if let Some(user_id) = auth
-        .claims
-        .claims
-        .get("user_id")
-        .and_then(|value| value.as_i64())
-        .and_then(|value| i32::try_from(value).ok())
-    {
-        return Ok(user_id);
-    }
-
-    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
-        .await?
-        .id)
 }
 
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {

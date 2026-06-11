@@ -10,8 +10,8 @@ use serde_json::Value;
 
 use crate::models::_entities::payment_methods;
 use crate::models::_entities::payment_setup_sessions;
-use crate::models::users;
 use crate::payment_gateways::{create_payment_setup_session, CreatePaymentSetupSessionInput};
+use crate::utils::auth::current_user_id;
 
 #[derive(Debug, Deserialize)]
 pub struct CreatePaymentSetupSessionParams {
@@ -28,22 +28,6 @@ pub struct PaymentSetupSessionJson {
     pub external_client_secret: Option<String>,
     pub action_url: Option<String>,
     pub requires_action: bool,
-}
-
-async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
-    if let Some(user_id) = auth
-        .claims
-        .claims
-        .get("user_id")
-        .and_then(|value| value.as_i64())
-        .and_then(|value| i32::try_from(value).ok())
-    {
-        return Ok(user_id);
-    }
-
-    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
-        .await?
-        .id)
 }
 
 #[debug_handler]

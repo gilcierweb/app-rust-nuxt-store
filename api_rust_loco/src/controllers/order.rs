@@ -31,6 +31,7 @@ use crate::services::cart;
 use crate::services::invoice;
 use crate::services::nfe;
 use crate::services::quotation;
+use crate::utils::auth::current_user_id;
 use crate::utils::pagination::PaginationParams;
 use crate::mailers::order::OrderMailer;
 use crate::mailers::email_service::EmailService;
@@ -39,22 +40,6 @@ fn generate_order_number() -> String {
     let ts = chrono::Utc::now().timestamp();
     let short = &Uuid::new_v4().to_string()[..8];
     format!("ORD-{}-{}", ts, short)
-}
-
-async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
-    if let Some(user_id) = auth
-        .claims
-        .claims
-        .get("user_id")
-        .and_then(|value| value.as_i64())
-        .and_then(|value| i32::try_from(value).ok())
-    {
-        return Ok(user_id);
-    }
-
-    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
-        .await?
-        .id)
 }
 
 #[debug_handler]

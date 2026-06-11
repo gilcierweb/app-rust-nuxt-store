@@ -6,24 +6,8 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use serde::Deserialize;
 
-use crate::models::users;
 use crate::services::cart;
-
-async fn current_user_id(ctx: &AppContext, auth: &CookieJWT) -> Result<i32> {
-    if let Some(user_id) = auth
-        .claims
-        .claims
-        .get("user_id")
-        .and_then(|value| value.as_i64())
-        .and_then(|value| i32::try_from(value).ok())
-    {
-        return Ok(user_id);
-    }
-
-    Ok(users::Model::find_by_pid(&ctx.db, &auth.claims.pid)
-        .await?
-        .id)
-}
+use crate::utils::auth::current_user_id;
 
 #[derive(Debug, Deserialize)]
 pub struct AddItemParams {

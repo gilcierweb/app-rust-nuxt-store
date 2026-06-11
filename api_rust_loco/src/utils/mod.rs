@@ -1,3 +1,4 @@
+pub mod auth;
 pub mod decimal;
 pub mod email;
 pub mod pagination;
