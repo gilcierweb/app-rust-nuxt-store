@@ -42,11 +42,6 @@ fn generate_order_number() -> String {
 }
 
 #[debug_handler]
-pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
-    format::empty()
-}
-
-#[debug_handler]
 pub async fn checkout(
     auth: CookieJWT,
     State(ctx): State<AppContext>,
@@ -821,8 +816,7 @@ pub fn routes() -> Routes {
 pub fn admin_routes() -> Routes {
     Routes::new()
         .prefix("api/admin/orders")
-        .add("/", get(index))
-        .add("/list", get(list))
+        .add("/", get(list))
         .add("/bulk-export", post(bulk_export))
         .add("/{id}", get(get_one))
         .add("/{id}/status", put(update_status))
@@ -844,10 +838,9 @@ pub fn account_routes() -> Routes {
 fn routes_with_prefix(prefix: &str) -> Routes {
     Routes::new()
         .prefix(prefix)
-        .add("/", get(index))
+        .add("/", get(list))
         .add("/checkout", post(checkout))
         .add("/my_orders", get(my_orders))
-        .add("/list", get(list))
         .add("/{id}", get(get_one))
         .add("/{id}/status", put(update_status))
 }

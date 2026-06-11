@@ -16,11 +16,6 @@ pub struct AddParams {
 }
 
 #[debug_handler]
-pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
-    format::empty()
-}
-
-#[debug_handler]
 pub async fn list(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Response> {
     let current_user_id = current_user_id(&ctx, &auth).await?;
     let items = Entity::find()
@@ -86,8 +81,7 @@ pub async fn remove(
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/wishlists")
-        .add("/", get(index))
-        .add("/list", get(list))
+        .add("/", get(list))
         .add("/add", post(add))
         .add("/remove/{id}", delete(remove))
 }

@@ -9,11 +9,6 @@ use loco_rs::prelude::*;
 use crate::payment_gateways::{receive_webhook, ReceiveWebhookInput};
 
 #[debug_handler]
-pub async fn index(State(_ctx): State<AppContext>) -> Result<Response> {
-    format::empty()
-}
-
-#[debug_handler]
 pub async fn receive(
     Path(gateway_code): Path<String>,
     State(ctx): State<AppContext>,
@@ -48,6 +43,5 @@ pub async fn receive(
 pub fn routes() -> Routes {
     Routes::new()
         .prefix("api/webhooks/payments/")
-        .add("/", get(index))
         .add("{gateway_code}", post(receive))
 }
