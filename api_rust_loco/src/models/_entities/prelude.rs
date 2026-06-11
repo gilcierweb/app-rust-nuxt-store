@@ -13,6 +13,7 @@ pub use super::coupon_usages::Entity as CouponUsages;
 pub use super::coupons::Entity as Coupons;
 pub use super::email_logs::Entity as EmailLogs;
 pub use super::gateway_customers::Entity as GatewayCustomers;
+pub use super::jwt_blacklist::Entity as JwtBlacklist;
 pub use super::order_items::Entity as OrderItems;
 pub use super::orders::Entity as Orders;
 pub use super::payment_gateway_events::Entity as PaymentGatewayEvents;

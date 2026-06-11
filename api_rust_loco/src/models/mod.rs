@@ -15,6 +15,7 @@ pub mod coupon_usages;
 pub mod coupons;
 pub mod email_logs;
 pub mod gateway_customers;
+pub mod jwt_blacklist;
 pub mod order_items;
 pub mod order_status;
 pub mod orders;

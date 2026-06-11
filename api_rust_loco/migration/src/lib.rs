@@ -59,6 +59,7 @@ mod m20260607_000003_create_stock_movements;
 mod m20260608_000001_add_cart_performance_indexes;
 mod m20260608_000002_add_remaining_performance_indexes;
 mod m20260608_000003_create_back_in_stock_notifications;
+mod m20260610_000001_create_jwt_blacklist;
 pub struct Migrator;
 
 #[async_trait::async_trait]
@@ -121,6 +122,7 @@ impl MigratorTrait for Migrator {
             Box::new(m20260608_000001_add_cart_performance_indexes::Migration),
             Box::new(m20260608_000002_add_remaining_performance_indexes::Migration),
             Box::new(m20260608_000003_create_back_in_stock_notifications::Migration),
+            Box::new(m20260610_000001_create_jwt_blacklist::Migration),
             // inject-above (do not remove this comment)
         ]
     }

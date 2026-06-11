@@ -11,16 +11,26 @@ use crate::{
 };
 use axum::debug_handler;
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
+use chrono::Utc;
 use loco_rs::auth::jwt::UserClaims;
 use loco_rs::environment::Environment;
 use loco_rs::prelude::*;
 use regex::Regex;
-use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
+use sha2::{Digest, Sha256};
 use std::sync::Arc;
 
 use crate::models::_entities::admin_settings;
+use crate::models::_entities::jwt_blacklist;
+
+fn hash_token(token: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(token.as_bytes());
+    let result = hasher.finalize();
+    hex::encode(result)
+}
 
 fn build_auth_claims(user: &users::Model, roles: &[String]) -> Map<String, Value> {
     let mut claims = Map::new();
@@ -235,7 +245,45 @@ async fn current(auth: CookieJWT, State(ctx): State<AppContext>) -> Result<Respo
 }
 
 #[debug_handler]
-async fn logout(jar: CookieJar) -> Result<(CookieJar, Response)> {
+async fn logout(
+    State(ctx): State<AppContext>,
+    jar: CookieJar,
+) -> Result<(CookieJar, Response)> {
+    if let Some(token_cookie) = jar.get("auth_token") {
+        let token = token_cookie.value().to_string();
+        let token_hash = hash_token(&token);
+
+        let jwt_secret = ctx.config.get_jwt_config()?;
+
+        if let Ok(token_data) = loco_rs::auth::jwt::JWT::new(&jwt_secret.secret).validate(&token) {
+            let user_id = token_data
+                .claims
+                .claims
+                .get("user_id")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(0) as i32;
+
+            let now = Utc::now();
+            let expires_at = now + chrono::Duration::seconds(jwt_secret.expiration as i64);
+
+            let existing = jwt_blacklist::Entity::find()
+                .filter(jwt_blacklist::Column::TokenHash.eq(&token_hash))
+                .one(&ctx.db)
+                .await;
+
+            if let Ok(None) = existing {
+                let new_entry = jwt_blacklist::ActiveModel {
+                    token_hash: Set(token_hash),
+                    user_id: Set(user_id),
+                    expires_at: Set(expires_at.into()),
+                    created_at: Set(now.into()),
+                    ..Default::default()
+                };
+                let _ = new_entry.insert(&ctx.db).await;
+            }
+        }
+    }
+
     let cookie = Cookie::build(("auth_token", ""))
         .path("/")
         .http_only(true)
