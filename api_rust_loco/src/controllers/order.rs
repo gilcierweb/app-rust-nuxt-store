@@ -383,6 +383,7 @@ pub async fn list(
 ) -> Result<Response> {
     let orders: Vec<crate::models::_entities::orders::Model> = Entity::find()
         .order_by_desc(crate::models::_entities::orders::Column::CreatedAt)
+        .order_by_desc(crate::models::_entities::orders::Column::Id)
         .paginate(&ctx.db, pagination.page_size())
         .fetch_page(pagination.page_index())
         .await?;

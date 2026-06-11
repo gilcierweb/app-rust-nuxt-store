@@ -60,15 +60,19 @@ pub async fn list(
         .map(str::trim)
         .filter(|value| !value.is_empty())
     {
-        query = query.filter(
-            Condition::any()
-                .add(admin_audit_logs::Column::ActorName.contains(search))
-                .add(admin_audit_logs::Column::ActorEmail.contains(search))
-                .add(admin_audit_logs::Column::Action.contains(search))
-                .add(admin_audit_logs::Column::ResourceType.contains(search))
-                .add(admin_audit_logs::Column::ResourceLabel.contains(search))
-                .add(admin_audit_logs::Column::Message.contains(search)),
-        );
+        let mut condition = Condition::any()
+            .add(admin_audit_logs::Column::ActorName.contains(search))
+            .add(admin_audit_logs::Column::ActorEmail.contains(search))
+            .add(admin_audit_logs::Column::ResourceLabel.contains(search));
+
+        if let Ok(identifier) = search.parse::<i32>() {
+            condition = condition
+                .add(admin_audit_logs::Column::Id.eq(identifier))
+                .add(admin_audit_logs::Column::ActorUserId.eq(identifier))
+                .add(admin_audit_logs::Column::ResourceId.eq(identifier));
+        }
+
+        query = query.filter(condition);
     }
 
     let total_fut = query.clone().count(&ctx.db);

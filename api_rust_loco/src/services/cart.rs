@@ -166,8 +166,8 @@ where
         cover AS (
             SELECT DISTINCT ON (pi.product_id) pi.product_id, pi.image
             FROM product_images pi
+            INNER JOIN cart_items ci ON ci.product_id = pi.product_id AND ci.cart_id = (SELECT id FROM cart)
             WHERE pi.cover = TRUE
-              AND pi.product_id IN (SELECT ci.product_id FROM cart_items ci WHERE ci.cart_id = (SELECT id FROM cart))
             ORDER BY pi.product_id, pi.position
         )
         SELECT

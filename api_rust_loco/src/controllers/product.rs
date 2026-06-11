@@ -142,6 +142,40 @@ fn product_select_sql(from_clause: &str, image_join_filter: &str) -> String {
     )
 }
 
+fn product_list_select_sql(from_clause: &str, image_join_filter: &str) -> String {
+    format!(
+        r#"
+        SELECT
+            p.id,
+            p.name,
+            p.slug,
+            p.sku,
+            p.price,
+            p.cost_price,
+            p.compare_price,
+            p.featured,
+            p.active,
+            p.status,
+            c.id AS category_id,
+            c.name AS category_name,
+            c.slug AS category_slug,
+            pi.id AS image_id,
+            pi.image,
+            pi.alt_text,
+            pi.active AS image_active,
+            pi.cover,
+            pi.position,
+            pi.product_id AS image_product_id
+        FROM {from_clause} p
+        LEFT JOIN categories c ON c.id = p.category_id
+        LEFT JOIN product_images pi
+            ON pi.product_id = p.id
+            {image_join_filter}
+        ORDER BY p.id ASC, pi.position ASC, pi.id ASC
+        "#
+    )
+}
+
 fn product_detail_select_sql() -> String {
     product_select_sql(
         r#"
@@ -237,8 +271,6 @@ struct ProductRow {
     name: Option<String>,
     slug: Option<String>,
     sku: Option<String>,
-    short_description: Option<String>,
-    description: Option<String>,
     price: Option<Decimal>,
     cost_price: Option<Decimal>,
     compare_price: Option<Decimal>,
@@ -256,8 +288,8 @@ fn product_from_product_row(row: &ProductRow) -> ProductWithCategory {
         name: row.name.clone(),
         slug: row.slug.clone(),
         sku: row.sku.clone(),
-        short_description: row.short_description.clone(),
-        description: row.description.clone(),
+        short_description: None,
+        description: None,
         price: row.price,
         cost_price: row.cost_price,
         compare_price: row.compare_price,
@@ -302,8 +334,6 @@ pub async fn get_products_with_categories(
         name: Option<String>,
         slug: Option<String>,
         sku: Option<String>,
-        short_description: Option<String>,
-        description: Option<String>,
         price: Option<Decimal>,
         cost_price: Option<Decimal>,
         compare_price: Option<Decimal>,
@@ -339,7 +369,7 @@ pub async fn get_products_with_categories(
             ORDER BY pi.product_id, pi.position
         )
         SELECT
-            p.id, p.name, p.slug, p.sku, p.short_description, p.description,
+            p.id, p.name, p.slug, p.sku,
             p.price, p.cost_price, p.compare_price, p.featured, p.active, p.status,
             c.id AS category_id, c.name AS category_name, c.slug AS category_slug,
             ci.id AS image_id, ci.image, ci.alt_text, ci.active AS image_active,
@@ -374,8 +404,6 @@ pub async fn get_products_with_categories(
                 name: row.name.clone(),
                 slug: row.slug.clone(),
                 sku: row.sku.clone(),
-                short_description: row.short_description.clone(),
-                description: row.description.clone(),
                 price: row.price,
                 cost_price: row.cost_price,
                 compare_price: row.compare_price,

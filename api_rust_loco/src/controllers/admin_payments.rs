@@ -114,11 +114,7 @@ pub async fn list(
         let mut condition = Condition::any()
             .add(payments::Column::Number.contains(search))
             .add(payments::Column::TransactionId.contains(search))
-            .add(payments::Column::ExternalPaymentId.contains(search))
-            .add(payments::Column::ExternalStatus.contains(search))
-            .add(payments::Column::IdempotencyKey.contains(search))
-            .add(payments::Column::FailureCode.contains(search))
-            .add(payments::Column::FailureMessage.contains(search));
+            .add(payments::Column::ExternalPaymentId.contains(search));
 
         if let Ok(identifier) = search.parse::<i32>() {
             condition = condition

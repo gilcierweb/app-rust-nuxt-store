@@ -12,6 +12,7 @@ use crate::models::_entities::products::Entity as ProductEntity;
 use crate::utils::slug::parameterize;
 use serde_json::json;
 use std::collections::HashMap;
+use sea_orm::QueryOrder;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Params {
@@ -76,7 +77,13 @@ pub async fn list(State(ctx): State<AppContext>) -> Result<Response> {
         return format::json(value);
     }
 
-    let data = Arc::new(Entity::find().all(&ctx.db).await?);
+    let data = Arc::new(
+        Entity::find()
+            .order_by_asc(crate::models::_entities::categories::Column::Position)
+            .order_by_asc(crate::models::_entities::categories::Column::Id)
+            .all(&ctx.db)
+            .await?,
+    );
     categories_cache().insert("list", Arc::clone(&data));
     format::json(data)
 }

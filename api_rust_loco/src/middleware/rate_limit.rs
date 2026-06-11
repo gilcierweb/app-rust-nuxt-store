@@ -213,6 +213,41 @@ async fn check_rate_limit_redis(
     })
 }
 
+static REDIS_MANAGER: std::sync::OnceLock<tokio::sync::Mutex<Option<redis::aio::ConnectionManager>>> = std::sync::OnceLock::new();
+
+async fn get_connection_manager(redis_url: &str) -> Option<redis::aio::ConnectionManager> {
+    let mutex = REDIS_MANAGER.get_or_init(|| tokio::sync::Mutex::new(None));
+    
+    {
+        let guard = mutex.lock().await;
+        if let Some(conn) = &*guard {
+            return Some(conn.clone());
+        }
+    }
+    
+    let mut guard = mutex.lock().await;
+    if let Some(conn) = &*guard {
+        return Some(conn.clone());
+    }
+    
+    match redis::Client::open(redis_url) {
+        Ok(client) => match client.get_tokio_connection_manager().await {
+            Ok(conn) => {
+                *guard = Some(conn.clone());
+                Some(conn)
+            }
+            Err(e) => {
+                tracing::warn!("Redis connection failed: {}", e);
+                None
+            }
+        },
+        Err(e) => {
+            tracing::warn!("Redis client open failed: {}", e);
+            None
+        }
+    }
+}
+
 pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next: Next) -> Response {
     if req.method() == Method::OPTIONS || !is_protected_path(req.uri().path()) {
         return next.run(req).await;
@@ -226,18 +261,10 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
     let ip_key = format!("ip:{}", client_ip(req.headers()));
     let user_key = user_key(&ctx, req.headers());
 
-    // Try to connect to Redis
-    let redis_client = match redis::Client::open(config.redis_url.as_str()) {
-        Ok(client) => client,
-        Err(_) => {
-            tracing::warn!("Redis unavailable, allowing request (rate limiter disabled)");
-            return next.run(req).await;
-        }
-    };
-
-    let mut conn = match redis_client.get_tokio_connection_manager().await {
-        Ok(conn) => conn,
-        Err(_) => {
+    let redis_url = config.redis_url.clone();
+    let mut conn = match get_connection_manager(&redis_url).await {
+        Some(conn) => conn,
+        None => {
             tracing::warn!("Redis connection failed, allowing request (rate limiter disabled)");
             return next.run(req).await;
         }

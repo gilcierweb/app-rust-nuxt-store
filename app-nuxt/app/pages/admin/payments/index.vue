@@ -363,7 +363,7 @@ function changePage(page: number) {
 }
 
 function paymentMethodName(paymentMethodId: number) {
-  return methodById.value.get(paymentMethodId)?.name || `Method #${paymentMethodId}`
+  return methodById.value.get(paymentMethodId)?.name || t('admin.payments.method.fallback', { id: paymentMethodId })
 }
 
 function paymentMethodCode(paymentMethodId: number) {
@@ -373,7 +373,7 @@ function paymentMethodCode(paymentMethodId: number) {
 function paymentGatewayName(paymentMethodId: number) {
   const method = methodById.value.get(paymentMethodId)
   if (!method?.payment_gateway_id) return t('admin.payments.gateway.manual')
-  return gatewayById.value.get(method.payment_gateway_id)?.name || `Gateway #${method.payment_gateway_id}`
+  return gatewayById.value.get(method.payment_gateway_id)?.name || t('admin.payments.gateway.fallback', { id: method.payment_gateway_id })
 }
 
 function statusLabel(status: unknown) {
