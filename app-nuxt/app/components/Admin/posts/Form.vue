@@ -76,20 +76,6 @@
                 </option>
               </select>
             </div>
-
-            <!-- User ID -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text font-semibold">Usuário ID</span>
-              </label>
-              <input
-                v-model.number="form.user_id"
-                type="number"
-                placeholder="ID do usuário"
-                class="input input-bordered w-full"
-                :disabled="pending"
-              />
-            </div>
           </div>
 
           <!-- Action Buttons -->
@@ -137,8 +123,7 @@ const { apiFetch } = useApi()
 const form = reactive({
   title: '',
   content: '',
-  status: 1,
-  user_id: 1
+  status: 1
 })
 
 const errors = reactive({
@@ -155,7 +140,6 @@ onMounted(() => {
     form.title = props.post.title || ''
     form.content = props.post.content || ''
     form.status = props.post.status ?? 1
-    form.user_id = props.post.user_id ?? 1
   }
 })
 
@@ -165,7 +149,6 @@ watch(() => props.post, (newPost) => {
     form.title = newPost.title || ''
     form.content = newPost.content || ''
     form.status = newPost.status ?? 1
-    form.user_id = newPost.user_id ?? 1
   }
 }, { immediate: true })
 
@@ -194,8 +177,7 @@ const onSubmit = async () => {
     const payload = {
       title: form.title.trim() || null,
       content: form.content.trim() || null,
-      status: form.status,
-      user_id: form.user_id
+      status: form.status
     }
 
     const url = props.isEditing

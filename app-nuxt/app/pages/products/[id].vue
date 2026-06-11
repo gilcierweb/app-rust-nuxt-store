@@ -333,7 +333,6 @@ async function submitReview() {
       method: 'POST',
       body: {
         product_id: Number(productId.value),
-        user_id: 1, // Static user for now, should be from auth store
         rating: reviewForm.rating,
         title: reviewForm.title.trim() || null,
         comment: reviewForm.comment.trim() || null,
