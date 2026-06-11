@@ -165,87 +165,84 @@ async fn check_rate_limit_redis(
     let window_ms = window.as_millis() as u64;
     let window_start = now.saturating_sub(window_ms);
     let redis_key = format!("ratelimit:{key}");
+    let member = format!("{}:{}", now, uuid::Uuid::new_v4());
 
-    // Remove old entries outside the window
-    let _: () = conn
-        .zrembyscore(&redis_key, 0, window_start)
+    let script = redis::Script::new(r#"
+        redis.call('ZREMRANGEBYSCORE', KEYS[1], 0, ARGV[1])
+        local count = redis.call('ZCARD', KEYS[1])
+        if count < tonumber(ARGV[2]) then
+            redis.call('ZADD', KEYS[1], ARGV[3], ARGV[4])
+            redis.call('EXPIRE', KEYS[1], tonumber(ARGV[5]))
+            return { 1, count, 0 }
+        else
+            local oldest = redis.call('ZRANGE', KEYS[1], 0, 0, 'WITHSCORES')
+            if oldest and oldest[2] then
+                return { 0, count, tonumber(oldest[2]) }
+            else
+                return { 0, count, 0 }
+            end
+        end
+    "#);
+
+    let result: (i32, usize, u64) = script
+        .key(&redis_key)
+        .arg(window_start)
+        .arg(limit)
+        .arg(now)
+        .arg(&member)
+        .arg(window.as_secs() as usize)
+        .invoke_async(conn)
         .await?;
 
-    // Count current entries in window
-    let count: usize = conn.zcard(&redis_key).await?;
+    let (allowed_flag, count, oldest_score) = result;
 
-    if count >= limit {
-        // Get oldest entry to calculate retry_after
-        let oldest: Option<(String, u64)> = conn.zrange_withscores(&redis_key, 0, 0).await?;
-        let retry_after = oldest
-            .map(|(_, score)| {
-                let remaining_ms = window_ms.saturating_sub(now.saturating_sub(score));
-                (remaining_ms / 1000).max(1)
-            })
-            .unwrap_or(1);
+    if allowed_flag == 1 {
+        let remaining = limit.saturating_sub(count + 1);
+        Ok(RateLimitState {
+            allowed: true,
+            limit,
+            remaining,
+            retry_after: 0,
+            scope,
+        })
+    } else {
+        let retry_after = if oldest_score > 0 {
+            let remaining_ms = window_ms.saturating_sub(now.saturating_sub(oldest_score));
+            (remaining_ms / 1000).max(1)
+        } else {
+            1
+        };
 
-        return Ok(RateLimitState {
+        Ok(RateLimitState {
             allowed: false,
             limit,
             remaining: 0,
             retry_after,
             scope,
-        });
+        })
     }
-
-    // Add current request
-    let member = format!("{}:{}", now, uuid::Uuid::new_v4());
-    let _: () = conn.zadd(&redis_key, &member, now).await?;
-
-    // Set expiration on the key
-    let _: () = conn
-        .expire(&redis_key, window.as_secs() as usize)
-        .await?;
-
-    let remaining = limit.saturating_sub(count + 1);
-
-    Ok(RateLimitState {
-        allowed: true,
-        limit,
-        remaining,
-        retry_after: 0,
-        scope,
-    })
 }
 
-static REDIS_MANAGER: std::sync::OnceLock<tokio::sync::Mutex<Option<redis::aio::ConnectionManager>>> = std::sync::OnceLock::new();
+static REDIS_MANAGER: tokio::sync::OnceCell<Option<redis::aio::ConnectionManager>> = tokio::sync::OnceCell::const_new();
 
 async fn get_connection_manager(redis_url: &str) -> Option<redis::aio::ConnectionManager> {
-    let mutex = REDIS_MANAGER.get_or_init(|| tokio::sync::Mutex::new(None));
-    
-    {
-        let guard = mutex.lock().await;
-        if let Some(conn) = &*guard {
-            return Some(conn.clone());
-        }
-    }
-    
-    let mut guard = mutex.lock().await;
-    if let Some(conn) = &*guard {
-        return Some(conn.clone());
-    }
-    
-    match redis::Client::open(redis_url) {
-        Ok(client) => match client.get_tokio_connection_manager().await {
-            Ok(conn) => {
-                *guard = Some(conn.clone());
-                Some(conn)
-            }
+    REDIS_MANAGER.get_or_init(|| async {
+        match redis::Client::open(redis_url) {
+            Ok(client) => match client.get_tokio_connection_manager().await {
+                Ok(conn) => Some(conn),
+                Err(e) => {
+                    tracing::warn!("Redis connection failed: {}", e);
+                    None
+                }
+            },
             Err(e) => {
-                tracing::warn!("Redis connection failed: {}", e);
+                tracing::warn!("Redis client open failed: {}", e);
                 None
             }
-        },
-        Err(e) => {
-            tracing::warn!("Redis client open failed: {}", e);
-            None
         }
-    }
+    })
+    .await
+    .clone()
 }
 
 pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next: Next) -> Response {
