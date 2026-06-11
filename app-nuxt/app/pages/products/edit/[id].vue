@@ -35,31 +35,36 @@
 
 <script setup lang="ts">
 import type { ProductApi } from '~/types';
-const { t } = useI18n()
 
-const { useApiLazyFetch } = useApi()
+definePageMeta({
+  middleware: 'auth'
+});
+
+const { t } = useI18n();
+const auth = useAuth();
+
+await auth.init();
+
+if (!auth.isAuthenticated.value || !auth.user.value?.can_manage_admin) {
+  throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
+}
+
+const route = useRoute();
+const { useApiLazyFetch } = useApi();
 
 const id = route.params.id;
 
-// Fetch product data for editing (non-blocking)
 const { pending, data: product, error } = useApiLazyFetch<ProductApi>(() => `/api/products/${id}`);
 
-// Handle successful product update
 const handleProductUpdated = (updatedProduct: ProductApi) => {
   console.log('Produto atualizado:', updatedProduct);
-  
-  // Optionally redirect to the product detail page
-  // await navigateTo(`/products/${updatedProduct.id}`);
 };
 
-// Handle cancel action
 const handleCancel = () => {
-  // Redirect back to products list
   navigateTo('/products');
 };
 
-// Set page title
 useHead({
   title: computed(() => product.value ? t('pages.products.edit.titleWithName', { name: product.value.name }) : t('pages.products.edit.title'))
 });
-</script> 
+</script>

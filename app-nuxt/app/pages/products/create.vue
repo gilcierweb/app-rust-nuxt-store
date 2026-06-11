@@ -18,25 +18,28 @@
 <script setup lang="ts">
 import type { ProductApi } from '~/types';
 
-// Handle successful product creation
+definePageMeta({
+  middleware: 'auth'
+});
+
+const { t } = useI18n();
+const auth = useAuth();
+
+await auth.init();
+
+if (!auth.isAuthenticated.value || !auth.user.value?.can_manage_admin) {
+  throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
+}
+
 const handleProductSaved = (product: ProductApi) => {
-  // You can redirect to the product detail page or show a success message
   console.log('Produto criado:', product);
-  
-  // Optionally redirect to the products list
-  // await navigateTo('/products');
 };
 
-// Handle cancel action
 const handleCancel = () => {
-  // Redirect back to products list
   navigateTo('/products');
 };
 
-const { t } = useI18n()
-
-// Set page title
 useHead({
   title: t('pages.products.create.title')
 });
-</script> 
+</script>
