@@ -1,3 +1,4 @@
+use crate::cache::blacklist_cache;
 use crate::models::ability::Ability;
 use axum::{extract::FromRequestParts, http::request::Parts};
 use axum_extra::extract::CookieJar;
@@ -45,14 +46,24 @@ impl FromRequestParts<AppContext> for CookieJWT {
             Ok(token_data) => {
                 let token_hash = hash_token(&token);
 
-                let now = Utc::now();
-                let is_blacklisted = jwt_blacklist::Entity::find()
-                    .filter(jwt_blacklist::Column::TokenHash.eq(&token_hash))
-                    .filter(jwt_blacklist::Column::ExpiresAt.gt(now))
-                    .one(&state.db)
-                    .await
-                    .map_err(|e| Error::DB(e))?
-                    .is_some();
+                // Fast path: check in-memory cache first (TTL = 2 s).
+                // This eliminates a DB round-trip on every authenticated request
+                // while keeping the revocation latency within 2 s of logout.
+                let is_blacklisted = if let Some(cached) = blacklist_cache().get(&token_hash) {
+                    cached
+                } else {
+                    let now = Utc::now();
+                    let result = jwt_blacklist::Entity::find()
+                        .filter(jwt_blacklist::Column::TokenHash.eq(&token_hash))
+                        .filter(jwt_blacklist::Column::ExpiresAt.gt(now))
+                        .one(&state.db)
+                        .await
+                        .map_err(Error::DB)?
+                        .is_some();
+                    // Cache both "not blacklisted" (false) and "blacklisted" (true).
+                    blacklist_cache().insert(token_hash.clone(), result);
+                    result
+                };
 
                 if is_blacklisted {
                     return Err(Error::Unauthorized("token revoked".to_string()));
@@ -66,3 +77,4 @@ impl FromRequestParts<AppContext> for CookieJWT {
         }
     }
 }
+

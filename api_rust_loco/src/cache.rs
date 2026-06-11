@@ -20,6 +20,10 @@ static CATEGORIES_CACHE: OnceLock<Cache<&'static str, Arc<Vec<categories::Model>
     OnceLock::new();
 static DASHBOARD_CACHE: OnceLock<Cache<&'static str, Arc<DashboardResponse>>> = OnceLock::new();
 static JSON_CACHE: OnceLock<Cache<String, Arc<Value>>> = OnceLock::new();
+/// Caches JWT blacklist lookups to avoid a DB round-trip on every authenticated request.
+/// TTL of 2 s is intentionally short: a revoked token will be blocked within at most 2 s
+/// of logout, which is acceptable for the security model in use.
+static BLACKLIST_CACHE: OnceLock<Cache<String, bool>> = OnceLock::new();
 
 pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
     CURRENT_CACHE.get_or_init(|| {
@@ -33,7 +37,7 @@ pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
 pub fn products_cache() -> &'static Cache<String, Arc<Vec<ProductWithCategory>>> {
     PRODUCTS_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(30))
+            .time_to_live(Duration::from_secs(60))
             .max_capacity(64)
             .build()
     })
@@ -42,7 +46,7 @@ pub fn products_cache() -> &'static Cache<String, Arc<Vec<ProductWithCategory>>>
 pub fn product_detail_cache() -> &'static Cache<String, Arc<ProductWithCategory>> {
     PRODUCT_DETAIL_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(5))
+            .time_to_live(Duration::from_secs(15))
             .max_capacity(256)
             .build()
     })
@@ -96,8 +100,19 @@ pub fn categories_cache() -> &'static Cache<&'static str, Arc<Vec<categories::Mo
 pub fn dashboard_cache() -> &'static Cache<&'static str, Arc<DashboardResponse>> {
     DASHBOARD_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(30))
+            .time_to_live(Duration::from_secs(60))
             .max_capacity(16)
+            .build()
+    })
+}
+
+/// Short-lived in-memory cache for JWT blacklist lookups.
+/// Avoids a synchronous DB query on every authenticated request.
+pub fn blacklist_cache() -> &'static Cache<String, bool> {
+    BLACKLIST_CACHE.get_or_init(|| {
+        Cache::builder()
+            .time_to_live(Duration::from_secs(2))
+            .max_capacity(4096)
             .build()
     })
 }
@@ -141,6 +156,10 @@ pub fn invalidate_categories_cache() {
 
 pub fn invalidate_dashboard_cache() {
     dashboard_cache().invalidate("stats");
+}
+
+pub fn invalidate_blacklist_cache(token_hash: &str) {
+    blacklist_cache().invalidate(token_hash);
 }
 
 pub fn invalidate_catalog_caches() {

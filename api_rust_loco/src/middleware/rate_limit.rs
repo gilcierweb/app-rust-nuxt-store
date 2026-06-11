@@ -7,7 +7,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use loco_rs::{app::AppContext, auth::jwt};
-use redis::AsyncCommands;
+use redis;
 use serde_json::json;
 use std::time::Duration;
 
@@ -74,6 +74,12 @@ fn env_duration(name: &str, default_seconds: u64) -> Duration {
         .filter(|value| *value > 0)
         .unwrap_or(default_seconds);
     Duration::from_secs(seconds)
+}
+
+static CONFIG: std::sync::OnceLock<RateLimitConfig> = std::sync::OnceLock::new();
+
+fn get_config() -> &'static RateLimitConfig {
+    CONFIG.get_or_init(config_from_env)
 }
 
 fn config_from_env() -> RateLimitConfig {
@@ -250,7 +256,7 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
         return next.run(req).await;
     }
 
-    let config = config_from_env();
+    let config = get_config();
     if !config.enabled {
         return next.run(req).await;
     }
@@ -258,8 +264,7 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
     let ip_key = format!("ip:{}", client_ip(req.headers()));
     let user_key = user_key(&ctx, req.headers());
 
-    let redis_url = config.redis_url.clone();
-    let mut conn = match get_connection_manager(&redis_url).await {
+    let mut conn = match get_connection_manager(&config.redis_url).await {
         Some(conn) => conn,
         None => {
             tracing::warn!("Redis connection failed, allowing request (rate limiter disabled)");
@@ -267,38 +272,32 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
         }
     };
 
-    // Check IP rate limit
-    let ip_state = match check_rate_limit_redis(
-        &mut conn,
-        &ip_key,
-        config.ip_requests,
-        config.ip_window,
-        "ip",
-    )
-    .await
-    {
-        Ok(state) => state,
-        Err(e) => {
-            tracing::error!(error = ?e, "Redis IP rate limit check failed");
-            return next.run(req).await;
-        }
-    };
-
-    if !ip_state.allowed {
-        return rate_limited_response(ip_state);
-    }
-
-    // Check user rate limit if authenticated
     if let Some(user_key) = user_key {
-        let user_state = match check_rate_limit_redis(
-            &mut conn,
-            &user_key,
-            config.user_requests,
-            config.user_window,
-            "user",
-        )
-        .await
-        {
+        // Run IP and user checks in parallel to halve the Redis round-trip overhead.
+        let ip_limit = config.ip_requests;
+        let ip_window = config.ip_window;
+        let user_limit = config.user_requests;
+        let user_window = config.user_window;
+        let mut conn2 = conn.clone();
+
+        let (ip_result, user_result) = tokio::join!(
+            check_rate_limit_redis(&mut conn, &ip_key, ip_limit, ip_window, "ip"),
+            check_rate_limit_redis(&mut conn2, &user_key, user_limit, user_window, "user"),
+        );
+
+        let ip_state = match ip_result {
+            Ok(state) => state,
+            Err(e) => {
+                tracing::error!(error = ?e, "Redis IP rate limit check failed");
+                return next.run(req).await;
+            }
+        };
+
+        if !ip_state.allowed {
+            return rate_limited_response(ip_state);
+        }
+
+        let user_state = match user_result {
             Ok(state) => state,
             Err(e) => {
                 tracing::error!(error = ?e, "Redis user rate limit check failed");
@@ -308,6 +307,27 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
 
         if !user_state.allowed {
             return rate_limited_response(user_state);
+        }
+    } else {
+        // Unauthenticated: only check IP limit.
+        let ip_state = match check_rate_limit_redis(
+            &mut conn,
+            &ip_key,
+            config.ip_requests,
+            config.ip_window,
+            "ip",
+        )
+        .await
+        {
+            Ok(state) => state,
+            Err(e) => {
+                tracing::error!(error = ?e, "Redis IP rate limit check failed");
+                return next.run(req).await;
+            }
+        };
+
+        if !ip_state.allowed {
+            return rate_limited_response(ip_state);
         }
     }
 

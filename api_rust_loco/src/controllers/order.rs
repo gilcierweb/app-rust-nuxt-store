@@ -9,6 +9,7 @@ use sea_orm::ActiveValue::Set;
 use sea_orm::{PaginatorTrait, QueryOrder, TransactionTrait};
 use uuid::Uuid;
 
+use crate::cache::{json_cache, invalidate_json_cache_with_prefix};
 use crate::models::_entities::addresses;
 use crate::models::_entities::coupon_usages;
 use crate::models::_entities::coupons;
@@ -320,6 +321,9 @@ pub async fn checkout(
 
     txn.commit().await?;
 
+    // Invalidate admin orders cache so the new order appears immediately.
+    invalidate_json_cache_with_prefix("orders:");
+
     // Send order confirmation email (non-blocking, logged)
     if let Ok(user) = users::Entity::find_by_id(current_user_id)
         .one(&ctx.db)
@@ -381,12 +385,21 @@ pub async fn list(
     State(ctx): State<AppContext>,
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
+    let cache_key = format!("orders:p{}:s{}", pagination.page_index(), pagination.page_size());
+
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
     let orders: Vec<crate::models::_entities::orders::Model> = Entity::find()
         .order_by_desc(crate::models::_entities::orders::Column::CreatedAt)
         .order_by_desc(crate::models::_entities::orders::Column::Id)
         .paginate(&ctx.db, pagination.page_size())
         .fetch_page(pagination.page_index())
         .await?;
+
+    let value = std::sync::Arc::new(serde_json::to_value(&orders).unwrap_or_default());
+    json_cache().insert(cache_key, value.clone());
 
     format::json(orders)
 }
@@ -548,6 +561,9 @@ pub async fn update_status(
     active.status = Set(Some(new_status.to_i32()));
     active.updated_at = Set(chrono::Utc::now().into());
     let updated_order = active.update(&ctx.db).await?;
+
+    // Invalidate admin orders list cache after status change.
+    invalidate_json_cache_with_prefix("orders:");
 
     // Send notification emails based on status transition
     if let Ok(user) = users::Entity::find_by_id(updated_order.user_id)
