@@ -82,17 +82,17 @@
         <!-- Payment Sessions -->
         <div class="card bg-base-100 shadow-sm border border-base-200">
           <div class="card-body">
-            <h2 class="card-title">Payment Sessions</h2>
+            <h2 class="card-title">{{ t('admin.payments.detail.sessions') }}</h2>
             <div class="overflow-x-auto mt-4">
               <table class="table table-sm">
                 <thead>
                   <tr>
-                    <th>Session</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Expires</th>
-                    <th>Completed</th>
-                    <th>Created</th>
+                    <th>{{ t('admin.payments.detail.session') }}</th>
+                    <th>{{ t('admin.payments.detail.method') }}</th>
+                    <th>{{ t('admin.payments.detail.status') }}</th>
+                    <th>{{ t('admin.payments.detail.expires') }}</th>
+                    <th>{{ t('admin.payments.detail.completed') }}</th>
+                    <th>{{ t('admin.payments.detail.created') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -114,7 +114,7 @@
                     <td>{{ formatDate(session.created_at) }}</td>
                   </tr>
                   <tr v-if="paymentSessions.length === 0">
-                    <td colspan="6" class="text-center py-4 text-gray-500">No sessions found</td>
+                    <td colspan="6" class="text-center py-4 text-gray-500">{{ t('admin.payments.detail.noSessions') }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -125,7 +125,7 @@
         <!-- Refund History -->
         <div class="card bg-base-100 shadow-sm border border-base-200">
           <div class="card-body">
-            <h2 class="card-title">Refund History</h2>
+            <h2 class="card-title">{{ t('admin.payments.detail.refundHistory') }}</h2>
             <div class="overflow-x-auto mt-4">
               <table class="table table-sm">
                 <thead>
@@ -162,7 +162,7 @@
                     <td>{{ formatDate(refund.created_at) }}</td>
                   </tr>
                   <tr v-if="paymentRefunds.length === 0">
-                    <td colspan="5" class="text-center py-4 text-gray-500">No refunds found</td>
+                    <td colspan="5" class="text-center py-4 text-gray-500">{{ t('admin.payments.detail.noRefunds') }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -173,7 +173,7 @@
         <!-- Events Log -->
         <div class="card bg-base-100 shadow-sm border border-base-200">
           <div class="card-body">
-            <h2 class="card-title">Webhook Events</h2>
+            <h2 class="card-title">{{ t('admin.payments.detail.webhookEvents') }}</h2>
             <div class="overflow-x-auto mt-4">
               <table class="table table-sm">
                 <thead>
@@ -196,7 +196,7 @@
                     <td>{{ formatDate(event.created_at) }}</td>
                   </tr>
                   <tr v-if="paymentEvents.length === 0">
-                    <td colspan="4" class="text-center py-4 text-gray-500">No events found</td>
+                    <td colspan="4" class="text-center py-4 text-gray-500">{{ t('admin.payments.detail.noEvents') }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -209,7 +209,7 @@
         <!-- Gateway Logs -->
         <div class="card bg-base-100 shadow-sm border border-base-200">
           <div class="card-body">
-            <h2 class="card-title">Gateway Logs</h2>
+            <h2 class="card-title">{{ t('admin.payments.detail.gatewayLogs') }}</h2>
             <div class="space-y-4 mt-4 max-h-[600px] overflow-y-auto">
               <div v-for="log in paymentLogs" :key="log.id" class="p-3 bg-base-200 rounded-lg text-sm">
                 <div class="flex justify-between mb-1">
@@ -220,7 +220,7 @@
                 <pre v-if="log.payload" class="mt-2 p-2 bg-base-300 rounded text-xs overflow-x-auto">{{ log.payload }}</pre>
               </div>
               <div v-if="paymentLogs.length === 0" class="text-center py-4 text-gray-500">
-                No logs found
+                {{ t('admin.payments.detail.noLogs') }}
               </div>
             </div>
           </div>
@@ -232,6 +232,8 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
+
 const route = useRoute()
 const paymentId = route.params.id
 
@@ -316,18 +318,18 @@ const paymentEvents = computed(() => detail.value?.events || [])
 
 const capturePayment = async () => {
   const confirmed = await dialog.confirm({
-    title: 'Capture payment',
-    message: 'Are you sure you want to capture this payment?',
-    confirmLabel: 'Capture'
+    title: t('admin.payments.detail.captureTitle'),
+    message: t('admin.payments.detail.captureMessage'),
+    confirmLabel: t('admin.payments.detail.capture')
   })
   if (!confirmed) return
   isActionLoading.value = true
   try {
     await apiFetch(`/api/admin/payments/${paymentId}/capture`, { method: 'POST' })
-    toast.success('Payment captured successfully.')
+    toast.success(t('admin.payments.detail.captureSuccess'))
     await refresh()
   } catch (e: any) {
-    toast.error(`Capture failed: ${e.message}`)
+    toast.error(`${t('admin.payments.detail.captureFailed')}${e.message}`)
   } finally {
     isActionLoading.value = false
   }
@@ -335,19 +337,19 @@ const capturePayment = async () => {
 
 const voidPayment = async () => {
   const confirmed = await dialog.confirm({
-    title: 'Void payment',
-    message: 'Are you sure you want to void this payment?',
-    confirmLabel: 'Void',
+    title: t('admin.payments.detail.voidTitle'),
+    message: t('admin.payments.detail.voidMessage'),
+    confirmLabel: t('admin.payments.detail.void'),
     tone: 'danger'
   })
   if (!confirmed) return
   isActionLoading.value = true
   try {
     await apiFetch(`/api/admin/payments/${paymentId}/void`, { method: 'POST' })
-    toast.success('Payment voided successfully.')
+    toast.success(t('admin.payments.detail.voidSuccess'))
     await refresh()
   } catch (e: any) {
-    toast.error(`Void failed: ${e.message}`)
+    toast.error(`${t('admin.payments.detail.voidFailed')}${e.message}`)
   } finally {
     isActionLoading.value = false
   }
@@ -355,13 +357,13 @@ const voidPayment = async () => {
 
 const refundPayment = async () => {
   const amountStr = await dialog.prompt({
-    title: 'Refund payment',
-    message: 'Enter an amount to refund or leave the field empty to issue a full refund.',
-    confirmLabel: 'Refund',
+    title: t('admin.payments.detail.refundTitle'),
+    message: t('admin.payments.detail.refundMessage'),
+    confirmLabel: t('admin.payments.detail.refundConfirm'),
     tone: 'danger',
     input: {
-      label: 'Amount',
-      placeholder: 'Leave empty for full refund',
+      label: t('admin.payments.detail.refundAmount'),
+      placeholder: t('admin.payments.detail.refundPlaceholder'),
       type: 'number',
       min: 0.01,
       step: '0.01'
@@ -373,7 +375,7 @@ const refundPayment = async () => {
   if (amountStr.trim() !== '') {
     amount = parseFloat(amountStr)
     if (isNaN(amount) || amount <= 0) {
-      toast.error('Invalid amount')
+      toast.error(t('admin.payments.detail.refundInvalidAmount'))
       return
     }
   }
@@ -384,10 +386,10 @@ const refundPayment = async () => {
       method: 'POST',
       body: { amount }
     })
-    toast.success('Refund requested successfully.')
+    toast.success(t('admin.payments.detail.refundSuccess'))
     await refresh()
   } catch (e: any) {
-    toast.error(`Refund failed: ${e.message}`)
+    toast.error(`${t('admin.payments.detail.refundFailed')}${e.message}`)
   } finally {
     isActionLoading.value = false
   }
@@ -408,7 +410,7 @@ const downloadReceipt = async () => {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   } catch (e: any) {
-    toast.error(`Download failed: ${e.message}`)
+    toast.error(`${t('admin.payments.detail.downloadFailed')}${e.message}`)
   } finally {
     isReceiptLoading.value = false
   }

@@ -6,13 +6,13 @@
           <i class="icon-[tabler--arrow-left] size-5"></i>
         </NuxtLinkLocale>
         <div>
-          <h1 class="h1">Gateway Logs</h1>
-          <p class="text-sm text-base-content/60">Sanitized provider requests, responses, webhook processing notes, and failures.</p>
+          <h1 class="h1">{{ t('admin.payments.logs.title') }}</h1>
+          <p class="text-sm text-base-content/60">{{ t('admin.payments.logs.description') }}</p>
         </div>
       </div>
       <NuxtLinkLocale to="/admin/payments/events" class="btn btn-outline btn-sm">
         <i class="icon-[tabler--inbox] size-4"></i>
-        Gateway Events
+        {{ t('admin.payments.logs.eventsLink') }}
       </NuxtLinkLocale>
     </div>
 
@@ -21,14 +21,14 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(220px,1fr)_180px_180px_180px_auto] lg:items-end">
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Search</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.logs.search') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 group-focus-within:text-primary"></span>
               <input
                 v-model="searchQuery"
                 class="input input-bordered w-full pl-10"
-                placeholder="Message, payment, session, event..."
+                :placeholder="t('admin.payments.logs.searchPlaceholder')"
                 type="text"
               />
             </div>
@@ -36,10 +36,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Level</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.logs.level') }}</span>
             </label>
             <select v-model="selectedLevel" class="select select-bordered w-full">
-              <option value="">All levels</option>
+              <option value="">{{ t('admin.payments.logs.allLevels') }}</option>
               <option v-for="level in logLevels" :key="level.value" :value="level.value">
                 {{ level.label }}
               </option>
@@ -48,10 +48,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Direction</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.logs.direction') }}</span>
             </label>
             <select v-model="selectedDirection" class="select select-bordered w-full">
-              <option value="">All directions</option>
+              <option value="">{{ t('admin.payments.logs.allDirections') }}</option>
               <option v-for="direction in logDirections" :key="direction.value" :value="direction.value">
                 {{ direction.label }}
               </option>
@@ -60,18 +60,18 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Payment</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.logs.payment') }}</span>
             </label>
             <input
               v-model="selectedPayment"
               class="input input-bordered w-full"
-              placeholder="Payment ID"
+              :placeholder="t('admin.payments.logs.paymentPlaceholder')"
               type="number"
             />
           </div>
 
           <button class="btn btn-ghost" type="button" @click="resetFilters">
-            Clear
+            {{ t('admin.payments.logs.clear') }}
           </button>
         </div>
       </div>
@@ -79,12 +79,12 @@
 
     <div v-if="logsPending" class="flex flex-col items-center justify-center py-20 bg-base-100 rounded-box border shadow-sm">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <p class="mt-4 text-base-content/60">Loading gateway logs...</p>
+      <p class="mt-4 text-base-content/60">{{ t('admin.payments.logs.loading') }}</p>
     </div>
 
     <div v-else-if="logsError" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Failed to load gateway logs: {{ logsError.message }}</span>
+      <span>{{ t('admin.payments.logs.error') }} {{ logsError.message }}</span>
     </div>
 
     <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
@@ -92,13 +92,13 @@
         <table class="table table-lg">
           <thead class="bg-base-200/50">
             <tr>
-              <th>Log</th>
-              <th>Payment</th>
-              <th>Session</th>
-              <th>Event</th>
-              <th>Direction</th>
-              <th>Level</th>
-              <th>Date</th>
+              <th>{{ t('admin.payments.logs.log') }}</th>
+              <th>{{ t('admin.payments.logs.payment') }}</th>
+              <th>{{ t('admin.payments.logs.session') }}</th>
+              <th>{{ t('admin.payments.logs.event') }}</th>
+              <th>{{ t('admin.payments.logs.direction') }}</th>
+              <th>{{ t('admin.payments.logs.level') }}</th>
+              <th>{{ t('admin.payments.logs.date') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -134,7 +134,7 @@
             </tr>
             <tr v-if="filteredLogs.length === 0">
               <td colspan="7" class="py-20 text-center text-base-content/50 italic">
-                No gateway logs found.
+                {{ t('admin.payments.logs.noLogs') }}
               </td>
             </tr>
           </tbody>
@@ -148,6 +148,8 @@
 definePageMeta({
   layout: 'admin'
 })
+
+const { t } = useI18n()
 
 interface AdminPaymentGatewayLog {
   id: number
@@ -177,17 +179,17 @@ const {
   { key: 'admin-payment-gateway-logs-list' }
 )
 
-const logLevels = [
-  { value: 1, label: 'Info', badge: 'badge-info' },
-  { value: 2, label: 'Warning', badge: 'badge-warning' },
-  { value: 3, label: 'Error', badge: 'badge-error' }
-]
+const logLevels = computed(() => [
+  { value: 1, label: t('admin.payments.logs.info'), badge: 'badge-info' },
+  { value: 2, label: t('admin.payments.logs.warning'), badge: 'badge-warning' },
+  { value: 3, label: t('admin.payments.logs.errorLevel'), badge: 'badge-error' }
+])
 
-const logDirections = [
-  { value: 1, label: 'Inbound' },
-  { value: 2, label: 'Outbound' },
-  { value: 3, label: 'Webhook' }
-]
+const logDirections = computed(() => [
+  { value: 1, label: t('admin.payments.logs.inbound') },
+  { value: 2, label: t('admin.payments.logs.outbound') },
+  { value: 3, label: t('admin.payments.logs.webhook') }
+])
 
 const logs = computed(() => logsData.value || [])
 

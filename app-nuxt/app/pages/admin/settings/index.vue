@@ -3,7 +3,7 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h1 class="h1">{{ $t('admin.settings.title') }}</h1>
-        <p class="text-sm text-base-content/60">Persist store, SEO, API, notification, and security settings.</p>
+        <p class="text-sm text-base-content/60">{{ $t('admin.settings.description') }}</p>
       </div>
       <button class="btn btn-primary" type="button" :disabled="pending || isSaving" @click="saveSettings">
         <span v-if="isSaving" class="loading loading-spinner loading-sm"></span>
@@ -15,13 +15,13 @@
     <div v-if="pending" class="card shadow-base-300/10 shadow-md">
       <div class="card-body flex flex-col items-center justify-center py-20">
         <span class="loading loading-spinner text-primary size-12"></span>
-        <p class="mt-4 text-base-content/60">Loading settings...</p>
+        <p class="mt-4 text-base-content/60">{{ $t('admin.settings.loading') }}</p>
       </div>
     </div>
 
     <div v-else-if="error" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Failed to load settings: {{ error.message }}</span>
+      <span>{{ $t('admin.settings.loadError') }}: {{ error.message }}</span>
     </div>
 
     <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr]">
@@ -114,6 +114,7 @@ interface AdminSettingsResponse {
   groups: AdminSettingsGroup[]
 }
 
+const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
 
 const activeNamespace = ref('general')
@@ -164,7 +165,7 @@ const groupIcon = (namespace: string) => {
 }
 
 const booleanLabel = (value: string) => {
-  return value === 'true' ? 'Enabled' : 'Disabled'
+  return value === 'true' ? t('admin.settings.enabled') : t('admin.settings.disabled')
 }
 
 const setBooleanValue = (setting: AdminSetting, event: Event) => {
@@ -191,9 +192,9 @@ const saveSettings = async () => {
       body: { settings }
     })
     await refresh()
-    saveMessage.value = 'Settings saved.'
+    saveMessage.value = t('admin.settings.saveSuccess')
   } catch (err: any) {
-    saveError.value = err?.message || 'Failed to save settings.'
+    saveError.value = err?.message || t('admin.settings.saveError')
   } finally {
     isSaving.value = false
   }

@@ -1,18 +1,18 @@
 <template>
   <div>
     <div class="mb-6 flex justify-between items-center">
-      <h1 class="h1">Payment Gateways</h1>
+      <h1 class="h1">{{ t('admin.payments.gateways.title') }}</h1>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">Loading...</span>
+      <span class="ml-3">{{ t('admin.payments.gateways.loading') }}</span>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="alert alert-error">
-      <span>Failed to load gateways: {{ error.message }}</span>
+      <span>{{ t('admin.payments.gateways.error') }} {{ error.message }}</span>
     </div>
 
     <!-- Gateways Table -->
@@ -21,12 +21,12 @@
         <table class="table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Environment</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ t('admin.payments.gateways.id') }}</th>
+              <th>{{ t('admin.payments.gateways.name') }}</th>
+              <th>{{ t('admin.payments.gateways.code') }}</th>
+              <th>{{ t('admin.payments.gateways.environment') }}</th>
+              <th>{{ t('admin.payments.gateways.status') }}</th>
+              <th>{{ t('admin.payments.gateways.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -40,8 +40,8 @@
                   @change="updateGateway(gateway)"
                   class="select select-sm select-bordered"
                 >
-                  <option :value="1">Sandbox</option>
-                  <option :value="2">Production</option>
+                  <option :value="1">{{ t('admin.payments.gateways.sandbox') }}</option>
+                  <option :value="2">{{ t('admin.payments.gateways.production') }}</option>
                 </select>
               </td>
               <td>
@@ -70,6 +70,7 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const toast = useAppToast()
+const { t } = useI18n()
 
 const { pending, data: gateways, error, refresh } = await useApiFetch<any[]>(
   '/api/admin/payment-gateways',
@@ -85,7 +86,7 @@ const toggleStatus = async (gateway: any) => {
     })
     gateway.status = newStatus
   } catch (err) {
-    toast.error('Failed to update status')
+    toast.error(t('admin.payments.gateways.updateStatusFailed'))
     gateway.status = gateway.status === 1 ? 1 : 0 // revert
   }
 }
@@ -97,7 +98,7 @@ const updateGateway = async (gateway: any) => {
       body: { environment: gateway.environment }
     })
   } catch (err) {
-    toast.error('Failed to update environment')
+    toast.error(t('admin.payments.gateways.updateEnvironmentFailed'))
     await refresh()
   }
 }

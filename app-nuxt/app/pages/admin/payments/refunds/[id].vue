@@ -6,8 +6,8 @@
           <i class="icon-[tabler--arrow-left] size-5"></i>
         </NuxtLinkLocale>
         <div>
-          <h1 class="h1">Refund #{{ refundId }}</h1>
-          <p class="text-sm text-base-content/60">Provider reference, status, and parent payment context.</p>
+          <h1 class="h1">{{ t('admin.payments.refunds.detail.title') }} #{{ refundId }}</h1>
+          <p class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.description') }}</p>
         </div>
       </div>
       <NuxtLinkLocale
@@ -16,12 +16,12 @@
         class="btn btn-outline btn-sm"
       >
         <i class="icon-[tabler--credit-card] size-4"></i>
-        Payment
+        {{ t('admin.payments.refunds.detail.paymentLink') }}
       </NuxtLinkLocale>
       <button class="btn btn-outline btn-sm" @click="downloadReceipt" :disabled="isReceiptLoading">
         <span v-if="isReceiptLoading" class="loading loading-spinner loading-xs"></span>
         <i v-else class="icon-[tabler--file-download] size-4"></i>
-        {{ $t('admin.payments.refunds.detail.downloadReceipt', 'Download Confirmation') }}
+        {{ t('admin.payments.refunds.detail.downloadReceipt') }}
       </button>
     </div>
 
@@ -40,15 +40,15 @@
       <div class="space-y-6">
         <div class="card shadow-base-300/10 shadow-md">
           <div class="card-header">
-            <h2 class="card-title text-xl">Overview</h2>
+            <h2 class="card-title text-xl">{{ t('admin.payments.refunds.detail.overview') }}</h2>
           </div>
           <div class="card-body grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
-              <div class="text-sm text-base-content/60">Amount</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.amount') }}</div>
               <div class="mt-1 text-xl font-semibold">{{ formatCurrency(detail.refund.amount, detail.refund.currency || 'BRL') }}</div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Status</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.status') }}</div>
               <div class="mt-1">
                 <span :class="['badge badge-soft', refundStatusBadge(detail.refund.status)]">
                   {{ refundStatusLabel(detail.refund.status) }}
@@ -56,23 +56,23 @@
               </div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">External refund ID</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.externalRefundId') }}</div>
               <div class="mt-1 font-mono text-sm">{{ detail.refund.external_refund_id || '-' }}</div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Idempotency key</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.idempotencyKey') }}</div>
               <div class="mt-1 break-all font-mono text-sm">{{ detail.refund.idempotency_key }}</div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Processed at</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.processedAt') }}</div>
               <div class="mt-1">{{ formatDate(detail.refund.processed_at) }}</div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Created at</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.createdAt') }}</div>
               <div class="mt-1">{{ formatDate(detail.refund.created_at) }}</div>
             </div>
             <div v-if="detail.refund.failure_code || detail.refund.failure_message" class="md:col-span-2">
-              <div class="text-sm text-base-content/60">Failure</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.failure') }}</div>
               <div class="mt-1 rounded-lg bg-error/10 p-3 text-sm text-error">
                 {{ detail.refund.failure_code || detail.refund.failure_message }}
               </div>
@@ -84,27 +84,27 @@
       <div class="space-y-6">
         <div class="card shadow-base-300/10 shadow-md">
           <div class="card-header">
-            <h2 class="card-title text-xl">Parent payment</h2>
+            <h2 class="card-title text-xl">{{ t('admin.payments.refunds.detail.parentPayment') }}</h2>
           </div>
           <div class="card-body space-y-4">
             <div>
-              <div class="text-sm text-base-content/60">Payment</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.payment') }}</div>
               <NuxtLinkLocale :to="`/admin/payments/${detail.payment.id}`" class="mt-1 inline-block link link-primary font-mono">
                 {{ detail.payment.number || `#${detail.payment.id}` }}
               </NuxtLinkLocale>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Order</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.order') }}</div>
               <NuxtLinkLocale :to="`/admin/orders/${detail.payment.order_id}`" class="mt-1 inline-block link link-primary font-mono">
                 #{{ detail.payment.order_id }}
               </NuxtLinkLocale>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Gateway</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.gateway') }}</div>
               <div class="mt-1">{{ detail.gateway_name || '-' }}</div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Payment status</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.paymentStatus') }}</div>
               <div class="mt-1">
                 <span :class="['badge badge-soft', paymentStatusBadge(detail.payment.status)]">
                   {{ paymentStatusLabel(detail.payment.status) }}
@@ -112,7 +112,7 @@
               </div>
             </div>
             <div>
-              <div class="text-sm text-base-content/60">Transaction</div>
+              <div class="text-sm text-base-content/60">{{ t('admin.payments.refunds.detail.transaction') }}</div>
               <div class="mt-1 break-all font-mono text-sm">{{ detail.payment.transaction_id || detail.payment.external_payment_id || '-' }}</div>
             </div>
           </div>
@@ -152,6 +152,7 @@ interface AdminRefundDetail {
   gateway_name?: string | null
 }
 
+const { t } = useI18n()
 const route = useRoute()
 const refundId = route.params.id
 const { apiFetch, useApiFetch } = useApi()

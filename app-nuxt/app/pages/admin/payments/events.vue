@@ -6,13 +6,13 @@
           <i class="icon-[tabler--arrow-left] size-5"></i>
         </NuxtLinkLocale>
         <div>
-          <h1 class="h1">Gateway Events</h1>
-          <p class="text-sm text-base-content/60">Webhook inbox with processing state and signature results.</p>
+          <h1 class="h1">{{ t('admin.payments.events.title') }}</h1>
+          <p class="text-sm text-base-content/60">{{ t('admin.payments.events.description') }}</p>
         </div>
       </div>
       <NuxtLinkLocale to="/admin/payments/logs" class="btn btn-outline btn-sm">
         <i class="icon-[tabler--list-details] size-4"></i>
-        Gateway Logs
+        {{ t('admin.payments.events.logsLink') }}
       </NuxtLinkLocale>
     </div>
 
@@ -21,14 +21,14 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(220px,1fr)_180px_180px_auto] lg:items-end">
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Search</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.events.search') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 group-focus-within:text-primary"></span>
               <input
                 v-model="searchQuery"
                 class="input input-bordered w-full pl-10"
-                placeholder="Event type, external ID, failure..."
+                :placeholder="t('admin.payments.events.searchPlaceholder')"
                 type="text"
               />
             </div>
@@ -36,10 +36,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Gateway</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.events.gateway') }}</span>
             </label>
             <select v-model="selectedGateway" class="select select-bordered w-full">
-              <option value="">All gateways</option>
+              <option value="">{{ t('admin.payments.events.allGateways') }}</option>
               <option v-for="gateway in gateways" :key="gateway.id" :value="gateway.id">
                 {{ gateway.name }}
               </option>
@@ -48,10 +48,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Status</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.events.status') }}</span>
             </label>
             <select v-model="selectedStatus" class="select select-bordered w-full">
-              <option value="">All statuses</option>
+              <option value="">{{ t('admin.payments.events.allStatuses') }}</option>
               <option v-for="status in eventStatuses" :key="status.value" :value="status.value">
                 {{ status.label }}
               </option>
@@ -59,7 +59,7 @@
           </div>
 
           <button class="btn btn-ghost" type="button" @click="resetFilters">
-            Clear
+            {{ t('admin.payments.events.clear') }}
           </button>
         </div>
       </div>
@@ -67,12 +67,12 @@
 
     <div v-if="eventsPending || gatewaysPending" class="flex flex-col items-center justify-center py-20 bg-base-100 rounded-box border shadow-sm">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <p class="mt-4 text-base-content/60">Loading gateway events...</p>
+      <p class="mt-4 text-base-content/60">{{ t('admin.payments.events.loading') }}</p>
     </div>
 
     <div v-else-if="eventsError" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Failed to load gateway events: {{ eventsError.message }}</span>
+      <span>{{ t('admin.payments.events.error') }} {{ eventsError.message }}</span>
     </div>
 
     <div v-else class="rounded-box shadow-base-300/10 bg-base-100 w-full pb-2 shadow-md overflow-hidden">
@@ -80,12 +80,12 @@
         <table class="table table-lg">
           <thead class="bg-base-200/50">
             <tr>
-              <th>Event</th>
-              <th>Gateway</th>
-              <th>Status</th>
-              <th>Signature</th>
-              <th>Processed</th>
-              <th>Received</th>
+              <th>{{ t('admin.payments.events.event') }}</th>
+              <th>{{ t('admin.payments.events.gateway') }}</th>
+              <th>{{ t('admin.payments.events.status') }}</th>
+              <th>{{ t('admin.payments.events.signature') }}</th>
+              <th>{{ t('admin.payments.events.processed') }}</th>
+              <th>{{ t('admin.payments.events.received') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -111,7 +111,7 @@
               </td>
               <td>
                 <span :class="['badge badge-soft badge-sm', event.signature_valid ? 'badge-success' : 'badge-error']">
-                  {{ event.signature_valid ? 'Valid' : 'Invalid' }}
+                  {{ event.signature_valid ? t('admin.payments.events.valid') : t('admin.payments.events.invalid') }}
                 </span>
               </td>
               <td>{{ formatDate(event.processed_at) }}</td>
@@ -122,7 +122,7 @@
             </tr>
             <tr v-if="filteredEvents.length === 0">
               <td colspan="6" class="py-20 text-center text-base-content/50 italic">
-                No gateway events found.
+                {{ t('admin.payments.events.noEvents') }}
               </td>
             </tr>
           </tbody>
@@ -136,6 +136,8 @@
 definePageMeta({
   layout: 'admin'
 })
+
+const { t } = useI18n()
 
 interface AdminPaymentGatewayEvent {
   id: number
@@ -179,13 +181,13 @@ const {
   { key: 'admin-payment-gateways-for-events' }
 )
 
-const eventStatuses = [
-  { value: 1, label: 'Received', badge: 'badge-info' },
-  { value: 2, label: 'Processing', badge: 'badge-warning' },
-  { value: 3, label: 'Processed', badge: 'badge-success' },
-  { value: 4, label: 'Failed', badge: 'badge-error' },
-  { value: 5, label: 'Ignored', badge: 'badge-neutral' }
-]
+const eventStatuses = computed(() => [
+  { value: 1, label: t('admin.payments.events.receivedStatus'), badge: 'badge-info' },
+  { value: 2, label: t('admin.payments.events.processingStatus'), badge: 'badge-warning' },
+  { value: 3, label: t('admin.payments.events.processedStatus'), badge: 'badge-success' },
+  { value: 4, label: t('admin.payments.events.failedStatus'), badge: 'badge-error' },
+  { value: 5, label: t('admin.payments.events.ignoredStatus'), badge: 'badge-neutral' }
+])
 
 const events = computed(() => eventsData.value || [])
 const gateways = computed(() => gatewaysData.value || [])

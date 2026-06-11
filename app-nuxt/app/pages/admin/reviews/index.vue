@@ -14,7 +14,7 @@
         <form @submit.prevent="handleSearch" class="flex flex-wrap gap-4 items-end">
           <div class="form-control flex-1 min-w-[240px]">
             <label class="label pt-0">
-              <span class="label-text-alt text-gray-500">Buscar Avaliação</span>
+              <span class="label-text-alt text-gray-500">{{ $t('admin.reviews.searchLabel') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors"></span>
@@ -27,7 +27,7 @@
             </div>
           </div>
           <button type="submit" class="btn btn-ghost">
-            Limpar
+            {{ $t('admin.reviews.clearFilters') }}
           </button>
         </form>
       </div>

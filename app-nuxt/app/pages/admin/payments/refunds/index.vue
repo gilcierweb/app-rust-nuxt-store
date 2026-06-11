@@ -2,13 +2,13 @@
   <div>
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h1 class="h1">Refunds</h1>
-        <p class="text-sm text-base-content/60">Track refund outcomes, provider references, and manual follow-up needs.</p>
+        <h1 class="h1">{{ t('admin.payments.refunds.title') }}</h1>
+        <p class="text-sm text-base-content/60">{{ t('admin.payments.refunds.description') }}</p>
       </div>
       <div class="flex gap-2">
         <NuxtLinkLocale to="/admin/payments" class="btn btn-outline btn-sm">
           <i class="icon-[tabler--credit-card] size-4"></i>
-          Payments
+          {{ t('admin.payments.refunds.paymentsLink') }}
         </NuxtLinkLocale>
       </div>
     </div>
@@ -18,14 +18,14 @@
         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(220px,1fr)_180px_180px_auto] lg:items-end">
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Search</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.refunds.search') }}</span>
             </label>
             <div class="relative group">
               <span class="icon-[tabler--search] absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 group-focus-within:text-primary"></span>
               <input
                 v-model="searchQuery"
                 class="input input-bordered w-full pl-10"
-                placeholder="Refund, payment, idempotency, failure..."
+                :placeholder="t('admin.payments.refunds.searchPlaceholder')"
                 type="text"
               />
             </div>
@@ -33,10 +33,10 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Status</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.refunds.status') }}</span>
             </label>
             <select v-model="selectedStatus" class="select select-bordered w-full">
-              <option value="">All statuses</option>
+              <option value="">{{ t('admin.payments.refunds.allStatuses') }}</option>
               <option v-for="status in refundStatuses" :key="status.value" :value="status.value">
                 {{ status.label }}
               </option>
@@ -45,17 +45,17 @@
 
           <div class="form-control">
             <label class="label pt-0">
-              <span class="label-text-alt text-base-content/60">Gateway</span>
+              <span class="label-text-alt text-base-content/60">{{ t('admin.payments.refunds.gateway') }}</span>
             </label>
             <select v-model="selectedGateway" class="select select-bordered w-full">
-              <option value="">All gateways</option>
+              <option value="">{{ t('admin.payments.refunds.allGateways') }}</option>
               <option v-for="gateway in gateways" :key="gateway" :value="gateway">
                 {{ gateway }}
               </option>
             </select>
           </div>
 
-          <button class="btn btn-ghost" type="button" @click="resetFilters">Clear</button>
+          <button class="btn btn-ghost" type="button" @click="resetFilters">{{ t('admin.payments.refunds.clear') }}</button>
         </div>
       </div>
     </div>
@@ -63,13 +63,13 @@
     <div v-if="pending" class="card shadow-base-300/10 shadow-md">
       <div class="card-body flex flex-col items-center justify-center py-20">
         <span class="loading loading-spinner text-primary size-12"></span>
-        <p class="mt-4 text-base-content/60">Loading refunds...</p>
+        <p class="mt-4 text-base-content/60">{{ t('admin.payments.refunds.loading') }}</p>
       </div>
     </div>
 
     <div v-else-if="error" class="alert alert-error">
       <i class="icon-[tabler--alert-circle] size-6"></i>
-      <span>Failed to load refunds: {{ error.message }}</span>
+      <span>{{ t('admin.payments.refunds.error') }} {{ error.message }}</span>
     </div>
 
     <div v-else class="card shadow-base-300/10 shadow-md overflow-hidden">
@@ -78,13 +78,13 @@
           <table class="table table-lg">
             <thead class="bg-base-200/50">
               <tr>
-                <th>Refund</th>
-                <th>Payment</th>
-                <th>Gateway</th>
-                <th>Status</th>
-                <th class="text-right">Amount</th>
-                <th>Processed</th>
-                <th class="text-right">Actions</th>
+                <th>{{ t('admin.payments.refunds.refund') }}</th>
+                <th>{{ t('admin.payments.refunds.payment') }}</th>
+                <th>{{ t('admin.payments.refunds.gateway') }}</th>
+                <th>{{ t('admin.payments.refunds.status') }}</th>
+                <th class="text-right">{{ t('admin.payments.refunds.amount') }}</th>
+                <th>{{ t('admin.payments.refunds.processed') }}</th>
+                <th class="text-right">{{ t('admin.payments.refunds.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -128,7 +128,7 @@
               </tr>
               <tr v-if="filteredRefunds.length === 0">
                 <td colspan="7" class="py-20 text-center text-base-content/50 italic">
-                  No refunds found.
+                  {{ t('admin.payments.refunds.noRefunds') }}
                 </td>
               </tr>
             </tbody>
@@ -164,6 +164,7 @@ interface AdminRefundListItem {
   gateway_name?: string | null
 }
 
+const { t } = useI18n()
 const { useApiFetch } = useApi()
 
 const searchQuery = ref('')

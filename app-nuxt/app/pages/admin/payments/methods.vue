@@ -1,18 +1,18 @@
 <template>
   <div>
     <div class="mb-6 flex justify-between items-center">
-      <h1 class="h1">Payment Methods</h1>
+      <h1 class="h1">{{ t('admin.payments.methods.title') }}</h1>
     </div>
 
     <!-- Loading State -->
     <div v-if="pending" class="flex items-center justify-center py-12">
       <span class="loading loading-spinner text-primary size-12"></span>
-      <span class="ml-3">Loading...</span>
+      <span class="ml-3">{{ t('admin.payments.methods.loading') }}</span>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="alert alert-error">
-      <span>Failed to load methods: {{ error.message }}</span>
+      <span>{{ t('admin.payments.methods.error') }} {{ error.message }}</span>
     </div>
 
     <!-- Methods Table -->
@@ -21,14 +21,14 @@
         <table class="table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Code</th>
-              <th>Gateway ID</th>
-              <th>Type</th>
-              <th>Active</th>
-              <th>Auto Capture</th>
-              <th>Position</th>
+              <th>{{ t('admin.payments.methods.id') }}</th>
+              <th>{{ t('admin.payments.methods.name') }}</th>
+              <th>{{ t('admin.payments.methods.code') }}</th>
+              <th>{{ t('admin.payments.methods.gatewayId') }}</th>
+              <th>{{ t('admin.payments.methods.type') }}</th>
+              <th>{{ t('admin.payments.methods.active') }}</th>
+              <th>{{ t('admin.payments.methods.autoCapture') }}</th>
+              <th>{{ t('admin.payments.methods.position') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -79,6 +79,7 @@ definePageMeta({
 
 const { apiFetch, useApiFetch } = useApi()
 const toast = useAppToast()
+const { t } = useI18n()
 
 const { pending, data: methods, error, refresh } = await useApiFetch<any[]>(
   '/api/admin/payment-methods',
@@ -87,9 +88,9 @@ const { pending, data: methods, error, refresh } = await useApiFetch<any[]>(
 
 const methodTypeLabel = (type: number) => {
   switch (type) {
-    case 1: return 'Credit Card'
-    case 2: return 'Boleto'
-    case 3: return 'Pix'
+    case 1: return t('admin.payments.methods.creditCard')
+    case 2: return t('admin.payments.methods.boleto')
+    case 3: return t('admin.payments.methods.pix')
     default: return 'Unknown'
   }
 }
@@ -103,7 +104,7 @@ const toggleActive = async (method: any) => {
     })
     method.active = newStatus
   } catch (err) {
-    toast.error('Failed to update status')
+    toast.error(t('admin.payments.methods.updateStatusFailed'))
     method.active = !newStatus
   }
 }
@@ -117,7 +118,7 @@ const toggleAutoCapture = async (method: any) => {
     })
     method.auto_capture = newValue
   } catch (err) {
-    toast.error('Failed to update auto capture')
+    toast.error(t('admin.payments.methods.updateAutoCaptureFailed'))
     method.auto_capture = !newValue
   }
 }
@@ -129,7 +130,7 @@ const updateMethod = async (method: any) => {
       body: { position: method.position }
     })
   } catch (err) {
-    toast.error('Failed to update position')
+    toast.error(t('admin.payments.methods.updatePositionFailed'))
     await refresh()
   }
 }
