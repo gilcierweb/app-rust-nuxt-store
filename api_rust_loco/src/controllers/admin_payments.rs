@@ -387,10 +387,14 @@ pub async fn capture(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Resu
         .one(&ctx.db)
         .await?
         .ok_or_else(|| Error::NotFound)?;
-    let gateway = payment_gateways::Entity::find_by_id(method.payment_gateway_id.unwrap())
-        .one(&ctx.db)
-        .await?
-        .ok_or_else(|| Error::NotFound)?;
+    let gateway = payment_gateways::Entity::find_by_id(
+        method
+            .payment_gateway_id
+            .ok_or_else(|| Error::BadRequest("payment method has no gateway".to_string()))?,
+    )
+    .one(&ctx.db)
+    .await?
+    .ok_or_else(|| Error::NotFound)?;
 
     let driver = gateway_for_driver(&gateway.driver).map_err(|e| Error::Message(e.to_string()))?;
 
@@ -428,10 +432,14 @@ pub async fn void(Path(id): Path<i32>, State(ctx): State<AppContext>) -> Result<
         .one(&ctx.db)
         .await?
         .ok_or_else(|| Error::NotFound)?;
-    let gateway = payment_gateways::Entity::find_by_id(method.payment_gateway_id.unwrap())
-        .one(&ctx.db)
-        .await?
-        .ok_or_else(|| Error::NotFound)?;
+    let gateway = payment_gateways::Entity::find_by_id(
+        method
+            .payment_gateway_id
+            .ok_or_else(|| Error::BadRequest("payment method has no gateway".to_string()))?,
+    )
+    .one(&ctx.db)
+    .await?
+    .ok_or_else(|| Error::NotFound)?;
 
     let driver = gateway_for_driver(&gateway.driver).map_err(|e| Error::Message(e.to_string()))?;
 
@@ -469,10 +477,14 @@ pub async fn refund(
         .one(&ctx.db)
         .await?
         .ok_or_else(|| Error::NotFound)?;
-    let gateway = payment_gateways::Entity::find_by_id(method.payment_gateway_id.unwrap())
-        .one(&ctx.db)
-        .await?
-        .ok_or_else(|| Error::NotFound)?;
+    let gateway = payment_gateways::Entity::find_by_id(
+        method
+            .payment_gateway_id
+            .ok_or_else(|| Error::BadRequest("payment method has no gateway".to_string()))?,
+    )
+    .one(&ctx.db)
+    .await?
+    .ok_or_else(|| Error::NotFound)?;
 
     let driver = gateway_for_driver(&gateway.driver).map_err(|e| Error::Message(e.to_string()))?;
 
