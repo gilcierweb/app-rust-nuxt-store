@@ -89,6 +89,13 @@ const SETTINGS: &[SettingDefinition] = &[
         value_type: VALUE_TYPE_BOOLEAN,
         default_value: "false",
     },
+    SettingDefinition {
+        namespace: "security",
+        key: "allowed_email_domains",
+        label: "Allowed Email Domains for Magic Link",
+        value_type: VALUE_TYPE_STRING,
+        default_value: "example.com,gmail.com",
+    },
 ];
 
 #[derive(Clone, Debug, Serialize)]

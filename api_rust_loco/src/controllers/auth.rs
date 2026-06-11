@@ -15,18 +15,12 @@ use loco_rs::auth::jwt::UserClaims;
 use loco_rs::environment::Environment;
 use loco_rs::prelude::*;
 use regex::Regex;
+use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use std::sync::Arc;
-use std::sync::OnceLock;
 
-pub static EMAIL_DOMAIN_RE: OnceLock<Regex> = OnceLock::new();
-
-fn get_allow_email_domain_re() -> &'static Regex {
-    EMAIL_DOMAIN_RE.get_or_init(|| {
-        Regex::new(r"@example\.com$|@gmail\.com$").expect("Failed to compile regex")
-    })
-}
+use crate::models::_entities::admin_settings;
 
 fn build_auth_claims(user: &users::Model, roles: &[String]) -> Map<String, Value> {
     let mut claims = Map::new();
@@ -269,7 +263,24 @@ async fn magic_link(
     State(ctx): State<AppContext>,
     Json(params): Json<MagicLinkParams>,
 ) -> Result<Response> {
-    let email_regex = get_allow_email_domain_re();
+    let allowed_domains = admin_settings::Entity::find()
+        .filter(admin_settings::Column::Namespace.eq("security"))
+        .filter(admin_settings::Column::Key.eq("allowed_email_domains"))
+        .one(&ctx.db)
+        .await
+        .ok()
+        .flatten()
+        .and_then(|s| s.value)
+        .unwrap_or_else(|| "example.com,gmail.com".to_string());
+
+    let pattern: String = allowed_domains
+        .split(',')
+        .map(|d| format!("@{}$", d.trim().replace('.', r"\.")))
+        .collect::<Vec<_>>()
+        .join("|");
+
+    let email_regex = Regex::new(&pattern).expect("Failed to compile email domain regex");
+
     if !email_regex.is_match(&params.email) {
         tracing::debug!(
             email = params.email,
