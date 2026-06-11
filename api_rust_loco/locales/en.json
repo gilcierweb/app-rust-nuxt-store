@@ -38,8 +38,7 @@
     "item_updated": "Cart item updated",
     "cart_cleared": "Cart cleared",
     "quantity_required": "Quantity is required",
-    "price_required": "Price is required",
-    "variant_not_found": "Product variant not found"
+    "invalid_product": "Invalid or inactive product"
   },
   "coupon": {
     "not_found": "Coupon not found",

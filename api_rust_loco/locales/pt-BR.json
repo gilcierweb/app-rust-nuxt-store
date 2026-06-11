@@ -38,8 +38,7 @@
     "item_updated": "Item do carrinho atualizado",
     "cart_cleared": "Carrinho limpo",
     "quantity_required": "Quantidade é obrigatória",
-    "price_required": "Preço é obrigatório",
-    "variant_not_found": "Variação do produto não encontrada"
+    "invalid_product": "Produto inválido ou inativo"
   },
   "coupon": {
     "not_found": "Cupom não encontrado",

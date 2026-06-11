@@ -284,7 +284,6 @@ pub async fn add_item<C>(
     product_id: i32,
     product_variant_id: Option<i32>,
     quantity: i32,
-    price: Decimal,
 ) -> Result<CartWithItems>
 where
     C: ConnectionTrait + TransactionTrait,
@@ -294,6 +293,37 @@ where
             Box::pin(async move {
                 let now = chrono::Utc::now().into();
                 let backend = txn.get_database_backend();
+
+                let price_lookup_sql = if product_variant_id.is_some() {
+                    r#"SELECT pv.price FROM product_variants pv WHERE pv.id = $1 AND pv.active = true"#
+                } else {
+                    r#"SELECT p.price FROM products p WHERE p.id = $1 AND p.active = true"#
+                };
+                let price_lookup_param = product_variant_id.unwrap_or(product_id);
+
+                #[derive(Debug, FromQueryResult)]
+                struct PriceRow {
+                    price: Option<Decimal>,
+                }
+
+                let price_row = PriceRow::find_by_statement(Statement::from_sql_and_values(
+                    backend,
+                    price_lookup_sql,
+                    vec![price_lookup_param.into()],
+                ))
+                .one(txn)
+                .await?;
+
+                let price = match price_row {
+                    Some(row) => row.price.ok_or_else(|| {
+                        Error::BadRequest(t!("cart.invalid_product").into())
+                    })?,
+                    None => {
+                        return Err(Error::BadRequest(
+                            t!("cart.invalid_product").into(),
+                        ));
+                    }
+                };
 
                 let lookup_sql = r#"
                     SELECT

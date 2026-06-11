@@ -4,7 +4,6 @@
 use crate::middleware::auth::CookieJWT;
 use axum::debug_handler;
 use loco_rs::prelude::*;
-use rust_decimal::Decimal;
 use serde::Deserialize;
 
 use crate::models::users;
@@ -31,8 +30,6 @@ pub struct AddItemParams {
     pub product_id: i32,
     pub product_variant_id: Option<i32>,
     pub quantity: i32,
-    #[serde(with = "crate::utils::decimal")]
-    pub price: Decimal,
 }
 
 #[derive(Debug, Deserialize)]
@@ -68,7 +65,6 @@ pub async fn add_item(
         params.product_id,
         params.product_variant_id,
         params.quantity,
-        params.price,
     )
     .await?;
     format::json(result)

@@ -65,7 +65,6 @@ export function useCartSync() {
           product_id: item.productId,
           product_variant_id: item.variantId ?? null,
           quantity: quantity,
-          price: String(Number(item.price)),
         },
       })
       cartStore.setItems(data.items.map(mapCartApiItem))
@@ -167,7 +166,6 @@ export function useCartSync() {
                 product_id: li.productId,
                 product_variant_id: li.variantId ?? null,
                 quantity: li.quantity,
-                price: String(li.price),
               },
             })
           }
