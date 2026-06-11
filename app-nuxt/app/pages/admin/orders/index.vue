@@ -159,7 +159,7 @@ const selectedIds = ref<number[]>([])
 const exporting = ref(false)
 
 const { data: ordersData, pending } = await useApiFetch<Order[]>(
-  '/api/admin/orders/list',
+  '/api/admin/orders',
   { key: 'admin-orders-list' }
 )
 
