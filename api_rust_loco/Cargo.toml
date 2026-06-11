@@ -57,6 +57,7 @@ zip = "2"
 axum-extra = { version = "0.10.0", features = ["cookie"] }
 time = "0.3"
 moka = { version = "0.12", features = ["sync"] }
+redis = { version = "0.22", features = ["tokio-comp", "connection-manager"] }
 
 [[bin]]
 name = "api_rust_loco-cli"

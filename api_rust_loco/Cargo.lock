@@ -221,6 +221,7 @@ dependencies = [
  "moka",
  "printpdf",
  "rand 0.9.1",
+ "redis",
  "regex",
  "reqwest",
  "rstest",
@@ -4394,9 +4395,11 @@ version = "0.22.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa8455fa3621f6b41c514946de66ea0531f57ca017b2e6c7cc368035ea5b46df"
 dependencies = [
+ "arc-swap",
  "async-trait",
  "bytes",
  "combine",
+ "futures",
  "futures-util",
  "itoa 1.0.15",
  "percent-encoding",

@@ -7,12 +7,9 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use loco_rs::{app::AppContext, auth::jwt};
+use redis::AsyncCommands;
 use serde_json::json;
-use std::{
-    collections::{HashMap, VecDeque},
-    sync::{Mutex, OnceLock},
-    time::{Duration, Instant},
-};
+use std::time::Duration;
 
 const DEFAULT_IP_REQUESTS: usize = 120;
 const DEFAULT_IP_WINDOW_SECONDS: u64 = 60;
@@ -24,16 +21,16 @@ const IP_WINDOW_ENV: &str = "API_RATE_LIMIT_IP_WINDOW_SECONDS";
 const USER_LIMIT_ENV: &str = "API_RATE_LIMIT_USER_REQUESTS";
 const USER_WINDOW_ENV: &str = "API_RATE_LIMIT_USER_WINDOW_SECONDS";
 const ENABLED_ENV: &str = "API_RATE_LIMIT_ENABLED";
+const REDIS_URL_ENV: &str = "REDIS_URL";
 
-static RATE_LIMITER: OnceLock<Mutex<HashMap<String, VecDeque<Instant>>>> = OnceLock::new();
-
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 struct RateLimitConfig {
     enabled: bool,
     ip_requests: usize,
     ip_window: Duration,
     user_requests: usize,
     user_window: Duration,
+    redis_url: String,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -86,6 +83,8 @@ fn config_from_env() -> RateLimitConfig {
         ip_window: env_duration(IP_WINDOW_ENV, DEFAULT_IP_WINDOW_SECONDS),
         user_requests: env_usize(USER_LIMIT_ENV, DEFAULT_USER_REQUESTS),
         user_window: env_duration(USER_WINDOW_ENV, DEFAULT_USER_WINDOW_SECONDS),
+        redis_url: std::env::var(REDIS_URL_ENV)
+            .unwrap_or_else(|_| "redis://127.0.0.1:6379".to_string()),
     }
 }
 
@@ -116,70 +115,6 @@ fn user_key(ctx: &AppContext, headers: &HeaderMap) -> Option<String> {
     let claims = jwt::JWT::new(&jwt_secret.secret).validate(&token).ok()?;
 
     Some(format!("user:{}", claims.claims.pid))
-}
-
-fn check_window(
-    entries: &mut VecDeque<Instant>,
-    limit: usize,
-    window: Duration,
-    now: Instant,
-    scope: &'static str,
-) -> RateLimitState {
-    while entries
-        .front()
-        .is_some_and(|seen_at| now.duration_since(*seen_at) >= window)
-    {
-        entries.pop_front();
-    }
-
-    if entries.len() >= limit {
-        let retry_after = entries
-            .front()
-            .map(|oldest| {
-                window
-                    .saturating_sub(now.duration_since(*oldest))
-                    .as_secs()
-                    .max(1)
-            })
-            .unwrap_or(1);
-
-        return RateLimitState {
-            allowed: false,
-            limit,
-            remaining: 0,
-            retry_after,
-            scope,
-        };
-    }
-
-    entries.push_back(now);
-    RateLimitState {
-        allowed: true,
-        limit,
-        remaining: limit.saturating_sub(entries.len()),
-        retry_after: 0,
-        scope,
-    }
-}
-
-fn check_rate_limit(
-    store: &mut HashMap<String, VecDeque<Instant>>,
-    key: &str,
-    limit: usize,
-    window: Duration,
-    now: Instant,
-    scope: &'static str,
-) -> RateLimitState {
-    let state = check_window(
-        store.entry(key.to_string()).or_default(),
-        limit,
-        window,
-        now,
-        scope,
-    );
-
-    store.retain(|_, entries| !entries.is_empty());
-    state
 }
 
 fn rate_limited_response(state: RateLimitState) -> Response {
@@ -219,6 +154,65 @@ fn rate_limited_response(state: RateLimitState) -> Response {
     response
 }
 
+async fn check_rate_limit_redis(
+    conn: &mut redis::aio::ConnectionManager,
+    key: &str,
+    limit: usize,
+    window: Duration,
+    scope: &'static str,
+) -> Result<RateLimitState, redis::RedisError> {
+    let now = chrono::Utc::now().timestamp_millis() as u64;
+    let window_ms = window.as_millis() as u64;
+    let window_start = now.saturating_sub(window_ms);
+    let redis_key = format!("ratelimit:{key}");
+
+    // Remove old entries outside the window
+    let _: () = conn
+        .zrembyscore(&redis_key, 0, window_start)
+        .await?;
+
+    // Count current entries in window
+    let count: usize = conn.zcard(&redis_key).await?;
+
+    if count >= limit {
+        // Get oldest entry to calculate retry_after
+        let oldest: Option<(String, u64)> = conn.zrange_withscores(&redis_key, 0, 0).await?;
+        let retry_after = oldest
+            .map(|(_, score)| {
+                let remaining_ms = window_ms.saturating_sub(now.saturating_sub(score));
+                (remaining_ms / 1000).max(1)
+            })
+            .unwrap_or(1);
+
+        return Ok(RateLimitState {
+            allowed: false,
+            limit,
+            remaining: 0,
+            retry_after,
+            scope,
+        });
+    }
+
+    // Add current request
+    let member = format!("{}:{}", now, uuid::Uuid::new_v4());
+    let _: () = conn.zadd(&redis_key, &member, now).await?;
+
+    // Set expiration on the key
+    let _: () = conn
+        .expire(&redis_key, window.as_secs() as usize)
+        .await?;
+
+    let remaining = limit.saturating_sub(count + 1);
+
+    Ok(RateLimitState {
+        allowed: true,
+        limit,
+        remaining,
+        retry_after: 0,
+        scope,
+    })
+}
+
 pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next: Next) -> Response {
     if req.method() == Method::OPTIONS || !is_protected_path(req.uri().path()) {
         return next.run(req).await;
@@ -231,55 +225,66 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
 
     let ip_key = format!("ip:{}", client_ip(req.headers()));
     let user_key = user_key(&ctx, req.headers());
-    let now = Instant::now();
 
-    let blocked_response = {
-        let limiter = RATE_LIMITER.get_or_init(|| Mutex::new(HashMap::new()));
-        let mut store = match limiter.lock() {
-            Ok(store) => store,
-            Err(_) => {
-                return (
-                    StatusCode::SERVICE_UNAVAILABLE,
-                    Json(json!({
-                        "error": "rate_limiter_unavailable",
-                        "description": "Rate limiter state is unavailable"
-                    })),
-                )
-                    .into_response()
-            }
-        };
-
-        let ip_state = check_rate_limit(
-            &mut store,
-            &ip_key,
-            config.ip_requests,
-            config.ip_window,
-            now,
-            "ip",
-        );
-        if !ip_state.allowed {
-            Some(rate_limited_response(ip_state))
-        } else if let Some(user_key) = user_key {
-            let user_state = check_rate_limit(
-                &mut store,
-                &user_key,
-                config.user_requests,
-                config.user_window,
-                now,
-                "user",
-            );
-            if !user_state.allowed {
-                Some(rate_limited_response(user_state))
-            } else {
-                None
-            }
-        } else {
-            None
+    // Try to connect to Redis
+    let redis_client = match redis::Client::open(config.redis_url.as_str()) {
+        Ok(client) => client,
+        Err(_) => {
+            tracing::warn!("Redis unavailable, allowing request (rate limiter disabled)");
+            return next.run(req).await;
         }
     };
 
-    if let Some(response) = blocked_response {
-        return response;
+    let mut conn = match redis_client.get_tokio_connection_manager().await {
+        Ok(conn) => conn,
+        Err(_) => {
+            tracing::warn!("Redis connection failed, allowing request (rate limiter disabled)");
+            return next.run(req).await;
+        }
+    };
+
+    // Check IP rate limit
+    let ip_state = match check_rate_limit_redis(
+        &mut conn,
+        &ip_key,
+        config.ip_requests,
+        config.ip_window,
+        "ip",
+    )
+    .await
+    {
+        Ok(state) => state,
+        Err(e) => {
+            tracing::error!(error = ?e, "Redis IP rate limit check failed");
+            return next.run(req).await;
+        }
+    };
+
+    if !ip_state.allowed {
+        return rate_limited_response(ip_state);
+    }
+
+    // Check user rate limit if authenticated
+    if let Some(user_key) = user_key {
+        let user_state = match check_rate_limit_redis(
+            &mut conn,
+            &user_key,
+            config.user_requests,
+            config.user_window,
+            "user",
+        )
+        .await
+        {
+            Ok(state) => state,
+            Err(e) => {
+                tracing::error!(error = ?e, "Redis user rate limit check failed");
+                return next.run(req).await;
+            }
+        };
+
+        if !user_state.allowed {
+            return rate_limited_response(user_state);
+        }
     }
 
     next.run(req).await
@@ -287,12 +292,8 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
 
 #[cfg(test)]
 mod tests {
-    use super::{check_rate_limit, client_ip, is_protected_path};
+    use super::{client_ip, is_protected_path};
     use axum::http::{HeaderMap, HeaderValue};
-    use std::{
-        collections::{HashMap, VecDeque},
-        time::{Duration, Instant},
-    };
 
     #[test]
     fn extracts_first_forwarded_ip() {
@@ -323,33 +324,5 @@ mod tests {
         assert!(is_protected_path("/api/products"));
         assert!(is_protected_path("/api-docs/openapi.json"));
         assert!(!is_protected_path("/uploads/image.png"));
-    }
-
-    #[test]
-    fn blocks_when_window_is_full() {
-        let mut store: HashMap<String, VecDeque<Instant>> = HashMap::new();
-        let now = Instant::now();
-        let window = Duration::from_secs(60);
-
-        assert!(check_rate_limit(&mut store, "ip:test", 2, window, now, "ip").allowed);
-        assert!(check_rate_limit(&mut store, "ip:test", 2, window, now, "ip").allowed);
-
-        let blocked = check_rate_limit(&mut store, "ip:test", 2, window, now, "ip");
-        assert!(!blocked.allowed);
-        assert_eq!(blocked.remaining, 0);
-        assert_eq!(blocked.scope, "ip");
-    }
-
-    #[test]
-    fn allows_after_window_expires() {
-        let mut store: HashMap<String, VecDeque<Instant>> = HashMap::new();
-        let now = Instant::now();
-        let window = Duration::from_secs(60);
-
-        assert!(check_rate_limit(&mut store, "user:test", 1, window, now, "user").allowed);
-        assert!(!check_rate_limit(&mut store, "user:test", 1, window, now, "user").allowed);
-
-        let later = now + Duration::from_secs(61);
-        assert!(check_rate_limit(&mut store, "user:test", 1, window, later, "user").allowed);
     }
 }
