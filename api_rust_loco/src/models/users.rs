@@ -12,6 +12,8 @@ use super::_entities::{roles, users_roles};
 pub const MAGIC_LINK_LENGTH: i8 = 32;
 pub const MAGIC_LINK_EXPIRATION_MIN: i8 = 5;
 
+pub const PASSWORD_MIN_LENGTH: usize = 8;
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoginParams {
     pub email: String,
@@ -40,6 +42,40 @@ impl Validatable for ActiveModel {
             email: self.email.as_ref().to_owned(),
         })
     }
+}
+
+pub fn validate_password(password: &str) -> ModelResult<()> {
+    if password.len() < PASSWORD_MIN_LENGTH {
+        return Err(ModelError::Any(
+            Error::BadRequest(
+                format!("password must be at least {} characters", PASSWORD_MIN_LENGTH).into(),
+            )
+            .into(),
+        ));
+    }
+
+    let has_uppercase = password.chars().any(|c| c.is_uppercase());
+    if !has_uppercase {
+        return Err(ModelError::Any(
+            Error::BadRequest("password must contain at least one uppercase letter".into()).into(),
+        ));
+    }
+
+    let has_lowercase = password.chars().any(|c| c.is_lowercase());
+    if !has_lowercase {
+        return Err(ModelError::Any(
+            Error::BadRequest("password must contain at least one lowercase letter".into()).into(),
+        ));
+    }
+
+    let has_digit = password.chars().any(|c| c.is_digit(10));
+    if !has_digit {
+        return Err(ModelError::Any(
+            Error::BadRequest("password must contain at least one digit".into()).into(),
+        ));
+    }
+
+    Ok(())
 }
 
 #[async_trait::async_trait]
@@ -225,6 +261,8 @@ impl Model {
         db: &DatabaseConnection,
         params: &RegisterParams,
     ) -> ModelResult<Self> {
+        validate_password(&params.password)?;
+
         let txn = db.begin().await?;
 
         if users::Entity::find()
@@ -395,6 +433,8 @@ impl ActiveModel {
         db: &DatabaseConnection,
         password: &str,
     ) -> ModelResult<Model> {
+        validate_password(password)?;
+
         self.password =
             ActiveValue::set(hash::hash_password(password).map_err(|e| ModelError::Any(e.into()))?);
         self.reset_token = ActiveValue::Set(None);

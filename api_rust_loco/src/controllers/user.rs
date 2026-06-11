@@ -18,6 +18,7 @@ use crate::models::_entities::roles;
 use crate::models::_entities::users::{ActiveModel, Entity, Model};
 use crate::models::_entities::users_roles;
 use crate::models::ability::{Ability, Action, Resource, Subject};
+use crate::models::users::validate_password;
 use crate::services::admin_audit_logs;
 use crate::utils::pagination::{AdminPaginatedResponse, AdminPaginationParams, PaginationParams};
 
@@ -94,20 +95,16 @@ impl UserParams {
     fn validate_for_create(&self) -> Result<()> {
         self.validate_common()?;
         match self.password.as_deref().map(str::trim) {
-            Some(password) if password.len() >= 8 => Ok(()),
-            _ => Err(Error::BadRequest(
-                "password must be at least 8 characters".into(),
-            )),
+            Some(password) => validate_password(password).map_err(|e| Error::Message(e.to_string())),
+            None => Err(Error::BadRequest("password is required".into())),
         }
     }
 
     fn validate_for_update(&self) -> Result<()> {
         self.validate_common()?;
         if let Some(password) = self.password.as_deref().map(str::trim) {
-            if !password.is_empty() && password.len() < 8 {
-                return Err(Error::BadRequest(
-                    "password must be at least 8 characters".into(),
-                ));
+            if !password.is_empty() {
+                validate_password(password).map_err(|e| Error::Message(e.to_string()))?;
             }
         }
         Ok(())
