@@ -104,7 +104,7 @@ fn validate_role_name(name: &str) -> Result<()> {
         Ok(())
     } else {
         Err(Error::BadRequest(
-            "role name must use letters, numbers, and underscores".into(),
+            t!("rbac.role_name_invalid").into(),
         ))
     }
 }
@@ -385,7 +385,7 @@ pub async fn create_role(
 
     if resource_id.is_some() && resource_type.is_none() {
         return Err(Error::BadRequest(
-            "resource_type is required when resource_id is set".into(),
+            t!("rbac.resource_type_required").into(),
         ));
     }
 
@@ -400,7 +400,7 @@ pub async fn create_role(
     };
 
     if query.one(&ctx.db).await?.is_some() {
-        return Err(Error::BadRequest("role already exists".into()));
+        return Err(Error::BadRequest(t!("rbac.role_exists").into()));
     }
 
     let now = chrono::Utc::now().into();
@@ -478,7 +478,7 @@ pub async fn remove_assignment(
 
     if admin_session.current_user_id == user_id && is_protected_admin_role(&role) {
         return Err(Error::BadRequest(
-            "current admin user must keep the admin role".into(),
+            t!("rbac.admin_role_protected").into(),
         ));
     }
 
@@ -510,7 +510,7 @@ pub async fn delete_role(
 ) -> Result<Response> {
     let role = load_role(&ctx.db, id).await?;
     if is_protected_admin_role(&role) {
-        return Err(Error::BadRequest("admin role cannot be deleted".into()));
+        return Err(Error::BadRequest(t!("rbac.admin_role_deletable").into()));
     }
 
     let assigned = users_roles::Entity::find()
@@ -519,7 +519,7 @@ pub async fn delete_role(
         .await?
         .is_some();
     if assigned {
-        return Err(Error::BadRequest("role has assignments".into()));
+        return Err(Error::BadRequest(t!("rbac.role_has_assignments").into()));
     }
 
     let role_id = role.id;

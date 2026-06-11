@@ -55,6 +55,41 @@
     "invalid_status": "Invalid status value",
     "invalid_transition": "Cannot transition from %{from} to %{to}"
   },
+  "user": {
+    "invalid_role": "Invalid user role",
+    "password_required": "Password is required",
+    "name_min_length": "Name must be at least 2 characters",
+    "email_invalid": "Email is invalid",
+    "email_in_use": "Email is already in use",
+    "admin_role_required": "Current admin user must keep the admin role"
+  },
+  "rbac": {
+    "role_name_invalid": "Role name must use letters, numbers, and underscores",
+    "resource_type_required": "Resource type is required when resource ID is set",
+    "role_exists": "Role already exists",
+    "admin_role_protected": "Current admin user must keep the admin role",
+    "admin_role_deletable": "Admin role cannot be deleted",
+    "role_has_assignments": "Role has assignments"
+  },
+  "banner": {
+    "link_target_invalid": "Link target must be 1 (same_tab) or 2 (new_tab)",
+    "device_invalid": "Device must be 1 (all), 2 (desktop), or 3 (mobile)",
+    "status_invalid": "Status must be 1 (draft), 2 (active), 3 (paused), or 4 (expired)",
+    "end_at_before_start": "End date must be greater than or equal to start date",
+    "event_type_invalid": "Event type must be 1 (impression) or 2 (click)",
+    "ip_address_invalid": "IP address must be a valid INET value",
+    "code_required": "Code is required",
+    "name_required": "Name is required",
+    "start_at_required": "Start date is required",
+    "title_required": "Title is required",
+    "image_desktop_required": "Desktop image URL is required",
+    "position_id_required": "Position ID is required",
+    "analytics_to_before_from": "End date must be greater than start date"
+  },
+  "payment": {
+    "no_ids_provided": "No IDs provided",
+    "unauthorized": "Unauthorized"
+  },
   "admin": {
     "statusLabels": {
       "paid": "Paid",

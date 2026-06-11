@@ -97,7 +97,7 @@ fn validate_banner_codes(params: &BannerParams) -> Result<()> {
     if let Some(value) = params.link_target {
         if !link_target::is_valid(value) {
             return Err(bad_request(
-                "link_target must be 1 (same_tab) or 2 (new_tab)",
+                &t!("banner.link_target_invalid"),
             ));
         }
     }
@@ -105,7 +105,7 @@ fn validate_banner_codes(params: &BannerParams) -> Result<()> {
     if let Some(value) = params.device {
         if !device::is_valid(value) {
             return Err(bad_request(
-                "device must be 1 (all), 2 (desktop), or 3 (mobile)",
+                &t!("banner.device_invalid"),
             ));
         }
     }
@@ -113,7 +113,7 @@ fn validate_banner_codes(params: &BannerParams) -> Result<()> {
     if let Some(value) = params.status {
         if !banner_status::is_valid(value) {
             return Err(bad_request(
-                "status must be 1 (draft), 2 (active), 3 (paused), or 4 (expired)",
+                &t!("banner.status_invalid"),
             ));
         }
     }
@@ -121,7 +121,7 @@ fn validate_banner_codes(params: &BannerParams) -> Result<()> {
     if let (Some(start_at), Some(end_at)) = (params.start_at, params.end_at) {
         if end_at < start_at {
             return Err(bad_request(
-                "end_at must be greater than or equal to start_at",
+                &t!("banner.end_at_before_start"),
             ));
         }
     }
@@ -200,7 +200,7 @@ pub async fn active(
     let requested_device = query.device.unwrap_or(device::ALL);
     if !device::is_valid(requested_device) {
         return Err(bad_request(
-            "device must be 1 (all), 2 (desktop), or 3 (mobile)",
+            &t!("banner.device_invalid"),
         ));
     }
 
@@ -235,7 +235,7 @@ pub async fn record_event(
 ) -> Result<Response> {
     if !banner_event_type::is_valid(params.event_type) {
         return Err(bad_request(
-            "event_type must be 1 (impression) or 2 (click)",
+            &t!("banner.event_type_invalid"),
         ));
     }
 
@@ -244,7 +244,7 @@ pub async fn record_event(
         .as_deref()
         .map(str::parse::<IpNetwork>)
         .transpose()
-        .map_err(|_| bad_request("ip_address must be a valid INET value"))?
+        .map_err(|_| bad_request(&t!("banner.ip_address_invalid")))?
         .map(|value| value.to_string());
 
     let item = BannerEventActiveModel {
@@ -289,8 +289,8 @@ pub async fn add_position(
 ) -> Result<Response> {
     let item = BannerPositionActiveModel {
         id: sea_orm::ActiveValue::NotSet,
-        code: Set(params.code.ok_or_else(|| bad_request("code is required"))?),
-        name: Set(params.name.ok_or_else(|| bad_request("name is required"))?),
+        code: Set(params.code.ok_or_else(|| bad_request(&t!("banner.code_required")))?),
+        name: Set(params.name.ok_or_else(|| bad_request(&t!("banner.name_required")))?),
         description: Set(params.description),
         is_active: Set(params.is_active.unwrap_or(true)),
         created_at: Set(chrono::Utc::now().into()),
@@ -365,31 +365,25 @@ pub async fn add_banner(
 
     let start_at = params
         .start_at
-        .ok_or_else(|| bad_request("start_at is required"))?;
+        .ok_or_else(|| bad_request(&t!("banner.start_at_required")))?;
     if let Some(end_at) = params.end_at {
         if end_at < start_at {
             return Err(bad_request(
-                "end_at must be greater than or equal to start_at",
+                &t!("banner.end_at_before_start"),
             ));
         }
     }
 
     let item = BannerActiveModel {
         id: sea_orm::ActiveValue::NotSet,
-        title: Set(params
-            .title
-            .ok_or_else(|| bad_request("title is required"))?),
+        title: Set(params.title.ok_or_else(|| bad_request(&t!("banner.title_required")))?),
         description: Set(params.description),
-        image_desktop_url: Set(params
-            .image_desktop_url
-            .ok_or_else(|| bad_request("image_desktop_url is required"))?),
+        image_desktop_url: Set(params.image_desktop_url.ok_or_else(|| bad_request(&t!("banner.image_desktop_required")))?),
         image_mobile_url: Set(params.image_mobile_url),
         alt_text: Set(params.alt_text),
         link_url: Set(params.link_url),
         link_target: Set(params.link_target.unwrap_or(link_target::SAME_TAB)),
-        position_id: Set(params
-            .position_id
-            .ok_or_else(|| bad_request("position_id is required"))?),
+        position_id: Set(params.position_id.ok_or_else(|| bad_request(&t!("banner.position_id_required")))?),
         device: Set(params.device.unwrap_or(device::ALL)),
         start_at: Set(start_at),
         end_at: Set(params.end_at),
@@ -457,7 +451,7 @@ pub async fn analytics(
     Query(query): Query<AnalyticsQuery>,
 ) -> Result<Response> {
     if query.to <= query.from {
-        return Err(bad_request("to must be greater than from"));
+        return Err(bad_request(&t!("banner.analytics_to_before_from")));
     }
 
     let cache_key = format!("banners:analytics:{}:{}", query.from, query.to);

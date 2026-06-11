@@ -88,7 +88,7 @@ impl UserParams {
         if ALLOWED_GLOBAL_ROLES.contains(&role.as_str()) {
             Ok(role)
         } else {
-            Err(Error::BadRequest("invalid user role".into()))
+            Err(Error::BadRequest(t!("user.invalid_role").into()))
         }
     }
 
@@ -96,7 +96,7 @@ impl UserParams {
         self.validate_common()?;
         match self.password.as_deref().map(str::trim) {
             Some(password) => validate_password(password).map_err(|e| Error::Message(e.to_string())),
-            None => Err(Error::BadRequest("password is required".into())),
+            None => Err(Error::BadRequest(t!("user.password_required").into())),
         }
     }
 
@@ -113,13 +113,13 @@ impl UserParams {
     fn validate_common(&self) -> Result<()> {
         if self.normalized_name().len() < 2 {
             return Err(Error::BadRequest(
-                "name must be at least 2 characters".into(),
+                t!("user.name_min_length").into(),
             ));
         }
 
         let email = self.normalized_email();
         if !email.contains('@') || email.len() < 5 {
-            return Err(Error::BadRequest("email is invalid".into()));
+            return Err(Error::BadRequest(t!("user.email_invalid").into()));
         }
 
         self.normalized_role()?;
@@ -216,7 +216,7 @@ async fn ensure_email_available(
         .as_ref()
         .is_some_and(|user| Some(user.id) != current_id)
     {
-        return Err(Error::BadRequest("email is already in use".into()));
+        return Err(Error::BadRequest(t!("user.email_in_use").into()));
     }
 
     Ok(())
@@ -457,7 +457,7 @@ pub async fn update(
     let role = params.normalized_role()?;
     if item.id == current_user_id && role != "admin" {
         return Err(Error::BadRequest(
-            "current admin user must keep the admin role".into(),
+            t!("user.admin_role_required").into(),
         ));
     }
 

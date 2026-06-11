@@ -55,6 +55,41 @@
     "invalid_status": "Valor de status inválido",
     "invalid_transition": "Não é possível transitar de %{from} para %{to}"
   },
+  "user": {
+    "invalid_role": "Função de usuário inválida",
+    "password_required": "Senha é obrigatória",
+    "name_min_length": "O nome deve ter pelo menos 2 caracteres",
+    "email_invalid": "E-mail inválido",
+    "email_in_use": "E-mail já está em uso",
+    "admin_role_required": "O administrador atual deve manter a função de administrador"
+  },
+  "rbac": {
+    "role_name_invalid": "O nome da função deve usar letras, números e sublinhados",
+    "resource_type_required": "O tipo de recurso é obrigatório quando o ID do recurso é definido",
+    "role_exists": "Função já existe",
+    "admin_role_protected": "O administrador atual deve manter a função de administrador",
+    "admin_role_deletable": "A função de administrador não pode ser excluída",
+    "role_has_assignments": "A função tem atribuições"
+  },
+  "banner": {
+    "link_target_invalid": "O destino do link deve ser 1 (mesma_aba) ou 2 (nova_aba)",
+    "device_invalid": "O dispositivo deve ser 1 (todos), 2 (desktop), ou 3 (móvel)",
+    "status_invalid": "O status deve ser 1 (rascunho), 2 (ativo), 3 (pausado), ou 4 (expirado)",
+    "end_at_before_start": "A data de término deve ser maior ou igual à data de início",
+    "event_type_invalid": "O tipo de evento deve ser 1 (impressão) ou 2 (clique)",
+    "ip_address_invalid": "O endereço IP deve ser um valor INET válido",
+    "code_required": "O código é obrigatório",
+    "name_required": "O nome é obrigatório",
+    "start_at_required": "A data de início é obrigatória",
+    "title_required": "O título é obrigatório",
+    "image_desktop_required": "A URL da imagem desktop é obrigatória",
+    "position_id_required": "O ID da posição é obrigatório",
+    "analytics_to_before_from": "A data de término deve ser maior que a data de início"
+  },
+  "payment": {
+    "no_ids_provided": "Nenhum ID fornecido",
+    "unauthorized": "Não autorizado"
+  },
   "admin": {
     "statusLabels": {
       "paid": "Pago",

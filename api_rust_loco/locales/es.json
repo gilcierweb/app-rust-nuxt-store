@@ -55,6 +55,41 @@
     "invalid_status": "Valor de estado inválido",
     "invalid_transition": "No se puede transitar de %{from} a %{to}"
   },
+  "user": {
+    "invalid_role": "Rol de usuario inválido",
+    "password_required": "La contraseña es obligatoria",
+    "name_min_length": "El nombre debe tener al menos 2 caracteres",
+    "email_invalid": "El correo electrónico es inválido",
+    "email_in_use": "El correo electrónico ya está en uso",
+    "admin_role_required": "El administrador actual debe mantener el rol de administrador"
+  },
+  "rbac": {
+    "role_name_invalid": "El nombre del rol debe usar letras, números y guiones bajos",
+    "resource_type_required": "El tipo de recurso es obligatorio cuando se establece el ID del recurso",
+    "role_exists": "El rol ya existe",
+    "admin_role_protected": "El administrador actual debe mantener el rol de administrador",
+    "admin_role_deletable": "El rol de administrador no se puede eliminar",
+    "role_has_assignments": "El rol tiene asignaciones"
+  },
+  "banner": {
+    "link_target_invalid": "El destino del enlace debe ser 1 (misma_pestana) o 2 (nueva_pestana)",
+    "device_invalid": "El dispositivo debe ser 1 (todos), 2 (escritorio), o 3 (movil)",
+    "status_invalid": "El estado debe ser 1 (borrador), 2 (activo), 3 (pausado), o 4 (expirado)",
+    "end_at_before_start": "La fecha de finalización debe ser mayor o igual a la fecha de inicio",
+    "event_type_invalid": "El tipo de evento debe ser 1 (impresion) o 2 (clic)",
+    "ip_address_invalid": "La dirección IP debe ser un valor INET válido",
+    "code_required": "El código es obligatorio",
+    "name_required": "El nombre es obligatorio",
+    "start_at_required": "La fecha de inicio es obligatoria",
+    "title_required": "El título es obligatorio",
+    "image_desktop_required": "La URL de la imagen de escritorio es obligatoria",
+    "position_id_required": "El ID de la posición es obligatorio",
+    "analytics_to_before_from": "La fecha de finalización debe ser mayor que la fecha de inicio"
+  },
+  "payment": {
+    "no_ids_provided": "No se proporcionaron IDs",
+    "unauthorized": "No autorizado"
+  },
   "admin": {
     "statusLabels": {
       "paid": "Pagado",

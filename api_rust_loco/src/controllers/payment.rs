@@ -168,7 +168,7 @@ pub async fn bulk_export(
     Json(params): Json<crate::utils::bulk_export::BulkExportParams>,
 ) -> Result<Response> {
     if params.ids.is_empty() {
-        return Err(Error::BadRequest("No IDs provided".into()));
+        return Err(Error::BadRequest(t!("payment.no_ids_provided").into()));
     }
 
     let (zip_bytes, filename) =
@@ -228,7 +228,7 @@ pub async fn account_get_one(
         .get("user_id")
         .and_then(|v| v.as_i64())
         .and_then(|v| i32::try_from(v).ok())
-        .ok_or_else(|| loco_rs::Error::string("unauthorized"))?;
+        .ok_or_else(|| loco_rs::Error::string(&t!("payment.unauthorized")))?;
 
     let payment = Entity::find_by_id(payment_id)
         .one(&ctx.db)
@@ -241,7 +241,7 @@ pub async fn account_get_one(
         .ok_or_else(|| Error::NotFound)?;
 
     if order.user_id != current_user_id {
-        return Err(loco_rs::Error::string("unauthorized"));
+        return Err(loco_rs::Error::string(&t!("payment.unauthorized")));
     }
 
     let payment_method =
@@ -290,7 +290,7 @@ pub async fn account_receipt(
         .get("user_id")
         .and_then(|v| v.as_i64())
         .and_then(|v| i32::try_from(v).ok())
-        .ok_or_else(|| loco_rs::Error::string("unauthorized"))?;
+        .ok_or_else(|| loco_rs::Error::string(&t!("payment.unauthorized")))?;
 
     let data = crate::services::receipt::load_receipt_data(&ctx.db, payment_id, Some(current_user_id))
         .await
