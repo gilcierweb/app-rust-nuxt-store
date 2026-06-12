@@ -106,6 +106,7 @@ const sectionLabels: Record<string, string> = {
   account: 'Resumo',
   orders: 'Pedidos',
   wishlist: 'Wishlist',
+  addresses: 'Enderecos',
   settings: 'Configuracoes'
 }
 

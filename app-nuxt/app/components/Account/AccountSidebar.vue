@@ -44,6 +44,12 @@
             </NuxtLinkLocale>
           </li>
           <li>
+            <NuxtLinkLocale to="/account/addresses" class="flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors hover:bg-base-200" active-class="bg-primary/10 text-primary font-bold">
+              <i class="icon-[tabler--map-pin] size-5"></i>
+              Enderecos
+            </NuxtLinkLocale>
+          </li>
+          <li>
             <NuxtLinkLocale to="/account/settings" class="flex items-center gap-3 rounded-lg px-4 py-2.5 transition-colors hover:bg-base-200" active-class="bg-primary/10 text-primary font-bold">
               <i class="icon-[tabler--settings] size-5"></i>
               Configuracoes
