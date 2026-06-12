@@ -22,7 +22,7 @@ use loco_rs::{
 };
 
 use crate::middleware::{
-    api_key::api_key_guard, auth::AdminSession, csrf::csrf_guard, rate_limit::rate_limit_guard,
+    api_key::api_key_guard, auth::{AdminSession, ValidatedTokenHash}, csrf::csrf_guard, rate_limit::rate_limit_guard,
 };
 use crate::seeds;
 use crate::{models::ability::Ability, models::users::Model as UserModel};
@@ -222,14 +222,24 @@ async fn admin_namespace_guard(
     });
 
     if let (Some(current_user_id), Some(roles)) = (current_user_id, roles) {
-        let ability = Ability::for_roles_and_user(roles, Some(current_user_id));
+        let ability = Ability::for_roles_and_user(roles.clone(), Some(current_user_id));
         if !ability.can_manage_admin() {
             return admin_forbidden().into_response();
         }
 
+        // Cache the token hash so CookieJWT skips the blacklist DB query.
+        let token_hash = {
+            use sha2::{Digest, Sha256};
+            let mut hasher = Sha256::new();
+            hasher.update(token.as_bytes());
+            hex::encode(hasher.finalize())
+        };
+        req.extensions_mut()
+            .insert(ValidatedTokenHash(token_hash));
         req.extensions_mut().insert(AdminSession {
             current_user_id,
             ability,
+            roles,
         });
 
         return next.run(req).await;
@@ -238,16 +248,26 @@ async fn admin_namespace_guard(
     let Ok(user) = UserModel::find_by_pid(&ctx.db, &claims.claims.pid).await else {
         return admin_unauthorized().into_response();
     };
-    let Ok(ability) = Ability::for_user(&user, &ctx.db).await else {
+    let Ok(roles) = user.roles(&ctx.db).await else {
         return admin_unauthorized().into_response();
     };
+    let ability = Ability::for_roles_and_user(roles.clone(), Some(user.id));
     if !ability.can_manage_admin() {
         return admin_forbidden().into_response();
     }
 
+    let token_hash = {
+        use sha2::{Digest, Sha256};
+        let mut hasher = Sha256::new();
+        hasher.update(token.as_bytes());
+        hex::encode(hasher.finalize())
+    };
+    req.extensions_mut()
+        .insert(ValidatedTokenHash(token_hash));
     req.extensions_mut().insert(AdminSession {
         current_user_id: user.id,
         ability,
+        roles,
     });
 
     next.run(req).await

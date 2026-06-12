@@ -22,8 +22,7 @@ static CATEGORIES_CACHE: OnceLock<Cache<&'static str, Arc<Vec<categories::Model>
 static DASHBOARD_CACHE: OnceLock<Cache<&'static str, Arc<DashboardResponse>>> = OnceLock::new();
 static JSON_CACHE: OnceLock<Cache<String, Arc<Value>>> = OnceLock::new();
 /// Caches JWT blacklist lookups to avoid a DB round-trip on every authenticated request.
-/// TTL of 2 s is intentionally short: a revoked token will be blocked within at most 2 s
-/// of logout, which is acceptable for the security model in use.
+/// TTL of 5 s: a revoked token will be blocked within at most 5 s of logout.
 static BLACKLIST_CACHE: OnceLock<Cache<String, bool>> = OnceLock::new();
 /// In-memory rate-limit result cache keyed by "<scope>:<key>".
 /// TTL of 1 s: avoids hitting Redis on every request for the same user/IP
@@ -33,7 +32,7 @@ static RATE_LIMIT_CACHE: OnceLock<Cache<String, bool>> = OnceLock::new();
 pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
     CURRENT_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(2))
+            .time_to_live(Duration::from_secs(5))
             .max_capacity(1024)
             .build()
     })
@@ -111,12 +110,13 @@ pub fn dashboard_cache() -> &'static Cache<&'static str, Arc<DashboardResponse>>
     })
 }
 
-/// Short-lived in-memory cache for JWT blacklist lookups.
-/// Avoids a synchronous DB query on every authenticated request.
+/// In-memory cache for JWT blacklist lookups.
+/// Avoids a DB round-trip on every authenticated request.
+/// TTL of 5 s: revoked tokens are blocked within 5 s of logout.
 pub fn blacklist_cache() -> &'static Cache<String, bool> {
     BLACKLIST_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(2))
+            .time_to_live(Duration::from_secs(5))
             .max_capacity(4096)
             .build()
     })
@@ -131,14 +131,13 @@ pub fn json_cache() -> &'static Cache<String, Arc<Value>> {
     })
 }
 
-/// Short-lived in-memory cache for rate-limit "allowed" decisions.
-/// Avoids a Redis round-trip on every request from the same user/IP within a 1 s window.
-/// The worst case is one extra request per second per key, which is negligible compared
-/// to the 300 req/min user limit and 120 req/min IP limit.
+/// In-memory cache for rate-limit "allowed" decisions.
+/// Avoids a Redis round-trip on every request from the same user/IP within a 5 s window.
+/// The worst case is 5 extra requests per key per window, negligible vs 300 req/min limit.
 pub fn rate_limit_cache() -> &'static Cache<String, bool> {
     RATE_LIMIT_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(1))
+            .time_to_live(Duration::from_secs(5))
             .max_capacity(8192)
             .build()
     })

@@ -18,7 +18,13 @@ pub struct CookieJWT {
 pub struct AdminSession {
     pub current_user_id: i32,
     pub ability: Ability,
+    pub roles: Vec<String>,
 }
+
+/// Token hash pre-validated by `admin_namespace_guard`.
+/// When present, `CookieJWT` skips the blacklist DB query.
+#[derive(Clone, Debug)]
+pub struct ValidatedTokenHash(pub String);
 
 fn hash_token(token: &str) -> String {
     let mut hasher = Sha256::new();
@@ -46,24 +52,25 @@ impl FromRequestParts<AppContext> for CookieJWT {
             Ok(token_data) => {
                 let token_hash = hash_token(&token);
 
-                // Fast path: check in-memory cache first (TTL = 2 s).
-                // This eliminates a DB round-trip on every authenticated request
-                // while keeping the revocation latency within 2 s of logout.
-                let is_blacklisted = if let Some(cached) = blacklist_cache().get(&token_hash) {
-                    cached
-                } else {
-                    let now = Utc::now();
-                    let result = jwt_blacklist::Entity::find()
-                        .filter(jwt_blacklist::Column::TokenHash.eq(&token_hash))
-                        .filter(jwt_blacklist::Column::ExpiresAt.gt(now))
-                        .one(&state.db)
-                        .await
-                        .map_err(Error::DB)?
-                        .is_some();
-                    // Cache both "not blacklisted" (false) and "blacklisted" (true).
-                    blacklist_cache().insert(token_hash.clone(), result);
-                    result
-                };
+                // If admin_namespace_guard already validated this token, it's
+                // not blacklisted — skip the DB query entirely.
+                let is_blacklisted =
+                    if parts.extensions.get::<ValidatedTokenHash>().is_some() {
+                        false
+                    } else if let Some(cached) = blacklist_cache().get(&token_hash) {
+                        cached
+                    } else {
+                        let now = Utc::now();
+                        let result = jwt_blacklist::Entity::find()
+                            .filter(jwt_blacklist::Column::TokenHash.eq(&token_hash))
+                            .filter(jwt_blacklist::Column::ExpiresAt.gt(now))
+                            .one(&state.db)
+                            .await
+                            .map_err(Error::DB)?
+                            .is_some();
+                        blacklist_cache().insert(token_hash.clone(), result);
+                        result
+                    };
 
                 if is_blacklisted {
                     return Err(Error::Unauthorized("token revoked".to_string()));

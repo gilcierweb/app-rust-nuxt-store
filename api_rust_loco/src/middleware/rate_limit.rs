@@ -6,7 +6,7 @@ use axum::{
     Json,
 };
 use axum_extra::extract::CookieJar;
-use loco_rs::{app::AppContext, auth::jwt};
+use loco_rs::app::AppContext;
 use redis;
 use serde_json::json;
 use std::time::Duration;
@@ -113,14 +113,23 @@ fn client_ip(headers: &HeaderMap) -> String {
     "unknown".to_string()
 }
 
-fn user_key(ctx: &AppContext, headers: &HeaderMap) -> Option<String> {
+fn user_key(headers: &HeaderMap) -> Option<String> {
     let token = CookieJar::from_headers(headers)
         .get("auth_token")
         .map(|cookie| cookie.value().to_string())?;
-    let jwt_secret = ctx.config.get_jwt_config().ok()?;
-    let claims = jwt::JWT::new(&jwt_secret.secret).validate(&token).ok()?;
 
-    Some(format!("user:{}", claims.claims.pid))
+    // Use SHA-256 of the raw token as the rate-limit key instead of decoding
+    // the JWT.  This avoids a full HMAC validation + JSON decode on every
+    // request just for rate limiting — the same validation will happen later
+    // in CookieJWT::from_request_parts anyway.
+    let hash = {
+        use sha2::{Digest, Sha256};
+        let mut hasher = Sha256::new();
+        hasher.update(token.as_bytes());
+        hex::encode(hasher.finalize())
+    };
+
+    Some(format!("user:{hash}"))
 }
 
 fn rate_limited_response(state: RateLimitState) -> Response {
@@ -251,7 +260,7 @@ async fn get_connection_manager(redis_url: &str) -> Option<redis::aio::Connectio
     .clone()
 }
 
-pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next: Next) -> Response {
+pub async fn rate_limit_guard(State(_ctx): State<AppContext>, req: Request, next: Next) -> Response {
     if req.method() == Method::OPTIONS || !is_protected_path(req.uri().path()) {
         return next.run(req).await;
     }
@@ -262,7 +271,7 @@ pub async fn rate_limit_guard(State(ctx): State<AppContext>, req: Request, next:
     }
 
     let ip_key = format!("ip:{}", client_ip(req.headers()));
-    let user_key = user_key(&ctx, req.headers());
+    let user_key = user_key(req.headers());
 
     // Fast path: if both keys were allowed within the last second (per the in-memory
     // cache), skip the Redis round-trips entirely.  This is safe because:
