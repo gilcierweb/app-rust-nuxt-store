@@ -22,7 +22,7 @@
       </div>
       
       <!-- Product form -->
-      <ProductForm
+      <AdminProductsForm
         v-else-if="product"
         :product="product"
         :is-editing="true"
@@ -56,8 +56,8 @@ const id = route.params.id;
 
 const { pending, data: product, error } = useApiLazyFetch<ProductApi>(() => `/api/products/${id}`);
 
-const handleProductUpdated = (updatedProduct: ProductApi) => {
-  console.log('Produto atualizado:', updatedProduct);
+const handleProductUpdated = (_updatedProduct: ProductApi) => {
+  navigateTo('/products');
 };
 
 const handleCancel = () => {

@@ -7,7 +7,7 @@
         </NuxtLinkLocale>
       </div>
       
-      <ProductForm
+      <AdminProductsForm
         @saved="handleProductSaved"
         @cancel="handleCancel"
       />
@@ -31,8 +31,8 @@ if (!auth.isAuthenticated.value || !auth.user.value?.can_manage_admin) {
   throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
 }
 
-const handleProductSaved = (product: ProductApi) => {
-  console.log('Produto criado:', product);
+const handleProductSaved = (_product: ProductApi) => {
+  navigateTo('/products');
 };
 
 const handleCancel = () => {
