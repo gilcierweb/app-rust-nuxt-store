@@ -5,6 +5,8 @@ type NuxtCsrfTokenResponse = {
 
 const NUXT_CSRF_ENDPOINT = '/api/csrf-token'
 
+let cachedCsrfToken: { token: string; headerName: string } | null = null
+
 function isApiRequest(request: string, baseURL: string): boolean {
   if (request.startsWith('/api/')) return true
   if (request.startsWith(`${baseURL}/api/`)) return true
@@ -17,25 +19,30 @@ function isProtectedMethod(method?: string): boolean {
 }
 
 async function resolveNuxtCsrfHeader() {
+  if (cachedCsrfToken) {
+    return cachedCsrfToken
+  }
+
   if (import.meta.client) {
     const config = useRuntimeConfig()
     const response = await $fetch<NuxtCsrfTokenResponse>(NUXT_CSRF_ENDPOINT, {
       method: 'GET',
       credentials: 'include',
-      cache: 'no-store',
       headers: {
         accept: 'application/json'
       }
     })
     const headerName = response.headerName || config.public.csurf?.headerName
     if (response.token && headerName) {
-      return { headerName, token: response.token }
+      cachedCsrfToken = { headerName, token: response.token }
+      return cachedCsrfToken
     }
   }
 
   const { csrf, headerName } = useCsrf()
   if (csrf && headerName) {
-    return { headerName, token: csrf }
+    cachedCsrfToken = { headerName, token: csrf }
+    return cachedCsrfToken
   }
 
   return null
@@ -69,6 +76,12 @@ export default defineNuxtPlugin(() => {
       }
 
       options.headers = headers
+    },
+    onResponse({ response }) {
+      // Invalidate CSRF cache on auth errors — session may have changed.
+      if (response.status === 401 || response.status === 403) {
+        cachedCsrfToken = null
+      }
     }
   })
 

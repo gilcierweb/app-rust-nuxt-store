@@ -15,6 +15,8 @@ const SKIPPED_RESPONSE_HEADERS = new Set([
   'access-control-allow-methods'
 ])
 
+let cachedBackendCsrf: { token: string; cookieHeader: string } | null = null
+
 function isProtectedMethod(method: string): boolean {
   return ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase())
 }
@@ -71,6 +73,10 @@ async function ensureBackendCsrfToken(
   incomingCookieHeader?: string,
   apiKey?: string
 ) {
+  if (cachedBackendCsrf) {
+    return cachedBackendCsrf
+  }
+
   const response = await $fetch.raw<{ token?: string }>(`${backendUrl}${BACKEND_CSRF_ENDPOINT}`, {
     method: 'GET',
     headers: {
@@ -101,7 +107,8 @@ async function ensureBackendCsrfToken(
     appendResponseHeader(event, 'set-cookie', cookie)
   }
 
-  return { token, cookieHeader }
+  cachedBackendCsrf = { token, cookieHeader: cookieHeader || '' }
+  return cachedBackendCsrf
 }
 
 function forwardResponseHeaders(event: any, responseHeaders: Headers) {
@@ -226,6 +233,11 @@ export default defineEventHandler(async (event) => {
         phase,
         description: error?.message || 'Backend request failed'
       }
+    }
+
+    // Invalidate cached CSRF token on auth errors — the session may have changed.
+    if (response.status === 401 || response.status === 403) {
+      cachedBackendCsrf = null
     }
 
     forwardResponseHeaders(event, response.headers)
