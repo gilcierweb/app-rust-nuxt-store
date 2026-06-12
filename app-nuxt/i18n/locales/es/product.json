@@ -56,5 +56,11 @@
     "outOfStock": "Agotado",
     "lowStock": "Solo quedan {count} unidades",
     "inStock": "En Stock"
+  },
+  "productCard": {
+    "addToCart": "Agregar al Carrito",
+    "new": "Nuevo",
+    "toggleWishlist": "Alternar wishlist",
+    "viewDetails": "Ver Detalles"
   }
 }

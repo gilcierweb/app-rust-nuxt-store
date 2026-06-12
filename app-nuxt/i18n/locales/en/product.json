@@ -56,5 +56,11 @@
     "outOfStock": "Out of Stock",
     "lowStock": "Only {count} left in stock",
     "inStock": "In Stock"
+  },
+  "productCard": {
+    "addToCart": "Add to Cart",
+    "new": "New",
+    "toggleWishlist": "Toggle wishlist",
+    "viewDetails": "View Details"
   }
 }
