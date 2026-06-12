@@ -255,6 +255,7 @@ interface AdminPaymentListResponse extends AdminPaginatedResponse<AdminPayment> 
 
 const { t } = useI18n()
 const { useApiFetch, apiFetch } = useApi()
+const toast = useAppToast()
 
 const searchQuery = ref('')
 const debouncedSearchQuery = ref('')
@@ -444,8 +445,8 @@ async function bulkExportReceipts() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to bulk export receipts:', err)
+  } catch {
+    toast.error(t('admin.payments.actions.errorExport'))
   } finally {
     exporting.value = false
   }

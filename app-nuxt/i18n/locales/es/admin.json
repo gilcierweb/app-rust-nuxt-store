@@ -603,6 +603,12 @@
         "downloadInvoice": "Descargar Factura",
         "downloadQuotation": "Descargar Cotizacion",
         "downloadNfe": "DANFE"
+      },
+      "actions": {
+        "errorExport": "Error al exportar pedidos",
+        "errorDownloadInvoice": "Error al descargar factura",
+        "errorDownloadQuotation": "Error al descargar cotizacion",
+        "errorDownloadNfe": "Error al descargar DANFE"
       }
     },
     "posts": {
@@ -880,6 +886,9 @@
         "confirmDelete": "¿Está seguro de que desea eliminar el envío #{id}?",
         "errorDelete": "Error al eliminar el envío",
         "downloadLabel": "Etiqueta de Envio"
+      },
+      "actions": {
+        "errorExport": "Error al exportar etiquetas de envio"
       }
     },
     "shippings": {
@@ -1031,7 +1040,8 @@
         "logs": "Logs",
         "refunds": "Reembolsos",
         "gateways": "Gateways",
-        "methods": "Métodos"
+        "methods": "Métodos",
+        "errorExport": "Error al exportar recibos"
       },
       "filters": {
         "search": "Buscar",

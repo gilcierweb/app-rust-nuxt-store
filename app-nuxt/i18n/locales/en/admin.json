@@ -603,6 +603,12 @@
         "downloadInvoice": "Download Invoice",
         "downloadQuotation": "Download Quotation",
         "downloadNfe": "DANFE"
+      },
+      "actions": {
+        "errorExport": "Failed to export orders",
+        "errorDownloadInvoice": "Failed to download invoice",
+        "errorDownloadQuotation": "Failed to download quotation",
+        "errorDownloadNfe": "Failed to download DANFE"
       }
     },
     "customers": {
@@ -824,6 +830,9 @@
         "confirmDelete": "Are you sure you want to delete shipment #{id}?",
         "errorDelete": "Error deleting shipment",
         "downloadLabel": "Shipping Label"
+      },
+      "actions": {
+        "errorExport": "Failed to export shipping labels"
       }
     },
     "shippings": {
@@ -977,7 +986,8 @@
         "logs": "Logs",
         "refunds": "Refunds",
         "gateways": "Gateways",
-        "methods": "Methods"
+        "methods": "Methods",
+        "errorExport": "Failed to export receipts"
       },
       "filters": {
         "search": "Search",

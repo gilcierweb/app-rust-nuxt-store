@@ -603,6 +603,12 @@
         "downloadInvoice": "Baixar Nota Fiscal",
         "downloadQuotation": "Baixar Orcamento",
         "downloadNfe": "DANFE"
+      },
+      "actions": {
+        "errorExport": "Falha ao exportar pedidos",
+        "errorDownloadInvoice": "Falha ao baixar nota fiscal",
+        "errorDownloadQuotation": "Falha ao baixar orcamento",
+        "errorDownloadNfe": "Falha ao baixar DANFE"
       }
     },
     "posts": {
@@ -880,6 +886,9 @@
         "confirmDelete": "Tem certeza que deseja excluir a remessa #{id}?",
         "errorDelete": "Erro ao excluir remessa",
         "downloadLabel": "Etiqueta de Postagem"
+      },
+      "actions": {
+        "errorExport": "Falha ao exportar etiquetas de envio"
       }
     },
     "shippings": {
@@ -1031,7 +1040,8 @@
         "logs": "Logs",
         "refunds": "Reembolsos",
         "gateways": "Gateways",
-        "methods": "Métodos"
+        "methods": "Métodos",
+        "errorExport": "Falha ao exportar comprovantes"
       },
       "filters": {
         "search": "Busca",

@@ -218,7 +218,6 @@ async function deleteBanner() {
     router.push('/admin/banners')
   } catch (err) {
     toast.error(t('admin.banners.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

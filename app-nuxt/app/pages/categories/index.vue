@@ -161,17 +161,11 @@ useSeoMeta({
 })
 
 // Methods
-function viewCategory(id: string) {
-  console.log('View category:', id)
-}
+function viewCategory(_id: string) {}
 
-function editCategory(id: string) {
-  console.log('Edit category:', id)
-}
+function editCategory(_id: string) {}
 
-function deleteCategory(id: string) {
-  console.log('Delete category:', id)
-}
+function deleteCategory(_id: string) {}
 
 function toggleFavorite(id: string) {
   const cat = allCategories.value.find(c => c.id === id)

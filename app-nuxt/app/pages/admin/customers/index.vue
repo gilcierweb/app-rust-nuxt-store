@@ -200,7 +200,6 @@ const confirmDelete = async (profile: Profile) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.customers.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

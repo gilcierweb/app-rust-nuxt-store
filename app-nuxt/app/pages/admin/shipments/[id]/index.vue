@@ -134,7 +134,6 @@ const deleteShipment = async () => {
     router.push('/admin/shipments')
   } catch (err) {
     toast.error(t('admin.shipments.detail.errorDelete'))
-    console.error(err)
   }
 }
 

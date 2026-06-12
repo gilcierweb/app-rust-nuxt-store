@@ -438,7 +438,6 @@ async function confirmDelete(banner: Banner) {
     await refreshAnalytics()
   } catch (err) {
     toast.error(t('admin.banners.detail.errorDelete'))
-    console.error(err)
   }
 }
 
@@ -476,7 +475,6 @@ async function savePosition() {
     await refreshPositions()
   } catch (err) {
     toast.error(t('admin.banners.positions.errorSave'))
-    console.error(err)
   } finally {
     positionSaving.value = false
   }
@@ -495,7 +493,6 @@ async function deletePosition(position: BannerPosition) {
     await refreshPositions()
   } catch (err) {
     toast.error(t('admin.banners.positions.errorDelete'))
-    console.error(err)
   }
 }
 </script>

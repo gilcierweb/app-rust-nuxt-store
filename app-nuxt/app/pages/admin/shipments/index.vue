@@ -169,8 +169,8 @@ async function bulkExportLabels() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to bulk export shipping labels:', err)
+  } catch {
+    toast.error(t('admin.shipments.actions.errorExport'))
   } finally {
     exporting.value = false
   }
@@ -211,7 +211,6 @@ const confirmDelete = async (shipment: Shipment) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.shipments.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

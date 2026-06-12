@@ -86,7 +86,6 @@ async function handleDelete(variantId: number) {
     refresh()
   } catch (e) {
     toast.error(t('common.errorDelete', { resource: t('variant.title').toLowerCase() }))
-    console.error(e)
   }
 }
 </script>

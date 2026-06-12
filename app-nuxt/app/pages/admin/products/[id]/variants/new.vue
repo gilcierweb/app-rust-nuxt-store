@@ -70,6 +70,7 @@ definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const route = useRoute()
 const { apiFetch } = useApi()
+const toast = useAppToast()
 const router = useRouter()
 const productId = route.params.id
 const saving = ref(false)
@@ -97,7 +98,7 @@ async function handleSave() {
     })
     router.push(`/admin/products/${productId}/variants`)
   } catch (e) {
-    console.error(e)
+    toast.error(t('common.errorSave', { resource: t('variant.title').toLowerCase() }))
   } finally {
     saving.value = false
   }

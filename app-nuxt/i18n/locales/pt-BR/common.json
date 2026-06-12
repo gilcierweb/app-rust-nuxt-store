@@ -71,6 +71,7 @@
     "confirmDelete": "Tem certeza que deseja excluir \"{name}\"?",
     "errorLoad": "Erro ao carregar {resource}",
     "errorDelete": "Erro ao excluir {resource}",
+    "errorSave": "Erro ao salvar {resource}",
     "more": "mais",
     "validation": {
       "required": "Este campo é obrigatório.",

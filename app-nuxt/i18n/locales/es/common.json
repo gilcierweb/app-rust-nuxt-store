@@ -71,6 +71,7 @@
     "confirmDelete": "¿Está seguro de que desea eliminar \"{name}\"?",
     "errorLoad": "Error al cargar {resource}",
     "errorDelete": "Error al eliminar {resource}",
+    "errorSave": "Error al guardar {resource}",
     "validation": {
       "required": "Este campo es obligatorio.",
       "invalidNumber": "Ingrese un número válido.",

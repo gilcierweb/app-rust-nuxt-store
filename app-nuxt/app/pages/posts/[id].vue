@@ -534,7 +534,6 @@ const route = useRoute();
 const config = useRuntimeConfig();
 const { useApiLazyFetch } = useApi()
 // When accessing /posts/1, route.params.id will be 1
-console.log(route.params.id);
 const id = route.params.id;
 
 const { status, data: post } = useApiLazyFetch<Post>(
@@ -592,8 +591,6 @@ onMounted(() => {
         scrollTopBtn.addEventListener("click", () => {
             window.scrollTo({ top: 0, behavior: "smooth" });
         });
-    } else {
-        console.error("Elemento #scrollTop não encontrado");
     }
 
     // Smooth animations on scroll

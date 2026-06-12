@@ -183,7 +183,6 @@ const confirmDelete = async (review: Review) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.reviews.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

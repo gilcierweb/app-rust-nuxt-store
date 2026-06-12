@@ -230,8 +230,7 @@ async function downloadReceipt() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download receipt:', err)
+  } catch {
     toast.error(t('account.errorDownloadingReceipt'))
   } finally {
     downloadingReceipt.value = false

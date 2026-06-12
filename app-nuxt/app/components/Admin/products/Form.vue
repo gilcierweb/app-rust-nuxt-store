@@ -340,9 +340,7 @@ const handleImageUpload = (event: Event) => {
           if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
           imageFields.value.push(newField)
         }
-        reader.onerror = () => {
-          console.error('Erro ao ler arquivo:', file.name)
-        }
+        reader.onerror = () => {}
         reader.readAsDataURL(file)
       }
     }
@@ -359,9 +357,7 @@ const handleImageFieldChange = (event: Event, index: number) => {
       imageFields.value[index].preview = previewUrl
       imageFields.value[index].alt_text = file.name
     }
-    reader.onerror = () => {
-      console.error('Erro ao ler arquivo:', file.name)
-    }
+    reader.onerror = () => {}
     reader.readAsDataURL(file)
   }
 }
@@ -404,9 +400,7 @@ const handleDrop = (event: DragEvent) => {
           if (newField.cover) imageFields.value.forEach(f => (f.cover = false))
           imageFields.value.push(newField)
         }
-        reader.onerror = () => {
-          console.error('Erro ao ler arquivo:', file.name)
-        }
+        reader.onerror = () => {}
         reader.readAsDataURL(file)
       }
     }

@@ -66,8 +66,7 @@ export const useAuth = () => {
   async function logout() {
     try {
       await apiFetch('/api/auth/logout', { method: 'POST' })
-    } catch (err) {
-      console.error('Erro ao fazer logout no servidor', err)
+    } catch {
     } finally {
       user.value = null
       adminSections.value = []

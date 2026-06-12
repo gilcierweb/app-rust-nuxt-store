@@ -171,7 +171,6 @@ const deleteCategory = async () => {
     router.push('/admin/categories')
   } catch (err) {
     toast.error(t('admin.categories.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

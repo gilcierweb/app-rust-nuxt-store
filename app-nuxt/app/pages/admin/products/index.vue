@@ -196,7 +196,6 @@ const confirmDelete = async (product: ProductApi) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.products.errorDelete'))
-    console.error(err)
   }
 }
 </script>

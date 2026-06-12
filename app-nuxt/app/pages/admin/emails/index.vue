@@ -435,7 +435,6 @@ const resendLog = async (logId: number) => {
       }
     }
   } catch (err) {
-    console.error('Erro ao reenviar e-mail:', err)
     toast.error(t('admin.emails.actions.error'))
   } finally {
     resendingIds.value = resendingIds.value.filter(id => id !== logId)

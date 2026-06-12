@@ -188,7 +188,6 @@ const deleteUser = async () => {
     router.push('/admin/users')
   } catch (err) {
     toast.error(t('common.errorDelete', { resource: t('admin.users.title').toLowerCase() }))
-    console.error(err)
   }
 }
 </script>

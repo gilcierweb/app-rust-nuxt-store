@@ -163,7 +163,6 @@ const confirmDelete = async (category: Category) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.categories.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

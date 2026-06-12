@@ -210,7 +210,6 @@ const confirmDelete = async () => {
     navigateTo('/admin/products')
   } catch (err) {
     toast.error(t('admin.products.errorDelete'))
-    console.error(err)
   }
 }
 </script>

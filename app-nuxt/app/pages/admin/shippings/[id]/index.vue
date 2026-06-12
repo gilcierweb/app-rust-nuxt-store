@@ -180,7 +180,6 @@ const deleteShipping = async () => {
     router.push('/admin/shippings')
   } catch (err) {
     toast.error(t('admin.shippings.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

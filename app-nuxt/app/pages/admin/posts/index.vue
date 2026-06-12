@@ -213,7 +213,6 @@ const confirmDelete = async (post: Post) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.posts.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

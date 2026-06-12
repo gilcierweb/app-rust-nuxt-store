@@ -71,6 +71,7 @@
     "confirmDelete": "Are you sure you want to delete \"{name}\"?",
     "errorLoad": "Error loading {resource}",
     "errorDelete": "Error deleting {resource}",
+    "errorSave": "Error saving {resource}",
     "validation": {
       "required": "This field is required.",
       "invalidNumber": "Enter a valid number.",

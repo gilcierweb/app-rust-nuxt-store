@@ -194,7 +194,6 @@ const confirmDelete = async (user: AdminUser) => {
     await refresh()
   } catch (err) {
     toast.error(t('common.errorDelete', { resource: t('admin.users.title').toLowerCase() }))
-    console.error(err)
   }
 }
 </script>

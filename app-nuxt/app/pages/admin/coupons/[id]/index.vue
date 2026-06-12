@@ -228,7 +228,6 @@ const deleteCoupon = async () => {
     router.push('/admin/coupons')
   } catch (err) {
     toast.error(t('admin.coupons.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

@@ -151,6 +151,7 @@ import type { Order } from '~/types'
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const { useApiFetch, apiFetch } = useApi()
+const toast = useAppToast()
 
 // Filters
 const searchQuery = ref('')
@@ -225,8 +226,8 @@ async function bulkExportInvoices() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to bulk export invoices:', err)
+  } catch {
+    toast.error(t('admin.orders.actions.errorExport'))
   } finally {
     exporting.value = false
   }

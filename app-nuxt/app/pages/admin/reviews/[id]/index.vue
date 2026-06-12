@@ -191,7 +191,6 @@ const deleteReview = async () => {
     router.push('/admin/reviews')
   } catch (err) {
     toast.error(t('admin.reviews.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

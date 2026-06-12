@@ -191,7 +191,6 @@ const deletePost = async () => {
     router.push('/admin/posts')
   } catch (err) {
     toast.error(t('admin.posts.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

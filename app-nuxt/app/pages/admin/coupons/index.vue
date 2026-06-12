@@ -212,7 +212,6 @@ const confirmDelete = async (coupon: Coupon) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.coupons.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

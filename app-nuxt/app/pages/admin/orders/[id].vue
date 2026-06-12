@@ -212,6 +212,7 @@ import type { Order, Profile, Address } from '~/types'
 definePageMeta({ layout: 'admin' })
 const { t } = useI18n()
 const { apiFetch, useApiFetch } = useApi()
+const toast = useAppToast()
 const config = useRuntimeConfig()
 const route = useRoute()
 
@@ -344,8 +345,8 @@ async function downloadInvoice() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download invoice:', err)
+  } catch {
+    toast.error(t('admin.orders.actions.errorDownloadInvoice'))
   } finally {
     downloadingInvoice.value = false
   }
@@ -366,8 +367,8 @@ async function downloadQuotation() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download quotation:', err)
+  } catch {
+    toast.error(t('admin.orders.actions.errorDownloadQuotation'))
   } finally {
     downloadingQuotation.value = false
   }
@@ -388,8 +389,8 @@ async function downloadNfe() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download DANFE:', err)
+  } catch {
+    toast.error(t('admin.orders.actions.errorDownloadNfe'))
   } finally {
     downloadingNfe.value = false
   }

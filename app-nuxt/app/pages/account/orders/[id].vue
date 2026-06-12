@@ -171,6 +171,7 @@ definePageMeta({
 const route = useRoute()
 const { locale, t } = useI18n()
 const { useApiLazyFetch, apiFetch } = useApi()
+const toast = useAppToast()
 
 const orderId = computed(() => {
   const id = route.params.id
@@ -252,8 +253,8 @@ async function downloadInvoice() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download invoice:', err)
+  } catch {
+    toast.error(t('account.errorDownloadingInvoice'))
   } finally {
     downloadingInvoice.value = false
   }
@@ -274,8 +275,8 @@ async function downloadQuotation() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download quotation:', err)
+  } catch {
+    toast.error(t('account.errorDownloadingQuotation'))
   } finally {
     downloadingQuotation.value = false
   }
@@ -295,8 +296,8 @@ async function downloadShippingLabel(shipmentId: number, trackingNumber?: string
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  } catch (err: any) {
-    console.error('Failed to download shipping label:', err)
+  } catch {
+    toast.error(t('account.errorDownloadingShippingLabel'))
   } finally {
     downloadingLabel.value = null
   }

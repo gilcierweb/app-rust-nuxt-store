@@ -190,7 +190,6 @@ const confirmDelete = async (shipping: ShippingMethod) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.shippings.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

@@ -264,7 +264,6 @@ const deleteProfile = async () => {
     router.push('/admin/customers')
   } catch (err) {
     toast.error(t('admin.customers.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>

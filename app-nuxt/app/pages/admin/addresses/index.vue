@@ -188,7 +188,6 @@ const confirmDelete = async (address: Address) => {
     await refresh()
   } catch (err) {
     toast.error(t('admin.addresses.detail.errorDelete'))
-    console.error(err)
   }
 }
 </script>
