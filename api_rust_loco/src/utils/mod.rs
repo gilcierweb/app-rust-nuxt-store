@@ -1,5 +1,6 @@
 pub mod auth;
 pub mod bulk_export;
+pub mod date_format;
 pub mod decimal;
 pub mod email;
 pub mod pagination;

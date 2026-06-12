@@ -98,7 +98,7 @@ function isExpired(dateStr: string) {
 }
 
 function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('pt-BR', {
+  return new Date(dateStr).toLocaleDateString(getAppLocale(), {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',

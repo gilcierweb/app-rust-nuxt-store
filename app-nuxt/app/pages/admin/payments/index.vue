@@ -386,17 +386,17 @@ function statusBadgeClass(status: unknown) {
 }
 
 function formatCurrency(value: number | string | null | undefined, currency: string) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(Number(value) || 0)
+  return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency }).format(Number(value) || 0)
 }
 
 function formatDate(dateString?: string | null) {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(new Date(dateString))
+  return new Intl.DateTimeFormat(getAppLocale(), { dateStyle: 'medium' }).format(new Date(dateString))
 }
 
 function formatTime(dateString?: string | null) {
   if (!dateString) return ''
-  return new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }).format(new Date(dateString))
+  return new Intl.DateTimeFormat(getAppLocale(), { timeStyle: 'short' }).format(new Date(dateString))
 }
 
 const allFilteredSelected = computed(() => {

@@ -42,11 +42,11 @@ fn format_currency(amount: Decimal) -> String {
 }
 
 fn format_date(dt: chrono::NaiveDateTime) -> String {
-    dt.format("%d/%m/%Y").to_string()
+    crate::utils::date_format::format_date_naive(dt)
 }
 
 fn format_date_short(dt: chrono::NaiveDate) -> String {
-    dt.format("%d/%m/%Y").to_string()
+    crate::utils::date_format::format_date_short(dt)
 }
 
 pub async fn load_quotation_data(
@@ -227,7 +227,13 @@ pub fn generate_quotation_pdf(data: &QuotationData) -> Result<Vec<u8>> {
     y -= 8.0;
 
     // Store info (left side)
-    ops.extend(text_op(STORE_ADDRESS, 9.0, MARGIN_LEFT_MM, y, &font_regular));
+    ops.extend(text_op(
+        STORE_ADDRESS,
+        9.0,
+        MARGIN_LEFT_MM,
+        y,
+        &font_regular,
+    ));
     y -= 4.0;
     ops.extend(text_op(
         &format!("CNPJ: {STORE_CNPJ}"),
@@ -244,7 +250,13 @@ pub fn generate_quotation_pdf(data: &QuotationData) -> Result<Vec<u8>> {
 
     // Quotation info (right side)
     let order_number = data.order.order_number.as_deref().unwrap_or("N/A");
-    let order_date = format_date(data.order.created_at.date_naive().and_hms_opt(0, 0, 0).unwrap_or_default());
+    let order_date = format_date(
+        data.order
+            .created_at
+            .date_naive()
+            .and_hms_opt(0, 0, 0)
+            .unwrap_or_default(),
+    );
     let valid_until = format_date_short(data.valid_until);
 
     let right_x = MARGIN_LEFT_MM + content_width - 65.0;
@@ -324,7 +336,13 @@ pub fn generate_quotation_pdf(data: &QuotationData) -> Result<Vec<u8>> {
             }
         }
         if let Some(ref address1) = addr.address1 {
-            ops.extend(text_op("Endereco / Address:", 9.0, col_label, y, &font_bold));
+            ops.extend(text_op(
+                "Endereco / Address:",
+                9.0,
+                col_label,
+                y,
+                &font_bold,
+            ));
             ops.extend(text_op(address1, 9.0, col_value, y, &font_regular));
             y -= 5.0;
         }
@@ -380,7 +398,12 @@ pub fn generate_quotation_pdf(data: &QuotationData) -> Result<Vec<u8>> {
     ops.extend(text_op("Total", 8.0, col_total, y, &font_bold));
     y -= 5.0;
 
-    ops.extend(line_op(MARGIN_LEFT_MM, y, PAGE_WIDTH_MM - MARGIN_RIGHT_MM, y));
+    ops.extend(line_op(
+        MARGIN_LEFT_MM,
+        y,
+        PAGE_WIDTH_MM - MARGIN_RIGHT_MM,
+        y,
+    ));
     y -= 5.0;
 
     for item in &data.items {
@@ -438,13 +461,7 @@ pub fn generate_quotation_pdf(data: &QuotationData) -> Result<Vec<u8>> {
     let totals_value_x = MARGIN_LEFT_MM + 152.0;
 
     if let Some(subtotal) = data.order.subtotal {
-        ops.extend(text_op(
-            "Subtotal:",
-            9.0,
-            totals_label_x,
-            y,
-            &font_regular,
-        ));
+        ops.extend(text_op("Subtotal:", 9.0, totals_label_x, y, &font_regular));
         ops.extend(text_op(
             &format_currency(subtotal),
             9.0,
@@ -516,7 +533,12 @@ pub fn generate_quotation_pdf(data: &QuotationData) -> Result<Vec<u8>> {
     }
 
     y -= 2.0;
-    ops.extend(thick_line_op(totals_label_x, y, PAGE_WIDTH_MM - MARGIN_RIGHT_MM, y));
+    ops.extend(thick_line_op(
+        totals_label_x,
+        y,
+        PAGE_WIDTH_MM - MARGIN_RIGHT_MM,
+        y,
+    ));
     y -= 6.0;
 
     let total = data.order.total_amount.unwrap_or(Decimal::ZERO);

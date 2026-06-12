@@ -117,7 +117,7 @@ function statusBadgeClass(status: unknown): string {
 
 const formatDate = (dateString?: string) => {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(dateString))
+  return new Intl.DateTimeFormat(getAppLocale(), { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(dateString))
 }
 
 const deleteShipment = async () => {

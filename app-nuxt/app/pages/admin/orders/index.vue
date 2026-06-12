@@ -267,16 +267,16 @@ function paymentBadgeClass(status: unknown): string {
 }
 
 function formatNumberBR(val: any) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(val) || 0)
+  return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency: 'BRL' }).format(Number(val) || 0)
 }
 
 function formatDate(dateString: string) {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(new Date(dateString))
+  return new Intl.DateTimeFormat(getAppLocale(), { dateStyle: 'medium' }).format(new Date(dateString))
 }
 
 function formatTime(dateString: string) {
   if (!dateString) return ''
-  return new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }).format(new Date(dateString))
+  return new Intl.DateTimeFormat(getAppLocale(), { timeStyle: 'short' }).format(new Date(dateString))
 }
 </script>

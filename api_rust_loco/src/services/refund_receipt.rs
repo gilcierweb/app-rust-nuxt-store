@@ -43,11 +43,11 @@ fn format_currency(amount: Decimal) -> String {
 }
 
 fn format_datetime_naive(dt: chrono::NaiveDateTime) -> String {
-    dt.format("%d/%m/%Y %H:%M").to_string()
+    crate::utils::date_format::format_datetime_naive(dt)
 }
 
 fn format_datetime_tz(dt: chrono::DateTime<chrono::FixedOffset>) -> String {
-    dt.format("%d/%m/%Y %H:%M").to_string()
+    crate::utils::date_format::format_datetime_tz(dt)
 }
 
 fn refund_status_label(status: i16) -> String {
@@ -114,9 +114,7 @@ pub async fn load_refund_receipt_data(
 
     let payment_gateway = if let Some(ref pm) = payment_method {
         if let Some(gw_id) = pm.payment_gateway_id {
-            payment_gateways::Entity::find_by_id(gw_id)
-                .one(db)
-                .await?
+            payment_gateways::Entity::find_by_id(gw_id).one(db).await?
         } else {
             None
         }
@@ -366,11 +364,7 @@ pub fn generate_refund_receipt_pdf(data: &RefundReceiptData) -> Result<Vec<u8>> 
     ops.extend(text_op(order_num, 10.0, value_x, y, &font_regular));
     y -= 6.0;
 
-    let order_date = data
-        .order
-        .created_at
-        .format("%d/%m/%Y")
-        .to_string();
+    let order_date = data.order.created_at.format("%d/%m/%Y").to_string();
     ops.extend(text_op("Order Date:", 10.0, label_x, y, &font_bold));
     ops.extend(text_op(&order_date, 10.0, value_x, y, &font_regular));
     y -= 6.0;
@@ -430,7 +424,13 @@ pub fn generate_refund_receipt_pdf(data: &RefundReceiptData) -> Result<Vec<u8>> 
     y -= 10.0;
 
     // --- Summary ---
-    ops.extend(text_op("REFUND SUMMARY", 12.0, MARGIN_LEFT_MM, y, &font_bold));
+    ops.extend(text_op(
+        "REFUND SUMMARY",
+        12.0,
+        MARGIN_LEFT_MM,
+        y,
+        &font_bold,
+    ));
     y -= 8.0;
 
     ops.extend(text_op("Original Payment:", 10.0, label_x, y, &font_bold));

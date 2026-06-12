@@ -185,7 +185,7 @@ const statusBadgeClass = (status?: number) => {
 // Format date
 const formatDate = (dateString: string) => {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     day: '2-digit',
     month: 'short',
     year: 'numeric'

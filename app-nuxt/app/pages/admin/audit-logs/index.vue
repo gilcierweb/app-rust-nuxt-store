@@ -238,7 +238,7 @@ function formatResourceId(resourceId?: number | null) {
 }
 
 function formatDate(dateString: string) {
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
@@ -246,7 +246,7 @@ function formatDate(dateString: string) {
 }
 
 function formatTime(dateString: string) {
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     hour: '2-digit',
     minute: '2-digit'
   }).format(new Date(dateString))

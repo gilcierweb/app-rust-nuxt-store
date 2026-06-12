@@ -229,7 +229,7 @@ const directionLabel = (direction: number) => {
 
 const formatDate = (dateString?: string | null) => {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
@@ -238,7 +238,7 @@ const formatDate = (dateString?: string | null) => {
 
 const formatTime = (dateString?: string | null) => {
   if (!dateString) return ''
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     hour: '2-digit',
     minute: '2-digit'
   }).format(new Date(dateString))

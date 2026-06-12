@@ -418,7 +418,7 @@ const downloadReceipt = async () => {
 
 const formatCurrency = (value: string | number, currency: string) => {
   if (value === null || value === undefined) return '-'
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(Number(value))
+  return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency }).format(Number(value))
 }
 
 const formatDate = (dateString?: string | null) => {

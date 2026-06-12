@@ -3,8 +3,8 @@
 use loco_rs::prelude::*;
 use serde_json::json;
 
-use crate::models::_entities::orders;
 use crate::models::_entities::order_items;
+use crate::models::_entities::orders;
 use crate::models::_entities::products;
 use crate::models::_entities::users;
 
@@ -43,7 +43,7 @@ impl OrderMailer {
                 locals: json!({
                     "name": user.name,
                     "order_number": order.order_number,
-                    "order_date": order.created_at.format("%B %d, %Y").to_string(),
+                    "order_date": crate::utils::date_format::format_date_long(order.created_at.fixed_offset()),
                     "subtotal": order.subtotal.unwrap_or(rust_decimal::Decimal::ZERO),
                     "shipping_amount": order.shipping_amount.unwrap_or(rust_decimal::Decimal::ZERO),
                     "discount_amount": order.discount_amount.unwrap_or(rust_decimal::Decimal::ZERO),
@@ -181,10 +181,7 @@ impl OrderMailer {
         Ok(())
     }
 
-    async fn load_order_items(
-        ctx: &AppContext,
-        order_id: i32,
-    ) -> Result<Vec<OrderItemInfo>> {
+    async fn load_order_items(ctx: &AppContext, order_id: i32) -> Result<Vec<OrderItemInfo>> {
         let items = order_items::Entity::find()
             .filter(order_items::Column::OrderId.eq(order_id))
             .all(&ctx.db)
@@ -201,17 +198,21 @@ impl OrderMailer {
             result.push(OrderItemInfo {
                 name: product_name,
                 quantity: item.quantity.unwrap_or(1),
-                total: item.total.unwrap_or(rust_decimal::Decimal::ZERO).to_string(),
-                price: item.price.unwrap_or(rust_decimal::Decimal::ZERO).to_string(),
+                total: item
+                    .total
+                    .unwrap_or(rust_decimal::Decimal::ZERO)
+                    .to_string(),
+                price: item
+                    .price
+                    .unwrap_or(rust_decimal::Decimal::ZERO)
+                    .to_string(),
             });
         }
 
         Ok(result)
     }
 
-    pub fn mail_template_public(
-        template_name: &str,
-    ) -> Result<&'static Dir<'static>> {
+    pub fn mail_template_public(template_name: &str) -> Result<&'static Dir<'static>> {
         match template_name {
             "order_confirmation" => Ok(&order_confirmation),
             "shipping_update" => Ok(&shipping_update),

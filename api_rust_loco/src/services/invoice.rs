@@ -37,7 +37,7 @@ fn format_currency(amount: Decimal) -> String {
 }
 
 fn format_date(dt: chrono::DateTime<chrono::FixedOffset>) -> String {
-    dt.format("%d/%m/%Y").to_string()
+    crate::utils::date_format::format_date(dt)
 }
 
 fn order_status_label(status: Option<i32>) -> String {
@@ -191,11 +191,29 @@ pub fn generate_invoice_pdf(data: &InvoiceData) -> Result<Vec<u8>> {
     let pay_status = payment_status_label(data.order.payment_status);
 
     let right_x = MARGIN_LEFT_MM + content_width - 60.0;
-    ops.extend(text_op(&format!("Invoice: {order_num}"), 10.0, right_x, y, &font_regular));
+    ops.extend(text_op(
+        &format!("Invoice: {order_num}"),
+        10.0,
+        right_x,
+        y,
+        &font_regular,
+    ));
     y -= 5.0;
-    ops.extend(text_op(&format!("Date: {order_date}"), 10.0, right_x, y, &font_regular));
+    ops.extend(text_op(
+        &format!("Date: {order_date}"),
+        10.0,
+        right_x,
+        y,
+        &font_regular,
+    ));
     y -= 5.0;
-    ops.extend(text_op(&format!("Status: {status}"), 10.0, right_x, y, &font_regular));
+    ops.extend(text_op(
+        &format!("Status: {status}"),
+        10.0,
+        right_x,
+        y,
+        &font_regular,
+    ));
     y -= 5.0;
     ops.extend(text_op(
         &format!("Payment: {pay_status}"),
@@ -218,9 +236,21 @@ pub fn generate_invoice_pdf(data: &InvoiceData) -> Result<Vec<u8>> {
     // --- Customer info ---
     ops.extend(text_op("BILL TO:", 10.0, MARGIN_LEFT_MM, y, &font_bold));
     y -= 6.0;
-    ops.extend(text_op(&data.user.name, 10.0, MARGIN_LEFT_MM, y, &font_regular));
+    ops.extend(text_op(
+        &data.user.name,
+        10.0,
+        MARGIN_LEFT_MM,
+        y,
+        &font_regular,
+    ));
     y -= 5.0;
-    ops.extend(text_op(&data.user.email, 10.0, MARGIN_LEFT_MM, y, &font_regular));
+    ops.extend(text_op(
+        &data.user.email,
+        10.0,
+        MARGIN_LEFT_MM,
+        y,
+        &font_regular,
+    ));
 
     // --- Shipping address (right side) ---
     if let Some(ref addr) = data.address {
@@ -291,7 +321,13 @@ pub fn generate_invoice_pdf(data: &InvoiceData) -> Result<Vec<u8>> {
             item.product_name.clone()
         };
         ops.extend(text_op(&name, 9.0, col_product, y, &font_regular));
-        ops.extend(text_op(&item.quantity.to_string(), 9.0, col_qty, y, &font_regular));
+        ops.extend(text_op(
+            &item.quantity.to_string(),
+            9.0,
+            col_qty,
+            y,
+            &font_regular,
+        ));
         ops.extend(text_op(
             &format_currency(item.unit_price),
             9.0,

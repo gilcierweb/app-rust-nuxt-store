@@ -195,7 +195,7 @@ function linkTargetLabel(target: number) {
 
 function formatDate(dateString?: string) {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     day: '2-digit',
     month: 'long',
     year: 'numeric',

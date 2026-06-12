@@ -220,12 +220,12 @@ function refundStatusBadge(status: number) {
 }
 
 function formatCurrency(value: string | number, currency: string) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency }).format(Number(value))
+  return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency }).format(Number(value))
 }
 
 function formatDate(dateString?: string | null) {
   if (!dateString) return '-'
-  return new Intl.DateTimeFormat('pt-BR', {
+  return new Intl.DateTimeFormat(getAppLocale(), {
     day: '2-digit',
     month: 'short',
     year: 'numeric',

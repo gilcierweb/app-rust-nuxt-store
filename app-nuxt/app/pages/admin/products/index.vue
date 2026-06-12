@@ -180,7 +180,7 @@ const resetFilters = () => {
 }
 
 const formatNumberBR = (num: number | undefined) => {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num || 0)
+  return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency: 'BRL' }).format(num || 0)
 }
 
 const confirmDelete = async (product: ProductApi) => {

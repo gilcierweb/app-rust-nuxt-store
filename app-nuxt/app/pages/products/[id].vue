@@ -157,7 +157,7 @@
                     </div>
                     <span v-if="review.verified_purchase" class="badge badge-success badge-xs rounded-md">{{ t('product.verifiedPurchase') }}</span>
                   </div>
-                  <span class="text-xs text-base-content/30 font-bold">{{ new Date(review.created_at).toLocaleDateString('pt-BR') }}</span>
+                  <span class="text-xs text-base-content/30 font-bold">{{ new Date(review.created_at).toLocaleDateString(getAppLocale()) }}</span>
                 </div>
                 <h4 v-if="review.title" class="font-black text-lg mb-2">{{ review.title }}</h4>
                 <p v-if="review.comment" class="text-base-content/60 leading-relaxed">{{ review.comment }}</p>
