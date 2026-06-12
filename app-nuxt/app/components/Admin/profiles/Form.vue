@@ -32,10 +32,10 @@
         <!-- Form -->
         <form @submit.prevent="onSubmit" class="space-y-6" novalidate>
           <!-- Avatar Preview -->
-          <div v-if="form.avatar" class="flex justify-center mb-4">
+          <div v-if="values.avatar" class="flex justify-center mb-4">
             <div class="avatar">
               <div class="w-24 rounded-full">
-                <img :src="form.avatar" alt="Avatar preview" />
+                <img :src="values.avatar" alt="Avatar preview" />
               </div>
             </div>
           </div>
@@ -47,16 +47,17 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.firstName') }} *</span>
               </label>
               <input
-                v-model="form.first_name"
+                v-model="firstName"
                 type="text"
                 :placeholder="t('admin.profiles.form.firstNamePlaceholder')"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.first_name }"
+                :class="{ 'input-error': firstNameError }"
                 required
                 :disabled="pending"
+                @blur="firstNameBlur"
               />
-              <label v-if="errors.first_name" class="label">
-                <span class="label-text-alt text-error">{{ errors.first_name }}</span>
+              <label v-if="firstNameError" class="label">
+                <span class="label-text-alt text-error">{{ firstNameError }}</span>
               </label>
             </div>
 
@@ -66,16 +67,17 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.lastName') }} *</span>
               </label>
               <input
-                v-model="form.last_name"
+                v-model="lastName"
                 type="text"
                 placeholder="Sobrenome"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.last_name }"
+                :class="{ 'input-error': lastNameError }"
                 required
                 :disabled="pending"
+                @blur="lastNameBlur"
               />
-              <label v-if="errors.last_name" class="label">
-                <span class="label-text-alt text-error">{{ errors.last_name }}</span>
+              <label v-if="lastNameError" class="label">
+                <span class="label-text-alt text-error">{{ lastNameError }}</span>
               </label>
             </div>
           </div>
@@ -86,7 +88,7 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.fullName') }}</span>
             </label>
             <input
-              v-model="form.full_name"
+              v-model="values.full_name"
               type="text"
               :placeholder="t('admin.profiles.form.fullNamePlaceholder')"
               class="input input-bordered w-full"
@@ -104,7 +106,7 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.username') }}</span>
               </label>
               <input
-                v-model="form.username"
+                v-model="values.username"
                 type="text"
                 :placeholder="t('admin.profiles.form.usernamePlaceholder')"
                 class="input input-bordered w-full"
@@ -118,7 +120,7 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.nickname') }}</span>
               </label>
               <input
-                v-model="form.nickname"
+                v-model="values.nickname"
                 type="text"
                 placeholder="Apelido"
                 class="input input-bordered w-full"
@@ -134,7 +136,7 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.phone') }}</span>
               </label>
               <input
-                v-model.number="form.phone"
+                v-model.number="values.phone"
                 type="tel"
                 placeholder="5511999999999"
                 class="input input-bordered w-full"
@@ -148,7 +150,7 @@
                 <span class="label-text font-semibold">{{ t('admin.profiles.form.whatsapp') }}</span>
               </label>
               <input
-                v-model.number="form.whatsapp"
+                v-model.number="values.whatsapp"
                 type="tel"
                 placeholder="5511999999999"
                 class="input input-bordered w-full"
@@ -163,7 +165,7 @@
               <span class="label-text font-semibold">{{ t('admin.profiles.form.birthDate') }}</span>
             </label>
             <input
-              v-model="form.birth_date"
+              v-model="values.birth_date"
               type="date"
               class="input input-bordered w-full"
               :disabled="pending"
@@ -176,7 +178,7 @@
               <span class="label-text font-semibold">{{ t('admin.profiles.form.avatarUrl') }}</span>
             </label>
             <input
-              v-model="form.avatar"
+              v-model="values.avatar"
               type="url"
               placeholder="https://exemplo.com/avatar.jpg"
               class="input input-bordered w-full"
@@ -190,7 +192,7 @@
               <span class="label-text font-semibold">{{ t('admin.profiles.form.bio') }}</span>
             </label>
             <textarea
-              v-model="form.bio"
+              v-model="values.bio"
               :placeholder="t('admin.profiles.form.bioPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="3"
@@ -204,16 +206,17 @@
               <span class="label-text font-semibold">{{ t('admin.profiles.form.userId') }} *</span>
             </label>
             <input
-              v-model.number="form.user_id"
+              v-model.number="userId"
               type="number"
               :placeholder="t('admin.profiles.form.userIdPlaceholder')"
               class="input input-bordered w-full"
-              :class="{ 'input-error': errors.user_id }"
+              :class="{ 'input-error': userIdError }"
               required
               :disabled="pending || isEditing"
+              @blur="userIdBlur"
             />
-            <label v-if="errors.user_id" class="label">
-              <span class="label-text-alt text-error">{{ errors.user_id }}</span>
+            <label v-if="userIdError" class="label">
+              <span class="label-text-alt text-error">{{ userIdError }}</span>
             </label>
           </div>
 
@@ -239,6 +242,7 @@
 </template>
 
 <script setup lang="ts">
+import { useForm, useField } from 'vee-validate'
 import type { Profile } from '~/types'
 
 interface Props {
@@ -259,24 +263,35 @@ const { t } = useI18n()
 const { apiFetch } = useApi()
 
 // Form state
-const form = reactive({
-  first_name: '',
-  last_name: '',
-  full_name: '',
-  username: '',
-  nickname: '',
-  phone: null as number | null,
-  birth_date: '',
-  avatar: '',
-  bio: '',
-  whatsapp: null as number | null,
-  user_id: null as number | null
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    first_name: '',
+    last_name: '',
+    full_name: '',
+    username: '',
+    nickname: '',
+    phone: null as number | null,
+    birth_date: '',
+    avatar: '',
+    bio: '',
+    whatsapp: null as number | null,
+    user_id: null as number | null
+  }
 })
 
-const errors = reactive({
-  first_name: '',
-  last_name: '',
-  user_id: ''
+const { value: firstName, errorMessage: firstNameError, handleBlur: firstNameBlur } = useField<string>('first_name', (v) => {
+  if (!v?.trim()) return t('admin.profiles.form.validation.firstNameRequired')
+  return true
+})
+
+const { value: lastName, errorMessage: lastNameError, handleBlur: lastNameBlur } = useField<string>('last_name', (v) => {
+  if (!v?.trim()) return t('admin.profiles.form.validation.lastNameRequired')
+  return true
+})
+
+const { value: userId, errorMessage: userIdError, handleBlur: userIdBlur } = useField<number | null>('user_id', (v) => {
+  if (!v) return t('admin.profiles.form.validation.userIdRequired')
+  return true
 })
 
 const pending = ref(false)
@@ -284,92 +299,67 @@ const successMessage = ref('')
 const errorMessage = ref('')
 
 // Auto-generate full name
-watch([() => form.first_name, () => form.last_name], ([first, last]) => {
-  if (!form.full_name || form.full_name === `${props.profile?.first_name || ''} ${props.profile?.last_name || ''}`.trim()) {
-    form.full_name = `${first} ${last}`.trim()
+watch([firstName, lastName], ([first, last]) => {
+  const currentFullName = values.full_name
+  const originalFullName = `${props.profile?.first_name || ''} ${props.profile?.last_name || ''}`.trim()
+  if (!currentFullName || currentFullName === originalFullName) {
+    setFieldValue('full_name', `${first} ${last}`.trim())
   }
 })
 
 // Populate form when editing
 onMounted(() => {
   if (props.profile && props.isEditing) {
-    form.first_name = props.profile.first_name || ''
-    form.last_name = props.profile.last_name || ''
-    form.full_name = props.profile.full_name || ''
-    form.username = props.profile.username || ''
-    form.nickname = props.profile.nickname || ''
-    form.phone = props.profile.phone ?? null
-    form.birth_date = props.profile.birth_date || ''
-    form.avatar = props.profile.avatar || ''
-    form.bio = props.profile.bio || ''
-    form.whatsapp = props.profile.whatsapp ?? null
-    form.user_id = props.profile.user_id ?? null
+    setFieldValue('first_name', props.profile.first_name || '')
+    setFieldValue('last_name', props.profile.last_name || '')
+    setFieldValue('full_name', props.profile.full_name || '')
+    setFieldValue('username', props.profile.username || '')
+    setFieldValue('nickname', props.profile.nickname || '')
+    setFieldValue('phone', props.profile.phone ?? null)
+    setFieldValue('birth_date', props.profile.birth_date || '')
+    setFieldValue('avatar', props.profile.avatar || '')
+    setFieldValue('bio', props.profile.bio || '')
+    setFieldValue('whatsapp', props.profile.whatsapp ?? null)
+    setFieldValue('user_id', props.profile.user_id ?? null)
   }
 })
 
 // Watch for profile prop changes (in case it loads async)
 watch(() => props.profile, (newProfile) => {
   if (newProfile && props.isEditing) {
-    form.first_name = newProfile.first_name || ''
-    form.last_name = newProfile.last_name || ''
-    form.full_name = newProfile.full_name || ''
-    form.username = newProfile.username || ''
-    form.nickname = newProfile.nickname || ''
-    form.phone = newProfile.phone ?? null
-    form.birth_date = newProfile.birth_date || ''
-    form.avatar = newProfile.avatar || ''
-    form.bio = newProfile.bio || ''
-    form.whatsapp = newProfile.whatsapp ?? null
-    form.user_id = newProfile.user_id ?? null
+    setFieldValue('first_name', newProfile.first_name || '')
+    setFieldValue('last_name', newProfile.last_name || '')
+    setFieldValue('full_name', newProfile.full_name || '')
+    setFieldValue('username', newProfile.username || '')
+    setFieldValue('nickname', newProfile.nickname || '')
+    setFieldValue('phone', newProfile.phone ?? null)
+    setFieldValue('birth_date', newProfile.birth_date || '')
+    setFieldValue('avatar', newProfile.avatar || '')
+    setFieldValue('bio', newProfile.bio || '')
+    setFieldValue('whatsapp', newProfile.whatsapp ?? null)
+    setFieldValue('user_id', newProfile.user_id ?? null)
   }
 }, { immediate: true })
 
-// Validation
-const validate = () => {
-  let isValid = true
-  errors.first_name = ''
-  errors.last_name = ''
-  errors.user_id = ''
-
-  if (!form.first_name?.trim()) {
-    errors.first_name = t('admin.profiles.form.validation.firstNameRequired')
-    isValid = false
-  }
-
-  if (!form.last_name?.trim()) {
-    errors.last_name = t('admin.profiles.form.validation.lastNameRequired')
-    isValid = false
-  }
-
-  if (!form.user_id) {
-    errors.user_id = t('admin.profiles.form.validation.userIdRequired')
-    isValid = false
-  }
-
-  return isValid
-}
-
 // Submit
-const onSubmit = async () => {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async () => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
     const payload = {
-      first_name: form.first_name.trim() || null,
-      last_name: form.last_name.trim() || null,
-      full_name: form.full_name.trim() || `${form.first_name} ${form.last_name}`.trim(),
-      username: form.username?.trim() || null,
-      nickname: form.nickname?.trim() || null,
-      phone: form.phone,
-      birth_date: form.birth_date || null,
-      avatar: form.avatar?.trim() || null,
-      bio: form.bio?.trim() || null,
-      whatsapp: form.whatsapp,
-      user_id: form.user_id
+      first_name: values.first_name.trim() || null,
+      last_name: values.last_name.trim() || null,
+      full_name: values.full_name.trim() || `${values.first_name} ${values.last_name}`.trim(),
+      username: values.username?.trim() || null,
+      nickname: values.nickname?.trim() || null,
+      phone: values.phone,
+      birth_date: values.birth_date || null,
+      avatar: values.avatar?.trim() || null,
+      bio: values.bio?.trim() || null,
+      whatsapp: values.whatsapp,
+      user_id: values.user_id
     }
 
     const url = props.isEditing
@@ -393,7 +383,7 @@ const onSubmit = async () => {
   } finally {
     pending.value = false
   }
-}
+})
 </script>
 
 <style scoped></style>

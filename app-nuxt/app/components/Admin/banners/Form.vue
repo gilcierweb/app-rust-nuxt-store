@@ -34,15 +34,16 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.title') }} *</span>
               </label>
               <input
-                v-model="form.title"
+                v-model="title"
+                @blur="titleBlur"
                 type="text"
                 maxlength="150"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.title }"
+                :class="{ 'input-error': titleError }"
                 :disabled="pending"
               />
-              <label v-if="errors.title" class="label">
-                <span class="label-text-alt text-error">{{ errors.title }}</span>
+              <label v-if="titleError" class="label">
+                <span class="label-text-alt text-error">{{ titleError }}</span>
               </label>
             </div>
 
@@ -51,7 +52,7 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.description') }}</span>
               </label>
               <textarea
-                v-model="form.description"
+                v-model="values.description"
                 class="textarea textarea-bordered min-h-24"
                 :disabled="pending"
               ></textarea>
@@ -62,9 +63,10 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.position') }} *</span>
               </label>
               <select
-                v-model.number="form.position_id"
+                v-model.number="position_id"
+                @blur="position_idBlur"
                 class="select select-bordered w-full"
-                :class="{ 'select-error': errors.position_id }"
+                :class="{ 'select-error': position_idError }"
                 :disabled="pending"
               >
                 <option :value="0">{{ t('admin.banners.form.selectPosition') }}</option>
@@ -72,8 +74,8 @@
                   {{ position.name }} ({{ position.code }})
                 </option>
               </select>
-              <label v-if="errors.position_id" class="label">
-                <span class="label-text-alt text-error">{{ errors.position_id }}</span>
+              <label v-if="position_idError" class="label">
+                <span class="label-text-alt text-error">{{ position_idError }}</span>
               </label>
             </div>
 
@@ -81,7 +83,7 @@
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.status') }}</span>
               </label>
-              <select v-model.number="form.status" class="select select-bordered w-full" :disabled="pending">
+              <select                 v-model.number="values.status" class="select select-bordered w-full" :disabled="pending">
                 <option :value="1">{{ t('admin.banners.status.draft') }}</option>
                 <option :value="2">{{ t('admin.banners.status.active') }}</option>
                 <option :value="3">{{ t('admin.banners.status.paused') }}</option>
@@ -93,7 +95,7 @@
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.device') }}</span>
               </label>
-              <select v-model.number="form.device" class="select select-bordered w-full" :disabled="pending">
+              <select                 v-model.number="values.device" class="select select-bordered w-full" :disabled="pending">
                 <option :value="1">{{ t('admin.banners.devices.all') }}</option>
                 <option :value="2">{{ t('admin.banners.devices.desktop') }}</option>
                 <option :value="3">{{ t('admin.banners.devices.mobile') }}</option>
@@ -105,7 +107,7 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.priority') }}</span>
               </label>
               <input
-                v-model.number="form.priority"
+                v-model.number="values.priority"
                 type="number"
                 class="input input-bordered w-full"
                 :disabled="pending"
@@ -117,14 +119,15 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.imageDesktopUrl') }} *</span>
               </label>
               <input
-                v-model="form.image_desktop_url"
+                v-model="image_desktop_url"
+                @blur="image_desktop_urlBlur"
                 type="url"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.image_desktop_url }"
+                :class="{ 'input-error': image_desktop_urlError }"
                 :disabled="pending"
               />
-              <label v-if="errors.image_desktop_url" class="label">
-                <span class="label-text-alt text-error">{{ errors.image_desktop_url }}</span>
+              <label v-if="image_desktop_urlError" class="label">
+                <span class="label-text-alt text-error">{{ image_desktop_urlError }}</span>
               </label>
             </div>
 
@@ -132,28 +135,28 @@
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.imageMobileUrl') }}</span>
               </label>
-              <input v-model="form.image_mobile_url" type="url" class="input input-bordered w-full" :disabled="pending" />
+              <input v-model="values.image_mobile_url" type="url" class="input input-bordered w-full" :disabled="pending" />
             </div>
 
             <div class="form-control">
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.altText') }}</span>
               </label>
-              <input v-model="form.alt_text" type="text" maxlength="150" class="input input-bordered w-full" :disabled="pending" />
+              <input v-model="values.alt_text" type="text" maxlength="150" class="input input-bordered w-full" :disabled="pending" />
             </div>
 
             <div class="form-control">
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.linkUrl') }}</span>
               </label>
-              <input v-model="form.link_url" type="url" class="input input-bordered w-full" :disabled="pending" />
+              <input v-model="values.link_url" type="url" class="input input-bordered w-full" :disabled="pending" />
             </div>
 
             <div class="form-control">
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.linkTarget') }}</span>
               </label>
-              <select v-model.number="form.link_target" class="select select-bordered w-full" :disabled="pending">
+              <select v-model.number="values.link_target" class="select select-bordered w-full" :disabled="pending">
                 <option :value="1">{{ t('admin.banners.linkTargets.sameTab') }}</option>
                 <option :value="2">{{ t('admin.banners.linkTargets.newTab') }}</option>
               </select>
@@ -164,14 +167,15 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.startAt') }} *</span>
               </label>
               <input
-                v-model="form.start_at"
+                v-model="start_at"
+                @blur="start_atBlur"
                 type="datetime-local"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.start_at }"
+                :class="{ 'input-error': start_atError }"
                 :disabled="pending"
               />
-              <label v-if="errors.start_at" class="label">
-                <span class="label-text-alt text-error">{{ errors.start_at }}</span>
+              <label v-if="start_atError" class="label">
+                <span class="label-text-alt text-error">{{ start_atError }}</span>
               </label>
             </div>
 
@@ -180,14 +184,15 @@
                 <span class="label-text font-semibold">{{ t('admin.banners.form.endAt') }}</span>
               </label>
               <input
-                v-model="form.end_at"
+                v-model="end_at"
+                @blur="end_atBlur"
                 type="datetime-local"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.end_at }"
+                :class="{ 'input-error': end_atError }"
                 :disabled="pending"
               />
-              <label v-if="errors.end_at" class="label">
-                <span class="label-text-alt text-error">{{ errors.end_at }}</span>
+              <label v-if="end_atError" class="label">
+                <span class="label-text-alt text-error">{{ end_atError }}</span>
               </label>
             </div>
 
@@ -195,12 +200,12 @@
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.banners.form.campaignName') }}</span>
               </label>
-              <input v-model="form.campaign_name" type="text" maxlength="150" class="input input-bordered w-full" :disabled="pending" />
+              <input v-model="values.campaign_name" type="text" maxlength="150" class="input input-bordered w-full" :disabled="pending" />
             </div>
           </div>
 
-          <div v-if="form.image_desktop_url" class="rounded-box border overflow-hidden bg-base-200">
-            <img :src="form.image_desktop_url" :alt="form.alt_text || form.title" class="w-full max-h-72 object-cover" />
+          <div v-if="values.image_desktop_url" class="rounded-box border overflow-hidden bg-base-200">
+            <img :src="values.image_desktop_url" :alt="values.alt_text || values.title" class="w-full max-h-72 object-cover" />
           </div>
 
           <div class="flex justify-end gap-4 pt-6">
@@ -220,6 +225,7 @@
 
 <script setup lang="ts">
 import type { Banner, BannerPosition } from '~/types'
+import { useForm, useField } from 'vee-validate'
 
 interface Props {
   banner?: Partial<Banner>
@@ -240,59 +246,53 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const { apiFetch } = useApi()
 
-const form = reactive({
-  title: '',
-  description: '',
-  image_desktop_url: '',
-  image_mobile_url: '',
-  alt_text: '',
-  link_url: '',
-  link_target: 1,
-  position_id: 0,
-  device: 1,
-  start_at: '',
-  end_at: '',
-  priority: 0,
-  status: 1,
-  campaign_name: ''
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    title: '',
+    description: '',
+    image_desktop_url: '',
+    image_mobile_url: '',
+    alt_text: '',
+    link_url: '',
+    link_target: 1,
+    position_id: 0,
+    device: 1,
+    start_at: '',
+    end_at: '',
+    priority: 0,
+    status: 1,
+    campaign_name: ''
+  }
 })
 
-const errors = reactive({
-  title: '',
-  image_desktop_url: '',
-  position_id: '',
-  start_at: '',
-  end_at: ''
+const { value: title, errorMessage: titleError, handleBlur: titleBlur } = useField<string>('title', (v) => {
+  if (!v?.trim()) return t('admin.banners.form.validation.titleRequired')
+  return true
+})
+const { value: image_desktop_url, errorMessage: image_desktop_urlError, handleBlur: image_desktop_urlBlur } = useField<string>('image_desktop_url', (v) => {
+  if (!v?.trim()) return t('admin.banners.form.validation.imageRequired')
+  return true
+})
+const { value: position_id, errorMessage: position_idError, handleBlur: position_idBlur } = useField<number>('position_id', (v) => {
+  if (!v) return t('admin.banners.form.validation.positionRequired')
+  return true
+})
+const { value: start_at, errorMessage: start_atError, handleBlur: start_atBlur } = useField<string>('start_at', (v) => {
+  if (!v) return t('admin.banners.form.validation.startRequired')
+  return true
+})
+const { value: end_at, errorMessage: end_atError, handleBlur: end_atBlur } = useField<string>('end_at', (v) => {
+  if (v && values.start_at && new Date(v) < new Date(values.start_at)) {
+    return t('admin.banners.form.validation.endAfterStart')
+  }
+  return true
 })
 
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-const activePositions = computed(() => props.positions.filter(position => position.is_active || position.id === form.position_id))
-
-watch(() => props.banner, (banner) => {
-  if (!banner || !props.isEditing) return
-
-  form.title = banner.title || ''
-  form.description = banner.description || ''
-  form.image_desktop_url = banner.image_desktop_url || ''
-  form.image_mobile_url = banner.image_mobile_url || ''
-  form.alt_text = banner.alt_text || ''
-  form.link_url = banner.link_url || ''
-  form.link_target = banner.link_target ?? 1
-  form.position_id = banner.position_id ?? 0
-  form.device = banner.device ?? 1
-  form.start_at = banner.start_at ? formatDateTimeLocal(banner.start_at) : ''
-  form.end_at = banner.end_at ? formatDateTimeLocal(banner.end_at) : ''
-  form.priority = banner.priority ?? 0
-  form.status = banner.status ?? 1
-  form.campaign_name = banner.campaign_name || ''
-}, { immediate: true })
-
-if (!props.isEditing && !form.start_at) {
-  form.start_at = formatDateTimeLocal(new Date().toISOString())
-}
+const activePositions = computed(() => props.positions.filter(position => position.is_active || position.id === values.position_id))
 
 function formatDateTimeLocal(dateString: string) {
   const date = new Date(dateString)
@@ -304,65 +304,50 @@ function toIsoDateTime(value: string) {
   return value ? new Date(value).toISOString() : null
 }
 
-function validate() {
-  let isValid = true
-  errors.title = ''
-  errors.image_desktop_url = ''
-  errors.position_id = ''
-  errors.start_at = ''
-  errors.end_at = ''
+watch(() => props.banner, (banner) => {
+  if (!banner || !props.isEditing) return
 
-  if (!form.title.trim()) {
-    errors.title = t('admin.banners.form.validation.titleRequired')
-    isValid = false
-  }
+  setFieldValue('title', banner.title || '')
+  setFieldValue('description', banner.description || '')
+  setFieldValue('image_desktop_url', banner.image_desktop_url || '')
+  setFieldValue('image_mobile_url', banner.image_mobile_url || '')
+  setFieldValue('alt_text', banner.alt_text || '')
+  setFieldValue('link_url', banner.link_url || '')
+  setFieldValue('link_target', banner.link_target ?? 1)
+  setFieldValue('position_id', banner.position_id ?? 0)
+  setFieldValue('device', banner.device ?? 1)
+  setFieldValue('start_at', banner.start_at ? formatDateTimeLocal(banner.start_at) : '')
+  setFieldValue('end_at', banner.end_at ? formatDateTimeLocal(banner.end_at) : '')
+  setFieldValue('priority', banner.priority ?? 0)
+  setFieldValue('status', banner.status ?? 1)
+  setFieldValue('campaign_name', banner.campaign_name || '')
+}, { immediate: true })
 
-  if (!form.image_desktop_url.trim()) {
-    errors.image_desktop_url = t('admin.banners.form.validation.imageRequired')
-    isValid = false
-  }
-
-  if (!form.position_id) {
-    errors.position_id = t('admin.banners.form.validation.positionRequired')
-    isValid = false
-  }
-
-  if (!form.start_at) {
-    errors.start_at = t('admin.banners.form.validation.startRequired')
-    isValid = false
-  }
-
-  if (form.end_at && form.start_at && new Date(form.end_at) < new Date(form.start_at)) {
-    errors.end_at = t('admin.banners.form.validation.endAfterStart')
-    isValid = false
-  }
-
-  return isValid
+if (!props.isEditing && !values.start_at) {
+  setFieldValue('start_at', formatDateTimeLocal(new Date().toISOString()))
 }
 
-async function onSubmit() {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async () => {
   pending.value = true
   successMessage.value = ''
   errorMessage.value = ''
 
   try {
     const payload = {
-      title: form.title.trim(),
-      description: form.description.trim() || null,
-      image_desktop_url: form.image_desktop_url.trim(),
-      image_mobile_url: form.image_mobile_url.trim() || null,
-      alt_text: form.alt_text.trim() || null,
-      link_url: form.link_url.trim() || null,
-      link_target: form.link_target,
-      position_id: form.position_id,
-      device: form.device,
-      start_at: toIsoDateTime(form.start_at),
-      end_at: toIsoDateTime(form.end_at),
-      priority: form.priority || 0,
-      status: form.status,
-      campaign_name: form.campaign_name.trim() || null
+      title: values.title.trim(),
+      description: values.description.trim() || null,
+      image_desktop_url: values.image_desktop_url.trim(),
+      image_mobile_url: values.image_mobile_url.trim() || null,
+      alt_text: values.alt_text.trim() || null,
+      link_url: values.link_url.trim() || null,
+      link_target: values.link_target,
+      position_id: values.position_id,
+      device: values.device,
+      start_at: toIsoDateTime(values.start_at),
+      end_at: toIsoDateTime(values.end_at),
+      priority: values.priority || 0,
+      status: values.status,
+      campaign_name: values.campaign_name.trim() || null
     }
 
     const url = props.isEditing ? `/api/admin/banners/${props.banner?.id}` : '/api/admin/banners'
@@ -379,5 +364,5 @@ async function onSubmit() {
   } finally {
     pending.value = false
   }
-}
+})
 </script>

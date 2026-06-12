@@ -37,16 +37,17 @@
               <span class="label-text font-semibold">{{ t('admin.posts.form.title') }} *</span>
             </label>
             <input
-              v-model="form.title"
+              v-model="title"
+              @blur="titleBlur"
               type="text"
               :placeholder="t('admin.posts.form.titlePlaceholder')"
               class="input input-bordered w-full"
-              :class="{ 'input-error': errors.title }"
+              :class="{ 'input-error': titleError }"
               required
               :disabled="pending"
             />
-            <label v-if="errors.title" class="label">
-              <span class="label-text-alt text-error">{{ errors.title }}</span>
+            <label v-if="titleError" class="label">
+              <span class="label-text-alt text-error">{{ titleError }}</span>
             </label>
           </div>
 
@@ -56,7 +57,7 @@
               <span class="label-text font-semibold">{{ t('admin.posts.form.content') }}</span>
             </label>
             <textarea
-              v-model="form.content"
+              v-model="values.content"
               :placeholder="t('admin.posts.form.contentPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="6"
@@ -70,7 +71,7 @@
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.posts.form.status') }}</span>
               </label>
-              <select v-model.number="form.status" class="select select-bordered w-full" :disabled="pending">
+              <select               v-model.number="values.status" class="select select-bordered w-full" :disabled="pending">
                 <option v-for="(label, value) in PostStatusLabels" :key="value" :value="Number(value)">
                   {{ label }}
                 </option>
@@ -102,6 +103,7 @@
 <script setup lang="ts">
 import type { Post } from '~/types'
 import { PostStatusLabels } from '~/types'
+import { useForm, useField } from 'vee-validate'
 
 interface Props {
   post?: Partial<Post>
@@ -120,65 +122,49 @@ const emit = defineEmits<{
 const { apiFetch } = useApi()
 const { t } = useI18n()
 
-// Form state
-const form = reactive({
-  title: '',
-  content: '',
-  status: 1
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    title: '',
+    content: '',
+    status: 1
+  }
 })
 
-const errors = reactive({
-  title: ''
+const { value: title, errorMessage: titleError, handleBlur: titleBlur } = useField<string>('title', (v) => {
+  if (!v?.trim()) return t('admin.posts.form.validation.titleRequired')
+  return true
 })
 
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Populate form when editing
 onMounted(() => {
   if (props.post && props.isEditing) {
-    form.title = props.post.title || ''
-    form.content = props.post.content || ''
-    form.status = props.post.status ?? 1
+    setFieldValue('title', props.post.title || '')
+    setFieldValue('content', props.post.content || '')
+    setFieldValue('status', props.post.status ?? 1)
   }
 })
 
-// Watch for post prop changes (in case it loads async)
 watch(() => props.post, (newPost) => {
   if (newPost && props.isEditing) {
-    form.title = newPost.title || ''
-    form.content = newPost.content || ''
-    form.status = newPost.status ?? 1
+    setFieldValue('title', newPost.title || '')
+    setFieldValue('content', newPost.content || '')
+    setFieldValue('status', newPost.status ?? 1)
   }
 }, { immediate: true })
 
-// Validation
-const validate = () => {
-  let isValid = true
-  errors.title = ''
-
-  if (!form.title.trim()) {
-    errors.title = t('admin.posts.form.validation.titleRequired')
-    isValid = false
-  }
-
-  return isValid
-}
-
-// Submit
-const onSubmit = async () => {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async () => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
     const payload = {
-      title: form.title.trim() || null,
-      content: form.content.trim() || null,
-      status: form.status
+      title: values.title.trim() || null,
+      content: values.content.trim() || null,
+      status: values.status
     }
 
     const url = props.isEditing
@@ -202,7 +188,7 @@ const onSubmit = async () => {
   } finally {
     pending.value = false
   }
-}
+})
 </script>
 
 <style scoped></style>

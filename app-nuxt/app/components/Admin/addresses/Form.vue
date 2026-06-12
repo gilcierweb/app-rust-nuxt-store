@@ -36,7 +36,7 @@
             <label class="label">
               <span class="label-text font-semibold">{{ t('admin.addresses.form.type') }}</span>
             </label>
-            <select v-model="form.type" class="select select-bordered w-full" :disabled="pending">
+            <select v-model="values.type" class="select select-bordered w-full" :disabled="pending">
               <option value="">{{ t('admin.addresses.form.typePlaceholder') }}</option>
               <option value="home">{{ t('admin.addresses.types.home') }}</option>
               <option value="work">{{ t('admin.addresses.types.work') }}</option>
@@ -51,16 +51,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.firstName') }} *</span>
               </label>
               <input
-                v-model="form.first_name"
+                v-model="first_name"
+                @blur="first_nameBlur"
                 type="text"
                 :placeholder="t('admin.addresses.form.firstNamePlaceholder')"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.first_name }"
+                :class="{ 'input-error': first_nameError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.first_name" class="label">
-                <span class="label-text-alt text-error">{{ errors.first_name }}</span>
+              <label v-if="first_nameError" class="label">
+                <span class="label-text-alt text-error">{{ first_nameError }}</span>
               </label>
             </div>
 
@@ -70,16 +71,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.lastName') }} *</span>
               </label>
               <input
-                v-model="form.last_name"
+                v-model="last_name"
+                @blur="last_nameBlur"
                 type="text"
                 placeholder="Sobrenome"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.last_name }"
+                :class="{ 'input-error': last_nameError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.last_name" class="label">
-                <span class="label-text-alt text-error">{{ errors.last_name }}</span>
+              <label v-if="last_nameError" class="label">
+                <span class="label-text-alt text-error">{{ last_nameError }}</span>
               </label>
             </div>
           </div>
@@ -90,7 +92,7 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.company') }}</span>
             </label>
             <input
-              v-model="form.company"
+              v-model="values.company"
               type="text"
               :placeholder="t('admin.addresses.form.companyPlaceholder')"
               class="input input-bordered w-full"
@@ -104,16 +106,17 @@
               <span class="label-text font-semibold">{{ t('admin.addresses.form.address1') }} *</span>
             </label>
             <input
-              v-model="form.address1"
-              type="text"
-              :placeholder="t('admin.addresses.form.address1Placeholder')"
-              class="input input-bordered w-full"
-              :class="{ 'input-error': errors.address1 }"
-              required
-              :disabled="pending"
-            />
-            <label v-if="errors.address1" class="label">
-              <span class="label-text-alt text-error">{{ errors.address1 }}</span>
+              v-model="address1"
+                @blur="address1Blur"
+                type="text"
+                :placeholder="t('admin.addresses.form.address1Placeholder')"
+                class="input input-bordered w-full"
+                :class="{ 'input-error': address1Error }"
+                required
+                :disabled="pending"
+              />
+              <label v-if="address1Error" class="label">
+                <span class="label-text-alt text-error">{{ address1Error }}</span>
             </label>
           </div>
 
@@ -123,7 +126,7 @@
               <span class="label-text font-semibold">{{ t('admin.addresses.form.address2') }}</span>
             </label>
             <input
-              v-model="form.address2"
+              v-model="values.address2"
               type="text"
               :placeholder="t('admin.addresses.form.address2Placeholder')"
               class="input input-bordered w-full"
@@ -138,16 +141,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.city') }} *</span>
               </label>
               <input
-                v-model="form.city"
+                v-model="city"
+                @blur="cityBlur"
                 type="text"
                 placeholder="Cidade"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.city }"
+                :class="{ 'input-error': cityError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.city" class="label">
-                <span class="label-text-alt text-error">{{ errors.city }}</span>
+              <label v-if="cityError" class="label">
+                <span class="label-text-alt text-error">{{ cityError }}</span>
               </label>
             </div>
 
@@ -157,16 +161,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.state') }} *</span>
               </label>
               <input
-                v-model="form.state"
+                v-model="state"
+                @blur="stateBlur"
                 type="text"
                 :placeholder="t('admin.addresses.form.statePlaceholder')"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.state }"
+                :class="{ 'input-error': stateError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.state" class="label">
-                <span class="label-text-alt text-error">{{ errors.state }}</span>
+              <label v-if="stateError" class="label">
+                <span class="label-text-alt text-error">{{ stateError }}</span>
               </label>
             </div>
           </div>
@@ -178,16 +183,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.zipCode') }} *</span>
               </label>
               <input
-                v-model="form.zip_code"
+                v-model="zip_code"
+                @blur="zip_codeBlur"
                 type="text"
                 placeholder="00000-000"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.zip_code }"
+                :class="{ 'input-error': zip_codeError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.zip_code" class="label">
-                <span class="label-text-alt text-error">{{ errors.zip_code }}</span>
+              <label v-if="zip_codeError" class="label">
+                <span class="label-text-alt text-error">{{ zip_codeError }}</span>
               </label>
             </div>
 
@@ -197,16 +203,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.country') }} *</span>
               </label>
               <input
-                v-model="form.country"
+                v-model="country"
+                @blur="countryBlur"
                 type="text"
                 placeholder="País"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.country }"
+                :class="{ 'input-error': countryError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.country" class="label">
-                <span class="label-text-alt text-error">{{ errors.country }}</span>
+              <label v-if="countryError" class="label">
+                <span class="label-text-alt text-error">{{ countryError }}</span>
               </label>
             </div>
           </div>
@@ -218,7 +225,7 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.phone') }}</span>
               </label>
               <input
-                v-model="form.phone"
+                v-model="values.phone"
                 type="tel"
                 placeholder="(00) 00000-0000"
                 class="input input-bordered w-full"
@@ -232,16 +239,17 @@
                 <span class="label-text font-semibold">{{ t('admin.addresses.form.userId') }} *</span>
               </label>
               <input
-                v-model.number="form.user_id"
+                v-model.number="user_id"
+                @blur="user_idBlur"
                 type="number"
                 :placeholder="t('admin.addresses.form.userIdPlaceholder')"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.user_id }"
+                :class="{ 'input-error': user_idError }"
                 required
                 :disabled="pending"
               />
-              <label v-if="errors.user_id" class="label">
-                <span class="label-text-alt text-error">{{ errors.user_id }}</span>
+              <label v-if="user_idError" class="label">
+                <span class="label-text-alt text-error">{{ user_idError }}</span>
               </label>
             </div>
           </div>
@@ -251,7 +259,7 @@
             <label class="label cursor-pointer">
               <span class="label-text font-semibold">{{ t('admin.addresses.form.default') }}</span>
               <input
-                v-model="form.default"
+                v-model="values.default"
                 type="checkbox"
                 class="checkbox checkbox-primary"
                 :disabled="pending"
@@ -282,6 +290,7 @@
 
 <script setup lang="ts">
 import type { Address } from '~/types'
+import { useForm, useField } from 'vee-validate'
 
 interface Props {
   address?: Partial<Address>
@@ -300,154 +309,117 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const { apiFetch } = useApi()
 
-// Form state
-const form = reactive({
-  type: '',
-  first_name: '',
-  last_name: '',
-  company: '',
-  address1: '',
-  address2: '',
-  city: '',
-  state: '',
-  zip_code: '',
-  country: 'Brasil',
-  phone: '',
-  user_id: null as number | null,
-  default: false
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    type: '',
+    first_name: '',
+    last_name: '',
+    company: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    zip_code: '',
+    country: 'Brasil',
+    phone: '',
+    user_id: null as number | null,
+    default: false
+  }
 })
 
-const errors = reactive({
-  first_name: '',
-  last_name: '',
-  address1: '',
-  city: '',
-  state: '',
-  zip_code: '',
-  country: '',
-  user_id: ''
+const { value: first_name, errorMessage: first_nameError, handleBlur: first_nameBlur } = useField<string>('first_name', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.firstNameRequired')
+  return true
+})
+const { value: last_name, errorMessage: last_nameError, handleBlur: last_nameBlur } = useField<string>('last_name', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.lastNameRequired')
+  return true
+})
+const { value: address1, errorMessage: address1Error, handleBlur: address1Blur } = useField<string>('address1', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.addressRequired')
+  return true
+})
+const { value: city, errorMessage: cityError, handleBlur: cityBlur } = useField<string>('city', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.cityRequired')
+  return true
+})
+const { value: state, errorMessage: stateError, handleBlur: stateBlur } = useField<string>('state', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.stateRequired')
+  return true
+})
+const { value: zip_code, errorMessage: zip_codeError, handleBlur: zip_codeBlur } = useField<string>('zip_code', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.zipCodeRequired')
+  return true
+})
+const { value: country, errorMessage: countryError, handleBlur: countryBlur } = useField<string>('country', (v) => {
+  if (!v?.trim()) return t('admin.addresses.form.validation.countryRequired')
+  return true
+})
+const { value: user_id, errorMessage: user_idError, handleBlur: user_idBlur } = useField<number | null>('user_id', (v) => {
+  if (!v) return t('admin.addresses.form.validation.userIdRequired')
+  return true
 })
 
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Populate form when editing
 onMounted(() => {
   if (props.address && props.isEditing) {
-    form.type = props.address.type || ''
-    form.first_name = props.address.first_name || ''
-    form.last_name = props.address.last_name || ''
-    form.company = props.address.company || ''
-    form.address1 = props.address.address1 || ''
-    form.address2 = props.address.address2 || ''
-    form.city = props.address.city || ''
-    form.state = props.address.state || ''
-    form.zip_code = props.address.zip_code || ''
-    form.country = props.address.country || 'Brasil'
-    form.phone = props.address.phone || ''
-    form.user_id = props.address.user_id ?? null
-    form.default = props.address.default ?? false
+    setFieldValue('type', props.address.type || '')
+    setFieldValue('first_name', props.address.first_name || '')
+    setFieldValue('last_name', props.address.last_name || '')
+    setFieldValue('company', props.address.company || '')
+    setFieldValue('address1', props.address.address1 || '')
+    setFieldValue('address2', props.address.address2 || '')
+    setFieldValue('city', props.address.city || '')
+    setFieldValue('state', props.address.state || '')
+    setFieldValue('zip_code', props.address.zip_code || '')
+    setFieldValue('country', props.address.country || 'Brasil')
+    setFieldValue('phone', props.address.phone || '')
+    setFieldValue('user_id', props.address.user_id ?? null)
+    setFieldValue('default', props.address.default ?? false)
   }
 })
 
-// Watch for address prop changes (in case it loads async)
 watch(() => props.address, (newAddress) => {
   if (newAddress && props.isEditing) {
-    form.type = newAddress.type || ''
-    form.first_name = newAddress.first_name || ''
-    form.last_name = newAddress.last_name || ''
-    form.company = newAddress.company || ''
-    form.address1 = newAddress.address1 || ''
-    form.address2 = newAddress.address2 || ''
-    form.city = newAddress.city || ''
-    form.state = newAddress.state || ''
-    form.zip_code = newAddress.zip_code || ''
-    form.country = newAddress.country || 'Brasil'
-    form.phone = newAddress.phone || ''
-    form.user_id = newAddress.user_id ?? null
-    form.default = newAddress.default ?? false
+    setFieldValue('type', newAddress.type || '')
+    setFieldValue('first_name', newAddress.first_name || '')
+    setFieldValue('last_name', newAddress.last_name || '')
+    setFieldValue('company', newAddress.company || '')
+    setFieldValue('address1', newAddress.address1 || '')
+    setFieldValue('address2', newAddress.address2 || '')
+    setFieldValue('city', newAddress.city || '')
+    setFieldValue('state', newAddress.state || '')
+    setFieldValue('zip_code', newAddress.zip_code || '')
+    setFieldValue('country', newAddress.country || 'Brasil')
+    setFieldValue('phone', newAddress.phone || '')
+    setFieldValue('user_id', newAddress.user_id ?? null)
+    setFieldValue('default', newAddress.default ?? false)
   }
 }, { immediate: true })
 
-// Validation
-const validate = () => {
-  let isValid = true
-  errors.first_name = ''
-  errors.last_name = ''
-  errors.address1 = ''
-  errors.city = ''
-  errors.state = ''
-  errors.zip_code = ''
-  errors.country = ''
-  errors.user_id = ''
-
-  if (!form.first_name?.trim()) {
-    errors.first_name = t('admin.addresses.form.validation.firstNameRequired')
-    isValid = false
-  }
-
-  if (!form.last_name?.trim()) {
-    errors.last_name = t('admin.addresses.form.validation.lastNameRequired')
-    isValid = false
-  }
-
-  if (!form.address1?.trim()) {
-    errors.address1 = t('admin.addresses.form.validation.addressRequired')
-    isValid = false
-  }
-
-  if (!form.city?.trim()) {
-    errors.city = t('admin.addresses.form.validation.cityRequired')
-    isValid = false
-  }
-
-  if (!form.state?.trim()) {
-    errors.state = t('admin.addresses.form.validation.stateRequired')
-    isValid = false
-  }
-
-  if (!form.zip_code?.trim()) {
-    errors.zip_code = t('admin.addresses.form.validation.zipCodeRequired')
-    isValid = false
-  }
-
-  if (!form.country?.trim()) {
-    errors.country = t('admin.addresses.form.validation.countryRequired')
-    isValid = false
-  }
-
-  if (!form.user_id) {
-    errors.user_id = t('admin.addresses.form.validation.userIdRequired')
-    isValid = false
-  }
-
-  return isValid
-}
-
-// Submit
-const onSubmit = async () => {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async () => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
     const payload = {
-      type: form.type || null,
-      first_name: form.first_name.trim(),
-      last_name: form.last_name.trim(),
-      company: form.company?.trim() || null,
-      address1: form.address1.trim(),
-      address2: form.address2?.trim() || null,
-      city: form.city.trim(),
-      state: form.state.trim(),
-      zip_code: form.zip_code.trim(),
-      country: form.country.trim(),
-      phone: form.phone?.trim() || null,
-      user_id: form.user_id,
-      default: form.default
+      type: values.type || null,
+      first_name: values.first_name.trim(),
+      last_name: values.last_name.trim(),
+      company: values.company?.trim() || null,
+      address1: values.address1.trim(),
+      address2: values.address2?.trim() || null,
+      city: values.city.trim(),
+      state: values.state.trim(),
+      zip_code: values.zip_code.trim(),
+      country: values.country.trim(),
+      phone: values.phone?.trim() || null,
+      user_id: values.user_id,
+      default: values.default
     }
 
     const url = props.isEditing
@@ -471,7 +443,7 @@ const onSubmit = async () => {
   } finally {
     pending.value = false
   }
-}
+})
 </script>
 
 <style scoped></style>

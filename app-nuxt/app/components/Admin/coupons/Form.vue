@@ -37,16 +37,17 @@
               <span class="label-text font-semibold">{{ t('admin.coupons.form.code') }} *</span>
             </label>
             <input
-              v-model="form.code"
+              v-model="code"
+              @blur="codeBlur"
               type="text"
               placeholder="PROMO2024"
               class="input input-bordered w-full uppercase"
-              :class="{ 'input-error': errors.code }"
+              :class="{ 'input-error': codeError }"
               required
               :disabled="pending"
             />
-            <label v-if="errors.code" class="label">
-              <span class="label-text-alt text-error">{{ errors.code }}</span>
+            <label v-if="codeError" class="label">
+              <span class="label-text-alt text-error">{{ codeError }}</span>
             </label>
           </div>
 
@@ -56,7 +57,7 @@
               <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.coupons.form.type') }}</span>
               </label>
-              <select v-model.number="form.discount_type" class="select select-bordered w-full" :disabled="pending">
+              <select               v-model.number="values.discount_type" class="select select-bordered w-full" :disabled="pending">
                 <option :value="1">{{ t('admin.coupons.types.percentage') }} (%)</option>
                 <option :value="2">{{ t('admin.coupons.types.fixed') }} (R$)</option>
                 <option :value="3">{{ t('admin.coupons.types.freeShipping') }}</option>
@@ -69,7 +70,7 @@
                 <span class="label-text font-semibold">{{ t('admin.coupons.form.value') }}</span>
               </label>
               <input
-                v-model.number="form.discount_value"
+                v-model.number="values.discount_value"
                 type="number"
                 step="0.01"
                 min="0"
@@ -87,7 +88,7 @@
                 <span class="label-text font-semibold">{{ t('admin.coupons.form.minAmount') }}</span>
               </label>
               <input
-                v-model.number="form.minimum_amount"
+                v-model.number="values.minimum_amount"
                 type="number"
                 step="0.01"
                 min="0"
@@ -103,7 +104,7 @@
                 <span class="label-text font-semibold">{{ t('admin.coupons.form.maxDiscount') }}</span>
               </label>
               <input
-                v-model.number="form.maximum_discount"
+                v-model.number="values.maximum_discount"
                 type="number"
                 step="0.01"
                 min="0"
@@ -121,7 +122,7 @@
                 <span class="label-text font-semibold">{{ t('admin.coupons.form.usageLimit') }}</span>
               </label>
               <input
-                v-model.number="form.usage_limit"
+                v-model.number="values.usage_limit"
                 type="number"
                 min="0"
                 :placeholder="t('admin.coupons.form.usageLimitPlaceholder')"
@@ -136,7 +137,7 @@
                 <span class="label-text font-semibold">{{ t('admin.coupons.form.expiration') }}</span>
               </label>
               <input
-                v-model="form.expires_at"
+                v-model="values.expires_at"
                 type="datetime-local"
                 class="input input-bordered w-full"
                 :disabled="pending"
@@ -149,7 +150,7 @@
             <label class="label cursor-pointer">
               <span class="label-text font-semibold">{{ t('admin.coupons.form.active') }}</span>
               <input
-                v-model="form.active"
+                v-model="values.active"
                 type="checkbox"
                 class="checkbox checkbox-primary"
                 :disabled="pending"
@@ -181,6 +182,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 import type { Coupon } from '~/types'
+import { useForm, useField } from 'vee-validate'
 
 interface Props {
   coupon?: Partial<Coupon>
@@ -198,91 +200,74 @@ const emit = defineEmits<{
 
 const { apiFetch } = useApi()
 
-// Form state
-const form = reactive({
-  code: '',
-  discount_type: 1,
-  discount_value: null as number | null,
-  minimum_amount: null as number | null,
-  maximum_discount: null as number | null,
-  usage_limit: null as number | null,
-  expires_at: '',
-  active: true
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    code: '',
+    discount_type: 1,
+    discount_value: null as number | null,
+    minimum_amount: null as number | null,
+    maximum_discount: null as number | null,
+    usage_limit: null as number | null,
+    expires_at: '',
+    active: true
+  }
 })
 
-const errors = reactive({
-  code: ''
+const { value: code, errorMessage: codeError, handleBlur: codeBlur } = useField<string>('code', (v) => {
+  if (!v?.trim()) return t('admin.coupons.form.validation.codeRequired')
+  return true
 })
 
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Populate form when editing
-onMounted(() => {
-  if (props.coupon && props.isEditing) {
-    form.code = props.coupon.code || ''
-    form.discount_type = props.coupon.discount_type ?? 1
-    form.discount_value = props.coupon.discount_value ?? null
-    form.minimum_amount = props.coupon.minimum_amount ?? null
-    form.maximum_discount = props.coupon.maximum_discount ?? null
-    form.usage_limit = props.coupon.usage_limit ?? null
-    form.expires_at = props.coupon.expires_at ? formatDateTimeLocal(props.coupon.expires_at) : ''
-    form.active = props.coupon.active ?? true
-  }
-})
-
-// Watch for coupon prop changes (in case it loads async)
-watch(() => props.coupon, (newCoupon) => {
-  if (newCoupon && props.isEditing) {
-    form.code = newCoupon.code || ''
-    form.discount_type = newCoupon.discount_type ?? 1
-    form.discount_value = newCoupon.discount_value ?? null
-    form.minimum_amount = newCoupon.minimum_amount ?? null
-    form.maximum_discount = newCoupon.maximum_discount ?? null
-    form.usage_limit = newCoupon.usage_limit ?? null
-    form.expires_at = newCoupon.expires_at ? formatDateTimeLocal(newCoupon.expires_at) : ''
-    form.active = newCoupon.active ?? true
-  }
-}, { immediate: true })
-
-// Format datetime for input
 const formatDateTimeLocal = (dateString: string) => {
   const date = new Date(dateString)
   return date.toISOString().slice(0, 16)
 }
 
-// Validation
-const validate = () => {
-  let isValid = true
-  errors.code = ''
-
-  if (!form.code.trim()) {
-    errors.code = t('admin.coupons.form.validation.codeRequired')
-    isValid = false
+onMounted(() => {
+  if (props.coupon && props.isEditing) {
+    setFieldValue('code', props.coupon.code || '')
+    setFieldValue('discount_type', props.coupon.discount_type ?? 1)
+    setFieldValue('discount_value', props.coupon.discount_value ?? null)
+    setFieldValue('minimum_amount', props.coupon.minimum_amount ?? null)
+    setFieldValue('maximum_discount', props.coupon.maximum_discount ?? null)
+    setFieldValue('usage_limit', props.coupon.usage_limit ?? null)
+    setFieldValue('expires_at', props.coupon.expires_at ? formatDateTimeLocal(props.coupon.expires_at) : '')
+    setFieldValue('active', props.coupon.active ?? true)
   }
+})
 
-  return isValid
-}
+watch(() => props.coupon, (newCoupon) => {
+  if (newCoupon && props.isEditing) {
+    setFieldValue('code', newCoupon.code || '')
+    setFieldValue('discount_type', newCoupon.discount_type ?? 1)
+    setFieldValue('discount_value', newCoupon.discount_value ?? null)
+    setFieldValue('minimum_amount', newCoupon.minimum_amount ?? null)
+    setFieldValue('maximum_discount', newCoupon.maximum_discount ?? null)
+    setFieldValue('usage_limit', newCoupon.usage_limit ?? null)
+    setFieldValue('expires_at', newCoupon.expires_at ? formatDateTimeLocal(newCoupon.expires_at) : '')
+    setFieldValue('active', newCoupon.active ?? true)
+  }
+}, { immediate: true })
 
-// Submit
-const onSubmit = async () => {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async () => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
     const payload = {
-      code: form.code.trim().toUpperCase(),
-      discount_type: form.discount_type,
-      discount_value: form.discount_value,
-      minimum_amount: form.minimum_amount,
-      maximum_discount: form.maximum_discount,
-      usage_limit: form.usage_limit,
-      expires_at: form.expires_at || null,
-      active: form.active
+      code: values.code.trim().toUpperCase(),
+      discount_type: values.discount_type,
+      discount_value: values.discount_value,
+      minimum_amount: values.minimum_amount,
+      maximum_discount: values.maximum_discount,
+      usage_limit: values.usage_limit,
+      expires_at: values.expires_at || null,
+      active: values.active
     }
 
     const url = props.isEditing
@@ -306,7 +291,7 @@ const onSubmit = async () => {
   } finally {
     pending.value = false
   }
-}
+})
 </script>
 
 <style scoped></style>

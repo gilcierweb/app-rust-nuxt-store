@@ -37,16 +37,17 @@
               <span class="label-text font-semibold">{{ t('admin.shippings.form.name') }} *</span>
             </label>
             <input
-              v-model="form.name"
+              v-model="name"
               type="text"
               :placeholder="t('admin.shippings.form.namePlaceholder')"
               class="input input-bordered w-full"
-              :class="{ 'input-error': errors.name }"
+              :class="{ 'input-error': nameError }"
               required
               :disabled="pending"
+              @blur="nameBlur"
             />
-            <label v-if="errors.name" class="label">
-              <span class="label-text-alt text-error">{{ errors.name }}</span>
+            <label v-if="nameError" class="label">
+              <span class="label-text-alt text-error">{{ nameError }}</span>
             </label>
           </div>
 
@@ -56,16 +57,17 @@
               <span class="label-text font-semibold">{{ t('admin.shippings.form.code') }} *</span>
             </label>
             <input
-              v-model="form.code"
+              v-model="code"
               type="text"
               :placeholder="t('admin.shippings.form.codePlaceholder')"
               class="input input-bordered w-full"
-              :class="{ 'input-error': errors.code }"
+              :class="{ 'input-error': codeError }"
               required
               :disabled="pending"
+              @blur="codeBlur"
             />
-            <label v-if="errors.code" class="label">
-              <span class="label-text-alt text-error">{{ errors.code }}</span>
+            <label v-if="codeError" class="label">
+              <span class="label-text-alt text-error">{{ codeError }}</span>
             </label>
           </div>
 
@@ -76,18 +78,19 @@
                 <span class="label-text font-semibold">{{ t('admin.shippings.form.basePrice') }} *</span>
               </label>
               <input
-                v-model.number="form.base_price"
+                v-model.number="base_price"
                 type="number"
                 step="0.01"
                 min="0"
                 placeholder="0.00"
                 class="input input-bordered w-full"
-                :class="{ 'input-error': errors.base_price }"
+                :class="{ 'input-error': base_priceError }"
                 required
                 :disabled="pending"
+                @blur="base_priceBlur"
               />
-              <label v-if="errors.base_price" class="label">
-                <span class="label-text-alt text-error">{{ errors.base_price }}</span>
+              <label v-if="base_priceError" class="label">
+                <span class="label-text-alt text-error">{{ base_priceError }}</span>
               </label>
             </div>
 
@@ -97,7 +100,7 @@
                 <span class="label-text font-semibold">{{ t('admin.shippings.form.freeThreshold') }}</span>
               </label>
               <input
-                v-model.number="form.free_shipping_threshold"
+                v-model.number="free_shipping_threshold"
                 type="number"
                 step="0.01"
                 min="0"
@@ -116,7 +119,7 @@
             <label class="label cursor-pointer">
               <span class="label-text font-semibold">{{ t('admin.shippings.form.active') }}</span>
               <input
-                v-model="form.active"
+                v-model="active"
                 type="checkbox"
                 class="checkbox checkbox-primary"
                 :disabled="pending"
@@ -146,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-const { t } = useI18n()
+import { useForm, useField } from 'vee-validate'
 import type { ShippingMethod } from '~/types'
 
 interface Props {
@@ -163,89 +166,75 @@ const emit = defineEmits<{
   (e: 'cancel'): void
 }>()
 
+const { t } = useI18n()
 const { apiFetch } = useApi()
-
-// Form state
-const form = reactive({
-  name: '',
-  code: '',
-  base_price: 0,
-  free_shipping_threshold: null as number | null,
-  active: true
-})
-
-const errors = reactive({
-  name: '',
-  code: '',
-  base_price: ''
-})
 
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    name: '',
+    code: '',
+    base_price: 0,
+    free_shipping_threshold: null as number | null,
+    active: true
+  }
+})
+
+const { value: name, errorMessage: nameError, handleBlur: nameBlur } = useField<string>('name', (v) => {
+  if (!v || !v.trim()) return t('admin.shippings.form.validation.nameRequired')
+  return true
+})
+
+const { value: code, errorMessage: codeError, handleBlur: codeBlur } = useField<string>('code', (v) => {
+  if (!v || !v.trim()) return t('admin.shippings.form.validation.codeRequired')
+  return true
+})
+
+const { value: base_price, errorMessage: base_priceError, handleBlur: base_priceBlur } = useField<number>('base_price', (v) => {
+  if (v < 0) return t('admin.shippings.form.validation.priceNegative')
+  return true
+})
+
+const { value: free_shipping_threshold } = useField<number | null>('free_shipping_threshold')
+const { value: active } = useField<boolean>('active')
+
 // Populate form when editing
 onMounted(() => {
   if (props.shipping && props.isEditing) {
-    form.name = props.shipping.name || ''
-    form.code = props.shipping.code || ''
-    form.base_price = props.shipping.base_price ?? 0
-    form.free_shipping_threshold = props.shipping.free_shipping_threshold ?? null
-    form.active = props.shipping.active ?? true
+    setFieldValue('name', props.shipping.name || '')
+    setFieldValue('code', props.shipping.code || '')
+    setFieldValue('base_price', props.shipping.base_price ?? 0)
+    setFieldValue('free_shipping_threshold', props.shipping.free_shipping_threshold ?? null)
+    setFieldValue('active', props.shipping.active ?? true)
   }
 })
 
 // Watch for shipping prop changes (in case it loads async)
 watch(() => props.shipping, (newShipping) => {
   if (newShipping && props.isEditing) {
-    form.name = newShipping.name || ''
-    form.code = newShipping.code || ''
-    form.base_price = newShipping.base_price ?? 0
-    form.free_shipping_threshold = newShipping.free_shipping_threshold ?? null
-    form.active = newShipping.active ?? true
+    setFieldValue('name', newShipping.name || '')
+    setFieldValue('code', newShipping.code || '')
+    setFieldValue('base_price', newShipping.base_price ?? 0)
+    setFieldValue('free_shipping_threshold', newShipping.free_shipping_threshold ?? null)
+    setFieldValue('active', newShipping.active ?? true)
   }
 }, { immediate: true })
 
-// Validation
-const validate = () => {
-  let isValid = true
-  errors.name = ''
-  errors.code = ''
-  errors.base_price = ''
-
-  if (!form.name.trim()) {
-    errors.name = t('admin.shippings.form.validation.nameRequired')
-    isValid = false
-  }
-
-  if (!form.code.trim()) {
-    errors.code = t('admin.shippings.form.validation.codeRequired')
-    isValid = false
-  }
-
-  if (form.base_price < 0) {
-    errors.base_price = t('admin.shippings.form.validation.priceNegative')
-    isValid = false
-  }
-
-  return isValid
-}
-
-// Submit
-const onSubmit = async () => {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async (formValues) => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
     const payload = {
-      name: form.name.trim(),
-      code: form.code.trim().toLowerCase(),
-      base_price: form.base_price,
-      free_shipping_threshold: form.free_shipping_threshold,
-      active: form.active
+      name: formValues.name.trim(),
+      code: formValues.code.trim().toLowerCase(),
+      base_price: formValues.base_price,
+      free_shipping_threshold: formValues.free_shipping_threshold,
+      active: formValues.active
     }
 
     const url = props.isEditing
@@ -269,7 +258,7 @@ const onSubmit = async () => {
   } finally {
     pending.value = false
   }
-}
+})
 </script>
 
 <style scoped></style>

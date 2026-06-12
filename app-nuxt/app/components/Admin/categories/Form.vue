@@ -37,16 +37,17 @@
                 <span class="label-text font-semibold">{{ t('admin.categories.form.name') }} *</span>
             </label>
             <input
-              v-model="form.name"
+              v-model="name"
+              @blur="nameBlur"
               type="text"
               :placeholder="t('admin.categories.form.namePlaceholder')"
               class="input input-bordered w-full"
-              :class="{ 'input-error': errors.name }"
+              :class="{ 'input-error': nameError }"
               required
               :disabled="pending"
             />
-            <label v-if="errors.name" class="label">
-              <span class="label-text-alt text-error">{{ errors.name }}</span>
+            <label v-if="nameError" class="label">
+              <span class="label-text-alt text-error">{{ nameError }}</span>
             </label>
           </div>
 
@@ -56,7 +57,7 @@
                 <span class="label-text font-semibold">{{ t('admin.categories.form.slug') }}</span>
             </label>
             <input
-              v-model="form.slug"
+              v-model="values.slug"
               type="text"
               :placeholder="t('admin.categories.form.slugPlaceholder')"
               class="input input-bordered w-full"
@@ -73,7 +74,7 @@
                 <span class="label-text font-semibold">{{ t('admin.categories.form.description') }}</span>
             </label>
             <textarea
-              v-model="form.description"
+              v-model="values.description"
               :placeholder="t('admin.categories.form.descriptionPlaceholder')"
               class="textarea textarea-bordered w-full"
               rows="3"
@@ -86,7 +87,7 @@
             <label class="label">
                 <span class="label-text font-semibold">{{ t('admin.categories.form.parentCategory') }}</span>
             </label>
-            <select v-model="form.parent_id" class="select select-bordered w-full" :disabled="pending">
+            <select v-model="values.parent_id" class="select select-bordered w-full" :disabled="pending">
               <option :value="null">{{ t('admin.categories.form.parentCategoryRoot') }}</option>
               <option
                 v-for="cat in availableParentCategories"
@@ -105,7 +106,7 @@
                 <span class="label-text font-semibold">{{ t('admin.categories.form.position') }}</span>
               </label>
               <input
-                v-model.number="form.position"
+                v-model.number="values.position"
                 type="number"
                 min="0"
                 placeholder="0"
@@ -119,7 +120,7 @@
               <label class="label cursor-pointer">
                 <span class="label-text font-semibold">{{ t('admin.categories.form.active') }}</span>
                 <input
-                  v-model="form.active"
+                  v-model="values.active"
                   type="checkbox"
                   class="checkbox checkbox-primary"
                   :disabled="pending"
@@ -151,6 +152,7 @@
 
 <script setup lang="ts">
 import type { Category } from '~/types'
+import { useForm, useField } from 'vee-validate'
 
 const { t } = useI18n()
 
@@ -170,38 +172,37 @@ const emit = defineEmits<{
 
 const { apiFetch, useApiLazyFetch } = useApi()
 
-// Form state
-const form = reactive({
-  name: '',
-  slug: '',
-  description: '',
-  parent_id: null as number | null,
-  position: 0,
-  active: true
+const { handleSubmit, values, setFieldValue } = useForm({
+  initialValues: {
+    name: '',
+    slug: '',
+    description: '',
+    parent_id: null as number | null,
+    position: 0,
+    active: true
+  }
 })
 
-const errors = reactive({
-  name: ''
+const { value: name, errorMessage: nameError, handleBlur: nameBlur } = useField<string>('name', (v) => {
+  if (!v?.trim()) return t('admin.categories.form.validation.nameRequired')
+  return true
 })
 
 const pending = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
 
-// Fetch parent categories
 const { data: parentCategories } = useApiLazyFetch<Category[]>(
   '/api/admin/categories',
   { key: 'admin-categories-list' }
 )
 
-// Filter out current category from parent options (can't be parent of itself)
 const availableParentCategories = computed(() => {
   if (!parentCategories.value) return []
   if (!props.isEditing || !props.category?.id) return parentCategories.value
   return parentCategories.value.filter(cat => cat.id !== props.category?.id)
 })
 
-// Generate slug from name
 const generateSlug = (text: string) => {
   return text
     .toLowerCase()
@@ -211,67 +212,47 @@ const generateSlug = (text: string) => {
     .replace(/(^-|-$)/g, '')
 }
 
-// Auto-generate slug when name changes
-watch(() => form.name, (newName) => {
-  // Only auto-generate if slug is empty or matches the previous auto-generated value
-  if (!form.slug || form.slug === generateSlug(props.category?.name || '')) {
-    form.slug = generateSlug(newName)
+watch(name, (newName) => {
+  if (!values.slug || values.slug === generateSlug(props.category?.name || '')) {
+    setFieldValue('slug', generateSlug(newName))
   }
 })
 
-// Populate form when editing
 onMounted(() => {
   if (props.category && props.isEditing) {
-    form.name = props.category.name || ''
-    form.slug = props.category.slug || ''
-    form.description = props.category.description || ''
-    form.parent_id = props.category.parent_id || null
-    form.position = props.category.position || 0
-    form.active = props.category.active ?? true
+    setFieldValue('name', props.category.name || '')
+    setFieldValue('slug', props.category.slug || '')
+    setFieldValue('description', props.category.description || '')
+    setFieldValue('parent_id', props.category.parent_id || null)
+    setFieldValue('position', props.category.position || 0)
+    setFieldValue('active', props.category.active ?? true)
   }
 })
 
-// Watch for category prop changes (in case it loads async)
 watch(() => props.category, (newCategory) => {
   if (newCategory && props.isEditing) {
-    form.name = newCategory.name || ''
-    form.slug = newCategory.slug || ''
-    form.description = newCategory.description || ''
-    form.parent_id = newCategory.parent_id || null
-    form.position = newCategory.position || 0
-    form.active = newCategory.active ?? true
+    setFieldValue('name', newCategory.name || '')
+    setFieldValue('slug', newCategory.slug || '')
+    setFieldValue('description', newCategory.description || '')
+    setFieldValue('parent_id', newCategory.parent_id || null)
+    setFieldValue('position', newCategory.position || 0)
+    setFieldValue('active', newCategory.active ?? true)
   }
 }, { immediate: true })
 
-// Validation
-const validate = () => {
-  let isValid = true
-  errors.name = ''
-
-  if (!form.name.trim()) {
-    errors.name = t('admin.categories.form.validation.nameRequired')
-    isValid = false
-  }
-
-  return isValid
-}
-
-// Submit
-const onSubmit = async () => {
-  if (!validate()) return
-
+const onSubmit = handleSubmit(async () => {
   pending.value = true
   errorMessage.value = ''
   successMessage.value = ''
 
   try {
     const payload = {
-      name: form.name.trim(),
-      slug: form.slug.trim() || generateSlug(form.name),
-      description: form.description.trim() || null,
-      parent_id: form.parent_id,
-      position: form.position,
-      active: form.active
+      name: values.name.trim(),
+      slug: values.slug.trim() || generateSlug(values.name),
+      description: values.description.trim() || null,
+      parent_id: values.parent_id,
+      position: values.position,
+      active: values.active
     }
 
     const url = props.isEditing
@@ -295,7 +276,7 @@ const onSubmit = async () => {
   } finally {
     pending.value = false
   }
-}
+})
 </script>
 
 <style scoped></style>
