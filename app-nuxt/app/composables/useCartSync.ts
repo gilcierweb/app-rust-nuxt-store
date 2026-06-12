@@ -46,6 +46,7 @@ export function useCartSync() {
       const available = qty - reserved
       return { available: available > 0, maxQuantity: Math.max(0, available) }
     } catch {
+      console.warn('[cart] checkStock failed, assuming available')
       return { available: true, maxQuantity: 999 }
     }
   }
@@ -68,8 +69,8 @@ export function useCartSync() {
         },
       })
       cartStore.setItems(data.items.map(mapCartApiItem))
-    } catch {
-      // Local state remains; API sync failure is non-blocking
+    } catch (err) {
+      console.warn('[cart] addItemSync failed:', err)
     } finally {
       syncing.value = false
     }
@@ -88,8 +89,8 @@ export function useCartSync() {
       await apiFetch<CartApiResponse>(`/api/carts/remove_item/${item.id}`, {
         method: 'DELETE',
       })
-    } catch {
-      // non-blocking
+    } catch (err) {
+      console.warn('[cart] removeItemSync failed:', err)
     } finally {
       syncing.value = false
     }
@@ -112,8 +113,8 @@ export function useCartSync() {
           quantity,
         },
       })
-    } catch {
-      // non-blocking
+    } catch (err) {
+      console.warn('[cart] updateQuantitySync failed:', err)
     } finally {
       syncing.value = false
     }
@@ -127,8 +128,8 @@ export function useCartSync() {
     syncing.value = true
     try {
       await apiFetch('/api/carts/clear', { method: 'DELETE' })
-    } catch {
-      // non-blocking
+    } catch (err) {
+      console.warn('[cart] clearCartSync failed:', err)
     } finally {
       syncing.value = false
     }
@@ -175,8 +176,8 @@ export function useCartSync() {
       }
 
       cartStore.setItems(serverData.items.map(mapCartApiItem))
-    } catch {
-      // If merge fails, keep local items
+    } catch (err) {
+      console.warn('[cart] mergeCartOnLogin failed:', err)
     } finally {
       syncing.value = false
     }

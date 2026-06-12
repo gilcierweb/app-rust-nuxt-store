@@ -26,6 +26,7 @@ export function useWishlist() {
         wishlist.value = []
         return
       }
+      console.warn('[wishlist] fetchWishlist failed:', err)
       wishlist.value = []
     } finally {
       loading.value = false
@@ -45,7 +46,9 @@ export function useWishlist() {
         try {
           await apiFetch(`/api/account/wishlist/remove/${existing.id}`, { method: 'DELETE' })
           wishlist.value = wishlist.value.filter(w => w.id !== existing.id)
-        } catch { /* ignore */ }
+        } catch (err) {
+          console.warn('[wishlist] remove failed:', err)
+        }
       } else {
         try {
           const item = await apiFetch<WishlistItem>('/api/account/wishlist/add', {
@@ -53,7 +56,9 @@ export function useWishlist() {
             body: { product_id: productId }
           })
           wishlist.value.push(item)
-        } catch { /* ignore */ }
+        } catch (err) {
+          console.warn('[wishlist] add failed:', err)
+        }
       }
     } finally {
       loading.value = false
