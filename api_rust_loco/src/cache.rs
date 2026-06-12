@@ -5,6 +5,7 @@ use moka::sync::Cache;
 use serde_json::Value;
 
 use crate::controllers::dashboard::DashboardResponse;
+use crate::controllers::post::PostListItem;
 use crate::models::_entities::{categories, posts, profiles};
 use crate::models::products::ProductWithCategory;
 use crate::views::auth::CurrentResponse;
@@ -12,7 +13,7 @@ use crate::views::auth::CurrentResponse;
 static CURRENT_CACHE: OnceLock<Cache<String, Arc<CurrentResponse>>> = OnceLock::new();
 static PRODUCTS_CACHE: OnceLock<Cache<String, Arc<Vec<ProductWithCategory>>>> = OnceLock::new();
 static PRODUCT_DETAIL_CACHE: OnceLock<Cache<String, Arc<ProductWithCategory>>> = OnceLock::new();
-static POSTS_CACHE: OnceLock<Cache<String, Arc<Vec<posts::Model>>>> = OnceLock::new();
+static POSTS_CACHE: OnceLock<Cache<String, Arc<Vec<PostListItem>>>> = OnceLock::new();
 static POST_DETAIL_CACHE: OnceLock<Cache<String, Arc<posts::Model>>> = OnceLock::new();
 static PROFILES_CACHE: OnceLock<Cache<String, Arc<Vec<profiles::Model>>>> = OnceLock::new();
 static PROFILE_DETAIL_CACHE: OnceLock<Cache<String, Arc<profiles::Model>>> = OnceLock::new();
@@ -56,7 +57,7 @@ pub fn product_detail_cache() -> &'static Cache<String, Arc<ProductWithCategory>
     })
 }
 
-pub fn posts_cache() -> &'static Cache<String, Arc<Vec<posts::Model>>> {
+pub fn posts_cache() -> &'static Cache<String, Arc<Vec<PostListItem>>> {
     POSTS_CACHE.get_or_init(|| {
         Cache::builder()
             .time_to_live(Duration::from_secs(30))

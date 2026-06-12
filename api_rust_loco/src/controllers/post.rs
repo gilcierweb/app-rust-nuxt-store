@@ -4,7 +4,7 @@
 use axum::debug_handler;
 use axum::extract::Query;
 use loco_rs::prelude::*;
-use sea_orm::{PaginatorTrait, QueryOrder};
+use sea_orm::{EntityTrait, FromQueryResult, Statement};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -35,6 +35,16 @@ impl Params {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, FromQueryResult)]
+pub struct PostListItem {
+    pub id: i32,
+    pub title: Option<String>,
+    pub status: Option<i32>,
+    pub user_id: i32,
+    pub created_at: DateTimeWithTimeZone,
+    pub updated_at: DateTimeWithTimeZone,
+}
+
 async fn load_item(ctx: &AppContext, id: i32) -> Result<Model> {
     let item = Entity::find_by_id(id).one(&ctx.db).await?;
     item.ok_or_else(|| Error::NotFound)
@@ -54,11 +64,22 @@ pub async fn list(
         return format::json(value);
     }
 
-    let items = Entity::find()
-        .order_by_desc(crate::models::_entities::posts::Column::CreatedAt)
-        .paginate(&ctx.db, pagination.page_size())
-        .fetch_page(pagination.page_index())
-        .await?;
+    let backend = ctx.db.get_database_backend();
+    let items = PostListItem::find_by_statement(Statement::from_sql_and_values(
+        backend,
+        r#"
+        SELECT id, title, status, user_id, created_at, updated_at
+        FROM posts
+        ORDER BY created_at DESC
+        LIMIT $1 OFFSET $2
+        "#,
+        [
+            (pagination.page_size() as i64).into(),
+            pagination.offset().into(),
+        ],
+    ))
+    .all(&ctx.db)
+    .await?;
 
     let items = Arc::new(items);
     posts_cache().insert(cache_key, Arc::clone(&items));
