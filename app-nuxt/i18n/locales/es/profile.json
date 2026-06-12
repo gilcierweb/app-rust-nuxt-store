@@ -162,6 +162,26 @@
       "successCreated": "Direccion creada correctamente!",
       "successUpdated": "Direccion actualizada correctamente!",
       "error": "Error al guardar direccion."
+    },
+    "myPayments": "Mis Pagos",
+    "paymentsHistory": "Historial de pagos de tu cuenta.",
+    "loadingPayments": "Cargando pagos...",
+    "errorLoadingPayments": "Error al cargar pagos:",
+    "noPaymentsFound": "No se encontraron pagos",
+    "noPaymentsMessage": "Cuando realices una compra, tus pagos apareceran aqui.",
+    "viewPayment": "Ver pago",
+    "amount": "Monto",
+    "paymentStatus": {
+      "pending": "Pendiente",
+      "authorized": "Autorizado",
+      "captured": "Capturado",
+      "settled": "Liquidado",
+      "failed": "Fallido",
+      "voided": "Anulado",
+      "refunded": "Reembolsado",
+      "partiallyRefunded": "Parcialmente Reembolsado",
+      "cancelled": "Cancelado",
+      "unknown": "Desconocido"
     }
   },
   "profile": {

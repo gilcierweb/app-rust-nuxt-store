@@ -162,6 +162,26 @@
       "successCreated": "Endereco criado com sucesso!",
       "successUpdated": "Endereco atualizado com sucesso!",
       "error": "Erro ao salvar endereco."
+    },
+    "myPayments": "Meus Pagamentos",
+    "paymentsHistory": "Historico de pagamentos da sua conta.",
+    "loadingPayments": "Carregando pagamentos...",
+    "errorLoadingPayments": "Erro ao carregar pagamentos:",
+    "noPaymentsFound": "Nenhum pagamento encontrado",
+    "noPaymentsMessage": "Quando voce fizer uma compra, seus pagamentos aparecem aqui.",
+    "viewPayment": "Ver pagamento",
+    "amount": "Valor",
+    "paymentStatus": {
+      "pending": "Pendente",
+      "authorized": "Autorizado",
+      "captured": "Capturado",
+      "settled": "Liquidado",
+      "failed": "Falhou",
+      "voided": "Anulado",
+      "refunded": "Reembolsado",
+      "partiallyRefunded": "Parcialmente Reembolsado",
+      "cancelled": "Cancelado",
+      "unknown": "Desconhecido"
     }
   },
   "profile": {

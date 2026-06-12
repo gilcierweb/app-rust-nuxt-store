@@ -162,6 +162,26 @@
       "successCreated": "Address created successfully!",
       "successUpdated": "Address updated successfully!",
       "error": "Error saving address."
+    },
+    "myPayments": "My Payments",
+    "paymentsHistory": "Payment history of your account.",
+    "loadingPayments": "Loading payments...",
+    "errorLoadingPayments": "Error loading payments:",
+    "noPaymentsFound": "No payments found",
+    "noPaymentsMessage": "When you make a purchase, your payments appear here.",
+    "viewPayment": "View payment",
+    "amount": "Amount",
+    "paymentStatus": {
+      "pending": "Pending",
+      "authorized": "Authorized",
+      "captured": "Captured",
+      "settled": "Settled",
+      "failed": "Failed",
+      "voided": "Voided",
+      "refunded": "Refunded",
+      "partiallyRefunded": "Partially Refunded",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
     }
   },
   "profile": {

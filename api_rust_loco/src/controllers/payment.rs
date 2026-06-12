@@ -5,6 +5,7 @@ use axum::debug_handler;
 use loco_rs::prelude::*;
 use rust_decimal::Decimal;
 use sea_orm::ActiveValue::Set;
+use sea_orm::QueryOrder;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -17,6 +18,7 @@ use crate::payment_gateways::{
     create_payment_attempt, latest_payment_session_json, order_payment_status,
     CreatePaymentAttemptInput,
 };
+use crate::utils::auth::current_user_id;
 
 #[derive(Debug, Deserialize)]
 pub struct ProcessPaymentParams {
@@ -204,8 +206,63 @@ fn routes_with_prefix(prefix: &str) -> Routes {
 
 pub fn account_routes() -> Routes {
     routes_with_prefix("api/account/payments/")
+        .add("/", get(account_list))
         .add("{id}", get(account_get_one))
         .add("{id}/receipt", get(account_receipt))
+}
+
+#[derive(Debug, Serialize)]
+pub struct AccountPaymentListItem {
+    pub id: i32,
+    pub order_id: i32,
+    pub order_number: Option<String>,
+    pub amount: Option<Decimal>,
+    pub currency: Option<String>,
+    pub status: Option<i32>,
+    pub transaction_id: Option<String>,
+    pub payment_method_name: Option<String>,
+    pub processed_at: Option<String>,
+    pub created_at: String,
+}
+
+#[debug_handler]
+pub async fn account_list(
+    auth: CookieJWT,
+    State(ctx): State<AppContext>,
+) -> Result<Response> {
+    let uid = current_user_id(&ctx, &auth).await?;
+
+    let payments = Entity::find()
+        .find_also_related(orders::Entity)
+        .filter(orders::Column::UserId.eq(uid))
+        .order_by_desc(payments::Column::CreatedAt)
+        .all(&ctx.db)
+        .await?;
+
+    let mut result: Vec<AccountPaymentListItem> = Vec::with_capacity(payments.len());
+    for (payment, order) in payments {
+        let payment_method_name = payment_methods::Entity::find_by_id(payment.payment_method_id)
+            .one(&ctx.db)
+            .await
+            .ok()
+            .flatten()
+            .and_then(|pm| pm.name);
+
+        result.push(AccountPaymentListItem {
+            id: payment.id,
+            order_id: payment.order_id,
+            order_number: order.and_then(|o| o.order_number),
+            amount: payment.amount,
+            currency: payment.currency,
+            status: payment.status,
+            transaction_id: payment.transaction_id,
+            payment_method_name,
+            processed_at: payment.processed_at.map(|dt| dt.and_utc().to_rfc3339()),
+            created_at: payment.created_at.to_rfc3339(),
+        });
+    }
+
+    format::json(result)
 }
 
 #[derive(Debug, Serialize)]
