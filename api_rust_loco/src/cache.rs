@@ -41,7 +41,7 @@ pub fn current_cache() -> &'static Cache<String, Arc<CurrentResponse>> {
 pub fn products_cache() -> &'static Cache<String, Arc<Vec<ProductWithCategory>>> {
     PRODUCTS_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(60))
+            .time_to_live(Duration::from_secs(300))
             .max_capacity(64)
             .build()
     })
@@ -59,7 +59,7 @@ pub fn product_detail_cache() -> &'static Cache<String, Arc<ProductWithCategory>
 pub fn posts_cache() -> &'static Cache<String, Arc<Vec<PostListItem>>> {
     POSTS_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(30))
+            .time_to_live(Duration::from_secs(300))
             .max_capacity(64)
             .build()
     })
@@ -95,7 +95,7 @@ pub fn profile_detail_cache() -> &'static Cache<String, Arc<profiles::Model>> {
 pub fn categories_cache() -> &'static Cache<&'static str, Arc<Vec<categories::Model>>> {
     CATEGORIES_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(60))
+            .time_to_live(Duration::from_secs(300))
             .max_capacity(32)
             .build()
     })
@@ -104,7 +104,7 @@ pub fn categories_cache() -> &'static Cache<&'static str, Arc<Vec<categories::Mo
 pub fn dashboard_cache() -> &'static Cache<&'static str, Arc<DashboardResponse>> {
     DASHBOARD_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(60))
+            .time_to_live(Duration::from_secs(300))
             .max_capacity(16)
             .build()
     })
@@ -125,7 +125,7 @@ pub fn blacklist_cache() -> &'static Cache<String, bool> {
 pub fn json_cache() -> &'static Cache<String, Arc<Value>> {
     JSON_CACHE.get_or_init(|| {
         Cache::builder()
-            .time_to_live(Duration::from_secs(30))
+            .time_to_live(Duration::from_secs(300))
             .max_capacity(512)
             .build()
     })

@@ -12,7 +12,7 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::cache::{invalidate_json_cache, json_cache};
+use crate::cache::{invalidate_json_cache, invalidate_json_cache_with_prefix, json_cache};
 use crate::models::_entities::banner_events::{
     ActiveModel as BannerEventActiveModel, Column as BannerEventColumn, Entity as BannerEventEntity,
 };
@@ -261,6 +261,8 @@ pub async fn record_event(
     .insert(&ctx.db)
     .await?;
 
+    invalidate_json_cache_with_prefix("banners:events:");
+
     format::json(item)
 }
 
@@ -347,13 +349,21 @@ pub async fn list_banners(
     State(ctx): State<AppContext>,
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
-    format::json(
-        BannerEntity::find()
-            .order_by_desc(BannerColumn::CreatedAt)
-            .paginate(&ctx.db, pagination.page_size())
-            .fetch_page(pagination.page_index())
-            .await?,
-    )
+    let cache_key = format!("banners:list:p{}:s{}", pagination.page_index(), pagination.page_size());
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
+    let items = BannerEntity::find()
+        .order_by_desc(BannerColumn::CreatedAt)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+
+    format::json(items)
 }
 
 #[debug_handler]
@@ -396,6 +406,9 @@ pub async fn add_banner(
     .insert(&ctx.db)
     .await?;
 
+    invalidate_json_cache_with_prefix("banners:list:");
+    invalidate_json_cache_with_prefix("banners:events:");
+
     format::json(item)
 }
 
@@ -412,12 +425,16 @@ pub async fn update_banner_handler(
 ) -> Result<Response> {
     let mut item = load_banner(&ctx, id).await?.into_active_model();
     update_banner(&mut item, &params)?;
-    format::json(item.update(&ctx.db).await?)
+    let result = item.update(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("banners:list:");
+    format::json(result)
 }
 
 #[debug_handler]
 pub async fn remove_banner(Path(id): Path<i64>, State(ctx): State<AppContext>) -> Result<Response> {
     load_banner(&ctx, id).await?.delete(&ctx.db).await?;
+    invalidate_json_cache_with_prefix("banners:list:");
+    invalidate_json_cache_with_prefix("banners:events:");
     format::empty()
 }
 
@@ -426,13 +443,21 @@ pub async fn list_events(
     State(ctx): State<AppContext>,
     Query(pagination): Query<PaginationParams>,
 ) -> Result<Response> {
-    format::json(
-        BannerEventEntity::find()
-            .order_by_desc(BannerEventColumn::CreatedAt)
-            .paginate(&ctx.db, pagination.page_size())
-            .fetch_page(pagination.page_index())
-            .await?,
-    )
+    let cache_key = format!("banners:events:p{}:s{}", pagination.page_index(), pagination.page_size());
+    if let Some(cached) = json_cache().get(&cache_key) {
+        return format::json(cached);
+    }
+
+    let items = BannerEventEntity::find()
+        .order_by_desc(BannerEventColumn::CreatedAt)
+        .paginate(&ctx.db, pagination.page_size())
+        .fetch_page(pagination.page_index())
+        .await?;
+
+    let value = std::sync::Arc::new(serde_json::to_value(&items).unwrap_or_default());
+    json_cache().insert(cache_key, value);
+
+    format::json(items)
 }
 
 #[debug_handler]
