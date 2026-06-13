@@ -53,7 +53,8 @@
   },
   "order": {
     "invalid_status": "Invalid status value",
-    "invalid_transition": "Cannot transition from %{from} to %{to}"
+    "invalid_transition": "Cannot transition from %{from} to %{to}",
+    "no_ids_provided": "No IDs provided"
   },
   "user": {
     "invalid_role": "Invalid user role",

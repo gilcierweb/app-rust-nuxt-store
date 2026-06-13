@@ -806,7 +806,7 @@ pub async fn bulk_export(
     Json(params): Json<crate::utils::bulk_export::BulkExportParams>,
 ) -> Result<Response> {
     if params.ids.is_empty() {
-        return Err(Error::BadRequest("No IDs provided".into()));
+        return Err(Error::BadRequest(t!("order.no_ids_provided").into()));
     }
 
     let (zip_bytes, filename) = crate::services::bulk_pdf::build_orders_zip(&ctx.db, &params.ids)

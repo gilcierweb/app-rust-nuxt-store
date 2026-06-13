@@ -53,7 +53,8 @@
   },
   "order": {
     "invalid_status": "Valor de status inválido",
-    "invalid_transition": "Não é possível transitar de %{from} para %{to}"
+    "invalid_transition": "Não é possível transitar de %{from} para %{to}",
+    "no_ids_provided": "Nenhum ID fornecido"
   },
   "user": {
     "invalid_role": "Função de usuário inválida",
