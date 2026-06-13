@@ -92,19 +92,3 @@ impl fmt::Display for Money {
         write!(f, "{} {:?}", decimal, self.currency)
     }
 }
-
-/*
-fn main() {
-    let price = Money::new(1990, Currency::BRL); // R$ 19,90
-    let tip = Money::new(500, Currency::BRL);    // R$ 5,00
-
-    let total = price.checked_add(tip).unwrap();
-
-    println!("Total: {}", total); // 24.90 BRL
-
-    // comissão de 20%
-    let fee = total.apply_basis_points(2000);
-
-    println!("Fee: {}", fee);
-}
-*/

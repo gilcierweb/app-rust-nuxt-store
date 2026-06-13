@@ -33,14 +33,3 @@ fn is_basic_valid(email: &str) -> bool {
 fn is_invisible(c: char) -> bool {
     matches!(c, '\u{200B}' | '\u{200C}' | '\u{200D}' | '\u{FEFF}')
 }
-
-/*
-
-fn main() {
-    let input = "  User+Test@Example.COM ";
-
-    match normalize_email(input) {
-        Some(email) => println!("Normalizado: {}", email),
-        None => println!("Email inválido"),
-    }
-}*/
