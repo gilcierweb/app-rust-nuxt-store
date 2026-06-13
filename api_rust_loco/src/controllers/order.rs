@@ -20,7 +20,7 @@ use crate::models::_entities::product_variants;
 use crate::models::_entities::shipments;
 use crate::models::_entities::stock_movements;
 use crate::models::_entities::stock_reservations;
-use crate::models::order_status::OrderStatus;
+use crate::models::order_status::{FulfillmentStatus, OrderStatus, PaymentStatus};
 use crate::models::orders::{CreateOrderParams, OrderWithItems, ShipmentJson, UpdateStatusParams};
 use crate::models::users;
 use crate::payment_gateways::{
@@ -140,8 +140,8 @@ pub async fn checkout(
         shipping_amount: Set(params.shipping_amount),
         discount_amount: Set(params.discount_amount),
         currency: Set(Some("BRL".to_string())),
-        payment_status: Set(Some(1)),     // unpaid
-        fulfillment_status: Set(Some(1)), // unfulfilled
+        payment_status: Set(Some(PaymentStatus::Unpaid.to_i32())),
+        fulfillment_status: Set(Some(FulfillmentStatus::Unfulfilled.to_i32())),
         notes: Set(params.notes),
         user_id: Set(current_user_id),
         created_at: Set(now),

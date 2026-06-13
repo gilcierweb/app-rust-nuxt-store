@@ -28,7 +28,6 @@ const PAGE_HEIGHT_MM: f32 = 297.0;
 const MARGIN_LEFT_MM: f32 = 10.0;
 const MARGIN_RIGHT_MM: f32 = 10.0;
 
-// Default tax rates (configurable via admin_settings in the future)
 const DEFAULT_ICMS_RATE: f64 = 0.18;
 const DEFAULT_PIS_RATE: f64 = 0.0165;
 const DEFAULT_COFINS_RATE: f64 = 0.076;
@@ -148,6 +147,13 @@ async fn load_setting(
         .unwrap_or_else(|| default.to_string())
 }
 
+async fn load_tax_rate(db: &impl ConnectionTrait, key: &str, default: f64) -> Decimal {
+    let raw = load_setting(db, "nfe", key, &default.to_string()).await;
+    raw.parse::<f64>()
+        .map(|v| Decimal::try_from(v).unwrap_or(Decimal::try_from(default).unwrap()))
+        .unwrap_or(Decimal::try_from(default).unwrap())
+}
+
 pub async fn load_nfe_data(db: &impl ConnectionTrait, order_id: i32) -> Result<NfeData> {
     let order = orders::Entity::find_by_id(order_id)
         .one(db)
@@ -225,9 +231,9 @@ pub async fn load_nfe_data(db: &impl ConnectionTrait, order_id: i32) -> Result<N
     let category_by_id: std::collections::HashMap<i32, categories::Model> =
         categories_list.into_iter().map(|c| (c.id, c)).collect();
 
-    let icms_rate: Decimal = Decimal::try_from(DEFAULT_ICMS_RATE).unwrap();
-    let pis_rate: Decimal = Decimal::try_from(DEFAULT_PIS_RATE).unwrap();
-    let cofins_rate: Decimal = Decimal::try_from(DEFAULT_COFINS_RATE).unwrap();
+    let icms_rate = load_tax_rate(db, "icms_rate", DEFAULT_ICMS_RATE).await;
+    let pis_rate = load_tax_rate(db, "pis_rate", DEFAULT_PIS_RATE).await;
+    let cofins_rate = load_tax_rate(db, "cofins_rate", DEFAULT_COFINS_RATE).await;
 
     let mut items = Vec::new();
     let mut totais = NfeTotais {
