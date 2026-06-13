@@ -169,7 +169,7 @@ pub async fn bulk_export(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(zip_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
 
 #[debug_handler]
@@ -203,5 +203,5 @@ pub async fn receipt(Path(refund_id): Path<i32>, State(ctx): State<AppContext>) 
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(pdf_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
