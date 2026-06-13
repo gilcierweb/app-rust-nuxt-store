@@ -1,7 +1,6 @@
 use bigdecimal::{BigDecimal, ToPrimitive};
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::ops::{Add, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Currency {
@@ -57,39 +56,33 @@ impl Money {
     }
 
     /// Soma segura (mesma moeda)
-    pub fn checked_add(self, other: Self) -> Self {
-        assert_eq!(self.currency, other.currency, "Moedas diferentes");
+    pub fn checked_add(self, other: Self) -> Result<Self, String> {
+        if self.currency != other.currency {
+            return Err(format!(
+                "Cannot add different currencies: {:?} and {:?}",
+                self.currency, other.currency
+            ));
+        }
 
-        Self {
+        Ok(Self {
             amount_minor: self.amount_minor + other.amount_minor,
             currency: self.currency,
-        }
+        })
     }
 
     /// Subtração segura
-    pub fn checked_sub(self, other: Self) -> Self {
-        assert_eq!(self.currency, other.currency, "Moedas diferentes");
+    pub fn checked_sub(self, other: Self) -> Result<Self, String> {
+        if self.currency != other.currency {
+            return Err(format!(
+                "Cannot subtract different currencies: {:?} and {:?}",
+                self.currency, other.currency
+            ));
+        }
 
-        Self {
+        Ok(Self {
             amount_minor: self.amount_minor - other.amount_minor,
             currency: self.currency,
-        }
-    }
-}
-
-impl Add for Money {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        self.checked_add(rhs)
-    }
-}
-
-impl Sub for Money {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        self.checked_sub(rhs)
+        })
     }
 }
 
@@ -105,7 +98,7 @@ fn main() {
     let price = Money::new(1990, Currency::BRL); // R$ 19,90
     let tip = Money::new(500, Currency::BRL);    // R$ 5,00
 
-    let total = price + tip;
+    let total = price.checked_add(tip).unwrap();
 
     println!("Total: {}", total); // 24.90 BRL
 
