@@ -6,15 +6,29 @@ use printpdf::{
 use rust_decimal::Decimal;
 use sea_orm::QueryOrder;
 
-use crate::models::_entities::{addresses, order_items, orders, products, users};
+use crate::models::_entities::{addresses, admin_settings, order_items, orders, products, users};
 use crate::models::order_status::{OrderStatus, PaymentStatus};
 
-const STORE_NAME: &str = "Gilcierweb Store";
-const STORE_ADDRESS: &str = "Sao Paulo, SP - Brazil";
-const STORE_EMAIL: &str = "contact@gilcierweb.com";
 const PAGE_WIDTH_MM: f32 = 210.0;
 const MARGIN_LEFT_MM: f32 = 20.0;
 const MARGIN_RIGHT_MM: f32 = 20.0;
+
+#[derive(Debug, Clone)]
+pub struct StoreConfig {
+    pub name: String,
+    pub address: String,
+    pub email: String,
+}
+
+impl Default for StoreConfig {
+    fn default() -> Self {
+        Self {
+            name: "Gilcierweb Store".to_string(),
+            address: "Sao Paulo, SP - Brazil".to_string(),
+            email: "contact@gilcierweb.com".to_string(),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct InvoiceData {
@@ -22,6 +36,7 @@ pub struct InvoiceData {
     pub user: users::Model,
     pub items: Vec<InvoiceItem>,
     pub address: Option<addresses::Model>,
+    pub store: StoreConfig,
 }
 
 #[derive(Debug)]
@@ -30,6 +45,30 @@ pub struct InvoiceItem {
     pub quantity: i32,
     pub unit_price: Decimal,
     pub total: Decimal,
+}
+
+async fn get_setting(db: &impl ConnectionTrait, namespace: &str, key: &str, default: &str) -> String {
+    admin_settings::Entity::find()
+        .filter(admin_settings::Column::Namespace.eq(namespace))
+        .filter(admin_settings::Column::Key.eq(key))
+        .one(db)
+        .await
+        .ok()
+        .flatten()
+        .and_then(|s| s.value)
+        .unwrap_or_else(|| default.to_string())
+}
+
+async fn load_store_config(db: &impl ConnectionTrait) -> StoreConfig {
+    let name = get_setting(db, "store", "name", "Gilcierweb Store").await;
+    let address = get_setting(db, "store", "address", "Sao Paulo, SP - Brazil").await;
+    let email = get_setting(db, "store", "email", "contact@gilcierweb.com").await;
+
+    StoreConfig {
+        name,
+        address,
+        email,
+    }
 }
 
 fn format_currency(amount: Decimal) -> String {
@@ -111,11 +150,14 @@ pub async fn load_invoice_data(
         .one(db)
         .await?;
 
+    let store = load_store_config(db).await;
+
     Ok(InvoiceData {
         order,
         user,
         items,
         address,
+        store,
     })
 }
 
@@ -173,7 +215,7 @@ pub fn generate_invoice_pdf(data: &InvoiceData) -> Result<Vec<u8>> {
     let mut ops: Vec<Op> = Vec::new();
 
     // --- Header ---
-    ops.extend(text_op(STORE_NAME, 20.0, MARGIN_LEFT_MM, y, &font_bold));
+    ops.extend(text_op(&data.store.name, 20.0, MARGIN_LEFT_MM, y, &font_bold));
     y -= 6.0;
     ops.extend(text_op(
         "INVOICE / NOTA FISCAL",
@@ -420,7 +462,7 @@ pub fn generate_invoice_pdf(data: &InvoiceData) -> Result<Vec<u8>> {
     ));
     y -= 6.0;
     ops.extend(text_op(
-        &format!("{STORE_NAME} - {STORE_ADDRESS}"),
+        &format!("{} - {}", data.store.name, data.store.address),
         8.0,
         MARGIN_LEFT_MM,
         y,
@@ -428,7 +470,7 @@ pub fn generate_invoice_pdf(data: &InvoiceData) -> Result<Vec<u8>> {
     ));
     y -= 4.0;
     ops.extend(text_op(
-        &format!("{STORE_EMAIL} | This is a system-generated invoice."),
+        &format!("{} | This is a system-generated invoice.", data.store.email),
         8.0,
         MARGIN_LEFT_MM,
         y,
