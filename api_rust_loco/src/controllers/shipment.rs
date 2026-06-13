@@ -127,7 +127,7 @@ pub async fn bulk_export(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(zip_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
 
 pub fn admin_routes() -> Routes {
@@ -178,7 +178,7 @@ pub async fn label(Path(shipment_id): Path<i32>, State(ctx): State<AppContext>) 
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(pdf_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
 
 pub fn account_routes() -> Routes {
@@ -244,5 +244,5 @@ pub async fn account_label(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(pdf_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
