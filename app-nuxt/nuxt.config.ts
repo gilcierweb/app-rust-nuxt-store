@@ -260,6 +260,7 @@ export default defineNuxtConfig({
       contentSecurityPolicy: {
         'default-src': ["'self'"],
         'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'"],
+        'script-src-attr': "'unsafe-inline'",
         'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com', 'https://picsum.photos', 'https://fastly.picsum.photos', 'https://images.unsplash.com'],
         'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
         'font-src': ["'self'", "https://cdnjs.cloudflare.com"],

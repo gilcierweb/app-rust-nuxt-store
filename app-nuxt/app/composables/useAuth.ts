@@ -2,7 +2,6 @@ import type { LoginResponse, CurrentResponse, AdminSectionsResponse } from '~/ty
 
 export const useAuth = () => {
   const { apiFetch } = useApi()
-  const { t } = useI18n()
 
   const user = useState<CurrentResponse | null>('auth_user', () => null)
   const adminSections = useState<string[]>('auth_admin_sections', () => [])
@@ -38,7 +37,8 @@ export const useAuth = () => {
 
       return data
     } catch (err: any) {
-      const message = err?.data?.message || err?.message || t('auth.login.error.generic')
+      const { $i18n } = useNuxtApp()
+      const message = err?.data?.message || err?.message || ($i18n as any).t('auth.login.error.generic')
       error.value = message
       throw err
     } finally {
@@ -56,7 +56,8 @@ export const useAuth = () => {
         body: { name, email, password }
       })
     } catch (err: any) {
-      const message = err?.data?.message || err?.message || t('auth.register.errors.generic')
+      const { $i18n } = useNuxtApp()
+      const message = err?.data?.message || err?.message || ($i18n as any).t('auth.register.errors.generic')
       error.value = message
       throw err
     } finally {
@@ -130,7 +131,8 @@ export const useAuth = () => {
         body: { email }
       })
     } catch (err: any) {
-      const message = err?.data?.message || err?.message || t('auth.forgotPassword.error.generic')
+      const { $i18n } = useNuxtApp()
+      const message = err?.data?.message || err?.message || ($i18n as any).t('auth.forgotPassword.error.generic')
       error.value = message
       throw err
     } finally {
@@ -148,7 +150,8 @@ export const useAuth = () => {
         body: { token, password }
       })
     } catch (err: any) {
-      const message = err?.data?.message || err?.message || t('auth.resetPassword.error.generic')
+      const { $i18n } = useNuxtApp()
+      const message = err?.data?.message || err?.message || ($i18n as any).t('auth.resetPassword.error.generic')
       error.value = message
       throw err
     } finally {
