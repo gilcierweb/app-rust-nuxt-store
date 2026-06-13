@@ -823,7 +823,7 @@ pub async fn bulk_export(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(zip_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
 
 pub fn routes() -> Routes {
