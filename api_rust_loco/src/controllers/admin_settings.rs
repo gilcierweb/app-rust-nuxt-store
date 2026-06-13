@@ -23,6 +23,7 @@ struct SettingDefinition {
     label: &'static str,
     value_type: i16,
     default_value: &'static str,
+    env_key: Option<&'static str>,
 }
 
 const SETTINGS: &[SettingDefinition] = &[
@@ -32,6 +33,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Store Name",
         value_type: VALUE_TYPE_STRING,
         default_value: "App Rust Nuxt Store",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "general",
@@ -39,6 +41,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Support Email",
         value_type: VALUE_TYPE_STRING,
         default_value: "support@example.com",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "general",
@@ -46,6 +49,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Default Currency",
         value_type: VALUE_TYPE_STRING,
         default_value: "BRL",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "seo",
@@ -53,6 +57,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Meta Title",
         value_type: VALUE_TYPE_STRING,
         default_value: "App Rust Nuxt Store",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "seo",
@@ -60,13 +65,15 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Meta Description",
         value_type: VALUE_TYPE_STRING,
         default_value: "Modern ecommerce store powered by Rust and Nuxt.",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "api",
         key: "public_base_url",
         label: "Public Base URL",
         value_type: VALUE_TYPE_STRING,
-        default_value: "http://localhost:5150",
+        default_value: "",
+        env_key: Some("PUBLIC_BASE_URL"),
     },
     SettingDefinition {
         namespace: "notifications",
@@ -74,6 +81,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Order Emails",
         value_type: VALUE_TYPE_BOOLEAN,
         default_value: "false",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "notifications",
@@ -81,6 +89,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Shipping Emails",
         value_type: VALUE_TYPE_BOOLEAN,
         default_value: "false",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "security",
@@ -88,6 +97,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Admin API Keys",
         value_type: VALUE_TYPE_BOOLEAN,
         default_value: "false",
+        env_key: None,
     },
     SettingDefinition {
         namespace: "security",
@@ -95,6 +105,7 @@ const SETTINGS: &[SettingDefinition] = &[
         label: "Allowed Email Domains for Magic Link",
         value_type: VALUE_TYPE_STRING,
         default_value: "example.com,gmail.com",
+        env_key: None,
     },
 ];
 
@@ -140,6 +151,17 @@ fn group_label(namespace: &str) -> &'static str {
         "security" => "Security",
         _ => "Settings",
     }
+}
+
+fn resolve_default(definition: SettingDefinition) -> String {
+    if let Some(env_key) = definition.env_key {
+        if let Ok(val) = std::env::var(env_key) {
+            if !val.is_empty() {
+                return val;
+            }
+        }
+    }
+    definition.default_value.to_string()
 }
 
 fn setting_definition(namespace: &str, key: &str) -> Option<SettingDefinition> {
@@ -190,7 +212,7 @@ async fn settings_response(ctx: &AppContext) -> Result<SettingsJson> {
                     let value = values
                         .get(&(setting.namespace.to_string(), setting.key.to_string()))
                         .cloned()
-                        .unwrap_or_else(|| setting.default_value.to_string());
+                        .unwrap_or_else(|| resolve_default(*setting));
 
                     SettingJson {
                         namespace: setting.namespace.to_string(),
