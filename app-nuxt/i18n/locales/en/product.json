@@ -55,7 +55,16 @@
     "reviewError": "Error submitting review",
     "outOfStock": "Out of Stock",
     "lowStock": "Only {count} left in stock",
-    "inStock": "In Stock"
+    "inStock": "In Stock",
+    "uncategorized": "Uncategorized",
+    "reviewCount": "({count} reviews)",
+    "variantFallback": "Variant",
+    "warranty": "2 Year Warranty",
+    "reviewSummary": "Based on {count} reviews",
+    "titlePlaceholder": "Excellent product!",
+    "commentPlaceholder": "Share your experience with this item...",
+    "unknownProduct": "Unknown Product",
+    "errorSubmittingReview": "Error submitting review"
   },
   "productCard": {
     "addToCart": "Add to Cart",

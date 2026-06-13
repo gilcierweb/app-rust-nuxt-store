@@ -55,7 +55,16 @@
     "reviewError": "Error al enviar la evaluación",
     "outOfStock": "Agotado",
     "lowStock": "Solo quedan {count} unidades",
-    "inStock": "En Stock"
+    "inStock": "En Stock",
+    "uncategorized": "Sin Categoria",
+    "reviewCount": "({count} evaluaciones)",
+    "variantFallback": "Variante",
+    "warranty": "Garantia de 2 Anos",
+    "reviewSummary": "Basado en {count} evaluaciones",
+    "titlePlaceholder": "¡Producto excelente!",
+    "commentPlaceholder": "Comparta su experiencia con este item...",
+    "unknownProduct": "Producto Desconocido",
+    "errorSubmittingReview": "Error al enviar la evaluación"
   },
   "productCard": {
     "addToCart": "Agregar al Carrito",

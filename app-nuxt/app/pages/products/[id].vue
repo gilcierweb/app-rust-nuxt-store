@@ -51,11 +51,11 @@
         <div class="flex flex-col">
           <div class="mb-8">
             <div class="flex items-center gap-3 mb-4">
-              <span class="badge badge-primary badge-soft rounded-lg px-3 py-3 font-bold">{{ productApi.category?.name || 'Uncategorized' }}</span>
+              <span class="badge badge-primary badge-soft rounded-lg px-3 py-3 font-bold">{{ productApi.category?.name || t('product.uncategorized') }}</span>
               <div class="flex items-center gap-1 text-warning">
                 <span class="icon-[tabler--star-filled] size-4"></span>
                 <span class="text-sm font-black text-base-content">4.8</span>
-                <span class="text-xs text-base-content/40">(120 reviews)</span>
+                <span class="text-xs text-base-content/40">{{ t('product.reviewCount', { count: 120 }) }}</span>
               </div>
             </div>
             <h1 class="h1 mb-4">{{ productApi.name }}</h1>
@@ -78,7 +78,7 @@
                 class="px-6 py-3 rounded-2xl border-2 transition-all duration-300 font-bold"
                 :class="selectedVariantId === v.id ? 'border-primary bg-primary/5 text-primary ring-4 ring-primary/10' : 'border-base-200 hover:border-base-300'"
               >
-                {{ v.name || `${v.sku || 'Variant'}` }}
+                {{ v.name || `${v.sku || t('product.variantFallback')}` }}
               </button>
             </div>
           </div>
@@ -125,7 +125,7 @@
             </div>
             <div class="flex items-center gap-3 p-4 bg-base-200/50 rounded-2xl">
               <span class="icon-[tabler--shield-check] text-primary size-5"></span>
-              <span class="text-xs font-bold">2 Year Warranty</span>
+              <span class="text-xs font-bold">{{ t('product.warranty') }}</span>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@
               <div class="flex justify-center text-warning my-4">
                 <span v-for="n in 5" :key="n" class="icon-[tabler--star-filled] size-6"></span>
               </div>
-              <p class="text-base-content/40 font-bold uppercase tracking-widest text-xs">Based on 120 reviews</p>
+              <p class="text-base-content/40 font-bold uppercase tracking-widest text-xs">{{ t('product.reviewSummary', { count: 120 }) }}</p>
             </div>
           </div>
 
@@ -188,11 +188,11 @@
                 </div>
                 <div class="form-control">
                   <label class="form-label">{{ t('product.reviewTitle') }}</label>
-                  <input v-model="reviewForm.title" type="text" placeholder="Excellent product!" class="input input-lg bg-base-200/50 border-none rounded-2xl" />
+                  <input v-model="reviewForm.title" type="text" :placeholder="t('product.titlePlaceholder')" class="input input-lg bg-base-200/50 border-none rounded-2xl" />
                 </div>
                 <div class="form-control">
                   <label class="form-label">{{ t('product.reviewComment') }}</label>
-                  <textarea v-model="reviewForm.comment" class="textarea bg-base-200/50 border-none rounded-2xl min-h-32 p-4" placeholder="Share your experience with this item..."></textarea>
+                  <textarea v-model="reviewForm.comment" class="textarea bg-base-200/50 border-none rounded-2xl min-h-32 p-4" :placeholder="t('product.commentPlaceholder')"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg w-full rounded-2xl shadow-lg shadow-primary/10 h-14" :disabled="reviewSubmitting">
                   <span v-if="reviewSubmitting" class="loading loading-spinner loading-sm mr-2"></span>
@@ -296,7 +296,7 @@ function addToCartApi(product: ProductApi) {
   
   addItemSync({
     productId: product.id,
-    name: product.name ?? 'Unknown Product',
+    name: product.name ?? t('product.unknownProduct'),
     price: selectedPrice.value,
     image: (product.images?.[0]?.image ?? ''),
     slug: (product.slug ?? ''),
@@ -345,7 +345,7 @@ async function submitReview() {
     reviewForm.comment = ''
     await refreshReviews()
   } catch (err: any) {
-    reviewError.value = err?.data?.message || err?.message || 'Erro ao enviar avaliação'
+    reviewError.value = err?.data?.message || err?.message || t('product.errorSubmittingReview')
   } finally {
     reviewSubmitting.value = false
   }
