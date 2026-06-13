@@ -24,12 +24,12 @@ const props = withDefaults(defineProps<Props>(), {
   loading: 'lazy',
 })
 
+const config = useRuntimeConfig()
 const loaded = ref(false)
 
 const imageSrc = computed(() => {
-  // Se for path relativo do DummyJSON, construir URL completa
   if (props.src && !props.src.startsWith('http') && !props.src.startsWith('/')) {
-    return `https://cdn.dummyjson.com/product-images/${props.src}`
+    return `${config.public.cdnBaseUrl}/${props.src}`
   }
   return props.src
 })

@@ -59,7 +59,8 @@ export default defineNuxtConfig({
     public: {
       ApiBaseUrl: '',
       baseURL: '', // Deixar vazio para forçar requisições relativas no front-end
-      stripePublishableKey: process.env.NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
+      stripePublishableKey: process.env.NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+      cdnBaseUrl: process.env.NUXT_PUBLIC_CDN_BASE_URL || 'https://cdn.dummyjson.com/product-images',
     }
   },
   
