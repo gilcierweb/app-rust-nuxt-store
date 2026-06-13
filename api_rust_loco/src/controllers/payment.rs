@@ -188,7 +188,7 @@ pub async fn bulk_export(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(zip_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
 
 pub fn admin_routes() -> Routes {
@@ -372,7 +372,7 @@ pub async fn account_receipt(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(pdf_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
 
 #[debug_handler]
@@ -403,5 +403,5 @@ pub async fn admin_receipt(
             format!("attachment; filename=\"{filename}\""),
         )
         .body(axum::body::Body::from(pdf_bytes))
-        .unwrap())
+        .map_err(|e| loco_rs::Error::string(&format!("Response build error: {e}")))?)
 }
