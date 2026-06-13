@@ -21,7 +21,7 @@ impl BackgroundWorker<WorkerArgs> for Worker {
         Self { ctx: ctx.clone() }
     }
     async fn perform(&self, _args: WorkerArgs) -> Result<()> {
-        println!("=================PaymentWebhookRetry=======================");
+        tracing::info!("PaymentWebhookRetry worker started");
         let db = &self.ctx.db;
 
         // Find failed events that have valid signatures and haven't been processed
@@ -36,7 +36,7 @@ impl BackgroundWorker<WorkerArgs> for Worker {
             .await?;
 
         for event in failed_events {
-            println!("Retrying webhook event {}...", event.id);
+            tracing::info!(event_id = event.id, "Retrying failed webhook event");
             let event_id = event.id;
             if let Ok(Some(gateway)) =
                 payment_gateways::Entity::find_by_id(event.payment_gateway_id)

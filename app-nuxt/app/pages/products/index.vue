@@ -18,7 +18,7 @@
           </div>
         </div>
         <button class="btn btn-square btn-ghost lg:hidden" 
-          onclick="document.getElementById('filter-drawer').classList.toggle('overlay-open')"
+          @click="toggleFilterDrawer"
           aria-haspopup="dialog" aria-expanded="false" aria-controls="filter-drawer">
           <span class="icon-[tabler--filter] size-6"></span>
         </button>
@@ -142,4 +142,8 @@ useSeoMeta({
 })
 
 const categories = ['Fashion', 'Technology', 'Books', 'Home', 'Vehicles', 'Art']
+
+function toggleFilterDrawer() {
+  document.getElementById('filter-drawer')?.classList.toggle('overlay-open')
+}
 </script>

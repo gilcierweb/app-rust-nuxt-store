@@ -40,8 +40,6 @@ export default defineNuxtConfig({
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "App Rust Nuxt Store" },
         { name: "twitter:card", content: "summary_large_image" },
-        // CSP desabilitado para desenvolvimento - reabilitar em produção
-        // { "http-equiv": "Content-Security-Policy", content: "default-src 'self' 'unsafe-inline' 'unsafe-eval' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: *; worker-src 'self' blob: data:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com *; img-src 'self' data: * https://cdn.flyonui.com https://dummyjson.com https://cdn.dummyjson.com; font-src 'self' https://cdnjs.cloudflare.com *; connect-src 'self' http://localhost:5150 https://dummyjson.com https://cdn.dummyjson.com *;" },
       ],
       link: [
         { rel: "canonical", href: "https://app-rust-nuxt-store.com" },
@@ -256,15 +254,16 @@ export default defineNuxtConfig({
       methodsToProtect: ['POST', 'PUT', 'PATCH', 'DELETE'],
       headerName: 'x-nuxt-csrf-token',
     },
+    nonce: true,
     headers: {
       contentSecurityPolicy: {
         'default-src': ["'self'"],
-        'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-        'script-src-attr': ["'self'", "'unsafe-inline'"],
+        'script-src': ["'self'", "'strict-dynamic'", "'nonce-{{nonce}}'"],
+        'script-src-attr': ["'none'"],
         'img-src': ["'self'", 'data:', 'https://cdn.flyonui.com', 'https://dummyjson.com', 'https://cdn.dummyjson.com', 'https://picsum.photos', 'https://fastly.picsum.photos', 'https://images.unsplash.com'],
         'style-src': ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
         'font-src': ["'self'", "https://cdnjs.cloudflare.com"],
-        'connect-src': ["'self'", "http://localhost:5150", "https://dummyjson.com", "https://cdn.dummyjson.com", "https://romantic-freedom-production-386f.up.railway.app", "https://picsum.photos", "https://fastly.picsum.photos"],
+        'connect-src': ["'self'", process.env.NUXT_API_RUST_BASE_URL || process.env.API_RUST_BASE_URL || 'http://localhost:5150', "https://picsum.photos", "https://fastly.picsum.photos"],
         'worker-src': ["'self'", 'blob:'],
         'child-src': ["'self'", 'blob:'],
       }
